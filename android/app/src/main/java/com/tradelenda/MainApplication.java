@@ -1,4 +1,4 @@
-package com.tradelenda;
+package com.tradelenda.app;
 
 import android.app.Application;
 import com.facebook.react.PackageList;
