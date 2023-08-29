@@ -1,24 +1,17 @@
-import React, {useEffect, useState, useRef, useCallback} from 'react';
+/* eslint-disable react-native/no-inline-styles */
+import React, {useEffect, useState, useRef} from 'react';
 import {
   Button,
   Platform,
-  SafeAreaView,
   ScrollView,
   StatusBar,
   StyleSheet,
   Text,
-  useColorScheme,
   View,
   AppState,
+  LogBox,
 } from 'react-native';
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
 import SplashScreen from 'react-native-splash-screen';
 import SpInAppUpdates, {
   NeedsUpdateResponse,
@@ -28,42 +21,42 @@ import SpInAppUpdates, {
 import {version} from './app.json';
 import Toast from 'react-native-toast-message';
 import {useAsyncStorage} from '@react-native-async-storage/async-storage';
-import EnterPinScreen from './src/screens/EnterPinScreen';
+import AppCenter from 'appcenter';
+import Analytics from 'appcenter-analytics';
+import Crashes from 'appcenter-crashes';
+import {
+  DatadogProviderConfiguration,
+  DatadogProvider,
+} from '@datadog/mobile-react-native';
+// import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
+import AppNavigationContainer from './src/navigation';
+import {SafeAreaProvider} from 'react-native-safe-area-context';
+import {Provider as PaperProvider, MD3LightTheme} from 'react-native-paper';
 
-const inAppUpdates = new SpInAppUpdates(true);
+const inAppUpdates = new SpInAppUpdates(false);
+LogBox.ignoreAllLogs();
+AppCenter.setLogLevel(AppCenter.LogLevel.VERBOSE);
+Analytics.setEnabled(true);
+Crashes.setEnabled(true);
 
-function Section({children, title}) {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
-}
+const datadogConfiguration = new DatadogProviderConfiguration(
+  'pub8927d4ff6dd483f142a70688c6e5fb7f',
+  'prod',
+  '6848aa7b-c6b5-4797-b087-8aad30149ece',
+  true, // track User interactions (e.g.: Tap on buttons. You can use 'accessibilityLabel' element property to give tap action the name, otherwise element type will be reported)
+  true, // track XHR Resources
+  true, // track Errors
+);
+// Optional: Select your Datadog website (one of "US", "EU" or "GOV")
+datadogConfiguration.site = 'US';
+// Optional: enable or disable native crash reports
+datadogConfiguration.nativeCrashReportEnabled = true;
+// Optional: sample RUM sessions (here, 80% of session will be sent to Datadog. Default = 100%)
+datadogConfiguration.sampleRate = 80;
 
 function App() {
-  const isDarkMode = useColorScheme() === 'dark';
+  // const insets = useSafeAreaInsets();
 
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
   const appMainState = useRef(AppState.currentState);
   const [appState, setAppState] = useState(appMainState.current);
   const [isLocked, setIsLocked] = useState('');
@@ -94,7 +87,7 @@ function App() {
   const showToast = () => {
     Toast.show({
       type: 'success', // "success", "error", "info", "warning"
-      position: 'top', // "top" or "bottom"
+      position: 'bottom', // "top" or "bottom"
       bottomOffset: 20,
       text1: 'Toast Message',
       text2: 'This is a toast message.',
@@ -120,28 +113,9 @@ function App() {
             updateType: IAUUpdateKind.FLEXIBLE,
           },
         });
-        // Toast.show({
-        //   type: 'info', // "success", "error", "info", "warning"
-        //   position: 'top', // "top" or "bottom"
-        //   bottomOffset: 20,
-        //   text1: 'App Update',
-        //   text2: `${result.reason.split(": 1 means there's")[1]}`,
-        //   visibilityTime: 3000,
-        //   autoHide: false,
-        //   onPress: () => Toast.hide(),
-        // });
+
+        console.log(result);
         inAppUpdates.startUpdate(updateOptions);
-      } else {
-        // Toast.show({
-        //   type: 'info', // "success", "error", "info", "warning"
-        //   position: 'top', // "top" or "bottom"
-        //   bottomOffset: 20,
-        //   text1: 'App Update',
-        //   text2: `${result.reason.split(": 1 means there's")[1]}`,
-        //   visibilityTime: 3000,
-        //   autoHide: false,
-        //   onPress: () => Toast.hide(),
-        // });
       }
     });
   }, []);
@@ -152,9 +126,11 @@ function App() {
       if (appState === 'active' && nextAppState.match(/inactive|background/)) {
         // App becomes inactive or goes to background
         const lockTimer = setTimeout(async () => {
-          setIsLocked(true);
-          writeItemToStorage('true');
-        }, 3000); // Lock after 30 seconds of inactivity
+          // setIsLocked(true);
+          // writeItemToStorage('true');
+          setIsLocked(false);
+          writeItemToStorage('false');
+        }, 30000); // Lock after 30 seconds of inactivity
 
         return () => clearTimeout(lockTimer);
       } else if (
@@ -184,72 +160,51 @@ function App() {
     writeItemToStorage(isLocked === 'true' ? 'false' : 'true');
   };
 
-  return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      {isLocked && isLocked === 'true' ? (
-        <View
-          style={{
-            justifyContent: 'center',
-            alignItems: 'center',
-            alignContent: 'center',
-          }}>
-          <Text>Locked: Reauthentication Required</Text>
+  const theme = {
+    ...MD3LightTheme, // or MD3DarkTheme
+    roundness: 2,
+    colors: {
+      ...MD3LightTheme.colors,
+      primary: '#3498db',
+      secondary: '#f1c40f',
+      tertiary: '#a1b2c3',
+      secondaryContainer: '#054B99',
+    },
+  };
 
-          <Button title="Toggle Lock" onPress={toggleLock} />
-        </View>
-      ) : (
-        <ScrollView
-          contentInsetAdjustmentBehavior="automatic"
-          style={backgroundStyle}>
-          <Header />
-          <View>
-            <Button title="Show Toast" onPress={showToast} />
-          </View>
-          <View
-            style={{
-              backgroundColor: isDarkMode ? Colors.black : Colors.white,
-            }}>
-            <Section title="Step One">
-              Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-              screen and then come back to see your edits.
-            </Section>
-            <Section title="See Your Changes">
-              <ReloadInstructions />
-            </Section>
-            <Section title="Debug">
-              <DebugInstructions />
-            </Section>
-            <Section title="Learn More">
-              Read the docs to discover what to do next:
-            </Section>
-            <LearnMoreLinks />
-          </View>
-        </ScrollView>
-      )}
-    </SafeAreaView>
+  return (
+    <SafeAreaProvider style={styles.rootContainer}>
+      <PaperProvider theme={theme}>
+        <DatadogProvider configuration={datadogConfiguration}>
+          <StatusBar translucent={true} />
+          {isLocked && isLocked === 'true' ? (
+            <View
+              style={{
+                justifyContent: 'center',
+                alignItems: 'center',
+                alignContent: 'center',
+              }}>
+              <Text>Locked: Reauthentication Required</Text>
+
+              <Button title="Toggle Lock" onPress={toggleLock} />
+            </View>
+          ) : (
+            <View style={styles.container}>
+              <AppNavigationContainer />
+            </View>
+          )}
+        </DatadogProvider>
+      </PaperProvider>
+    </SafeAreaProvider>
   );
 }
 
 const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
+  rootContainer: {
+    flex: 1,
   },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
+  container: {
+    flex: 1,
   },
 });
 

@@ -1,5 +1,6 @@
 apply plugin: "com.android.application"
 apply plugin: "com.facebook.react"
+apply from: file("../../node_modules/react-native-vector-icons/fonts.gradle")
 // apply plugin: 'com.google.gms.google-services'
 
 /**
@@ -79,8 +80,8 @@ android {
         applicationId 'com.tradelenda.app'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionName "2.5.2"
-        versionCode 29
+        versionName "2.5.1"
+        versionCode 23
     }
     signingConfigs {
         debug {
