@@ -23,7 +23,15 @@ import Input from '../../component/inputField/input.component';
 import Loader from '../../component/loader/loader';
 import Button from '../../component/buttons/Button';
 import COLORS from '../../constants/colors';
-import firebase from '../../util/firebase/firebaseConfig';
+import {auth} from '../../util/firebase/firebaseConfig';
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  sendEmailVerification,
+  signOut,
+  updateProfile,
+  sendPasswordResetEmail,
+} from 'firebase/auth';
 // import {StoreContext} from '../../config/mobX stores/RootStore';
 // import {auth} from '../../config/firebase/firebase';
 // import useAuth from '../../config/hooks/useAuth';
@@ -64,15 +72,23 @@ const Login = () => {
     // authStore.handleLogin(userDetails);
 
     const {email, password} = userDetails;
-    await firebase
-      .auth()
-      .signInWithEmailAndPassword(email, password)
-      .then(res => {
-        console.log(res);
-      })
-      .catch(err => {
-        console.log(err);
-      });
+    // await signOut();
+    // await signInWithEmailAndPassword(auth, email, password)
+    //   .then(res => {
+    //     console.log(res);
+    //   })
+    //   .catch(err => {
+    //     console.log(err);
+    //   });
+    // await firebase
+    //   .auth()
+    //   .signInWithEmailAndPassword(email, password)
+    //   .then(res => {
+    //     console.log(res);
+    //   })
+    //   .catch(err => {
+    //     console.log(err);
+    //   });
   };
 
   const validate = async () => {
@@ -96,6 +112,7 @@ const Login = () => {
     if (isValid) {
       // console.log(userDetails);
       // login();
+      handleLogin();
     }
   };
 
@@ -227,7 +244,7 @@ const Login = () => {
                 <Button
                   title="Log In"
                   onPress={validate}
-                  disabled={disableit}
+                  // disabled={disableit}
                 />
 
                 <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>

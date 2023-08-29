@@ -1,6 +1,10 @@
-import firebase from 'react-native-firebase';
-// import firebase from '@react-native-firebase/app';
-// import auth from '@react-native-firebase/auth';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {initializeApp} from 'firebase/app';
+// import {
+//   initializeAuth,
+//   getReactNativePersistence,
+// } from 'firebase/auth/react-native';
+import {initializeAuth, getReactNativePersistence} from 'firebase/auth';
 import firebase_config from '../../../app.json';
 
 const firebaseConfig = {
@@ -20,9 +24,9 @@ const firebaseConfig = {
   appId: '1:1046946781296:web:2915787620c19ca662fcb5',
   measurementId: 'G-1JEE8QKLC7',
 };
+const app = initializeApp(firebaseConfig);
+const auth = initializeAuth(app, {
+  persistence: getReactNativePersistence(AsyncStorage),
+});
 
-if (!firebase.apps.length) {
-  firebase.initializeApp(firebaseConfig);
-}
-
-export default firebase;
+export {auth};
