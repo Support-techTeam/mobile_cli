@@ -16,9 +16,9 @@ import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 import KeyboardAvoidingWrapper from '../../component/KeyBoardAvoiding/keyBoardAvoiding';
 import Input from '../../component/inputField/input.component';
 import Button from '../../component/buttons/Button';
-// import CustomInput from '../../component/custominput/CustomInput';
-// import {StoreContext} from '../../config/mobX stores/RootStore';
-// import {observer} from 'mobx-react-lite';
+import {forgotPassword} from '../../stores/AuthStore';
+import Toast from 'react-native-toast-message';
+
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
 const ForgotPassword = () => {
@@ -29,9 +29,35 @@ const ForgotPassword = () => {
   const [userDetails, setUserDetails] = useState({
     email: '',
   });
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleForgotPassword = () => {
-    // authStore.ForgotPassword(userDetails);
+  const handleForgotPassword = async () => {
+    setIsLoading(true);
+    const res = await forgotPassword(userDetails.email);
+    if (res.error) {
+      Toast.show({
+        type: 'error',
+        position: 'top',
+        topOffset: 50,
+        text1: res.title,
+        text2: res.message,
+        visibilityTime: 3000,
+        autoHide: true,
+        onPress: () => Toast.hide(),
+      });
+    } else {
+      Toast.show({
+        type: 'success',
+        position: 'top',
+        topOffset: 50,
+        text1: res.title,
+        text2: res.message,
+        visibilityTime: 3000,
+        autoHide: true,
+        onPress: () => Toast.hide(),
+      });
+    }
+    setIsLoading(false);
   };
 
   const validate = async () => {
@@ -44,6 +70,7 @@ const ForgotPassword = () => {
       isValid = false;
     }
     if (isValid) {
+      handleForgotPassword();
     }
   };
 
@@ -75,14 +102,14 @@ const ForgotPassword = () => {
           showsHorizontalScrollIndicator={false}
           showsVerticalScrollIndicator={false}
           style={{paddingHorizontal: 20}}>
-          {/* {sending && (
-          <Spinner
-            textContent={'Loading...'}
-            textStyle={{ color: 'white' }}
-            visible={true}
-            overlayColor="rgba(16, 17, 17, 0.7)"
-          />
-        )} */}
+          {isLoading && (
+            <Spinner
+              textContent={'Loading...'}
+              textStyle={{color: 'white'}}
+              visible={true}
+              overlayColor="rgba(16, 17, 17, 0.7)"
+            />
+          )}
           <KeyboardAvoidingWrapper>
             <View style={{marginBottom: 40}}>
               <View style={{alignItems: 'center'}}>
@@ -114,7 +141,7 @@ const ForgotPassword = () => {
                   borderWidth: 2,
                 }}>
                 <Input
-                  onChangeText={text => handleOnchange(text.trim(), 'email')}
+                  onChangeText={text => handleOnchange(text, 'email')}
                   onFocus={() => handleError(null, 'email')}
                   iconName="email-outline"
                   label="Email"
@@ -129,28 +156,6 @@ const ForgotPassword = () => {
                   onPress={validate}
                   disabled={!userDetails.email}
                 />
-                {/* <TouchableOpacity
-                  style={[
-                    styles.signUp,
-                    {
-                      backgroundColor: userDetails.email
-                        ? '#054B99'
-                        : '#6993C2',
-                    },
-                  ]}
-                  onPress={handleForgotPassword}
-                  disabled={!userDetails.email}>
-                  <Text
-                    style={{
-                      fontWeight: '700',
-                      color: '#fff',
-                      fontFamily: 'Montserat',
-                      fontSize: 18,
-                      lineHeight: 24,
-                    }}>
-                    Submit
-                  </Text>
-                </TouchableOpacity> */}
               </View>
             </View>
           </KeyboardAvoidingWrapper>

@@ -1,0 +1,266 @@
+/* eslint-disable no-shadow */
+/* eslint-disable react/no-unstable-nested-components */
+import { View, Text, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
+import React, { useState } from 'react';
+import { AntDesign } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
+import ProofofAdd from '../../../component/Idtypes/ProofOfAddress';
+import SignaturePad from '../../../component/CustomSignaturePad/AddDocsSign';
+
+const ITEM_HEIGHT = 100;
+
+const TobTabs = [
+  { name: 'Valid Identity', key: 'ValidIndentity' },
+  { name: 'Proof of Address', key: 'ProofOfAddress' },
+  { name: 'Bank Statement', key: 'BankStatement' },
+  { name: 'Passport', key: 'Passport' },
+  { name: 'Signature', key: 'Signature' },
+  { name: 'Company Seals', key: 'CompanySeals' },
+  { name: 'CAC', key: 'CAC' },
+  { name: 'Others', key: 'Others' },
+  { name: 'Submit All', key: 'SubmitDocs' },
+];
+
+const Signature = ({ route }) => {
+  const docsDetails = route?.params?.paramKey;
+
+  const userDocs = {
+    validIdentificationType:
+      docsDetails?.validIdentificationType === undefined
+        ? ''
+        : docsDetails?.validIdentificationType,
+    validIdentification:
+      docsDetails?.validIdentification === undefined ? '' : docsDetails?.validIdentification,
+    utilityBill: docsDetails?.utilityBill === undefined ? '' : docsDetails?.utilityBill,
+    bankStatement: docsDetails?.bankStatement === undefined ? '' : docsDetails?.bankStatement,
+    passport: docsDetails?.passport === undefined ? '' : docsDetails?.passport,
+    signature: docsDetails?.signature === undefined ? '' : docsDetails?.signature,
+    seal: docsDetails?.seal === undefined ? '' : docsDetails?.seal,
+    cac: docsDetails?.cac === undefined ? '' : docsDetails?.cac,
+  };
+
+  const activeTab = 'Signature';
+  const [index, setIndex] = useState(0);
+  const navigation = useNavigation();
+
+  const renderItem = ({ item }) => {
+    const isActive = item.key === activeTab;
+
+    return (
+      <View>
+        <View style={[styles.tobTab, isActive && styles.activeTab]}>
+          <Text style={[styles.tabText, isActive && styles.activeTabText]}>{item.name}</Text>
+        </View>
+      </View>
+    );
+  };
+
+  const FirstRoute = () => {
+    return (
+      <View style={{ flex: 1, marginHorizontal: 10 }}>
+        <SignaturePad deets={route} />
+      </View>
+    );
+  };
+
+  const SecondRoute = () => {
+    return (
+      <View
+        style={{
+          flex: 1,
+          marginHorizontal: 19,
+        }}
+      >
+        <View style={{ marginHorizontal: 10, marginVertical: 20 }}>
+          <ProofofAdd isSign={true} deets={route} />
+        </View>
+      </View>
+    );
+  };
+
+  const [routes] = useState([
+    { key: 'upload', title: 'UPLOAD' },
+    { key: 'draw', title: 'Draw' },
+  ]);
+  const renderScene = SceneMap({
+    upload: SecondRoute,
+    draw: FirstRoute,
+  });
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginHorizontal: 15,
+        }}
+      >
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <View
+            style={{
+              borderWidth: 0.5,
+              borderColor: '#D9DBE9',
+              borderRadius: 5,
+            }}
+          >
+            <AntDesign name="left" size={24} color="black" />
+          </View>
+        </TouchableOpacity>
+        <View style={styles.HeadView}>
+          <View style={styles.TopView}>
+            <Text style={styles.TextHead}>UPLOAD DOCUMENT</Text>
+          </View>
+        </View>
+        <View>
+          <Text> </Text>
+        </View>
+      </View>
+
+      <View style={styles.form}>
+        <Text style={styles.header}>Upload Signature</Text>
+      </View>
+      <View style={styles.innercontainer}>
+        <FlatList
+          data={TobTabs}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.key}
+          horizontal
+          scrollEnabled={true}
+          showsHorizontalScrollIndicator={false}
+          initialScrollIndex={4}
+          getItemLayout={(data, index) => ({
+            length: ITEM_HEIGHT,
+            offset: ITEM_HEIGHT * index,
+            index,
+          })}
+        />
+      </View>
+
+      <TabView
+        navigationState={{
+          index,
+          routes,
+        }}
+        renderScene={renderScene}
+        onIndexChange={setIndex}
+        tabBarPosition="top"
+        swipeEnabled={false}
+        renderTabBar={(props) => (
+          <TabBar
+            {...props}
+            // tabStyle={styles.tabBar}
+            labelStyle={styles.label}
+            indicatorStyle={styles.indicator}
+            style={styles.tabBar}
+            renderLabel={({ route, focused }) => (
+              <Text style={[styles.tabText2, focused && { color: '#054B99' }]}>{route.title}</Text>
+            )}
+            // contentContainerStyle={styles.tabBar}
+          />
+        )}
+      />
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginVertical: 16,
+          marginHorizontal: 16,
+        }}
+      >
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <View style={[styles.tobTab, { backgroundColor: '#054B99' }]}>
+            <Text style={[styles.tabText, { color: 'white' }]}>Prev.</Text>
+          </View>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={() => navigation.navigate('CompanySeals', { paramKey: userDocs })}
+        >
+          <View style={[styles.tobTab, { backgroundColor: '#054B99' }]}>
+            <Text style={[styles.tabText, { color: 'white' }]}>Skip</Text>
+          </View>
+        </TouchableOpacity>
+      </View>
+    </SafeAreaView>
+  );
+};
+
+export default Signature;
+const styles = StyleSheet.create({
+  innercontainer: {
+    marginTop: 16,
+    marginHorizontal: 19,
+  },
+  tobTab: {
+    borderWidth: 1,
+    borderColor: '#D9DBE9',
+    borderRadius: 5,
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    marginHorizontal: 2,
+  },
+  tabText: {
+    fontFamily: 'Montserat',
+    fontSize: 12,
+    fontWeight: '600',
+    textAlign: 'center',
+  },
+  tabText2: {
+    fontFamily: 'MontSBold',
+    fontSize: 14,
+    textAlign: 'center',
+  },
+  TextHead: {
+    fontFamily: 'Montserat',
+    fontWeight: '700',
+    fontSize: 16,
+    lineHeight: 24,
+    letterSpacing: 0.4,
+  },
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  form: {
+    alignItems: 'center',
+    marginVertical: 16,
+  },
+  header: {
+    fontFamily: 'Montserat',
+    fontSize: 20,
+    fontWeight: '700',
+    letterSpacing: 1,
+    color: '#14142B',
+  },
+  tabBar: {
+    backgroundColor: '#fff',
+    marginTop: 20,
+    borderWidth: 0,
+  },
+  indicator: {
+    backgroundColor: '#054B99',
+  },
+  label: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: 'black',
+    fontFamily: 'Montserat',
+  },
+  camHead: {
+    fontFamily: 'Montserat',
+    fontSize: 14,
+    fontWeight: '400',
+  },
+  activeTabText: {
+    color: 'white',
+  },
+  activeTab: {
+    backgroundColor: '#054B99',
+  },
+});

@@ -4,7 +4,6 @@ import {AppRegistry, Text, View} from 'react-native';
 import App from './App';
 import {name as appName} from './app.json';
 import Toast, {BaseToast, ErrorToast} from 'react-native-toast-message';
-import {SafeAreaProvider} from 'react-native-safe-area-context';
 
 const toastConfig = {
   success: props => (

@@ -33,6 +33,10 @@ import AppNavigationContainer from './src/navigation';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {Provider as PaperProvider, MD3LightTheme} from 'react-native-paper';
 
+import {Provider} from 'react-redux';
+import {PersistGate} from 'redux-persist/integration/react';
+import {persistor, store} from './src/util/redux/store';
+
 const inAppUpdates = new SpInAppUpdates(false);
 LogBox.ignoreAllLogs();
 AppCenter.setLogLevel(AppCenter.LogLevel.VERBOSE);
@@ -61,7 +65,6 @@ function App() {
   const [appState, setAppState] = useState(appMainState.current);
   const [isLocked, setIsLocked] = useState('');
   const {getItem, setItem} = useAsyncStorage('@lockState');
-
   useEffect(() => {
     if (Platform.OS === 'android') {
       if (isLocked !== '') {
@@ -190,7 +193,11 @@ function App() {
             </View>
           ) : (
             <View style={styles.container}>
-              <AppNavigationContainer />
+              <Provider store={store}>
+                <PersistGate persistor={persistor} loading={null}>
+                  <AppNavigationContainer />
+                </PersistGate>
+              </Provider>
             </View>
           )}
         </DatadogProvider>

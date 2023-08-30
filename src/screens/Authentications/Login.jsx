@@ -23,41 +23,27 @@ import Input from '../../component/inputField/input.component';
 import Loader from '../../component/loader/loader';
 import Button from '../../component/buttons/Button';
 import COLORS from '../../constants/colors';
-import {auth} from '../../util/firebase/firebaseConfig';
-import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  sendEmailVerification,
-  signOut,
-  updateProfile,
-  sendPasswordResetEmail,
-} from 'firebase/auth';
-// import {StoreContext} from '../../config/mobX stores/RootStore';
-// import {auth} from '../../config/firebase/firebase';
-// import useAuth from '../../config/hooks/useAuth';
-
-// const { StatusBarManager } = NativeModules;
-const image = {
-  // uri: 'https://media.geeksforgeeks.org/wp-content/uploads/20220217151648/download3.png',
-};
+import {userLogin} from '../../stores/AuthStore';
+import {useDispatch, useSelector} from 'react-redux';
+import {signInUser} from '../../util/redux/userAuth/user.auth.slice';
+import Toast from 'react-native-toast-message';
 
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
 const Login = () => {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
-  const [hidePassword, setHidePassword] = useState(true);
-  // const {authStore} = useContext(StoreContext);
-  // const {success, error, sending} = authStore;
   const [userMail, setUserMail] = useState(null);
   const [error, setError] = useState('');
   const [errors, setErrors] = React.useState({});
-  // const {user} = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
 
   const [userDetails, setUserDetails] = useState({
     email: '',
     password: '',
   });
+
+  const dispatch = useDispatch();
 
   useEffect(() => {
     setUserDetails({
@@ -69,30 +55,37 @@ const Login = () => {
   const disableit = !userDetails.email || !userDetails.password;
 
   const handleLogin = async () => {
-    // authStore.handleLogin(userDetails);
-
+    setIsLoading(true);
     const {email, password} = userDetails;
-    // await signOut();
-    // await signInWithEmailAndPassword(auth, email, password)
-    //   .then(res => {
-    //     console.log(res);
-    //   })
-    //   .catch(err => {
-    //     console.log(err);
-    //   });
-    // await firebase
-    //   .auth()
-    //   .signInWithEmailAndPassword(email, password)
-    //   .then(res => {
-    //     console.log(res);
-    //   })
-    //   .catch(err => {
-    //     console.log(err);
-    //   });
+    const res = await userLogin(email, password);
+    if (res.error) {
+      Toast.show({
+        type: 'error',
+        position: 'top',
+        topOffset: 50,
+        text1: res.title,
+        text2: res.message,
+        visibilityTime: 3000,
+        autoHide: true,
+        onPress: () => Toast.hide(),
+      });
+    } else {
+      Toast.show({
+        type: 'success',
+        position: 'top',
+        topOffset: 50,
+        text1: res.title,
+        text2: res.message,
+        visibilityTime: 3000,
+        autoHide: true,
+        onPress: () => Toast.hide(),
+      });
+      dispatch(signInUser(JSON.stringify(res)));
+    }
+    setIsLoading(false);
   };
 
   const validate = async () => {
-    // Keyboard.dismiss();
     let isValid = true;
     if (!userDetails.email) {
       handleError('Please input email', 'email');
@@ -110,8 +103,6 @@ const Login = () => {
       isValid = false;
     }
     if (isValid) {
-      // console.log(userDetails);
-      // login();
       handleLogin();
     }
   };
@@ -135,7 +126,7 @@ const Login = () => {
         paddingRight: insets.right !== 0 ? insets.right : 'auto',
       }}>
       <Loader visible={false} />
-      {false && (
+      {isLoading && (
         <Spinner
           textContent={'Logging in...'}
           textStyle={{color: 'white'}}
@@ -244,7 +235,7 @@ const Login = () => {
                 <Button
                   title="Log In"
                   onPress={validate}
-                  // disabled={disableit}
+                  disabled={disableit}
                 />
 
                 <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>

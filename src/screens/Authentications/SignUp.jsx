@@ -9,21 +9,20 @@ import {
   ImageBackground,
   Dimensions,
 } from 'react-native';
-import React, {useState, useEffect, useContext} from 'react';
+import React, {useState, useEffect} from 'react';
 import {Formik} from 'formik';
 import {CheckBox} from '@rneui/themed';
 import Icon from 'react-native-vector-icons/AntDesign';
-
 import {useNavigation} from '@react-navigation/native';
 import Spinner from 'react-native-loading-spinner-overlay';
-
-import CustomInput from '../../component/custominput/CustomInput';
 import Input from '../../component/inputField/input.component';
 import KeyboardAvoidingWrapper from '../../component/KeyBoardAvoiding/keyBoardAvoiding';
-// import Buttons from '../../component/buttons/Buttons';
 import Button from '../../component/buttons/Button';
-// import { StoreContext } from '../../config/mobX stores/RootStore';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
+import {userSignUp} from '../../stores/AuthStore';
+import Toast from 'react-native-toast-message';
+import {useDispatch, useSelector} from 'react-redux';
+import {signUpUser} from '../../util/redux/userAuth/user.auth.slice';
 
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
@@ -39,7 +38,9 @@ const SignUp = () => {
   const [checked, setChecked] = useState(false);
   const [errors, setErrors] = useState({});
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const toggleCheckbox = () => setChecked(!checked);
+  const dispatch = useDispatch();
 
   const [inputs, setInputs] = useState({
     firstname: '',
@@ -61,8 +62,34 @@ const SignUp = () => {
     showPassLogs === true ||
     error !== '';
 
-  const handleSignUp = () => {
-    // authStore.handleSignup(userDetails);
+  const handleSignUp = async () => {
+    setIsLoading(true);
+    const res = await userSignUp(inputs);
+    if (res.error) {
+      Toast.show({
+        type: 'error',
+        position: 'top',
+        topOffset: 50,
+        text1: res.title,
+        text2: res.message,
+        visibilityTime: 3000,
+        autoHide: true,
+        onPress: () => Toast.hide(),
+      });
+    } else {
+      Toast.show({
+        type: 'success',
+        position: 'top',
+        topOffset: 50,
+        text1: res.title,
+        text2: res.message,
+        visibilityTime: 3000,
+        autoHide: true,
+        onPress: () => Toast.hide(),
+      });
+      dispatch(signUpUser(JSON.stringify(res)));
+    }
+    setIsLoading(false);
   };
 
   const validate = () => {
@@ -86,11 +113,6 @@ const SignUp = () => {
       isValid = false;
     }
 
-    if (!inputs.phone) {
-      handleError('Please input phone number', 'phone');
-      isValid = false;
-    }
-
     if (!inputs.password) {
       handleError('Please input password', 'password');
       isValid = false;
@@ -105,13 +127,13 @@ const SignUp = () => {
     } else if (inputs.confirmpassword.length < 5) {
       handleError('Min password length of 5', 'confirmpassword');
       isValid = false;
-    } else if (inputs.confirmpassword !== inputs.password) {
+    } else if (inputs.confirmpassword != inputs.password) {
       handleError('Password not a match', 'confirmpassword');
       isValid = false;
     }
 
     if (isValid) {
-      // register();
+      handleSignUp();
     }
   };
 
@@ -203,14 +225,14 @@ const SignUp = () => {
         paddingLeft: insets.left !== 0 ? insets.left : 'auto',
         paddingRight: insets.right !== 0 ? insets.right : 'auto',
       }}>
-      {/* {sending && (
+      {isLoading && (
         <Spinner
           textContent={'Signing Up...'}
-          textStyle={{ color: 'white' }}
+          textStyle={{color: 'white'}}
           visible={true}
           overlayColor="rgba(16, 17, 17, 0.7)"
         />
-      )} */}
+      )}
       <ImageBackground
         source={require('../../../assets/signup.png')}
         resizeMode="stretch"
@@ -282,7 +304,7 @@ const SignUp = () => {
                       <View>
                         <Input
                           onChangeText={text =>
-                            handleOnchange(text.trim(), 'firstname')
+                            handleOnchange(text, 'firstname')
                           }
                           onFocus={() => handleError(null, 'firstname')}
                           iconName="account-outline"
@@ -294,7 +316,7 @@ const SignUp = () => {
 
                         <Input
                           onChangeText={text =>
-                            handleOnchange(text.trim(), 'lastname')
+                            handleOnchange(text, 'lastname')
                           }
                           onFocus={() => handleError(null, 'lastname')}
                           iconName="account-outline"
@@ -305,9 +327,7 @@ const SignUp = () => {
                         />
 
                         <Input
-                          onChangeText={text =>
-                            handleOnchange(text.trim(), 'email')
-                          }
+                          onChangeText={text => handleOnchange(text, 'email')}
                           onFocus={() => handleError(null, 'email')}
                           iconName="email-outline"
                           label="Email"
@@ -348,22 +368,6 @@ const SignUp = () => {
                           autoCorrect={false}
                           isNeeded={true}
                         />
-                        {/* <CustomInput
-                          label="Confirm Password"
-                          isPassword={true}
-                          hidePassword={hidePassword}
-                          setHidePassword={setHidePassword}
-                          secureTextEntry={hidePassword}
-                          value={values.confirmpassword}
-                          onChangeText={confirmpass => {
-                            setConPass(confirmpass);
-                            handleChange('confirmpassword')(confirmpass);
-                          }}
-                          onBlur={handleBlur('confirmpassword')}
-                          autoCapitalize="none"
-                          autoCorrect={false}
-                          isNeeded={true}
-                        /> */}
                         {showPassLogs && (
                           <View
                             style={{

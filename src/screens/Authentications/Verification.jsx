@@ -7,39 +7,83 @@ import {
   ScrollView,
   ActivityIndicator,
 } from 'react-native';
-import React, { useEffect, useContext } from 'react';
-import { getStatusBarHeight } from 'react-native-status-bar-height';
-// import { NavigationContainer } from '@react-navigation/native';
-import { observer } from 'mobx-react-lite';
-import { StoreContext } from '../../config/mobX stores/RootStore';
-import { useSafeAreaInsets, SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation } from '@react-navigation/native';
-import { navigationRef } from '../../../RootNavigation';
-import { auth } from '../../config/firebase/firebase';
+import React, {useEffect, useState} from 'react';
+import {useSafeAreaInsets, SafeAreaView} from 'react-native-safe-area-context';
+import {resendVerificationEmail, userLogOut} from '../../stores/AuthStore';
+import {useDispatch, useSelector} from 'react-redux';
+import {
+  signOutUser,
+  signUpUser,
+} from '../../util/redux/userAuth/user.auth.slice';
+import {auth} from '../../util/firebase/firebaseConfig';
+import Toast from 'react-native-toast-message';
+import Spinner from 'react-native-loading-spinner-overlay';
+import COLORS from '../../constants/colors';
+import {useRoute} from '@react-navigation/native';
 
-const statusBarHeight = getStatusBarHeight();
-
-const Verification = observer(({ navigation }) => {
+const Verification = ({navigation}) => {
+  const dispatch = useDispatch();
+  const user = useSelector(state => state.userAuth.user);
   const insets = useSafeAreaInsets();
-  const { authStore } = useContext(StoreContext);
-  const { emailsuccess, loading } = authStore;
-
-  const handleResendVerificationEmail = async () => {
-    await authStore.ResendVerificationMail();
-  };
-
-  const checkVerificationStatus = async () => {
-    await authStore.checkVerificationStatus();
-    authStore.setEmailSuccess;
-  };
+  const [isLoading, setIsLoading] = useState(false);
+  const [isVerified, setIsVerified] = useState(
+    JSON.parse(user)?.user?.emailVerified,
+  );
+  const [count, setCount] = useState(0);
+  const route = useRoute();
 
   useEffect(() => {
-    if (emailsuccess === 'Successful') {
-      if (auth.currentUser.emailVerified) {
-        authStore.getProfileDetails();
+    const interval = setInterval(async () => {
+      const userData = auth.currentUser;
+      await userData.reload();
+      if (userData && userData.emailVerified) {
+        dispatch(signUpUser(JSON.stringify(userData)));
+        setIsVerified(userData.emailVerified);
+      } else {
+        setCount(count + 1);
       }
+    }, 5000);
+
+    if (!isVerified) {
+      return () => clearInterval(interval);
     }
-  }, [navigation, emailsuccess]);
+  }, [isVerified == false && route.name === 'Verification' ? count : '']);
+
+  const handleSignOut = () => {
+    userLogOut();
+    dispatch(signOutUser(null));
+  };
+
+  // console.log();
+
+  const handleResendVerificationEmail = async () => {
+    setIsLoading(true);
+    const res = await resendVerificationEmail();
+    if (res.error) {
+      Toast.show({
+        type: 'error',
+        position: 'top',
+        topOffset: 50,
+        text1: res.title,
+        text2: res.message,
+        visibilityTime: 3000,
+        autoHide: true,
+        onPress: () => Toast.hide(),
+      });
+    } else {
+      Toast.show({
+        type: 'success',
+        position: 'top',
+        topOffset: 50,
+        text1: res.title,
+        text2: res.message,
+        visibilityTime: 3000,
+        autoHide: true,
+        onPress: () => Toast.hide(),
+      });
+    }
+    setIsLoading(false);
+  };
 
   return (
     <SafeAreaView
@@ -51,35 +95,46 @@ const Verification = observer(({ navigation }) => {
         paddingBottom: insets.bottom !== 0 ? insets.bottom : 'auto',
         paddingLeft: insets.left !== 0 ? insets.left : 'auto',
         paddingRight: insets.right !== 0 ? insets.right : 'auto',
-      }}
-    >
+      }}>
+      {isLoading && (
+        <Spinner
+          textContent={'Resending Verification Email...'}
+          textStyle={{color: 'white'}}
+          visible={true}
+          overlayColor="rgba(16, 17, 17, 0.7)"
+          animation="slide"
+        />
+      )}
       <ScrollView
         bounces={false}
         showsHorizontalScrollIndicator={false}
-        showsVerticalScrollIndicator={false}
-      >
-        <View style={{ alignItems: 'center' }}>
-          <View style={{ marginTop: 40, alignItems: 'center' }}>
+        showsVerticalScrollIndicator={false}>
+        <View style={{alignItems: 'center'}}>
+          <View style={{marginTop: 40, alignItems: 'center'}}>
             <Image source={require('../../../assets/images/HeadLogo.png')} />
           </View>
-          <View style={{ marginTop: 40 }}>
+          <View style={{marginTop: 40}}>
             <Image source={require('../../../assets/images/veriEnv.png')} />
           </View>
         </View>
         <View style={styles.pinView}>
-          <View style={{ paddingVertical: 10 }}>
-            <Text style={styles.verify}>Verify Your Account</Text>
+          <View style={{paddingVertical: 10}}>
+            <Text style={styles.verify}>
+              Waiting for you to verify your account
+            </Text>
           </View>
           <View style={styles.message}>
             <Text style={styles.messageText}>
-              Check your inbox or spam, we’ve sent you a verification mail to complete your
-              registration.
+              Check your inbox or spam, we’ve sent you a verification mail to
+              complete your registration.
             </Text>
           </View>
           <View style={styles.demark} />
 
-          <TouchableOpacity style={styles.signUp} onPress={checkVerificationStatus}>
-            {loading ? (
+          <TouchableOpacity
+            style={styles.signUp}
+            onPress={handleResendVerificationEmail}>
+            {false ? (
               <View style={styles.signUpactivity}>
                 <ActivityIndicator size="large" color="#fff" />
               </View>
@@ -89,28 +144,45 @@ const Verification = observer(({ navigation }) => {
                   fontWeight: '500',
                   color: '#fff',
                   fontFamily: 'Montserat',
-                }}
-              >
-                Continue
+                }}>
+                Resend verification code
+              </Text>
+            )}
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.signOut} onPress={handleSignOut}>
+            {false ? (
+              <View style={styles.signUpactivity}>
+                <ActivityIndicator size="large" color="#fff" />
+              </View>
+            ) : (
+              <Text
+                style={{
+                  fontWeight: '500',
+                  color: COLORS.white,
+                  fontFamily: 'Montserat',
+                }}>
+                SignOut
               </Text>
             )}
           </TouchableOpacity>
         </View>
 
-        <TouchableOpacity style={styles.resendView} onPress={handleResendVerificationEmail}>
+        {/* <TouchableOpacity
+          style={styles.resendView}
+          onPress={handleResendVerificationEmail}>
           <Text style={styles.resendText}>Resend verification code</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </ScrollView>
     </SafeAreaView>
   );
-});
+};
 
 export default Verification;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: statusBarHeight,
+    // paddingTop: statusBarHeight,
     paddingHorizontal: 20,
     backgroundColor: '#ffffff',
   },
@@ -131,6 +203,9 @@ const styles = StyleSheet.create({
     lineHeight: 42,
     fontWeight: '400',
     paddingHorizontal: 2.5,
+    justifyContent: 'center',
+    alignContent: 'center',
+    textAlign: 'center',
   },
   message: {
     // paddingHorizontal: 10,
@@ -175,7 +250,16 @@ const styles = StyleSheet.create({
   },
   signUp: {
     marginTop: 10,
-    backgroundColor: '#054B99',
+    backgroundColor: COLORS.lendaBlue,
+    width: '95%',
+    height: 48,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  signOut: {
+    marginTop: 10,
+    backgroundColor: COLORS.red,
     width: '95%',
     height: 48,
     borderRadius: 12,
@@ -206,7 +290,7 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     // borderWidth:.5,
     shadowColor: 'black',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.8,
     shadowRadius: 2,
     backgroundColor: '#ffffff',
