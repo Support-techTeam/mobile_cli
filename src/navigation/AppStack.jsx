@@ -32,6 +32,9 @@ const config = {
 const AppStack = () => {
   const dispatch = useDispatch();
   const userData = useSelector(state => state.userAuth.user);
+  const isVerified = JSON.parse(userData)?.emailVerified
+    ? JSON.parse(userData)?.emailVerified
+    : JSON.parse(userData).user?.emailVerified;
   const userProfileData = useSelector(state => state.userProfile.profile);
 
   useEffect(() => {
@@ -49,7 +52,7 @@ const AppStack = () => {
             }
           }
         } catch (error) {
-          console.error(error);
+          // console.error(error);
         }
       };
 
@@ -62,30 +65,39 @@ const AppStack = () => {
 
   // console.log('userProfileData', userProfileData?.email);
   // console.log('profileDetails', profileDetails?.city);
-  // console.log('JSON.parse(user)', JSON.parse(userData)?.user);
+  // console.log('JSON.parse(user)', isVerified);
   // console.log('APPuserProfileData', userProfileData?.profileProgress);
   // console.log('auth.currentUser', auth.currentUser?.emailVerified);
   return (
     <Stack.Navigator screenOptions={{headerShown: false}}>
+      {userData && !isVerified && userProfileData?.profileProgress == null && (
+        <>
+          <Stack.Screen
+            name="Verification"
+            component={Verification}
+            options={{
+              title: 'Verification',
+              transitionSpec: {
+                open: config,
+                close: config,
+              },
+            }}
+          />
+          <Stack.Screen
+            name="PersonalDetails"
+            component={PersonalDetails}
+            options={{
+              title: 'Personal Details',
+              transitionSpec: {
+                open: config,
+                close: config,
+              },
+            }}
+          />
+        </>
+      )}
       {userData &&
-        !JSON.parse(userData).user?.emailVerified &&
-        userProfileData?.profileProgress == null && (
-          <>
-            <Stack.Screen
-              name="Verification"
-              component={Verification}
-              options={{
-                title: 'Verification',
-                transitionSpec: {
-                  open: config,
-                  close: config,
-                },
-              }}
-            />
-          </>
-        )}
-      {userData &&
-        JSON.parse(userData).user?.emailVerified &&
+        isVerified &&
         userProfileData &&
         userProfileData?.profileProgress === null && (
           <Stack.Screen
@@ -101,7 +113,7 @@ const AppStack = () => {
           />
         )}
       {userData &&
-        JSON.parse(userData).user?.emailVerified &&
+        isVerified &&
         userProfileData &&
         userProfileData?.profileProgress !== null && (
           <Stack.Screen
@@ -116,36 +128,22 @@ const AppStack = () => {
             }}
           />
         )}
-      {(userData && !JSON.parse(userData).user?.emailVerified) ||
-        (!userProfileData && (
-          <Stack.Screen
-            name="Splashscreen"
-            component={Splashscreen}
-            options={{
-              title: 'Splashscreen',
-              transitionSpec: {
-                open: config,
-                close: config,
-              },
-            }}
-          />
-        ))}
+      {userData && !userProfileData && (
+        <Stack.Screen
+          name="Splashscreen"
+          component={Splashscreen}
+          options={{
+            title: 'Splashscreen',
+            transitionSpec: {
+              open: config,
+              close: config,
+            },
+          }}
+        />
+      )}
     </Stack.Navigator>
     // )
   );
 };
 
 export default AppStack;
-
-// auth.currentUser &&
-// userData &&
-// JSON.parse(userData).user?.emailVerified &&
-// profileDetails &&
-// profileDetails?.profileProgress !== null ? (
-// <>
-//   <Stack.Screen name="OnboardingScreen" component={OnboardingScreen} />
-// </>
-// ) : (
-// <>
-//   <Stack.Screen name="PersonalDetails" component={PersonalDetails} />
-// </>

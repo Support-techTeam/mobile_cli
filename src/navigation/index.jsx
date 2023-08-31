@@ -38,7 +38,7 @@ const AppNavigationContainer = () => {
       onStateChange={async () => {
         const previousRouteName = routeNameRef.current;
         const currentRouteName = navigationRef.getCurrentRoute();
-        console.log(currentRouteName.name);
+        console.log(currentRouteName);
         // if (previousRouteName !== currentRouteName) {
         //   // Save the current route name for later comparison
         //   routeNameRef.current = currentRouteName;
