@@ -35,12 +35,18 @@ import {Dropdown} from 'react-native-element-dropdown';
 import COLORS from '../../constants/colors';
 import CustomDropdown from '../../component/dropDown/dropdown.component';
 import {useSelector, useDispatch} from 'react-redux';
-import {getCity, getProfileDetails, getState} from '../../stores/ProfileStore';
+import {
+  createUserProfile,
+  getCity,
+  getProfileDetails,
+  getState,
+} from '../../stores/ProfileStore';
 import axios from 'axios';
 import {setReduxState} from '../../util/redux/locationData/location.data.slice';
 import Toast from 'react-native-toast-message';
 import {userLogOut} from '../../stores/AuthStore';
 import {resetStore} from '../../util/redux/store';
+import {setProfile} from '../../util/redux/userProfile/user.profile.slice';
 
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
@@ -193,50 +199,112 @@ const PersonalDetails = ({navigation}) => {
     }
   }, []);
 
-  // useEffect(() => {
-  //   // fetch profile
-  //   setIsLoading(true);
-  //   const fetchState = async () => {
-  //     try {
-  //       const res = await getProfileDetails();
-  //       console.log('Profile Data: ', res.data);
-  //       if (res.error) {
-  //         Toast.show({
-  //           type: 'error',
-  //           position: 'top',
-  //           topOffset: 50,
-  //           text1: res.title,
-  //           text2: res.message,
-  //           visibilityTime: 3000,
-  //           autoHide: true,
-  //           onPress: () => Toast.hide(),
-  //         });
-  //       } else {
-  //         Toast.show({
-  //           type: 'success',
-  //           position: 'top',
-  //           topOffset: 50,
-  //           text1: res.title,
-  //           text2: res.message,
-  //           visibilityTime: 3000,
-  //           autoHide: true,
-  //           onPress: () => Toast.hide(),
-  //         });
-  //         // dispatch(signUpUser(JSON.stringify(res)));
-  //       }
-  //     } catch (error) {
-  //       console.error(error);
-  //     }
-  //   };
+  const validate = () => {
+    let isValid = true;
 
-  //   fetchState();
-  //   setTimeout(() => {
-  //     setIsLoading(false);
-  //   }, 3000);
-  //   return () => {
-  //     fetchState();
-  //   };
-  // }, []);
+    if (!userDetails.email) {
+      handleError('Please input email', 'email');
+      isValid = false;
+    } else if (!userDetails.email.match(/\S+@\S+\.\S+/)) {
+      handleError('Please input a valid email', 'email');
+      isValid = false;
+    }
+
+    if (!userDetails.firstName) {
+      handleError('Please input firstname', 'firstName');
+      isValid = false;
+    }
+
+    if (!userDetails.lastName) {
+      handleError('Please input lastname', 'lastName');
+      isValid = false;
+    }
+
+    if (!userDetails.title) {
+      handleError('Please input title', 'title');
+      isValid = false;
+    }
+
+    if (!userDetails.phoneNumber) {
+      handleError('Please input phone number', 'phoneNumber');
+      isValid = false;
+    }
+
+    if (!userDetails.bvn) {
+      handleError('Please input bvn', 'bvn');
+      isValid = false;
+    }
+
+    if (!userDetails.nin) {
+      handleError('Please input nin', 'nin');
+      isValid = false;
+    }
+    if (!userDetails.dob) {
+      handleError('Please input dob', 'dob');
+      isValid = false;
+    }
+    if (!userDetails.address) {
+      handleError('Please input address', 'address');
+      isValid = false;
+    }
+    if (!userDetails.country) {
+      handleError('Please input country', 'country');
+      isValid = false;
+    }
+    if (!userDetails.state) {
+      handleError('Please input state', 'state');
+      isValid = false;
+    }
+
+    if (!userDetails.city) {
+      handleError('Please input city', 'city');
+      isValid = false;
+    }
+
+    if (!userDetails.maritalStatus) {
+      handleError('Please input marital status', 'maritalStatus');
+      isValid = false;
+    }
+    if (!userDetails.eduLevel) {
+      handleError('Please input educational level', 'eduLevel');
+      isValid = false;
+    }
+
+    if (!userDetails.gender) {
+      handleError('Please input gender', 'gender');
+      isValid = false;
+    }
+
+    if (!userDetails.residentialStatus) {
+      handleError('Please input residential status', 'residentialStatus');
+      isValid = false;
+    }
+
+    if (!userDetails.yearYouMovedToCurrentAddress) {
+      handleError(
+        'Please input year you moved to current address',
+        'yearYouMovedToCurrentAddress',
+      );
+      isValid = false;
+    }
+
+    if (!userDetails.NoOfDependents) {
+      handleError('Please input No of dependents', 'NoOfDependents');
+      isValid = false;
+    }
+    if (!userDetails.referredByOption) {
+      handleError('Please input referred by option', 'referredByOption');
+      isValid = false;
+    }
+
+    if (isValid) {
+      handleCreateUser();
+    }
+  };
+
+  const handleError = (error, input) => {
+    setErrors(prevState => ({...prevState, [input]: error}));
+  };
 
   const disableit =
     !userDetails.phoneNumber ||
@@ -263,7 +331,7 @@ const PersonalDetails = ({navigation}) => {
     setShow(false);
   };
 
-  const handleCreateUser = async () => {
+  const handleLogOut = async () => {
     const res = await userLogOut();
     if (res.error) {
       Toast.show({
@@ -279,7 +347,36 @@ const PersonalDetails = ({navigation}) => {
     } else {
       await resetStore();
     }
-    // authStore.createUserProfile(userDetails);
+  };
+
+  const handleCreateUser = async () => {
+    setIsLoading(true);
+    const res = await createUserProfile(userDetails);
+    if (res.data.data.error) {
+      Toast.show({
+        type: 'error',
+        position: 'top',
+        topOffset: 50,
+        text1: res.data.title,
+        text2: res.data.message,
+        visibilityTime: 5000,
+        autoHide: true,
+        onPress: () => Toast.hide(),
+      });
+    } else {
+      Toast.show({
+        type: 'success',
+        position: 'top',
+        topOffset: 50,
+        text1: res.data.title,
+        text2: res.data.message,
+        visibilityTime: 3000,
+        autoHide: true,
+        onPress: () => Toast.hide(),
+      });
+      dispatch(setProfile(res.data.data));
+    }
+    setIsLoading(true);
   };
 
   const pickerRef = useRef();
@@ -440,7 +537,7 @@ const PersonalDetails = ({navigation}) => {
                 <View style={{marginVertical: 10}}>
                   <CustomDropdown
                     label="Title"
-                    // onFocus={() => handleError(null, 'lastname')}
+                    onFocus={() => handleError(null, 'title')}
                     // search
                     isNeeded={true}
                     // iconName="gender-male-female"
@@ -463,7 +560,7 @@ const PersonalDetails = ({navigation}) => {
                   onChangeText={text =>
                     setUserDetails({...userDetails, firstName: text.trim()})
                   }
-                  // onFocus={() => handleError(null, 'firstname')}
+                  onFocus={() => handleError(null, 'firstName')}
                   iconName="account-outline"
                   label="First Name"
                   placeholder="Enter your first name"
@@ -478,7 +575,7 @@ const PersonalDetails = ({navigation}) => {
                   onChangeText={text =>
                     setUserDetails({...userDetails, lastName: text.trim()})
                   }
-                  // onFocus={() => handleError(null, 'lastName')}
+                  onFocus={() => handleError(null, 'lastName')}
                   iconName="account-outline"
                   label="Last Name"
                   placeholder="Enter your first name"
@@ -493,7 +590,7 @@ const PersonalDetails = ({navigation}) => {
                   onChangeText={text =>
                     setUserDetails({...userDetails, email: text.trim()})
                   }
-                  // onFocus={() => handleError(null, 'email')}
+                  onFocus={() => handleError(null, 'email')}
                   iconName="email-outline"
                   label="Email"
                   placeholder="Enter your email"
@@ -507,7 +604,7 @@ const PersonalDetails = ({navigation}) => {
 
                 <InputPhone
                   label="Phone number"
-                  // onFocus={() => handleError(null, 'phoneNumber')}
+                  onFocus={() => handleError(null, 'phoneNumber')}
                   layout="first"
                   isNeeded={true}
                   defaultCode="NG"
@@ -522,7 +619,7 @@ const PersonalDetails = ({navigation}) => {
                 <View style={{marginVertical: 10}}>
                   <CustomDropdown
                     label="Gender"
-                    // onFocus={() => handleError(null, 'lastname')}
+                    onFocus={() => handleError(null, 'gender')}
                     // search
                     isNeeded={true}
                     iconName="gender-male-female"
@@ -545,7 +642,7 @@ const PersonalDetails = ({navigation}) => {
                   onChangeText={text =>
                     setUserDetails({...userDetails, bvn: text.trim()})
                   }
-                  // onFocus={() => handleError(null, 'bvn')}
+                  onFocus={() => handleError(null, 'bvn')}
                   iconName="shield-lock-outline"
                   label="BVN"
                   placeholder="Enter your BVN"
@@ -559,7 +656,7 @@ const PersonalDetails = ({navigation}) => {
                   onChangeText={text =>
                     setUserDetails({...userDetails, nin: text.trim()})
                   }
-                  // onFocus={() => handleError(null, 'nin')}
+                  onFocus={() => handleError(null, 'nin')}
                   iconName="shield-lock-outline"
                   placeholder="Enter your NIN"
                   error={errors.nin}
@@ -570,7 +667,7 @@ const PersonalDetails = ({navigation}) => {
                 <Pressable onPress={showDatePicker}>
                   <Input
                     label="Date of Birth"
-                    // onFocus={() => handleError(null, 'dob')}
+                    onFocus={() => handleError(null, 'dob')}
                     iconName="calendar-month-outline"
                     placeholder="2000 - 01 - 01"
                     defaultValue={
@@ -604,7 +701,7 @@ const PersonalDetails = ({navigation}) => {
                   onChangeText={text =>
                     setUserDetails({...userDetails, address: text})
                   }
-                  // onFocus={() => handleError(null, 'address')}
+                  onFocus={() => handleError(null, 'address')}
                   iconName="map-marker-outline"
                   placeholder="Enter your address"
                   error={errors.address}
@@ -617,7 +714,7 @@ const PersonalDetails = ({navigation}) => {
                   onChangeText={text =>
                     setUserDetails({...userDetails, country: text})
                   }
-                  // onFocus={() => handleError(null, 'country')}
+                  onFocus={() => handleError(null, 'country')}
                   iconName="flag-outline"
                   placeholder="Enter your country"
                   error={errors.country}
@@ -633,7 +730,7 @@ const PersonalDetails = ({navigation}) => {
                     style={{marginVertical: 10, paddingRight: 5, width: '50%'}}>
                     <CustomDropdown
                       label="State"
-                      // onFocus={() => handleError(null, 'state')}
+                      onFocus={() => handleError(null, 'state')}
                       isNeeded={true}
                       placeholder="Select State"
                       placeholderStyle={styles.placeholderStyle}
@@ -654,7 +751,7 @@ const PersonalDetails = ({navigation}) => {
                     style={{marginVertical: 10, paddingLeft: 5, width: '50%'}}>
                     <CustomDropdown
                       label="City"
-                      // onFocus={() => handleError(null, 'city')}
+                      onFocus={() => handleError(null, 'city')}
                       isNeeded={true}
                       placeholder="Select LGA"
                       placeholderStyle={styles.placeholderStyle}
@@ -675,7 +772,7 @@ const PersonalDetails = ({navigation}) => {
                 <View style={{marginVertical: 10}}>
                   <CustomDropdown
                     label="Residential Status"
-                    // onFocus={() => handleError(null, 'residentialStatus')}
+                    onFocus={() => handleError(null, 'residentialStatus')}
                     iconName="home-outline"
                     isNeeded={true}
                     placeholderStyle={styles.placeholderStyle}
@@ -698,7 +795,9 @@ const PersonalDetails = ({navigation}) => {
                 <View style={{marginVertical: 10}}>
                   <CustomDropdown
                     label="When did you move to that address?"
-                    // onFocus={() => handleError(null, 'residentialStatus')}
+                    onFocus={() =>
+                      handleError(null, 'yearYouMovedToCurrentAddress')
+                    }
                     isNeeded={true}
                     placeholderStyle={styles.placeholderStyle}
                     selectedTextStyle={styles.selectedTextStyle}
@@ -720,7 +819,7 @@ const PersonalDetails = ({navigation}) => {
                 <View style={{marginVertical: 10}}>
                   <CustomDropdown
                     label="Marital Status"
-                    // onFocus={() => handleError(null, 'maritalStatus')}
+                    onFocus={() => handleError(null, 'maritalStatus')}
                     isNeeded={true}
                     placeholderStyle={styles.placeholderStyle}
                     selectedTextStyle={styles.selectedTextStyle}
@@ -742,7 +841,7 @@ const PersonalDetails = ({navigation}) => {
                 <View style={{marginVertical: 10}}>
                   <CustomDropdown
                     label="Educational Level"
-                    // onFocus={() => handleError(null, 'eduLevel')}
+                    onFocus={() => handleError(null, 'eduLevel')}
                     iconName="school-outline"
                     isNeeded={true}
                     placeholderStyle={styles.placeholderStyle}
@@ -770,7 +869,7 @@ const PersonalDetails = ({navigation}) => {
                       NoOfDependents: parseInt(text, 10),
                     })
                   }
-                  // onFocus={() => handleError(null, 'NoOfDependents')}
+                  onFocus={() => handleError(null, 'NoOfDependents')}
                   error={errors.NoOfDependents}
                   keyboardType="numeric"
                   isNeeded={true}
@@ -779,7 +878,7 @@ const PersonalDetails = ({navigation}) => {
                 <View style={{marginVertical: 10}}>
                   <CustomDropdown
                     label="How did you hear about TradeLenda?"
-                    // onFocus={() => handleError(null, 'referredByOption')}
+                    onFocus={() => handleError(null, 'referredByOption')}
                     iconName="account-voice"
                     isNeeded={true}
                     placeholderStyle={styles.placeholderStyle}
@@ -807,8 +906,6 @@ const PersonalDetails = ({navigation}) => {
                     onChangeText={text =>
                       setUserDetails({...userDetails, referredByCode: text})
                     }
-                    // onFocus={() => handleError(null, 'referredByCode')}
-                    error={errors.referredByCode}
                     isNeeded={true}
                   />
                 ) : userDetails?.referredByOption &&
@@ -827,21 +924,16 @@ const PersonalDetails = ({navigation}) => {
                     onChangeText={text =>
                       setUserDetails({...userDetails, referredByAnswer: text})
                     }
-                    // onFocus={() => handleError(null, 'referredByAnswer')}
-                    error={errors.referredByAnswer}
                     isNeeded={true}
                   />
                 ) : null}
 
                 <TouchableOpacity
                   onPress={() => handleCreateUser()}
-                  // disabled={disableit}
+                  disabled={disableit}
                   style={{marginBottom: 50}}>
                   <View style={{marginBottom: 50, marginTop: 20}}>
-                    <Buttons
-                      label="Save & Continue"
-                      // disabled={disableit}
-                    />
+                    <Buttons label="Save & Continue" disabled={disableit} />
                   </View>
                 </TouchableOpacity>
               </View>

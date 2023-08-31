@@ -73,7 +73,6 @@ const getProfileDetails = async () => {
     try {
       const response = await axiosInstance.get(`/users/get-profile`, {headers});
       await AsyncStorage.setItem('hasProfile', 'true');
-      console.log('response GET', reducSetStore);
       return {
         error: false,
         data: response.data,
@@ -89,4 +88,35 @@ const getProfileDetails = async () => {
   }
 };
 
-export {getState, getCity, getProfileDetails};
+const createUserProfile = async details => {
+  if (auth?.currentUser?.stsTokenManager?.accessToken) {
+    headers = {
+      accept: 'application/json',
+      Authorization: `Bearer ${auth.currentUser?.stsTokenManager?.accessToken}`,
+      'Content-Type': 'application/json',
+    };
+    try {
+      const response = await axiosInstance.post(
+        `/users/create-profile`,
+        details,
+        {headers},
+      );
+      await AsyncStorage.setItem('hasProfile', 'true');
+      return {
+        title: 'Create Profile',
+        error: false,
+        data: response.data,
+        message: 'Profile created successfully',
+      };
+    } catch (error) {
+      return {
+        title: 'Create Profile',
+        error: true,
+        data: null,
+        message: error,
+      };
+    }
+  }
+};
+
+export {getState, getCity, getProfileDetails, createUserProfile};
