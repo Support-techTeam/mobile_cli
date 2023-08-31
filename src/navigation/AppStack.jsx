@@ -5,45 +5,147 @@ import {userLogOut} from '../stores/AuthStore';
 import {useDispatch, useSelector} from 'react-redux';
 import {signOutUser} from '../util/redux/userAuth/user.auth.slice';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import Toast from 'react-native-toast-message';
 
 //Screens
 import Verification from '../screens/Authentications/Verification';
 import PersonalDetails from '../screens/ProfileOnboardings/PersonalDetails';
 import OnboardingScreen from '../screens/Authentications/OnboardingScreen';
+import Splashscreen from './Splashscreen';
+//Styles
+import {getProfileDetails} from '../stores/ProfileStore';
+import {setProfile} from '../util/redux/userProfile/user.profile.slice';
+import {auth} from '../util/firebase/firebaseConfig';
 
 const Stack = createNativeStackNavigator();
-
+const config = {
+  animation: 'spring',
+  config: {
+    stiffness: 1000,
+    damping: 500,
+    mass: 3,
+    overshootClamping: true,
+    restDisplacementThreshold: 0.01,
+    restSpeedThreshold: 0.01,
+  },
+};
 const AppStack = () => {
   const dispatch = useDispatch();
-  const [profile, setProfile] = useState(null);
-  const user = useSelector(state => state.userAuth.user);
-  // console.log(JSON.parse(user).user?.emailVerified);
+  const userData = useSelector(state => state.userAuth.user);
+  const userProfileData = useSelector(state => state.userProfile.profile);
 
-  // useEffect(() => {
-  //     userLogOut();
-  //     dispatch(signOutUser(null));
-  // }, []);
+  useEffect(() => {
+    // fetch profile
+    if (auth.currentUser !== null) {
+      // console.log('Fetching profile');
+      const fetchState = async () => {
+        try {
+          const res = await getProfileDetails();
+          if (res?.data !== undefined) {
+            if (res.error) {
+              // console.error(error);
+            } else {
+              dispatch(setProfile(res?.data));
+            }
+          }
+        } catch (error) {
+          console.error(error);
+        }
+      };
+
+      fetchState();
+      return () => {
+        fetchState();
+      };
+    }
+  }, []);
+
+  // console.log('userProfileData', userProfileData?.email);
+  // console.log('profileDetails', profileDetails?.city);
+  // console.log('JSON.parse(user)', JSON.parse(userData)?.user);
+  // console.log('APPuserProfileData', userProfileData?.profileProgress);
+  // console.log('auth.currentUser', auth.currentUser?.emailVerified);
   return (
     <Stack.Navigator screenOptions={{headerShown: false}}>
-      {JSON.parse(user).user && !JSON.parse(user).user?.emailVerified ? (
-        <>
-          <Stack.Screen name="Verification" component={Verification} />
-        </>
-      ) : JSON.parse(user).user &&
-        JSON.parse(user).user?.emailVerified &&
-        profile ? (
-        <>
-          {/* <Stack.Screen name="Verification" component={Verification} /> */}
-          <Stack.Screen name="OnboardingScreen" component={OnboardingScreen} />
-        </>
-      ) : (
-        <>
-          {/* <Stack.Screen name="Verification" component={Verification} /> */}
-          <Stack.Screen name="PersonalDetails" component={PersonalDetails} />
-        </>
-      )}
+      {userData &&
+        !JSON.parse(userData).user?.emailVerified &&
+        userProfileData?.profileProgress == null && (
+          <>
+            <Stack.Screen
+              name="Verification"
+              component={Verification}
+              options={{
+                title: 'Verification',
+                transitionSpec: {
+                  open: config,
+                  close: config,
+                },
+              }}
+            />
+          </>
+        )}
+      {userData &&
+        JSON.parse(userData).user?.emailVerified &&
+        userProfileData &&
+        userProfileData?.profileProgress === null && (
+          <Stack.Screen
+            name="PersonalDetails"
+            component={PersonalDetails}
+            options={{
+              title: 'Personal Details',
+              transitionSpec: {
+                open: config,
+                close: config,
+              },
+            }}
+          />
+        )}
+      {userData &&
+        JSON.parse(userData).user?.emailVerified &&
+        userProfileData &&
+        userProfileData?.profileProgress !== null && (
+          <Stack.Screen
+            name="OnboardingScreen"
+            component={OnboardingScreen}
+            options={{
+              title: 'Onboarding',
+              transitionSpec: {
+                open: config,
+                close: config,
+              },
+            }}
+          />
+        )}
+      {(userData && !JSON.parse(userData).user?.emailVerified) ||
+        (!userProfileData && (
+          <Stack.Screen
+            name="Splashscreen"
+            component={Splashscreen}
+            options={{
+              title: 'Splashscreen',
+              transitionSpec: {
+                open: config,
+                close: config,
+              },
+            }}
+          />
+        ))}
     </Stack.Navigator>
+    // )
   );
 };
 
 export default AppStack;
+
+// auth.currentUser &&
+// userData &&
+// JSON.parse(userData).user?.emailVerified &&
+// profileDetails &&
+// profileDetails?.profileProgress !== null ? (
+// <>
+//   <Stack.Screen name="OnboardingScreen" component={OnboardingScreen} />
+// </>
+// ) : (
+// <>
+//   <Stack.Screen name="PersonalDetails" component={PersonalDetails} />
+// </>

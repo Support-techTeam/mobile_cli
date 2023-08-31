@@ -11,17 +11,15 @@ import React, {useEffect, useState} from 'react';
 import {useSafeAreaInsets, SafeAreaView} from 'react-native-safe-area-context';
 import {resendVerificationEmail, userLogOut} from '../../stores/AuthStore';
 import {useDispatch, useSelector} from 'react-redux';
-import {
-  signOutUser,
-  signUpUser,
-} from '../../util/redux/userAuth/user.auth.slice';
+import {signUpUser} from '../../util/redux/userAuth/user.auth.slice';
 import {auth} from '../../util/firebase/firebaseConfig';
 import Toast from 'react-native-toast-message';
 import Spinner from 'react-native-loading-spinner-overlay';
 import COLORS from '../../constants/colors';
 import {useRoute} from '@react-navigation/native';
+import {resetStore} from '../../util/redux/store';
 
-const Verification = ({navigation}) => {
+const Verification = () => {
   const dispatch = useDispatch();
   const user = useSelector(state => state.userAuth.user);
   const insets = useSafeAreaInsets();
@@ -35,7 +33,7 @@ const Verification = ({navigation}) => {
   useEffect(() => {
     const interval = setInterval(async () => {
       const userData = auth.currentUser;
-      await userData.reload();
+      await userData?.reload();
       if (userData && userData.emailVerified) {
         dispatch(signUpUser(JSON.stringify(userData)));
         setIsVerified(userData.emailVerified);
@@ -49,12 +47,23 @@ const Verification = ({navigation}) => {
     }
   }, [isVerified == false && route.name === 'Verification' ? count : '']);
 
-  const handleSignOut = () => {
-    userLogOut();
-    dispatch(signOutUser(null));
+  const handleSignOut = async () => {
+    const res = await userLogOut();
+    if (res.error) {
+      Toast.show({
+        type: 'error',
+        position: 'top',
+        topOffset: 50,
+        text1: res.title,
+        text2: res.message,
+        visibilityTime: 3000,
+        autoHide: true,
+        onPress: () => Toast.hide(),
+      });
+    } else {
+      await resetStore();
+    }
   };
-
-  // console.log();
 
   const handleResendVerificationEmail = async () => {
     setIsLoading(true);
@@ -166,12 +175,6 @@ const Verification = ({navigation}) => {
             )}
           </TouchableOpacity>
         </View>
-
-        {/* <TouchableOpacity
-          style={styles.resendView}
-          onPress={handleResendVerificationEmail}>
-          <Text style={styles.resendText}>Resend verification code</Text>
-        </TouchableOpacity> */}
       </ScrollView>
     </SafeAreaView>
   );

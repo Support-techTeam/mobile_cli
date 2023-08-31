@@ -1,4 +1,4 @@
-import {combineReducers} from '@reduxjs/toolkit';
+import {combineReducers, AnyAction, Reducer} from '@reduxjs/toolkit';
 import {userAuthReducer} from './userAuth/user.auth.slice';
 import {locationReducer} from './locationData/location.data.slice';
 import {userProfileReducer} from './userProfile/user.profile.slice';

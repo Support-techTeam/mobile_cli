@@ -14,9 +14,12 @@ import {
 
 import SplashScreen from 'react-native-splash-screen';
 import SpInAppUpdates, {
+  IncomingStatusUpdateEvent,
   NeedsUpdateResponse,
   IAUUpdateKind,
   StartUpdateOptions,
+  StatusUpdateEvent,
+  IAUInstallStatus,
 } from 'sp-react-native-in-app-updates';
 import {version} from './app.json';
 import Toast from 'react-native-toast-message';
@@ -32,7 +35,7 @@ import {
 import AppNavigationContainer from './src/navigation';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {Provider as PaperProvider, MD3LightTheme} from 'react-native-paper';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {Provider} from 'react-redux';
 import {PersistGate} from 'redux-persist/integration/react';
 import {persistor, store} from './src/util/redux/store';
@@ -65,10 +68,11 @@ function App() {
   const [appState, setAppState] = useState(appMainState.current);
   const [isLocked, setIsLocked] = useState('');
   const {getItem, setItem} = useAsyncStorage('@lockState');
+
   useEffect(() => {
     if (Platform.OS === 'android') {
       if (isLocked !== '') {
-        SplashScreen.hide();
+        // SplashScreen.hide();
       }
     }
   });
@@ -117,11 +121,34 @@ function App() {
           },
         });
 
-        console.log(result);
         inAppUpdates.startUpdate(updateOptions);
       }
     });
   }, []);
+
+  useEffect(() => {
+    inAppUpdates.addStatusUpdateListener(onStatusUpdate);
+    return () => {
+      inAppUpdates.removeStatusUpdateListener(onStatusUpdate);
+    };
+  }, [onStatusUpdate]);
+
+  const onStatusUpdate = status => {
+    const {bytesDownloaded, totalBytesToDownload} = status;
+    Toast.show({
+      type: 'info',
+      position: 'top',
+      topOffset: 55,
+      text1: 'Updating App',
+      text2: `Download : ${(bytesDownloaded / 1024).toFixed(
+        1,
+      )} Kb | Total Size: ${(totalBytesToDownload / 1024).toFixed(1)} Kb`,
+      autoHide: false,
+    });
+    if (totalBytesToDownload === bytesDownloaded) {
+      Toast.hide();
+    }
+  };
 
   // App State Monitor
   useEffect(() => {
@@ -174,6 +201,21 @@ function App() {
       secondaryContainer: '#054B99',
     },
   };
+
+  useEffect(() => {
+    const getUserStore = async () => {
+      const appData = await AsyncStorage.getItem('isAppFirstLaunched');
+      if (appData == null) {
+        AsyncStorage.setItem('isAppFirstLaunched', 'false');
+      } else {
+      }
+    };
+    getUserStore();
+
+    return () => {
+      getUserStore();
+    };
+  }, []);
 
   return (
     <SafeAreaProvider style={styles.rootContainer}>

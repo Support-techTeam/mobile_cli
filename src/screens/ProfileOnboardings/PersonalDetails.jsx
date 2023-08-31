@@ -35,9 +35,12 @@ import {Dropdown} from 'react-native-element-dropdown';
 import COLORS from '../../constants/colors';
 import CustomDropdown from '../../component/dropDown/dropdown.component';
 import {useSelector, useDispatch} from 'react-redux';
-import {getCity, getState} from '../../stores/ProfileStore';
+import {getCity, getProfileDetails, getState} from '../../stores/ProfileStore';
 import axios from 'axios';
 import {setReduxState} from '../../util/redux/locationData/location.data.slice';
+import Toast from 'react-native-toast-message';
+import {userLogOut} from '../../stores/AuthStore';
+import {resetStore} from '../../util/redux/store';
 
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
@@ -56,6 +59,9 @@ const genderData = [
   {value: 'Prefer Not To Say', label: 'Prefer Not To Say'},
 ];
 
+const stateData = [{value: '', label: 'Select State'}];
+
+const cityData = [{value: '', label: 'Select LGA'}];
 const residencyData = [
   {value: '', label: 'Select Residential Status'},
   {value: 'Renting', label: 'Renting'},
@@ -114,11 +120,12 @@ const PersonalDetails = ({navigation}) => {
   const insets = useSafeAreaInsets();
   const [currentState, setCurrentState] = useState(undefined);
   const [currentCity, setCurrentCity] = useState(undefined);
-
-  const [isFocus, setIsFocus] = useState(false);
-
   const [isFocused, setIsFocused] = useState(false);
   const [errors, setErrors] = useState({});
+  const [state, setState] = useState();
+  const [cityByState, setCitybyState] = useState([]);
+  const [city, setCity] = useState();
+  const [isLoading, setIsLoading] = useState(false);
 
   const user = useSelector(state => state.userAuth.user);
   const stateRedux = useSelector(state => state.locationData.state);
@@ -150,6 +157,32 @@ const PersonalDetails = ({navigation}) => {
   });
 
   useEffect(() => {
+    setUserDetails({
+      ...userDetails,
+      firstName:
+        (user &&
+          JSON.parse(user)?.user?.displayName?.split(' ')[1] == undefined) ||
+        JSON.parse(user)?.user?.displayName?.split(' ')[1] == null ||
+        JSON.parse(user)?.user?.displayName?.split(' ')[0] == ''
+          ? ''
+          : JSON.parse(user)?.user?.displayName?.split(' ')[0],
+      lastName:
+        (user &&
+          JSON.parse(user)?.user?.displayName?.split(' ')[1] == undefined) ||
+        JSON.parse(user)?.user?.displayName?.split(' ')[1] == null ||
+        JSON.parse(user)?.user?.displayName?.split(' ')[1] == ''
+          ? ''
+          : JSON.parse(user)?.user?.displayName?.split(' ')[1],
+      email:
+        (user && JSON.parse(user)?.user?.email == undefined) ||
+        JSON.parse(user)?.user?.email == null ||
+        JSON.parse(user)?.user?.email == ''
+          ? ''
+          : JSON.parse(user)?.user?.email,
+    });
+  }, [user]);
+
+  useEffect(() => {
     const platform = Platform.OS;
     if (platform === 'ios') {
       setUserDetails({...userDetails, signedOnDevice: 'ios'});
@@ -160,6 +193,51 @@ const PersonalDetails = ({navigation}) => {
     }
   }, []);
 
+  // useEffect(() => {
+  //   // fetch profile
+  //   setIsLoading(true);
+  //   const fetchState = async () => {
+  //     try {
+  //       const res = await getProfileDetails();
+  //       console.log('Profile Data: ', res.data);
+  //       if (res.error) {
+  //         Toast.show({
+  //           type: 'error',
+  //           position: 'top',
+  //           topOffset: 50,
+  //           text1: res.title,
+  //           text2: res.message,
+  //           visibilityTime: 3000,
+  //           autoHide: true,
+  //           onPress: () => Toast.hide(),
+  //         });
+  //       } else {
+  //         Toast.show({
+  //           type: 'success',
+  //           position: 'top',
+  //           topOffset: 50,
+  //           text1: res.title,
+  //           text2: res.message,
+  //           visibilityTime: 3000,
+  //           autoHide: true,
+  //           onPress: () => Toast.hide(),
+  //         });
+  //         // dispatch(signUpUser(JSON.stringify(res)));
+  //       }
+  //     } catch (error) {
+  //       console.error(error);
+  //     }
+  //   };
+
+  //   fetchState();
+  //   setTimeout(() => {
+  //     setIsLoading(false);
+  //   }, 3000);
+  //   return () => {
+  //     fetchState();
+  //   };
+  // }, []);
+
   const disableit =
     !userDetails.phoneNumber ||
     !userDetails.address ||
@@ -169,43 +247,6 @@ const PersonalDetails = ({navigation}) => {
     !userDetails.bvn ||
     !userDetails.nin ||
     !userDetails.email;
-
-  const [state, setState] = useState([]);
-  const [cityByState, setCitybyState] = useState([]);
-  const [city, setCity] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-
-  // useEffect(() => {
-  //   setState(toJS(loansStore.state));
-  //   setCity(toJS(loansStore.city));
-  // }, [loansStore.state, loansStore.city]);
-
-  // useEffect(() => {
-  //   const stateData = toJS(loansStore.state).map((item, index) => {
-  //     return {value: item, label: item, key: index};
-  //   });
-
-  //   if (currentState == undefined || currentState == '') {
-  //     setCurrentState(stateData);
-  //   }
-  // }, [state]);
-
-  // useEffect(() => {
-  //   if (userDetails.state !== '') {
-  //     setCitybyState(state.filter(statee => statee === userDetails.state));
-  //   }
-  // }, [state, userDetails.state]);
-
-  // const stateCity = cityByState[0];
-
-  // const cityData = city.map((item, index) => {
-  //   return {value: item, label: item, key: index};
-  // });
-
-  // useEffect(() => {
-  //   loansStore.getState();
-  //   loansStore.getCity(stateCity);
-  // }, [loansStore, stateCity]);
 
   const showDatePicker = () => {
     setShow(true);
@@ -222,11 +263,22 @@ const PersonalDetails = ({navigation}) => {
     setShow(false);
   };
 
-  // useEffect(() => {
-  //   authStore.getProfileDetails();
-  // }, [authStore]);
-
-  const handleCreateUser = () => {
+  const handleCreateUser = async () => {
+    const res = await userLogOut();
+    if (res.error) {
+      Toast.show({
+        type: 'error',
+        position: 'top',
+        topOffset: 50,
+        text1: res.title,
+        text2: res.message,
+        visibilityTime: 3000,
+        autoHide: true,
+        onPress: () => Toast.hide(),
+      });
+    } else {
+      await resetStore();
+    }
     // authStore.createUserProfile(userDetails);
   };
 
@@ -244,7 +296,9 @@ const PersonalDetails = ({navigation}) => {
     const fetchState = async () => {
       try {
         const res = await getState();
-        setState(res.data);
+        if (res.data !== undefined) {
+          setState(res.data);
+        }
         dispatch(setReduxState(res.data));
       } catch (error) {
         console.error(error);
@@ -258,9 +312,11 @@ const PersonalDetails = ({navigation}) => {
   }, []);
 
   useEffect(() => {
-    const stateData = stateRedux.map((item, index) => {
-      return {value: item, label: item, key: index};
-    });
+    const stateData =
+      state &&
+      state.map((item, index) => {
+        return {value: item, label: item, key: index};
+      });
 
     if (currentState == undefined || currentState == '') {
       setCurrentState(stateData);
@@ -279,7 +335,9 @@ const PersonalDetails = ({navigation}) => {
     const fetchCity = async () => {
       try {
         const res = await getCity(stateCity);
-        setCity(res.data);
+        if (res.data !== undefined) {
+          setCity(res.data);
+        }
       } catch (error) {
         console.error(error);
       }
@@ -292,9 +350,11 @@ const PersonalDetails = ({navigation}) => {
   }, [stateCity]);
 
   useEffect(() => {
-    const cityData = city.map((item, index) => {
-      return {value: item, label: item, key: index};
-    });
+    const cityData =
+      city &&
+      city.map((item, index) => {
+        return {value: item, label: item, key: index};
+      });
 
     setCurrentCity(cityData);
   }, [city]);
@@ -573,13 +633,12 @@ const PersonalDetails = ({navigation}) => {
                     style={{marginVertical: 10, paddingRight: 5, width: '50%'}}>
                     <CustomDropdown
                       label="State"
-                      // onFocus={() => handleError(null, 'lastname')}
-                      search
+                      // onFocus={() => handleError(null, 'state')}
                       isNeeded={true}
                       placeholder="Select State"
                       placeholderStyle={styles.placeholderStyle}
                       selectedTextStyle={styles.selectedTextStyle}
-                      data={currentState}
+                      data={currentState ? currentState : stateData}
                       // data={genderData}
                       maxHeight={300}
                       labelField="label"
@@ -595,13 +654,12 @@ const PersonalDetails = ({navigation}) => {
                     style={{marginVertical: 10, paddingLeft: 5, width: '50%'}}>
                     <CustomDropdown
                       label="City"
-                      // onFocus={() => handleError(null, 'lastname')}
-                      search
+                      // onFocus={() => handleError(null, 'city')}
                       isNeeded={true}
                       placeholder="Select LGA"
                       placeholderStyle={styles.placeholderStyle}
                       selectedTextStyle={styles.selectedTextStyle}
-                      data={currentCity}
+                      data={currentCity ? currentCity : cityData}
                       maxHeight={300}
                       labelField="label"
                       valueField="value"
@@ -777,10 +835,13 @@ const PersonalDetails = ({navigation}) => {
 
                 <TouchableOpacity
                   onPress={() => handleCreateUser()}
-                  disabled={disableit}
+                  // disabled={disableit}
                   style={{marginBottom: 50}}>
                   <View style={{marginBottom: 50, marginTop: 20}}>
-                    <Buttons label="Save & Continue" disabled={disableit} />
+                    <Buttons
+                      label="Save & Continue"
+                      // disabled={disableit}
+                    />
                   </View>
                 </TouchableOpacity>
               </View>

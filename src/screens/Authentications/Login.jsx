@@ -9,16 +9,12 @@ import {
   Dimensions,
 } from 'react-native';
 import {Formik} from 'formik';
-import React, {useState, useContext, useEffect} from 'react';
+import React, {useState, useEffect} from 'react';
 import {useNavigation} from '@react-navigation/native';
-// import { observer } from 'mobx-react-lite';
 import Spinner from 'react-native-loading-spinner-overlay';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
-
-import CustomInput from '../../component/custominput/CustomInput';
 import KeyboardAvoidingWrapper from '../../component/KeyBoardAvoiding/keyBoardAvoiding';
-import Buttons from '../../component/buttons/Buttons';
 import Input from '../../component/inputField/input.component';
 import Loader from '../../component/loader/loader';
 import Button from '../../component/buttons/Button';
@@ -27,6 +23,7 @@ import {userLogin} from '../../stores/AuthStore';
 import {useDispatch, useSelector} from 'react-redux';
 import {signInUser} from '../../util/redux/userAuth/user.auth.slice';
 import Toast from 'react-native-toast-message';
+import {store} from '../../util/redux/store';
 
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;

@@ -1,38 +1,54 @@
-import React, {useEffect} from 'react';
-import {NavigationContainer} from '@react-navigation/native';
+import React, {useLayoutEffect, useRef} from 'react';
+import {
+  NavigationContainer,
+  DefaultTheme,
+  DarkTheme,
+  useNavigationContainerRef,
+} from '@react-navigation/native';
+import {useColorScheme} from 'react-native';
 import AppStack from './AppStack';
 import AuthStack from './AuthStack';
-import {onAuthStateChanged} from 'firebase/auth';
 import {auth} from '../util/firebase/firebaseConfig';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {userLogOut} from '../stores/AuthStore';
-import {signOutUser} from '../util/redux/userAuth/user.auth.slice';
-import {useDispatch, useSelector} from 'react-redux';
+import {useSelector} from 'react-redux';
+import SplashScreen from 'react-native-splash-screen';
 
 const AppNavigationContainer = () => {
-  const dispatch = useDispatch();
   const user = useSelector(state => state.userAuth.user);
-  // console.log(user?.user?.emailVerified);
-  //monitor auth state change events
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async user => {
-      await AsyncStorage.clear();
-      if (user) {
-        //prevent onBoarding screen from coming up
-        await AsyncStorage.setItem('hasUser', 'true');
-      }
-    });
-
-    return () => unsubscribe();
-  }, []);
-
-  // useEffect(async () => {
-  //   await AsyncStorage.clear();
-  // }, []);
-
+  const navigationRef = useNavigationContainerRef();
+  const routeNameRef = useRef();
+  const scheme = useColorScheme();
+  useLayoutEffect(() => {
+    if (
+      auth.currentUser === undefined ||
+      auth.currentUser === null ||
+      auth.currentUser
+    ) {
+      setTimeout(() => {
+        SplashScreen.hide();
+      }, 1000);
+    }
+  });
   return (
-    <NavigationContainer>
-      {user ? <AppStack /> : <AuthStack />}
+    <NavigationContainer
+      theme={scheme === 'dark' ? DarkTheme : DefaultTheme}
+      ref={navigationRef}
+      onReady={() => {
+        routeNameRef.current = navigationRef.getCurrentRoute();
+      }}
+      onStateChange={async () => {
+        const previousRouteName = routeNameRef.current;
+        const currentRouteName = navigationRef.getCurrentRoute();
+        console.log(currentRouteName.name);
+        // if (previousRouteName !== currentRouteName) {
+        //   // Save the current route name for later comparison
+        //   routeNameRef.current = currentRouteName;
+
+        //   // Replace the line below to add the tracker from a mobile analytics SDK
+        //   console.log(previousRouteName);
+        //   console.log(currentRouteName);
+        // }
+      }}>
+      {auth.currentUser !== null ? <AppStack /> : <AuthStack />}
     </NavigationContainer>
   );
 };

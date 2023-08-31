@@ -7,37 +7,68 @@ import ForgotPassword from '../screens/Authentications/ForgotPassword';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Stack = createNativeStackNavigator();
+const config = {
+  animation: 'slide',
+  config: {
+    stiffness: 1000,
+    damping: 500,
+    mass: 3,
+    overshootClamping: true,
+    restDisplacementThreshold: 0.01,
+    restSpeedThreshold: 0.01,
+  },
+};
 const AuthStack = () => {
-  const [hasUser, setHasUser] = useState(null);
-  const getUSerStorage = async () => {
-    try {
-      const hasUserr = await AsyncStorage.getItem('hasUser');
-      if (hasUserr !== null) {
-        setHasUser(hasUserr);
-      }
-    } catch (error) {}
-  };
+  const [isAppFirstLaunched, setIsAppFirstLaunched] = useState(null);
 
   useEffect(() => {
-    getUSerStorage();
+    const getUserStore = async () => {
+      const appData = await AsyncStorage.getItem('isAppFirstLaunched');
+      if (appData == null) {
+        setIsAppFirstLaunched(true);
+        AsyncStorage.setItem('isAppFirstLaunched', 'false');
+      } else {
+        setIsAppFirstLaunched(false);
+      }
+    };
+    getUserStore();
+
+    return () => {
+      getUserStore();
+    };
   }, []);
+
   return (
-    <Stack.Navigator screenOptions={{headerShown: false}}>
-      {!hasUser ? (
-        <>
-          <Stack.Screen name="OnboardingScreen" component={OnboardingScreen} />
-          <Stack.Screen name="Login" component={Login} />
-          <Stack.Screen name="SignUp" component={SignUp} />
-          <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
-        </>
-      ) : (
-        <>
-          <Stack.Screen name="Login" component={Login} />
-          <Stack.Screen name="SignUp" component={SignUp} />
-          <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
-        </>
-      )}
-    </Stack.Navigator>
+    isAppFirstLaunched != null && (
+      <Stack.Navigator screenOptions={{headerShown: false}}>
+        {isAppFirstLaunched ? (
+          <>
+            <Stack.Screen
+              name="OnboardingScreen"
+              component={OnboardingScreen}
+            />
+            <Stack.Screen
+              name="Login"
+              component={Login}
+              options={{
+                transitionSpec: {
+                  open: config,
+                  close: config,
+                },
+              }}
+            />
+            <Stack.Screen name="SignUp" component={SignUp} />
+            <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
+          </>
+        ) : (
+          <>
+            <Stack.Screen name="Login" component={Login} />
+            <Stack.Screen name="SignUp" component={SignUp} />
+            <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
+          </>
+        )}
+      </Stack.Navigator>
+    )
   );
 };
 

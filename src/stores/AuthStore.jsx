@@ -6,7 +6,6 @@ import {
   signOut,
   sendEmailVerification,
   sendPasswordResetEmail,
-  onAuthStateChanged,
   updateProfile,
 } from 'firebase/auth';
 import {BASE_URL} from '../../app.json';
@@ -37,7 +36,22 @@ const userLogin = async (email, password) => {
 };
 
 const userLogOut = async () => {
-  await signOut(auth);
+  try {
+    await signOut(auth);
+    return {
+      user: null,
+      title: 'Account Logout',
+      error: false,
+      message: 'Logout Successful',
+    };
+  } catch (err) {
+    return {
+      user: null,
+      title: 'Account Logout',
+      error: true,
+      message: 'Logout Failed',
+    };
+  }
 };
 
 const userSignUp = async details => {
