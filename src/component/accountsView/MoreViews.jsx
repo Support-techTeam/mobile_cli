@@ -1,43 +1,54 @@
-import { View, Text, StyleSheet } from 'react-native';
+import {View, Text, StyleSheet} from 'react-native';
 import React from 'react';
-import { AntDesign } from '@expo/vector-icons';
-import { Entypo } from '@expo/vector-icons';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-const CustomView = ({ label, isWallet, isSecurity, isSettings, isSupport, isRate }) => {
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import EntypoIcon from 'react-native-vector-icons/Entypo';
+
+const CustomView = ({
+  label,
+  isWallet,
+  isSecurity,
+  isSettings,
+  isSupport,
+  isRate,
+}) => {
   return (
     <View style={styles.container}>
       <View style={styles.rowView}>
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+        <View style={{flexDirection: 'row', alignItems: 'center'}}>
           {isWallet && (
             <View style={styles.icon}>
-              <Entypo name="wallet" size={24} color="#054B99" />
+              <EntypoIcon name="wallet" size={24} color="#054B99" />
             </View>
           )}
           {isSecurity && (
             <View style={styles.icon}>
-              <MaterialCommunityIcons name="shield-lock" size={24} color="#054B99" />
+              <Icon name="shield-lock" size={24} color="#054B99" />
             </View>
           )}
           {isSettings && (
             <View style={styles.icon}>
-              <AntDesign name="user" size={24} color="#054B99" />
+              <Icon name="account" size={24} color="#054B99" />
             </View>
           )}
           {isSupport && (
             <View style={styles.icon}>
-              <MaterialCommunityIcons name="chat-question" size={24} color="#054B99" />
+              <MaterialCommunityIcons
+                name="chat-question"
+                size={24}
+                color="#054B99"
+              />
             </View>
           )}
           {isRate && (
             <View style={styles.icon}>
-              <Entypo name="star" size={24} color="#F4B740" />
+              <EntypoIcon name="star" size={24} color="#F4B740" />
             </View>
           )}
           <Text style={styles.pageText}>{label}</Text>
         </View>
 
-        <AntDesign name="right" size={24} color="black" />
+        <Icon name="chevron-right" size={24} color="black" />
       </View>
     </View>
   );

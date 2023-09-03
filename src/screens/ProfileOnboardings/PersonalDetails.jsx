@@ -30,10 +30,10 @@ import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 import CustomInput from '../../component/custominput/CustomInput';
 import Input from '../../component/inputField/input.component';
 import InputPhone from '../../component/inputField/phone-input.component';
+import CustomDropdown from '../../component/dropDown/dropdown.component';
 import Buttons from '../../component/buttons/Buttons';
 import {Dropdown} from 'react-native-element-dropdown';
 import COLORS from '../../constants/colors';
-import CustomDropdown from '../../component/dropDown/dropdown.component';
 import {useSelector, useDispatch} from 'react-redux';
 import {
   createUserProfile,
@@ -47,9 +47,12 @@ import Toast from 'react-native-toast-message';
 import {userLogOut} from '../../stores/AuthStore';
 import {resetStore} from '../../util/redux/store';
 import {setProfile} from '../../util/redux/userProfile/user.profile.slice';
+import {useBottomTabBarHeight} from '@react-navigation/bottom-tabs';
+import RNRestart from 'react-native-restart';
 
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
+
 const titleData = [
   {value: '', label: 'Select Title'},
   {value: 'Mr', label: 'Mr'},
@@ -67,7 +70,10 @@ const genderData = [
 
 const stateData = [{value: '', label: 'Select State'}];
 
-const cityData = [{value: '', label: 'Select LGA'}];
+const cityData = [
+  {value: '', label: 'Select LGA'},
+  {value: '', label: 'N/A'},
+];
 const residencyData = [
   {value: '', label: 'Select Residential Status'},
   {value: 'Renting', label: 'Renting'},
@@ -132,16 +138,15 @@ const PersonalDetails = ({navigation}) => {
   const [cityByState, setCitybyState] = useState([]);
   const [city, setCity] = useState();
   const [isLoading, setIsLoading] = useState(false);
-
+  const tabBarHeight = useBottomTabBarHeight();
   const user = useSelector(state => state.userAuth.user);
-  const stateRedux = useSelector(state => state.locationData.state);
   const dispatch = useDispatch();
 
   const [userDetails, setUserDetails] = useState({
     title: '',
-    email: JSON.parse(user)?.user?.email,
-    firstName: JSON.parse(user)?.user?.displayName?.split(' ')[0],
-    lastName: JSON.parse(user)?.user?.displayName?.split(' ')[1],
+    email: JSON.parse(user)?.email,
+    firstName: JSON.parse(user)?.displayName?.split(' ')[0],
+    lastName: JSON.parse(user)?.displayName?.split(' ')[1],
     phoneNumber: '',
     bvn: '',
     nin: '',
@@ -166,25 +171,23 @@ const PersonalDetails = ({navigation}) => {
     setUserDetails({
       ...userDetails,
       firstName:
-        (user &&
-          JSON.parse(user)?.user?.displayName?.split(' ')[1] == undefined) ||
-        JSON.parse(user)?.user?.displayName?.split(' ')[1] == null ||
-        JSON.parse(user)?.user?.displayName?.split(' ')[0] == ''
+        (user && JSON.parse(user)?.displayName?.split(' ')[1] == undefined) ||
+        JSON.parse(user)?.displayName?.split(' ')[1] == null ||
+        JSON.parse(user)?.displayName?.split(' ')[0] == ''
           ? ''
-          : JSON.parse(user)?.user?.displayName?.split(' ')[0],
+          : JSON.parse(user)?.displayName?.split(' ')[0],
       lastName:
-        (user &&
-          JSON.parse(user)?.user?.displayName?.split(' ')[1] == undefined) ||
-        JSON.parse(user)?.user?.displayName?.split(' ')[1] == null ||
-        JSON.parse(user)?.user?.displayName?.split(' ')[1] == ''
+        (user && JSON.parse(user)?.displayName?.split(' ')[1] == undefined) ||
+        JSON.parse(user)?.displayName?.split(' ')[1] == null ||
+        JSON.parse(user)?.displayName?.split(' ')[1] == ''
           ? ''
-          : JSON.parse(user)?.user?.displayName?.split(' ')[1],
+          : JSON.parse(user)?.displayName?.split(' ')[1],
       email:
-        (user && JSON.parse(user)?.user?.email == undefined) ||
-        JSON.parse(user)?.user?.email == null ||
-        JSON.parse(user)?.user?.email == ''
+        (user && JSON.parse(user)?.email == undefined) ||
+        JSON.parse(user)?.email == null ||
+        JSON.parse(user)?.email == ''
           ? ''
-          : JSON.parse(user)?.user?.email,
+          : JSON.parse(user)?.email,
     });
   }, [user]);
 
@@ -310,11 +313,11 @@ const PersonalDetails = ({navigation}) => {
     !userDetails.phoneNumber ||
     !userDetails.address ||
     !userDetails.title ||
-    !userDetails.firstName ||
-    !userDetails.lastName ||
+    // !userDetails.firstName ||
+    // !userDetails.lastName ||
+    // !userDetails.email ||
     !userDetails.bvn ||
-    !userDetails.nin ||
-    !userDetails.email;
+    !userDetails.nin;
 
   const showDatePicker = () => {
     setShow(true);
@@ -331,28 +334,10 @@ const PersonalDetails = ({navigation}) => {
     setShow(false);
   };
 
-  const handleLogOut = async () => {
-    const res = await userLogOut();
-    if (res.error) {
-      Toast.show({
-        type: 'error',
-        position: 'top',
-        topOffset: 50,
-        text1: res.title,
-        text2: res.message,
-        visibilityTime: 3000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
-    } else {
-      await resetStore();
-    }
-  };
-
   const handleCreateUser = async () => {
     setIsLoading(true);
     const res = await createUserProfile(userDetails);
-    if (res.data.data.error) {
+    if (res.data.error) {
       Toast.show({
         type: 'error',
         position: 'top',
@@ -374,7 +359,9 @@ const PersonalDetails = ({navigation}) => {
         autoHide: true,
         onPress: () => Toast.hide(),
       });
-      dispatch(setProfile(res.data.data));
+      dispatch(setProfile(res.data));
+      // To test new implementation
+      // RNRestart.restart();
     }
     setIsLoading(true);
   };
@@ -473,7 +460,7 @@ const PersonalDetails = ({navigation}) => {
             textContent={'Loading Profile Details...'}
             textStyle={{color: 'white'}}
             visible={true}
-            overlayColor="rgba(16, 17, 16, 0.70)"
+            overlayColor="rgba(78, 75, 102, 0.7)"
           />
           <View
             style={{
@@ -503,7 +490,7 @@ const PersonalDetails = ({navigation}) => {
               textContent={'Creating user Profile Details...'}
               textStyle={{color: 'white'}}
               visible={true}
-              overlayColor="rgba(16, 17, 16, 0.70)"
+              overlayColor="rgba(78, 75, 102, 0.7)"
             />
           )}
           <ImageBackground
@@ -514,7 +501,10 @@ const PersonalDetails = ({navigation}) => {
               bounces={false}
               showsHorizontalScrollIndicator={false}
               showsVerticalScrollIndicator={false}
-              style={{paddingHorizontal: 10, marginBottom: 60}}>
+              style={{
+                paddingHorizontal: 10,
+                marginBottom: tabBarHeight + 25,
+              }}>
               <View style={styles.HeadView}>
                 <View style={styles.TopView}>
                   <Text style={styles.TextHead}>CREATE PROFILE</Text>
@@ -567,7 +557,7 @@ const PersonalDetails = ({navigation}) => {
                   error={errors.firstname}
                   isNeeded={true}
                   defaultValue={
-                    user && JSON.parse(user)?.user?.displayName?.split(' ')[0]
+                    user && JSON.parse(user)?.displayName?.split(' ')[0]
                   }
                 />
 
@@ -582,7 +572,7 @@ const PersonalDetails = ({navigation}) => {
                   error={errors.lastName}
                   isNeeded={true}
                   defaultValue={
-                    user && JSON.parse(user)?.user?.displayName?.split(' ')[1]
+                    user && JSON.parse(user)?.displayName?.split(' ')[1]
                   }
                 />
 
@@ -599,7 +589,7 @@ const PersonalDetails = ({navigation}) => {
                   editable={
                     user && JSON.parse(user)?.user?.email ? false : true
                   }
-                  defaultValue={user && JSON.parse(user)?.user?.email}
+                  defaultValue={user && JSON.parse(user)?.email}
                 />
 
                 <InputPhone
@@ -929,10 +919,10 @@ const PersonalDetails = ({navigation}) => {
                 ) : null}
 
                 <TouchableOpacity
-                  onPress={() => handleCreateUser()}
-                  disabled={disableit}
-                  style={{marginBottom: 50}}>
-                  <View style={{marginBottom: 50, marginTop: 20}}>
+                  // onPress={() => handleCreateUser()}
+                  onPress={() => validate()}
+                  disabled={disableit}>
+                  <View style={{marginBottom: 5, marginTop: 20}}>
                     <Buttons label="Save & Continue" disabled={disableit} />
                   </View>
                 </TouchableOpacity>
@@ -950,7 +940,6 @@ export default PersonalDetails;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // paddingTop: statusBarHeight,
     paddingHorizontal: 30,
     backgroundColor: '#fff',
   },

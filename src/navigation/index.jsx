@@ -1,4 +1,4 @@
-import React, {useLayoutEffect, useRef} from 'react';
+import React, {useLayoutEffect, useRef, useState} from 'react';
 import {
   NavigationContainer,
   DefaultTheme,
@@ -9,25 +9,37 @@ import {useColorScheme} from 'react-native';
 import AppStack from './AppStack';
 import AuthStack from './AuthStack';
 import {auth} from '../util/firebase/firebaseConfig';
-import {useSelector} from 'react-redux';
+import Spinner from 'react-native-loading-spinner-overlay';
 import SplashScreen from 'react-native-splash-screen';
+import Splashscreen from './Splashscreen';
+import {UserProvider} from '../context/userContext';
 
 const AppNavigationContainer = () => {
-  const user = useSelector(state => state.userAuth.user);
   const navigationRef = useNavigationContainerRef();
   const routeNameRef = useRef();
   const scheme = useColorScheme();
+  const [user, setUser] = useState();
+  const [isLoading, setIsLoading] = useState(true);
+
   useLayoutEffect(() => {
     if (
       auth.currentUser === undefined ||
       auth.currentUser === null ||
       auth.currentUser
     ) {
-      setTimeout(() => {
-        SplashScreen.hide();
-      }, 1000);
+      SplashScreen.hide();
     }
-  });
+  }, []);
+
+  useLayoutEffect(() => {
+    const subscriber = auth.onAuthStateChanged(user => {
+      // console.log('user', JSON.stringify(user));
+      setUser(user);
+      setIsLoading(false);
+    });
+
+    return subscriber;
+  }, []);
   return (
     <NavigationContainer
       theme={scheme === 'dark' ? DarkTheme : DefaultTheme}
@@ -39,16 +51,16 @@ const AppNavigationContainer = () => {
         const previousRouteName = routeNameRef.current;
         const currentRouteName = navigationRef.getCurrentRoute();
         console.log(currentRouteName);
-        // if (previousRouteName !== currentRouteName) {
-        //   // Save the current route name for later comparison
-        //   routeNameRef.current = currentRouteName;
-
-        //   // Replace the line below to add the tracker from a mobile analytics SDK
-        //   console.log(previousRouteName);
-        //   console.log(currentRouteName);
-        // }
       }}>
-      {auth.currentUser !== null ? <AppStack /> : <AuthStack />}
+      {!user && isLoading ? (
+        <Splashscreen text="Checking Authentication..." />
+      ) : user ? (
+        // <UserProvider>
+        <AppStack />
+      ) : (
+        // </UserProvider>
+        <AuthStack />
+      )}
     </NavigationContainer>
   );
 };

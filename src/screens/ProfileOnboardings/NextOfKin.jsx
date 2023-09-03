@@ -1,22 +1,28 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import React, { useContext, useEffect, useState } from 'react';
-import { Picker } from '@react-native-picker/picker';
-import { AntDesign } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+} from 'react-native';
+import React, {useContext, useEffect, useState} from 'react';
+import {Picker} from '@react-native-picker/picker';
+import {AntDesign} from '@expo/vector-icons';
+import {useNavigation} from '@react-navigation/native';
 import Spinner from 'react-native-loading-spinner-overlay/lib';
-import { observer } from 'mobx-react-lite';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import {observer} from 'mobx-react-lite';
+import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 
 import CustomInput from '../../component/custominput/CustomInput';
 import Buttons from '../../component/buttons/Buttons';
 import PhoneInput from 'react-native-phone-number-input';
-import { StoreContext } from '../../config/mobX stores/RootStore';
+import {StoreContext} from '../../config/mobX stores/RootStore';
 
-const NextOfKin = ({ route }) => {
+const NextOfKin = ({route}) => {
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
-  const { loansStore } = useContext(StoreContext);
-  const { success, sending, loanUserdetails, loading } = loansStore;
+  const {loansStore} = useContext(StoreContext);
+  const {success, sending, loanUserdetails, loading} = loansStore;
 
   useEffect(() => {
     loansStore.getLoanUserDetails();
@@ -36,15 +42,32 @@ const NextOfKin = ({ route }) => {
 
   useEffect(() => {
     setKinDetails({
-      firstName: nokDetails && nokDetails?.firstName === undefined ? '' : nokDetails?.firstName,
-      lastName: nokDetails && nokDetails?.lastName === undefined ? '' : nokDetails?.lastName,
+      firstName:
+        nokDetails && nokDetails?.firstName === undefined
+          ? ''
+          : nokDetails?.firstName,
+      lastName:
+        nokDetails && nokDetails?.lastName === undefined
+          ? ''
+          : nokDetails?.lastName,
       relationship:
-        nokDetails && nokDetails?.relationship === undefined ? '' : nokDetails?.relationship,
-      email: nokDetails && nokDetails?.email === undefined ? '' : nokDetails?.email,
-      Address: nokDetails && nokDetails?.Address === undefined ? '' : nokDetails?.Address,
+        nokDetails && nokDetails?.relationship === undefined
+          ? ''
+          : nokDetails?.relationship,
+      email:
+        nokDetails && nokDetails?.email === undefined ? '' : nokDetails?.email,
+      Address:
+        nokDetails && nokDetails?.Address === undefined
+          ? ''
+          : nokDetails?.Address,
       phoneNumber:
-        nokDetails && nokDetails?.phoneNumber === undefined ? '' : nokDetails?.phoneNumber,
-      gender: nokDetails && nokDetails?.gender === undefined ? '' : nokDetails?.gender,
+        nokDetails && nokDetails?.phoneNumber === undefined
+          ? ''
+          : nokDetails?.phoneNumber,
+      gender:
+        nokDetails && nokDetails?.gender === undefined
+          ? ''
+          : nokDetails?.gender,
     });
   }, [nokDetails]);
 
@@ -87,22 +110,21 @@ const NextOfKin = ({ route }) => {
         paddingBottom: insets.bottom !== 0 ? insets.bottom / 2 : 'auto',
         paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
         paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
-      }}
-    >
+      }}>
       {sending && (
         <Spinner
           textContent={'Please wait...'}
-          textStyle={{ color: 'white' }}
+          textStyle={{color: 'white'}}
           visible={true}
-          overlayColor="rgba(16, 17, 16, 0.70)"
+          overlayColor="rgba(78, 75, 102, 0.7)"
         />
       )}
       {loading && (
         <Spinner
           textContent={'Loading...'}
-          textStyle={{ color: 'white' }}
+          textStyle={{color: 'white'}}
           visible={true}
-          overlayColor="rgba(16, 17, 16, 0.70)"
+          overlayColor="rgba(78, 75, 102, 0.7)"
         />
       )}
 
@@ -112,16 +134,14 @@ const NextOfKin = ({ route }) => {
           justifyContent: 'space-between',
           alignItems: 'center',
           marginHorizontal: 15,
-        }}
-      >
+        }}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <View
             style={{
               borderWidth: 0.5,
               borderColor: '#D9DBE9',
               borderRadius: 5,
-            }}
-          >
+            }}>
             <AntDesign name="left" size={24} color="black" />
           </View>
         </TouchableOpacity>
@@ -139,8 +159,7 @@ const NextOfKin = ({ route }) => {
         bounces={false}
         showsHorizontalScrollIndicator={false}
         showsVerticalScrollIndicator={false}
-        style={[styles.innercontainer]}
-      >
+        style={[styles.innercontainer]}>
         <View style={styles.form}>
           <Text style={styles.header}>
             Trade Lenda requires this information of your next of kin
@@ -150,17 +169,21 @@ const NextOfKin = ({ route }) => {
           <CustomInput
             label="First name"
             defaultValue={kinDetails.firstName}
-            onChangeText={(text) => setKinDetails({ ...kinDetails, firstName: text })}
+            onChangeText={text =>
+              setKinDetails({...kinDetails, firstName: text})
+            }
             isNeeded={true}
           />
           <CustomInput
             label="Last name"
             defaultValue={kinDetails.lastName}
-            onChangeText={(text) => setKinDetails({ ...kinDetails, lastName: text })}
+            onChangeText={text =>
+              setKinDetails({...kinDetails, lastName: text})
+            }
             isNeeded={true}
           />
-          <View style={{ marginVertical: 10 }}>
-            <View style={{ flexDirection: 'row' }}>
+          <View style={{marginVertical: 10}}>
+            <View style={{flexDirection: 'row'}}>
               <Text
                 style={{
                   paddingBottom: 4,
@@ -169,18 +192,18 @@ const NextOfKin = ({ route }) => {
                   lineHeight: 24,
                   color: '#14142B',
                   fontFamily: 'Montserat',
-                }}
-              >
+                }}>
                 Gender
               </Text>
-              <Text style={{ color: 'red', marginRight: 10 }}>*</Text>
+              <Text style={{color: 'red', marginRight: 10}}>*</Text>
             </View>
 
             <View style={styles.pick}>
               <Picker
                 selectedValue={kinDetails.gender}
-                onValueChange={(itemValue) => setKinDetails({ ...kinDetails, gender: itemValue })}
-              >
+                onValueChange={itemValue =>
+                  setKinDetails({...kinDetails, gender: itemValue})
+                }>
                 <Picker.Item label="Select Gender" value="" />
                 <Picker.Item label="Male" value="Male" />
                 <Picker.Item label="Female" value="Female" />
@@ -191,7 +214,9 @@ const NextOfKin = ({ route }) => {
           <CustomInput
             label="Next of kin's Relationship"
             value={kinDetails.relationship}
-            onChangeText={(text) => setKinDetails({ ...kinDetails, relationship: text })}
+            onChangeText={text =>
+              setKinDetails({...kinDetails, relationship: text})
+            }
             isNeeded={true}
           />
 
@@ -201,15 +226,15 @@ const NextOfKin = ({ route }) => {
             autoCorrect={false}
             autoCapitalize="none"
             defaultValue={kinDetails.email}
-            onChangeText={(text) => setKinDetails({ ...kinDetails, email: text })}
+            onChangeText={text => setKinDetails({...kinDetails, email: text})}
             isNeeded={true}
           />
 
-          <View style={{ marginVertical: 10 }}>
-            <View style={{ marginBottom: -14 }}>
-              <View style={{ flexDirection: 'row' }}>
+          <View style={{marginVertical: 10}}>
+            <View style={{marginBottom: -14}}>
+              <View style={{flexDirection: 'row'}}>
                 <Text style={styles.label}>Phone number</Text>
-                <Text style={{ color: 'red', marginRight: 10 }}>*</Text>
+                <Text style={{color: 'red', marginRight: 10}}>*</Text>
               </View>
             </View>
             <View>
@@ -221,9 +246,9 @@ const NextOfKin = ({ route }) => {
                 containerStyle={styles.phoneContainer}
                 placeholder=" "
                 defaultValue={kinDetails?.phoneNumber}
-                codeTextStyle={{ color: '#6E7191' }}
-                onChangeFormattedText={(text) =>
-                  setKinDetails({ ...kinDetails, phoneNumber: text })
+                codeTextStyle={{color: '#6E7191'}}
+                onChangeFormattedText={text =>
+                  setKinDetails({...kinDetails, phoneNumber: text})
                 }
               />
             </View>
@@ -232,17 +257,18 @@ const NextOfKin = ({ route }) => {
           <CustomInput
             label="Address"
             defaultValue={kinDetails.Address}
-            onChangeText={(text) => setKinDetails({ ...kinDetails, Address: text })}
+            onChangeText={text => setKinDetails({...kinDetails, Address: text})}
             isNeeded={true}
           />
 
           <TouchableOpacity
             onPress={
-              nokDetails?.firstName === undefined ? handleCreateNokDetails : handleUpdateNokDetails
+              nokDetails?.firstName === undefined
+                ? handleCreateNokDetails
+                : handleUpdateNokDetails
             }
-            disabled={disableit}
-          >
-            <View style={{ marginBottom: 40, marginTop: 20 }}>
+            disabled={disableit}>
+            <View style={{marginBottom: 40, marginTop: 20}}>
               <Buttons label="Save & Continue" disabled={disableit} />
             </View>
           </TouchableOpacity>
@@ -319,7 +345,7 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     // borderWidth:.5,
     shadowColor: 'black',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.8,
     shadowRadius: 2,
     backgroundColor: '#ffffff',

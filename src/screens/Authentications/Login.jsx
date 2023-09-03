@@ -23,7 +23,8 @@ import {userLogin} from '../../stores/AuthStore';
 import {useDispatch, useSelector} from 'react-redux';
 import {signInUser} from '../../util/redux/userAuth/user.auth.slice';
 import Toast from 'react-native-toast-message';
-import {store} from '../../util/redux/store';
+import {getProfileDetails} from '../../stores/ProfileStore';
+import {setProfile} from '../../util/redux/userProfile/user.profile.slice';
 
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
@@ -41,6 +42,17 @@ const Login = () => {
   });
 
   const dispatch = useDispatch();
+
+  const getUSerStorage = async () => {
+    const emaill = await AsyncStorage.getItem('userEmail');
+    if (emaill !== null) {
+      setUserMail(emaill);
+    }
+  };
+
+  useEffect(() => {
+    getUSerStorage();
+  }, []);
 
   useEffect(() => {
     setUserDetails({
@@ -62,7 +74,7 @@ const Login = () => {
         topOffset: 50,
         text1: res.title,
         text2: res.message,
-        visibilityTime: 3000,
+        visibilityTime: 5000,
         autoHide: true,
         onPress: () => Toast.hide(),
       });
@@ -77,9 +89,22 @@ const Login = () => {
         autoHide: true,
         onPress: () => Toast.hide(),
       });
-      dispatch(signInUser(JSON.stringify(res)));
+      dispatch(signInUser(JSON.stringify(res.user)));
+      fetchProfileData();
     }
     setIsLoading(false);
+  };
+
+  const fetchProfileData = async () => {
+    try {
+      const res = await getProfileDetails();
+      if (res?.data !== undefined) {
+        if (res.error) {
+        } else {
+          dispatch(setProfile(res?.data));
+        }
+      }
+    } catch (error) {}
   };
 
   const validate = async () => {
@@ -128,7 +153,7 @@ const Login = () => {
           textContent={'Logging in...'}
           textStyle={{color: 'white'}}
           visible={true}
-          overlayColor="rgba(16, 17, 17, 0.7)"
+          overlayColor="rgba(78, 75, 102, 0.7)"
           animation="slide"
         />
       )}

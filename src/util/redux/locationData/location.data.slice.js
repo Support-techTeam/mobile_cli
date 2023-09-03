@@ -8,10 +8,10 @@ export const locationSlice = createSlice({
   },
   reducers: {
     setReduxState: (state, action) => {
-      return {...state.state, state: action.payload};
+      return {...state, state: action.payload};
     },
     setReduxCity: (state, action) => {
-      return {...state.city, city: action.payload};
+      return {...state, city: action.payload};
     },
     clearLocationReduxState: state => {
       return {

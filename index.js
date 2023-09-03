@@ -4,23 +4,42 @@ import {AppRegistry, Text, View} from 'react-native';
 import App from './App';
 import {name as appName} from './app.json';
 import Toast, {BaseToast, ErrorToast} from 'react-native-toast-message';
+import {NativeBaseProvider, extendTheme} from 'native-base';
+
+const newColorTheme = {
+  brand: {
+    900: '#5B8DF6',
+    800: '#ffffff',
+    700: '#cccccc',
+  },
+};
+
+const themeNative = extendTheme({
+  colors: newColorTheme,
+});
 
 const toastConfig = {
   success: props => (
     <BaseToast
       {...props}
       style={{
-        borderLeftColor: 'green',
-        borderRightColor: 'green',
+        borderLeftColor: '#28a745',
+        borderRightColor: '#28a745',
         borderRightWidth: 2,
+        backgroundColor: '#28a745',
       }}
-      contentContainerStyle={{paddingHorizontal: 15}}
+      contentContainerStyle={{
+        paddingHorizontal: 15,
+        backgroundColor: '#28a745',
+      }}
       text1Style={{
         fontSize: 15,
         fontWeight: '400',
+        color: 'white',
       }}
       text2Style={{
         fontSize: 14,
+        color: 'white',
       }}
     />
   ),
@@ -29,36 +48,48 @@ const toastConfig = {
     <ErrorToast
       {...props}
       style={{
-        borderLeftColor: 'red',
-        borderRightColor: 'red',
+        borderLeftColor: '#dc3545',
+        borderRightColor: '#dc3545',
         borderRightWidth: 2,
+        backgroundColor: '#dc3545',
       }}
-      contentContainerStyle={{paddingHorizontal: 15}}
+      contentContainerStyle={{
+        paddingHorizontal: 15,
+        backgroundColor: '#dc3545',
+      }}
       text1Style={{
         fontSize: 15,
         fontWeight: '400',
+        color: 'white',
       }}
       text2Style={{
         fontSize: 14,
+        color: 'white',
       }}
     />
   ),
 
   info: props => (
-    <ErrorToast
+    <BaseToast
       {...props}
       style={{
-        borderLeftColor: 'skyblue',
-        borderRightColor: 'skyblue',
+        borderLeftColor: '#17a2b8',
+        borderRightColor: '#17a2b8',
         borderRightWidth: 2,
+        backgroundColor: '#17a2b8',
       }}
-      contentContainerStyle={{paddingHorizontal: 15}}
+      contentContainerStyle={{
+        paddingHorizontal: 15,
+        backgroundColor: '#17a2b8',
+      }}
       text1Style={{
         fontSize: 15,
         fontWeight: '400',
+        color: 'white',
       }}
       text2Style={{
         fontSize: 14,
+        color: 'white',
       }}
     />
   ),
@@ -67,17 +98,23 @@ const toastConfig = {
     <ErrorToast
       {...props}
       style={{
-        borderLeftColor: 'orange',
-        borderRightColor: 'orange',
+        borderLeftColor: '#ffc107',
+        borderRightColor: '#ffc107',
         borderRightWidth: 2,
+        backgroundColor: '#ffc107',
       }}
-      contentContainerStyle={{paddingHorizontal: 15}}
+      contentContainerStyle={{
+        paddingHorizontal: 15,
+        backgroundColor: '#ffc107',
+      }}
       text1Style={{
         fontSize: 15,
         fontWeight: '400',
+        color: 'white',
       }}
       text2Style={{
         fontSize: 14,
+        color: 'white',
       }}
     />
   ),
@@ -91,9 +128,9 @@ const toastConfig = {
 };
 
 const AppWithToast = () => (
-  <>
+  <NativeBaseProvider theme={themeNative}>
     <App />
     <Toast config={toastConfig} />
-  </>
+  </NativeBaseProvider>
 );
 AppRegistry.registerComponent(appName, () => AppWithToast);

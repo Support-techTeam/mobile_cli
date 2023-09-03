@@ -39,9 +39,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {Provider} from 'react-redux';
 import {PersistGate} from 'redux-persist/integration/react';
 import {persistor, store} from './src/util/redux/store';
+import {LightTheme} from './src/constants/lightTheme';
 
 const inAppUpdates = new SpInAppUpdates(false);
 LogBox.ignoreAllLogs();
+
 AppCenter.setLogLevel(AppCenter.LogLevel.VERBOSE);
 Analytics.setEnabled(true);
 Crashes.setEnabled(true);
@@ -90,19 +92,6 @@ function App() {
   useEffect(() => {
     readItemFromStorage();
   });
-
-  const showToast = () => {
-    Toast.show({
-      type: 'success', // "success", "error", "info", "warning"
-      position: 'bottom', // "top" or "bottom"
-      bottomOffset: 20,
-      text1: 'Toast Message',
-      text2: 'This is a toast message.',
-      visibilityTime: 3000,
-      autoHide: true,
-      onPress: () => Toast.hide(),
-    });
-  };
 
   //update check
   useEffect(() => {
@@ -191,15 +180,16 @@ function App() {
   };
 
   const theme = {
-    ...MD3LightTheme, // or MD3DarkTheme
-    roundness: 2,
-    colors: {
-      ...MD3LightTheme.colors,
-      primary: '#3498db',
-      secondary: '#f1c40f',
-      tertiary: '#a1b2c3',
-      secondaryContainer: '#054B99',
-    },
+    ...LightTheme,
+    // ...MD3LightTheme, // or MD3DarkTheme
+    // roundness: 2,
+    // colors: {
+    //   ...MD3LightTheme.colors,
+    //   primary: '#3498db',
+    //   secondary: '#f1c40f',
+    //   tertiary: '#a1b2c3',
+    //   secondaryContainer: '#054B99',
+    // },
   };
 
   useEffect(() => {

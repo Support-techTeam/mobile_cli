@@ -19,7 +19,7 @@ import COLORS from '../../constants/colors';
 import {useRoute} from '@react-navigation/native';
 import {resetStore} from '../../util/redux/store';
 
-const Verification = ({navigation}) => {
+const Verification = () => {
   const dispatch = useDispatch();
   const user = useSelector(state => state.userAuth.user);
   const insets = useSafeAreaInsets();
@@ -47,7 +47,6 @@ const Verification = ({navigation}) => {
     }
   }, [isVerified == false && route.name === 'Verification' ? count : '']);
 
-  console.log(isVerified);
   const handleSignOut = async () => {
     const res = await userLogOut();
     if (res.error) {
@@ -111,7 +110,7 @@ const Verification = ({navigation}) => {
           textContent={'Resending Verification Email...'}
           textStyle={{color: 'white'}}
           visible={true}
-          overlayColor="rgba(16, 17, 17, 0.7)"
+          overlayColor="rgba(78, 75, 102, 0.7)"
           animation="slide"
         />
       )}

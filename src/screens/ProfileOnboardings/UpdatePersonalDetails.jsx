@@ -1,29 +1,36 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Pressable } from 'react-native';
-import React, { useContext, useEffect, useState } from 'react';
-import { Picker } from '@react-native-picker/picker';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  Pressable,
+} from 'react-native';
+import React, {useContext, useEffect, useState} from 'react';
+import {Picker} from '@react-native-picker/picker';
 import PhoneInput from 'react-native-phone-number-input';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
-import { useNavigation } from '@react-navigation/native';
-import { AntDesign } from '@expo/vector-icons';
-import { toJS } from 'mobx';
-import { observer } from 'mobx-react-lite';
+import {useNavigation} from '@react-navigation/native';
+import {AntDesign} from '@expo/vector-icons';
+import {toJS} from 'mobx';
+import {observer} from 'mobx-react-lite';
 import Spinner from 'react-native-loading-spinner-overlay/lib';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 
 import CustomInput from '../../component/custominput/CustomInput';
 import Buttons from '../../component/buttons/Buttons';
-import { StoreContext } from '../../config/mobX stores/RootStore';
+import {StoreContext} from '../../config/mobX stores/RootStore';
 
-const UpdatePersonalDetails = ({ route }) => {
+const UpdatePersonalDetails = ({route}) => {
   const navigation = useNavigation();
   const [show, setShow] = useState(false);
   const date = new Date(2000, 0, 1);
   const insets = useSafeAreaInsets();
   // const [profileDetails, setProfileDetails] = useState({});
 
-  const { loansStore, authStore } = useContext(StoreContext);
-  const { loadingProfile, profile } = authStore;
-  const { success, sending } = loansStore;
+  const {loansStore, authStore} = useContext(StoreContext);
+  const {loadingProfile, profile} = authStore;
+  const {success, sending} = loansStore;
 
   useEffect(() => {
     authStore.getProfileDetails();
@@ -54,40 +61,69 @@ const UpdatePersonalDetails = ({ route }) => {
   useEffect(() => {
     setUserDetails({
       firstName:
-        profileDetails && profileDetails?.firstName === undefined ? '' : profileDetails?.firstName,
+        profileDetails && profileDetails?.firstName === undefined
+          ? ''
+          : profileDetails?.firstName,
       lastName:
-        profileDetails && profileDetails?.lastName === undefined ? '' : profileDetails?.lastName,
-      email: profileDetails && profileDetails?.email === undefined ? '' : profileDetails?.email,
-      title: profileDetails && profileDetails?.title === undefined ? '' : profileDetails?.title,
+        profileDetails && profileDetails?.lastName === undefined
+          ? ''
+          : profileDetails?.lastName,
+      email:
+        profileDetails && profileDetails?.email === undefined
+          ? ''
+          : profileDetails?.email,
+      title:
+        profileDetails && profileDetails?.title === undefined
+          ? ''
+          : profileDetails?.title,
       phoneNumber:
         profileDetails && profileDetails?.phoneNumber === undefined
           ? ''
           : profileDetails?.phoneNumber,
-      bvn: profileDetails && profileDetails?.bvn === undefined ? '' : profileDetails?.bvn,
+      bvn:
+        profileDetails && profileDetails?.bvn === undefined
+          ? ''
+          : profileDetails?.bvn,
       dob:
         profileDetails && profileDetails?.dob === undefined
           ? ''
           : profileDetails?.dob?.substr(0, 10),
       address:
-        profileDetails && profileDetails?.address === undefined ? '' : profileDetails?.address,
+        profileDetails && profileDetails?.address === undefined
+          ? ''
+          : profileDetails?.address,
       country:
-        profileDetails && profileDetails?.country === undefined ? '' : profileDetails?.country,
-      state: profileDetails && profileDetails?.state === undefined ? '' : profileDetails?.state,
-      city: profileDetails && profileDetails?.city === undefined ? '' : profileDetails?.city,
+        profileDetails && profileDetails?.country === undefined
+          ? ''
+          : profileDetails?.country,
+      state:
+        profileDetails && profileDetails?.state === undefined
+          ? ''
+          : profileDetails?.state,
+      city:
+        profileDetails && profileDetails?.city === undefined
+          ? ''
+          : profileDetails?.city,
       maritalStatus:
         profileDetails && profileDetails?.maritalStatus === undefined
           ? ''
           : profileDetails?.maritalStatus,
       eduLevel:
-        profileDetails && profileDetails?.eduLevel === undefined ? '' : profileDetails?.eduLevel,
-      gender: profileDetails && profileDetails?.gender === undefined ? '' : profileDetails?.gender,
+        profileDetails && profileDetails?.eduLevel === undefined
+          ? ''
+          : profileDetails?.eduLevel,
+      gender:
+        profileDetails && profileDetails?.gender === undefined
+          ? ''
+          : profileDetails?.gender,
 
       residentialStatus:
         profileDetails && profileDetails?.residentialStatus === undefined
           ? ''
           : profileDetails?.residentialStatus,
       yearYouMovedToCurrentAddress:
-        profileDetails && profileDetails?.yearYouMovedToCurrentAddress === undefined
+        profileDetails &&
+        profileDetails?.yearYouMovedToCurrentAddress === undefined
           ? ''
           : profileDetails?.yearYouMovedToCurrentAddress,
       NoOfDependents:
@@ -116,7 +152,7 @@ const UpdatePersonalDetails = ({ route }) => {
 
   useEffect(() => {
     if (userDetails.state !== '') {
-      setCitybyState(state.filter((statee) => statee === userDetails.state));
+      setCitybyState(state.filter(statee => statee === userDetails.state));
     }
   }, [userDetails.state, state]);
 
@@ -135,10 +171,10 @@ const UpdatePersonalDetails = ({ route }) => {
     setShow(false);
   };
 
-  const handleConfirm = (selectedDate) => {
+  const handleConfirm = selectedDate => {
     const currentDate = selectedDate || date;
     const formattedDate = new Date(currentDate).toISOString().split('T')[0];
-    setUserDetails({ ...userDetails, dob: formattedDate });
+    setUserDetails({...userDetails, dob: formattedDate});
     setShow(false);
   };
 
@@ -173,22 +209,21 @@ const UpdatePersonalDetails = ({ route }) => {
         paddingBottom: insets.bottom !== 0 ? insets.bottom / 2 : 'auto',
         paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
         paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
-      }}
-    >
+      }}>
       {loadingProfile && (
         <Spinner
           textContent={'Loading...'}
-          textStyle={{ color: 'white' }}
+          textStyle={{color: 'white'}}
           visible={true}
-          overlayColor="rgba(16, 17, 16, 0.70)"
+          overlayColor="rgba(78, 75, 102, 0.7)"
         />
       )}
       {sending && (
         <Spinner
           textContent={'Updating Profile Details...'}
-          textStyle={{ color: 'white' }}
+          textStyle={{color: 'white'}}
           visible={true}
-          overlayColor="rgba(16, 17, 16, 0.70)"
+          overlayColor="rgba(78, 75, 102, 0.7)"
         />
       )}
       <View
@@ -196,16 +231,14 @@ const UpdatePersonalDetails = ({ route }) => {
           flexDirection: 'row',
           justifyContent: 'space-between',
           alignItems: 'center',
-        }}
-      >
+        }}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <View
             style={{
               borderWidth: 0.5,
               borderColor: '#D9DBE9',
               borderRadius: 5,
-            }}
-          >
+            }}>
             <AntDesign name="left" size={24} color="black" />
           </View>
         </TouchableOpacity>
@@ -221,8 +254,7 @@ const UpdatePersonalDetails = ({ route }) => {
       <ScrollView
         bounces={false}
         showsHorizontalScrollIndicator={false}
-        showsVerticalScrollIndicator={false}
-      >
+        showsVerticalScrollIndicator={false}>
         <View>
           <View style={styles.HeadView}>
             <Text style={styles.extraText}>
@@ -230,8 +262,8 @@ const UpdatePersonalDetails = ({ route }) => {
             </Text>
           </View>
 
-          <View style={{ marginVertical: 10 }}>
-            <View style={{ flexDirection: 'row' }}>
+          <View style={{marginVertical: 10}}>
+            <View style={{flexDirection: 'row'}}>
               <Text
                 style={{
                   paddingBottom: 4,
@@ -240,18 +272,18 @@ const UpdatePersonalDetails = ({ route }) => {
                   lineHeight: 24,
                   color: '#14142B',
                   fontFamily: 'Montserat',
-                }}
-              >
+                }}>
                 Title
               </Text>
-              <Text style={{ color: 'red', marginRight: 10 }}>*</Text>
+              <Text style={{color: 'red', marginRight: 10}}>*</Text>
             </View>
 
             <View style={styles.pick}>
               <Picker
                 selectedValue={userDetails.title}
-                onValueChange={(text) => setUserDetails({ ...userDetails, title: text })}
-              >
+                onValueChange={text =>
+                  setUserDetails({...userDetails, title: text})
+                }>
                 <Picker.Item label="Select Title" value="" />
                 <Picker.Item label="Mr" value="Mr" />
                 <Picker.Item label="Mrs" value="Mrs" />
@@ -264,14 +296,18 @@ const UpdatePersonalDetails = ({ route }) => {
           <CustomInput
             label="First name"
             defaultValue={profileDetails?.firstName}
-            onChangeText={(text) => setUserDetails({ ...userDetails, firstName: text.trim() })}
+            onChangeText={text =>
+              setUserDetails({...userDetails, firstName: text.trim()})
+            }
             isNeeded={true}
           />
 
           <CustomInput
             label="Last name"
             defaultValue={profileDetails?.lastName}
-            onChangeText={(text) => setUserDetails({ ...userDetails, lastName: text.trim() })}
+            onChangeText={text =>
+              setUserDetails({...userDetails, lastName: text.trim()})
+            }
             isNeeded={true}
           />
 
@@ -279,15 +315,17 @@ const UpdatePersonalDetails = ({ route }) => {
             label="Email"
             keyboardType="email-address"
             defaultValue={profileDetails?.email}
-            onChangeText={(text) => setUserDetails({ ...userDetails, email: text.trim() })}
+            onChangeText={text =>
+              setUserDetails({...userDetails, email: text.trim()})
+            }
             isNeeded={true}
           />
 
-          <View style={{ marginVertical: 10 }}>
-            <View style={{ marginBottom: -14 }}>
-              <View style={{ flexDirection: 'row' }}>
+          <View style={{marginVertical: 10}}>
+            <View style={{marginBottom: -14}}>
+              <View style={{flexDirection: 'row'}}>
                 <Text style={styles.label}>Phone number</Text>
-                <Text style={{ color: 'red', marginRight: 10 }}>*</Text>
+                <Text style={{color: 'red', marginRight: 10}}>*</Text>
               </View>
             </View>
             <View>
@@ -299,15 +337,15 @@ const UpdatePersonalDetails = ({ route }) => {
                 containerStyle={styles.phoneContainer}
                 placeholder=" "
                 defaultValue={profileDetails?.phoneNumber}
-                codeTextStyle={{ color: '#6E7191' }}
-                onChangeFormattedText={(text) =>
-                  setUserDetails({ ...userDetails, phoneNumber: text })
+                codeTextStyle={{color: '#6E7191'}}
+                onChangeFormattedText={text =>
+                  setUserDetails({...userDetails, phoneNumber: text})
                 }
               />
             </View>
           </View>
 
-          <View style={{ marginVertical: 10 }}>
+          <View style={{marginVertical: 10}}>
             <Text
               style={{
                 paddingBottom: 4,
@@ -316,19 +354,22 @@ const UpdatePersonalDetails = ({ route }) => {
                 lineHeight: 24,
                 color: '#14142B',
                 fontFamily: 'Montserat',
-              }}
-            >
+              }}>
               Gender
             </Text>
             <View style={styles.pick}>
               <Picker
                 selectedValue={userDetails.gender}
-                onValueChange={(text) => setUserDetails({ ...userDetails, gender: text })}
-              >
+                onValueChange={text =>
+                  setUserDetails({...userDetails, gender: text})
+                }>
                 <Picker.Item label="Select Gender" value="" />
                 <Picker.Item label="Female" value="Female" />
                 <Picker.Item label="Male" value="Male" />
-                <Picker.Item label="Prefer Not To Say" value="Prefer Not To Say" />
+                <Picker.Item
+                  label="Prefer Not To Say"
+                  value="Prefer Not To Say"
+                />
               </Picker>
             </View>
           </View>
@@ -336,7 +377,9 @@ const UpdatePersonalDetails = ({ route }) => {
           <CustomInput
             label="BVN"
             defaultValue={userDetails.bvn}
-            onChangeText={(text) => setUserDetails({ ...userDetails, bvn: text.trim() })}
+            onChangeText={text =>
+              setUserDetails({...userDetails, bvn: text.trim()})
+            }
             keyboardType="numeric"
           />
 
@@ -348,7 +391,9 @@ const UpdatePersonalDetails = ({ route }) => {
               isDate={true}
               editable={false}
               showDatePicker={showDatePicker}
-              onChangeValue={(text) => setUserDetails({ ...userDetails, dob: text })}
+              onChangeValue={text =>
+                setUserDetails({...userDetails, dob: text})
+              }
               isNeeded={true}
             />
           </Pressable>
@@ -367,18 +412,22 @@ const UpdatePersonalDetails = ({ route }) => {
           <CustomInput
             label="Address"
             defaultValue={userDetails.address}
-            onChangeText={(text) => setUserDetails({ ...userDetails, address: text })}
+            onChangeText={text =>
+              setUserDetails({...userDetails, address: text})
+            }
             isNeeded={true}
           />
 
           <CustomInput
             label="Country"
             defaultValue={userDetails.country}
-            onChangeText={(text) => setUserDetails({ ...userDetails, country: text })}
+            onChangeText={text =>
+              setUserDetails({...userDetails, country: text})
+            }
           />
 
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-            <View style={{ marginVertical: 10, paddingRight: 5, width: '50%' }}>
+          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+            <View style={{marginVertical: 10, paddingRight: 5, width: '50%'}}>
               <Text
                 style={{
                   paddingBottom: 4,
@@ -387,22 +436,26 @@ const UpdatePersonalDetails = ({ route }) => {
                   lineHeight: 24,
                   color: '#14142B',
                   fontFamily: 'Montserat',
-                }}
-              >
+                }}>
                 State
               </Text>
               <View style={styles.pick}>
                 <Picker
                   selectedValue={userDetails.state}
-                  onValueChange={(text) => setUserDetails({ ...userDetails, state: text })}
-                >
-                  {state.map((stateee) => (
-                    <Picker.Item label={stateee} value={stateee} key={stateee} />
+                  onValueChange={text =>
+                    setUserDetails({...userDetails, state: text})
+                  }>
+                  {state.map(stateee => (
+                    <Picker.Item
+                      label={stateee}
+                      value={stateee}
+                      key={stateee}
+                    />
                   ))}
                 </Picker>
               </View>
             </View>
-            <View style={{ marginVertical: 10, paddingLeft: 5, width: '50%' }}>
+            <View style={{marginVertical: 10, paddingLeft: 5, width: '50%'}}>
               <Text
                 style={{
                   paddingBottom: 4,
@@ -411,17 +464,17 @@ const UpdatePersonalDetails = ({ route }) => {
                   lineHeight: 24,
                   color: '#14142B',
                   fontFamily: 'Montserat',
-                }}
-              >
+                }}>
                 LGA
               </Text>
               <View style={styles.pick}>
                 {city && (
                   <Picker
                     selectedValue={userDetails.city}
-                    onValueChange={(text) => setUserDetails({ ...userDetails, city: text })}
-                  >
-                    {city.map((lg) => (
+                    onValueChange={text =>
+                      setUserDetails({...userDetails, city: text})
+                    }>
+                    {city.map(lg => (
                       <Picker.Item label={lg} value={lg} key={lg} />
                     ))}
                   </Picker>
@@ -430,7 +483,7 @@ const UpdatePersonalDetails = ({ route }) => {
             </View>
           </View>
 
-          <View style={{ marginVertical: 10 }}>
+          <View style={{marginVertical: 10}}>
             <Text
               style={{
                 paddingBottom: 4,
@@ -439,17 +492,15 @@ const UpdatePersonalDetails = ({ route }) => {
                 lineHeight: 24,
                 color: '#14142B',
                 fontFamily: 'Montserat',
-              }}
-            >
+              }}>
               Residential Status
             </Text>
             <View style={styles.pick}>
               <Picker
                 selectedValue={userDetails.residentialStatus}
-                onValueChange={(text) =>
-                  setUserDetails({ ...userDetails, residentialStatus: text })
-                }
-              >
+                onValueChange={text =>
+                  setUserDetails({...userDetails, residentialStatus: text})
+                }>
                 <Picker.Item label="Select status" value="" />
                 <Picker.Item label="Renting" value="Renting" />
                 <Picker.Item label="Owner" value="Owner" />
@@ -458,7 +509,7 @@ const UpdatePersonalDetails = ({ route }) => {
             </View>
           </View>
 
-          <View style={{ marginVertical: 10 }}>
+          <View style={{marginVertical: 10}}>
             <Text
               style={{
                 paddingBottom: 4,
@@ -467,17 +518,18 @@ const UpdatePersonalDetails = ({ route }) => {
                 lineHeight: 24,
                 color: '#14142B',
                 fontFamily: 'Montserat',
-              }}
-            >
+              }}>
               When did you move to that address?
             </Text>
             <View style={styles.pick}>
               <Picker
                 selectedValue={userDetails.yearYouMovedToCurrentAddress}
-                onValueChange={(text) =>
-                  setUserDetails({ ...userDetails, yearYouMovedToCurrentAddress: text })
-                }
-              >
+                onValueChange={text =>
+                  setUserDetails({
+                    ...userDetails,
+                    yearYouMovedToCurrentAddress: text,
+                  })
+                }>
                 <Picker.Item label="Select status" value="" />
                 <Picker.Item label="0-1 years" value="0-1 years" />
                 <Picker.Item label="1-3 years" value="1-3 years" />
@@ -488,7 +540,7 @@ const UpdatePersonalDetails = ({ route }) => {
             </View>
           </View>
 
-          <View style={{ marginVertical: 10 }}>
+          <View style={{marginVertical: 10}}>
             <Text
               style={{
                 paddingBottom: 4,
@@ -497,15 +549,15 @@ const UpdatePersonalDetails = ({ route }) => {
                 lineHeight: 24,
                 color: '#14142B',
                 fontFamily: 'Montserat',
-              }}
-            >
+              }}>
               Marital Status
             </Text>
             <View style={styles.pick}>
               <Picker
                 selectedValue={userDetails.maritalStatus}
-                onValueChange={(text) => setUserDetails({ ...userDetails, maritalStatus: text })}
-              >
+                onValueChange={text =>
+                  setUserDetails({...userDetails, maritalStatus: text})
+                }>
                 <Picker.Item label="Select status" value="" />
                 <Picker.Item label="Single" value="Single" />
                 <Picker.Item label="Married" value="Married" />
@@ -516,7 +568,7 @@ const UpdatePersonalDetails = ({ route }) => {
             </View>
           </View>
 
-          <View style={{ marginVertical: 10 }}>
+          <View style={{marginVertical: 10}}>
             <Text
               style={{
                 paddingBottom: 4,
@@ -525,18 +577,21 @@ const UpdatePersonalDetails = ({ route }) => {
                 lineHeight: 24,
                 color: '#14142B',
                 fontFamily: 'Montserat',
-              }}
-            >
+              }}>
               Educational Level
             </Text>
             <View style={styles.pick}>
               <Picker
                 selectedValue={userDetails.eduLevel}
-                onValueChange={(text) => setUserDetails({ ...userDetails, eduLevel: text })}
-              >
+                onValueChange={text =>
+                  setUserDetails({...userDetails, eduLevel: text})
+                }>
                 <Picker.Item label="Select status" value="" />
                 <Picker.Item label="Primary School" value="Primary School" />
-                <Picker.Item label="Secondary School" value="Secondary School" />
+                <Picker.Item
+                  label="Secondary School"
+                  value="Secondary School"
+                />
                 <Picker.Item
                   label="Ordinary National Diploma (OND)"
                   value="Ordinary National Diploma (OND)"
@@ -548,7 +603,10 @@ const UpdatePersonalDetails = ({ route }) => {
                 <Picker.Item label="Bachelors" value="Bachelors" />
                 <Picker.Item label="Masters" value="Masters" />
                 <Picker.Item label="PHD" value="PHD" />
-                <Picker.Item label="Post Graduate Diploma" value="Post Graduate Diploma" />
+                <Picker.Item
+                  label="Post Graduate Diploma"
+                  value="Post Graduate Diploma"
+                />
               </Picker>
             </View>
           </View>
@@ -556,8 +614,11 @@ const UpdatePersonalDetails = ({ route }) => {
           <CustomInput
             label="Number of dependents"
             defaultValue={profileDetails?.NoOfDependents?.toString()}
-            onChangeText={(text) =>
-              setUserDetails({ ...userDetails, NoOfDependents: parseInt(text, 10) })
+            onChangeText={text =>
+              setUserDetails({
+                ...userDetails,
+                NoOfDependents: parseInt(text, 10),
+              })
             }
             keyboardType="numeric"
           />
@@ -569,9 +630,8 @@ const UpdatePersonalDetails = ({ route }) => {
                 : handleUpdatePersonalDetails
             }
             disabled={disableit}
-            style={{ marginBottom: 30 }}
-          >
-            <View style={{ marginBottom: 30, marginTop: 20 }}>
+            style={{marginBottom: 30}}>
+            <View style={{marginBottom: 30, marginTop: 20}}>
               <Buttons label="Save & Continue" disabled={disableit} />
             </View>
           </TouchableOpacity>
@@ -661,7 +721,7 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     // borderWidth:.5,
     shadowColor: 'black',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.8,
     shadowRadius: 2,
     backgroundColor: '#ffffff',

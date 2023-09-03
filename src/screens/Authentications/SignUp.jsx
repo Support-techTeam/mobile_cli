@@ -12,7 +12,6 @@ import {
 import React, {useState, useEffect} from 'react';
 import {Formik} from 'formik';
 import {CheckBox} from '@rneui/themed';
-import Icon from 'react-native-vector-icons/AntDesign';
 import {useNavigation} from '@react-navigation/native';
 import Spinner from 'react-native-loading-spinner-overlay';
 import Input from '../../component/inputField/input.component';
@@ -23,6 +22,7 @@ import {userSignUp} from '../../stores/AuthStore';
 import Toast from 'react-native-toast-message';
 import {useDispatch, useSelector} from 'react-redux';
 import {signUpUser} from '../../util/redux/userAuth/user.auth.slice';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
@@ -40,6 +40,7 @@ const SignUp = () => {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const toggleCheckbox = () => setChecked(!checked);
+  const navigation = useNavigation();
   const dispatch = useDispatch();
 
   const [inputs, setInputs] = useState({
@@ -49,8 +50,6 @@ const SignUp = () => {
     password: '',
     confirmpassword: '',
   });
-
-  const navigation = useNavigation();
 
   const disableit =
     !inputs.firstname ||
@@ -87,7 +86,7 @@ const SignUp = () => {
         autoHide: true,
         onPress: () => Toast.hide(),
       });
-      dispatch(signUpUser(JSON.stringify(res)));
+      dispatch(signUpUser(JSON.stringify(res.user)));
     }
     setIsLoading(false);
   };
@@ -230,7 +229,7 @@ const SignUp = () => {
           textContent={'Signing Up...'}
           textStyle={{color: 'white'}}
           visible={true}
-          overlayColor="rgba(16, 17, 17, 0.7)"
+          overlayColor="rgba(78, 75, 102, 0.7)"
         />
       )}
       <ImageBackground
@@ -243,19 +242,40 @@ const SignUp = () => {
           showsVerticalScrollIndicator={false}
           style={{paddingHorizontal: 20, marginBottom: 40}}>
           <KeyboardAvoidingWrapper>
+            {/* Work In Progress with goBack() */}
             <View style={{marginBottom: 40}}>
-              <View style={{alignItems: 'center'}}>
-                <View style={styles.signupView}>
-                  <Image
-                    source={require('../../../assets/images/HeadLogo.png')}
-                    style={{marginBottom: 24}}
-                  />
-                  <Text style={styles.signupText}>Sign Up</Text>
+              <View
+                style={{
+                  flex: 1,
+                  flexDirection: 'row',
+                  justifyContent: 'flex-start',
+                }}>
+                <View
+                  style={{alignItems: 'center', marginRight: screenWidth / 8}}>
+                  <TouchableOpacity onPress={() => navigation.goBack()}>
+                    <View
+                      style={{
+                        borderWidth: 0.5,
+                        borderColor: '#D9DBE9',
+                        borderRadius: 5,
+                      }}>
+                      <Icon name="chevron-left" size={36} color="black" />
+                    </View>
+                  </TouchableOpacity>
                 </View>
-                <View style={styles.signupDetails}>
-                  <Text style={[styles.DetailsText, {marginBottom: 40}]}>
-                    Create an account to get started
-                  </Text>
+                <View style={{alignItems: 'center'}}>
+                  <View style={styles.signupView}>
+                    <Image
+                      source={require('../../../assets/images/HeadLogo.png')}
+                      style={{marginBottom: 24}}
+                    />
+                    <Text style={styles.signupText}>Sign Up</Text>
+                  </View>
+                  <View style={styles.signupDetails}>
+                    <Text style={[styles.DetailsText, {marginBottom: 40}]}>
+                      Create an account to get started
+                    </Text>
+                  </View>
                 </View>
               </View>
               <View

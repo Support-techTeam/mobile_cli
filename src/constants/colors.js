@@ -10,5 +10,13 @@ const COLORS = {
   lendaBlue: '#054B99',
   labelColor: '#14142B',
   lightGray: '#CED4DA',
+  Primary: '#0d6efd',
+  Secondary: '#6c757d',
+  Success: '#28a745',
+  Danger: '#dc3545',
+  Warning: '#ffc107',
+  Info: '#17a2b8',
+  Dark: '#343a40',
+  Light: '#f8f9fa',
 };
 export default COLORS;

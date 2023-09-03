@@ -1,47 +1,49 @@
-import { View, Text, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
-import React, { useContext, useEffect } from 'react';
-import { AntDesign } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import {View, Text, StyleSheet, TouchableOpacity, FlatList} from 'react-native';
+import React, {useContext, useEffect} from 'react';
+import {AntDesign} from '@expo/vector-icons';
+import {useNavigation} from '@react-navigation/native';
 import Spinner from 'react-native-loading-spinner-overlay/lib';
-import { observer } from 'mobx-react-lite';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import {observer} from 'mobx-react-lite';
+import {SafeAreaView} from 'react-native-safe-area-context';
 
 import Buttons from '../../../component/buttons/Buttons';
-import { StoreContext } from '../../../config/mobX stores/RootStore';
+import {StoreContext} from '../../../config/mobX stores/RootStore';
 
 const ITEM_HEIGHT = 100;
 
 const TobTabs = [
-  { name: 'Valid Identity', key: 'ValidIndentity' },
-  { name: 'Proof of Address', key: 'ProofOfAddress' },
-  { name: 'Bank Statement', key: 'BankStatement' },
-  { name: 'Passport', key: 'Passport' },
-  { name: 'Signature', key: 'Signature' },
-  { name: 'Company Seals', key: 'CompanySeals' },
-  { name: 'CAC', key: 'CAC' },
-  { name: 'Others', key: 'Others' },
-  { name: 'Submit All', key: 'SubmitDocs' },
+  {name: 'Valid Identity', key: 'ValidIndentity'},
+  {name: 'Proof of Address', key: 'ProofOfAddress'},
+  {name: 'Bank Statement', key: 'BankStatement'},
+  {name: 'Passport', key: 'Passport'},
+  {name: 'Signature', key: 'Signature'},
+  {name: 'Company Seals', key: 'CompanySeals'},
+  {name: 'CAC', key: 'CAC'},
+  {name: 'Others', key: 'Others'},
+  {name: 'Submit All', key: 'SubmitDocs'},
 ];
 
-const FinalSubmit = ({ route }) => {
+const FinalSubmit = ({route}) => {
   const docsDetails = route?.params?.paramKey;
 
   const navigation = useNavigation();
   const activeTab = 'SubmitDocs';
-  const renderItem = ({ item }) => {
+  const renderItem = ({item}) => {
     const isActive = item.key === activeTab;
 
     return (
       <View>
         <View style={[styles.tobTab, isActive && styles.activeTab]}>
-          <Text style={[styles.tabText, isActive && styles.activeTabText]}>{item.name}</Text>
+          <Text style={[styles.tabText, isActive && styles.activeTabText]}>
+            {item.name}
+          </Text>
         </View>
       </View>
     );
   };
 
-  const { loansStore } = useContext(StoreContext);
-  const { sending, success, docs } = loansStore;
+  const {loansStore} = useContext(StoreContext);
+  const {sending, success, docs} = loansStore;
 
   const formDetails = {
     validIdentificationType:
@@ -49,14 +51,22 @@ const FinalSubmit = ({ route }) => {
         ? ''
         : docsDetails?.validIdentificationType,
     validIdentification:
-      docsDetails?.validIdentification === undefined ? '' : docsDetails?.validIdentification,
-    utilityBill: docsDetails?.utilityBill === undefined ? '' : docsDetails?.utilityBill,
-    bankStatement: docsDetails?.bankStatement === undefined ? '' : docsDetails?.bankStatement,
+      docsDetails?.validIdentification === undefined
+        ? ''
+        : docsDetails?.validIdentification,
+    utilityBill:
+      docsDetails?.utilityBill === undefined ? '' : docsDetails?.utilityBill,
+    bankStatement:
+      docsDetails?.bankStatement === undefined
+        ? ''
+        : docsDetails?.bankStatement,
     passport: docsDetails?.passport === undefined ? '' : docsDetails?.passport,
-    signature: docsDetails?.signature === undefined ? '' : docsDetails?.signature,
+    signature:
+      docsDetails?.signature === undefined ? '' : docsDetails?.signature,
     seal: docsDetails?.seal === undefined ? '' : docsDetails?.seal,
     cacCertificate: docsDetails?.cac === undefined ? '' : docsDetails?.cac,
-    othersName: docsDetails?.othersName === undefined ? '' : docsDetails?.othersName,
+    othersName:
+      docsDetails?.othersName === undefined ? '' : docsDetails?.othersName,
     others: docsDetails?.others === undefined ? '' : docsDetails?.others,
     cac7: '',
     cac2: '',
@@ -90,9 +100,9 @@ const FinalSubmit = ({ route }) => {
       {sending && (
         <Spinner
           textContent={'Submitting ...'}
-          textStyle={{ color: 'white' }}
+          textStyle={{color: 'white'}}
           visible={true}
-          overlayColor="rgba(16, 17, 17, 0.7)"
+          overlayColor="rgba(78, 75, 102, 0.7)"
         />
       )}
       <View
@@ -101,16 +111,14 @@ const FinalSubmit = ({ route }) => {
           justifyContent: 'space-between',
           alignItems: 'center',
           marginHorizontal: 15,
-        }}
-      >
+        }}>
         <TouchableOpacity onPress={() => navigation.goBack('')}>
           <View
             style={{
               borderWidth: 0.5,
               borderColor: '#D9DBE9',
               borderRadius: 5,
-            }}
-          >
+            }}>
             <AntDesign name="left" size={24} color="black" />
           </View>
         </TouchableOpacity>
@@ -131,7 +139,7 @@ const FinalSubmit = ({ route }) => {
         <FlatList
           data={TobTabs}
           renderItem={renderItem}
-          keyExtractor={(item) => item.key}
+          keyExtractor={item => item.key}
           horizontal
           scrollEnabled={true}
           showsHorizontalScrollIndicator={false}
@@ -144,29 +152,29 @@ const FinalSubmit = ({ route }) => {
         />
       </View>
 
-      <View style={[styles.innercontainer, { marginBottom: 40, flex: 1 }]}>
+      <View style={[styles.innercontainer, {marginBottom: 40, flex: 1}]}>
         <View>
           <View style={styles.require}>
             <View>
               <Text style={styles.Head}>Document Submission </Text>
             </View>
-            <View style={{ marginBottom: 10 }}>
+            <View style={{marginBottom: 10}}>
               <Text style={styles.textHead}>
-                Thank you for submitting your documents. Your documents will be processed after you
-                click the submit button. Please allow up to 24 hours for processing. If you have any
-                questions, please contact us.
+                Thank you for submitting your documents. Your documents will be
+                processed after you click the submit button. Please allow up to
+                24 hours for processing. If you have any questions, please
+                contact us.
               </Text>
             </View>
           </View>
 
-          <View style={{ marginTop: 40 }}>
+          <View style={{marginTop: 40}}>
             <TouchableOpacity
               onPress={
                 docsDetails?.validIdentificationType === undefined
                   ? handleCreateDocs
                   : handleUpdateDocs
-              }
-            >
+              }>
               <Buttons label={'Submit & Finish'} />
             </TouchableOpacity>
           </View>

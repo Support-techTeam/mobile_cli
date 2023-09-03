@@ -19,9 +19,17 @@ const Input = ({
   const [isFocused, setIsFocused] = React.useState(false);
   return (
     <View style={{marginBottom: 20}}>
-      <View style={{flexDirection: 'row'}}>
-        <Text style={style.label}>{label}</Text>
-        {isNeeded && <Text style={{color: 'red', marginRight: 10}}>*</Text>}
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}>
+        <View style={{flexDirection: 'row'}}>
+          <Text style={style.label}>{label}</Text>
+          {isNeeded && <Text style={{color: 'red', marginRight: 10}}>*</Text>}
+        </View>
+        {isAirtime && <Text>Wallet Balance: ₦{isBalance}</Text>}
       </View>
       <View
         style={[

@@ -1,19 +1,26 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Pressable } from 'react-native';
-import React, { useContext, useEffect, useState } from 'react';
-import { Picker } from '@react-native-picker/picker';
-import { AntDesign } from '@expo/vector-icons';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  Pressable,
+} from 'react-native';
+import React, {useContext, useEffect, useState} from 'react';
+import {Picker} from '@react-native-picker/picker';
+import {AntDesign} from '@expo/vector-icons';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
-import { useNavigation } from '@react-navigation/native';
-import { observer } from 'mobx-react-lite';
+import {useNavigation} from '@react-navigation/native';
+import {observer} from 'mobx-react-lite';
 import Spinner from 'react-native-loading-spinner-overlay/lib';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { toJS } from 'mobx';
+import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
+import {toJS} from 'mobx';
 
 import CustomInput from '../../component/custominput/CustomInput';
 import Buttons from '../../component/buttons/Buttons';
-import { StoreContext } from '../../config/mobX stores/RootStore';
+import {StoreContext} from '../../config/mobX stores/RootStore';
 
-const BusinessDetails = ({ route }) => {
+const BusinessDetails = ({route}) => {
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const [show, setShow] = useState(false);
@@ -21,8 +28,8 @@ const BusinessDetails = ({ route }) => {
   const date = new Date(2000, 0, 1);
   const addressDate = new Date(2000, 0, 1);
 
-  const { loansStore } = useContext(StoreContext);
-  const { success, sending, loanUserdetails, loading } = loansStore;
+  const {loansStore} = useContext(StoreContext);
+  const {success, sending, loanUserdetails, loading} = loansStore;
 
   useEffect(() => {
     loansStore.getLoanUserDetails();
@@ -60,47 +67,91 @@ const BusinessDetails = ({ route }) => {
   useEffect(() => {
     setBusinessDetails({
       businessType:
-        orgDetails && orgDetails?.businessType === undefined ? '' : orgDetails?.businessType,
+        orgDetails && orgDetails?.businessType === undefined
+          ? ''
+          : orgDetails?.businessType,
       businessName:
-        orgDetails && orgDetails?.businessName === undefined ? '' : orgDetails?.businessName,
+        orgDetails && orgDetails?.businessName === undefined
+          ? ''
+          : orgDetails?.businessName,
       positionInOrg:
-        orgDetails && orgDetails?.positionInOrg === undefined ? '' : orgDetails?.positionInOrg,
-      shareInOrg: orgDetails && orgDetails?.shareInOrg === undefined ? '' : orgDetails?.shareInOrg,
-      rcNum: orgDetails && orgDetails?.rcNum === undefined ? '' : orgDetails?.rcNum,
+        orgDetails && orgDetails?.positionInOrg === undefined
+          ? ''
+          : orgDetails?.positionInOrg,
+      shareInOrg:
+        orgDetails && orgDetails?.shareInOrg === undefined
+          ? ''
+          : orgDetails?.shareInOrg,
+      rcNum:
+        orgDetails && orgDetails?.rcNum === undefined ? '' : orgDetails?.rcNum,
       establishmentDate:
         orgDetails && orgDetails?.establishmentDate === undefined
           ? ''
           : orgDetails?.establishmentDate?.substr(0, 10),
       businessAddress:
-        orgDetails && orgDetails?.businessAddress === undefined ? '' : orgDetails?.businessAddress,
-      country: orgDetails && orgDetails?.country === undefined ? '' : orgDetails?.country,
-      state: orgDetails && orgDetails?.state === undefined ? '' : orgDetails?.state,
-      city: orgDetails && orgDetails?.city === undefined ? '' : orgDetails?.city,
+        orgDetails && orgDetails?.businessAddress === undefined
+          ? ''
+          : orgDetails?.businessAddress,
+      country:
+        orgDetails && orgDetails?.country === undefined
+          ? ''
+          : orgDetails?.country,
+      state:
+        orgDetails && orgDetails?.state === undefined ? '' : orgDetails?.state,
+      city:
+        orgDetails && orgDetails?.city === undefined ? '' : orgDetails?.city,
       ownedOrRented:
-        orgDetails && orgDetails?.ownedOrRented === undefined ? '' : orgDetails?.ownedOrRented,
+        orgDetails && orgDetails?.ownedOrRented === undefined
+          ? ''
+          : orgDetails?.ownedOrRented,
       NoOfOutlets:
-        orgDetails && orgDetails?.NoOfOutlets === undefined ? 0 : orgDetails?.NoOfOutlets,
+        orgDetails && orgDetails?.NoOfOutlets === undefined
+          ? 0
+          : orgDetails?.NoOfOutlets,
       totalEmployees:
-        orgDetails && orgDetails?.totalEmployees === undefined ? 0 : orgDetails?.totalEmployees,
+        orgDetails && orgDetails?.totalEmployees === undefined
+          ? 0
+          : orgDetails?.totalEmployees,
       salesMethod:
-        orgDetails && orgDetails?.salesMethod === undefined ? '' : orgDetails?.salesMethod,
-      industry: orgDetails && orgDetails?.industry === undefined ? '' : orgDetails?.industry,
+        orgDetails && orgDetails?.salesMethod === undefined
+          ? ''
+          : orgDetails?.salesMethod,
+      industry:
+        orgDetails && orgDetails?.industry === undefined
+          ? ''
+          : orgDetails?.industry,
       monthlySales:
-        orgDetails && orgDetails?.monthlySales === undefined ? '' : orgDetails?.monthlySales,
+        orgDetails && orgDetails?.monthlySales === undefined
+          ? ''
+          : orgDetails?.monthlySales,
       monthlyExpenses:
-        orgDetails && orgDetails?.monthlyExpenses === undefined ? '' : orgDetails?.monthlyExpenses,
+        orgDetails && orgDetails?.monthlyExpenses === undefined
+          ? ''
+          : orgDetails?.monthlyExpenses,
       businessDuration:
         orgDetails && orgDetails?.businessDuration === undefined
           ? ''
           : orgDetails?.businessDuration,
-      womenLed: orgDetails && orgDetails?.womenLed === undefined ? false : orgDetails?.womenLed,
-      shariaCom: orgDetails && orgDetails?.shariaCom === undefined ? false : orgDetails?.shariaCom,
+      womenLed:
+        orgDetails && orgDetails?.womenLed === undefined
+          ? false
+          : orgDetails?.womenLed,
+      shariaCom:
+        orgDetails && orgDetails?.shariaCom === undefined
+          ? false
+          : orgDetails?.shariaCom,
       tin: orgDetails && orgDetails?.tin === undefined ? '' : orgDetails?.tin,
       registered:
-        orgDetails && orgDetails?.registered === undefined ? false : orgDetails?.registered,
-      MAMERT: orgDetails && orgDetails?.MAMERT === undefined ? '' : orgDetails?.MAMERT,
+        orgDetails && orgDetails?.registered === undefined
+          ? false
+          : orgDetails?.registered,
+      MAMERT:
+        orgDetails && orgDetails?.MAMERT === undefined
+          ? ''
+          : orgDetails?.MAMERT,
       whenDidYouMoveToThisBusinessLocation:
-        orgDetails && orgDetails?.whenDidYouMoveToThisBusinessLocation === undefined
+        orgDetails &&
+        orgDetails?.whenDidYouMoveToThisBusinessLocation === undefined
           ? ''
           : orgDetails?.whenDidYouMoveToThisBusinessLocation?.substr(0, 10),
     });
@@ -129,7 +180,7 @@ const BusinessDetails = ({ route }) => {
 
   useEffect(() => {
     if (businessDetails.state !== '') {
-      setCitybyState(state?.filter((statee) => statee === businessDetails.state));
+      setCitybyState(state?.filter(statee => statee === businessDetails.state));
     }
   }, [businessDetails.state, state]);
 
@@ -156,17 +207,20 @@ const BusinessDetails = ({ route }) => {
     setShowDate(false);
   };
 
-  const handleConfirm = (selectedDate) => {
+  const handleConfirm = selectedDate => {
     const currentDate = selectedDate || date;
     const formattedDate = new Date(currentDate).toISOString().split('T')[0];
-    setBusinessDetails({ ...businessDetails, establishmentDate: formattedDate });
+    setBusinessDetails({...businessDetails, establishmentDate: formattedDate});
     setShow(false);
   };
 
-  const handleConfirmAddressDate = (selectedDate) => {
+  const handleConfirmAddressDate = selectedDate => {
     const currentDate = selectedDate || addressDate;
     const formattedDate = new Date(currentDate).toISOString().split('T')[0];
-    setBusinessDetails({ ...businessDetails, whenDidYouMoveToThisBusinessLocation: formattedDate });
+    setBusinessDetails({
+      ...businessDetails,
+      whenDidYouMoveToThisBusinessLocation: formattedDate,
+    });
     setShowDate(false);
   };
 
@@ -200,22 +254,21 @@ const BusinessDetails = ({ route }) => {
         paddingBottom: insets.bottom !== 0 ? insets.bottom / 2 : 'auto',
         paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
         paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
-      }}
-    >
+      }}>
       {sending && (
         <Spinner
           textContent={'Please wait...'}
-          textStyle={{ color: 'white' }}
+          textStyle={{color: 'white'}}
           visible={true}
-          overlayColor="rgba(16, 17, 16, 0.70)"
+          overlayColor="rgba(78, 75, 102, 0.7)"
         />
       )}
       {loading && (
         <Spinner
           textContent={'Loading...'}
-          textStyle={{ color: 'white' }}
+          textStyle={{color: 'white'}}
           visible={true}
-          overlayColor="rgba(16, 17, 16, 0.70)"
+          overlayColor="rgba(78, 75, 102, 0.7)"
         />
       )}
       <View
@@ -224,16 +277,14 @@ const BusinessDetails = ({ route }) => {
           justifyContent: 'space-between',
           alignItems: 'center',
           marginHorizontal: 15,
-        }}
-      >
+        }}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <View
             style={{
               borderWidth: 0.5,
               borderColor: '#D9DBE9',
               borderRadius: 5,
-            }}
-          >
+            }}>
             <AntDesign name="left" size={24} color="black" />
           </View>
         </TouchableOpacity>
@@ -251,17 +302,17 @@ const BusinessDetails = ({ route }) => {
         bounces={false}
         showsHorizontalScrollIndicator={false}
         showsVerticalScrollIndicator={false}
-        style={[styles.innercontainer]}
-      >
+        style={[styles.innercontainer]}>
         <View style={styles.form}>
           <Text style={styles.header}>
-            Trade Lenda requires this information to give you a better experience
+            Trade Lenda requires this information to give you a better
+            experience
           </Text>
         </View>
 
         <View>
-          <View style={{ marginVertical: 10 }}>
-            <View style={{ flexDirection: 'row' }}>
+          <View style={{marginVertical: 10}}>
+            <View style={{flexDirection: 'row'}}>
               <Text
                 style={{
                   paddingBottom: 4,
@@ -270,29 +321,39 @@ const BusinessDetails = ({ route }) => {
                   lineHeight: 24,
                   color: '#14142B',
                   fontFamily: 'Montserat',
-                }}
-              >
+                }}>
                 Type of business
               </Text>
-              <Text style={{ color: 'red', marginRight: 10 }}>*</Text>
+              <Text style={{color: 'red', marginRight: 10}}>*</Text>
             </View>
 
             <View style={styles.pick}>
               <Picker
                 selectedValue={businessDetails?.businessType}
-                onValueChange={(text) =>
-                  setBusinessDetails({ ...businessDetails, businessType: text })
-                }
-              >
+                onValueChange={text =>
+                  setBusinessDetails({...businessDetails, businessType: text})
+                }>
                 <Picker.Item label="Select type" value="" />
-                <Picker.Item label="Sole Proprietorship" value="Sole Proprietorship" />
-                <Picker.Item label="Private Limited Company" value="Private Limited Company" />
-                <Picker.Item label="Public Limited Company" value="Public Limited Company" />
+                <Picker.Item
+                  label="Sole Proprietorship"
+                  value="Sole Proprietorship"
+                />
+                <Picker.Item
+                  label="Private Limited Company"
+                  value="Private Limited Company"
+                />
+                <Picker.Item
+                  label="Public Limited Company"
+                  value="Public Limited Company"
+                />
                 <Picker.Item
                   label="Public Company Limited by Guarantee"
                   value="Public Company Limited by Guarantee"
                 />
-                <Picker.Item label="Private Unlimited Company" value="Private Unlimited Company" />
+                <Picker.Item
+                  label="Private Unlimited Company"
+                  value="Private Unlimited Company"
+                />
                 <Picker.Item label="Others" value="Others" />
               </Picker>
             </View>
@@ -301,11 +362,13 @@ const BusinessDetails = ({ route }) => {
           <CustomInput
             label="Name of business"
             defaultValue={businessDetails?.businessName}
-            onChangeText={(text) => setBusinessDetails({ ...businessDetails, businessName: text })}
+            onChangeText={text =>
+              setBusinessDetails({...businessDetails, businessName: text})
+            }
             isNeeded={true}
           />
 
-          <View style={{ marginVertical: 10 }}>
+          <View style={{marginVertical: 10}}>
             <Text
               style={{
                 paddingBottom: 4,
@@ -314,17 +377,15 @@ const BusinessDetails = ({ route }) => {
                 lineHeight: 24,
                 color: '#14142B',
                 fontFamily: 'Montserat',
-              }}
-            >
+              }}>
               Is your business registered?
             </Text>
             <View style={styles.pick}>
               <Picker
                 selectedValue={businessDetails?.registered}
-                onValueChange={(text) =>
-                  setBusinessDetails({ ...businessDetails, registered: text })
-                }
-              >
+                onValueChange={text =>
+                  setBusinessDetails({...businessDetails, registered: text})
+                }>
                 <Picker.Item label="Select status" value={false} />
                 <Picker.Item label="Yes" value={true} />
                 <Picker.Item label="No" value={false} />
@@ -335,13 +396,17 @@ const BusinessDetails = ({ route }) => {
           <CustomInput
             label="Position in the company"
             defaultValue={businessDetails?.positionInOrg}
-            onChangeText={(text) => setBusinessDetails({ ...businessDetails, positionInOrg: text })}
+            onChangeText={text =>
+              setBusinessDetails({...businessDetails, positionInOrg: text})
+            }
             isNeeded={true}
           />
           <CustomInput
             label="Shares in the company"
             defaultValue={businessDetails?.shareInOrg}
-            onChangeText={(text) => setBusinessDetails({ ...businessDetails, shareInOrg: text })}
+            onChangeText={text =>
+              setBusinessDetails({...businessDetails, shareInOrg: text})
+            }
           />
 
           <Pressable onPress={showDatePicker}>
@@ -356,8 +421,11 @@ const BusinessDetails = ({ route }) => {
               isDate={true}
               editable={false}
               showDatePicker={showDatePicker}
-              onChangeValue={(text) =>
-                setBusinessDetails({ ...businessDetails, establishmentDate: text })
+              onChangeValue={text =>
+                setBusinessDetails({
+                  ...businessDetails,
+                  establishmentDate: text,
+                })
               }
               isNeeded={true}
             />
@@ -377,15 +445,17 @@ const BusinessDetails = ({ route }) => {
           <CustomInput
             label="RC/BN Number"
             defaultValue={businessDetails?.rcNum}
-            onChangeText={(text) => setBusinessDetails({ ...businessDetails, rcNum: text })}
+            onChangeText={text =>
+              setBusinessDetails({...businessDetails, rcNum: text})
+            }
             keyboardType="numeric"
           />
 
           <CustomInput
             label="Business address"
             defaultValue={businessDetails?.businessAddress}
-            onChangeText={(text) =>
-              setBusinessDetails({ ...businessDetails, businessAddress: text })
+            onChangeText={text =>
+              setBusinessDetails({...businessDetails, businessAddress: text})
             }
             isNeeded={true}
           />
@@ -396,13 +466,16 @@ const BusinessDetails = ({ route }) => {
               placeholder="2000 - 01 - 01"
               defaultValue={
                 businessDetails.whenDidYouMoveToThisBusinessLocation
-                  ? businessDetails.whenDidYouMoveToThisBusinessLocation?.substr(0, 10)
+                  ? businessDetails.whenDidYouMoveToThisBusinessLocation?.substr(
+                      0,
+                      10,
+                    )
                   : ''
               }
               isDate={true}
               editable={false}
               showDatePicker={showAddressDatePicker}
-              onChangeValue={(text) =>
+              onChangeValue={text =>
                 setBusinessDetails({
                   ...businessDetails,
                   whenDidYouMoveToThisBusinessLocation: text,
@@ -426,12 +499,14 @@ const BusinessDetails = ({ route }) => {
           <CustomInput
             label="Country"
             defaultValue={businessDetails?.country}
-            onChangeText={(text) => setBusinessDetails({ ...businessDetails, country: text })}
+            onChangeText={text =>
+              setBusinessDetails({...businessDetails, country: text})
+            }
           />
 
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-            <View style={{ marginVertical: 10, paddingRight: 5, width: '50%' }}>
-              <View style={{ flexDirection: 'row' }}>
+          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+            <View style={{marginVertical: 10, paddingRight: 5, width: '50%'}}>
+              <View style={{flexDirection: 'row'}}>
                 <Text
                   style={{
                     paddingBottom: 4,
@@ -440,18 +515,18 @@ const BusinessDetails = ({ route }) => {
                     lineHeight: 24,
                     color: '#14142B',
                     fontFamily: 'Montserat',
-                  }}
-                >
+                  }}>
                   State
                 </Text>
-                <Text style={{ color: 'red', marginRight: 10 }}>*</Text>
+                <Text style={{color: 'red', marginRight: 10}}>*</Text>
               </View>
 
               <View style={styles.pick}>
                 <Picker
                   selectedValue={businessDetails?.state}
-                  onValueChange={(text) => setBusinessDetails({ ...businessDetails, state: text })}
-                >
+                  onValueChange={text =>
+                    setBusinessDetails({...businessDetails, state: text})
+                  }>
                   <Picker.Item label="Select state" value="" />
 
                   {state?.map((stateee, i) => (
@@ -460,7 +535,7 @@ const BusinessDetails = ({ route }) => {
                 </Picker>
               </View>
             </View>
-            <View style={{ marginVertical: 10, paddingLeft: 5, width: '50%' }}>
+            <View style={{marginVertical: 10, paddingLeft: 5, width: '50%'}}>
               <Text
                 style={{
                   paddingBottom: 4,
@@ -469,16 +544,16 @@ const BusinessDetails = ({ route }) => {
                   lineHeight: 24,
                   color: '#14142B',
                   fontFamily: 'Montserat',
-                }}
-              >
+                }}>
                 LGA
               </Text>
               <View style={styles.pick}>
                 {city && (
                   <Picker
                     selectedValue={businessDetails?.city}
-                    onValueChange={(text) => setBusinessDetails({ ...businessDetails, city: text })}
-                  >
+                    onValueChange={text =>
+                      setBusinessDetails({...businessDetails, city: text})
+                    }>
                     {city.map((lg, i) => (
                       <Picker.Item label={lg} value={lg} key={i} />
                     ))}
@@ -488,7 +563,7 @@ const BusinessDetails = ({ route }) => {
             </View>
           </View>
 
-          <View style={{ marginVertical: 10 }}>
+          <View style={{marginVertical: 10}}>
             <Text
               style={{
                 paddingBottom: 4,
@@ -497,17 +572,15 @@ const BusinessDetails = ({ route }) => {
                 lineHeight: 24,
                 color: '#14142B',
                 fontFamily: 'Montserat',
-              }}
-            >
+              }}>
               Is your business location owned or rented
             </Text>
             <View style={styles.pick}>
               <Picker
                 selectedValue={businessDetails?.ownedOrRented}
-                onValueChange={(text) =>
-                  setBusinessDetails({ ...businessDetails, ownedOrRented: text })
-                }
-              >
+                onValueChange={text =>
+                  setBusinessDetails({...businessDetails, ownedOrRented: text})
+                }>
                 <Picker.Item label="Select option" value="" />
                 <Picker.Item label="Owned" value="Owned" />
                 <Picker.Item label="Rented" value="Rented" />
@@ -518,14 +591,17 @@ const BusinessDetails = ({ route }) => {
           <CustomInput
             label="Number of employees"
             defaultValue={businessDetails?.totalEmployees?.toString()}
-            onChangeText={(text) =>
-              setBusinessDetails({ ...businessDetails, totalEmployees: parseInt(text, 10) })
+            onChangeText={text =>
+              setBusinessDetails({
+                ...businessDetails,
+                totalEmployees: parseInt(text, 10),
+              })
             }
             keyboardType="numeric"
             isNeeded={true}
           />
 
-          <View style={{ marginVertical: 10 }}>
+          <View style={{marginVertical: 10}}>
             <Text
               style={{
                 paddingBottom: 4,
@@ -534,15 +610,15 @@ const BusinessDetails = ({ route }) => {
                 lineHeight: 24,
                 color: '#14142B',
                 fontFamily: 'Montserat',
-              }}
-            >
+              }}>
               Is your business women led?
             </Text>
             <View style={styles.pick}>
               <Picker
                 selectedValue={businessDetails?.womenLed}
-                onValueChange={(text) => setBusinessDetails({ ...businessDetails, womenLed: text })}
-              >
+                onValueChange={text =>
+                  setBusinessDetails({...businessDetails, womenLed: text})
+                }>
                 <Picker.Item label="Select option" value={false} />
                 <Picker.Item label="Yes" value={true} />
                 <Picker.Item label="No" value={false} />
@@ -550,7 +626,7 @@ const BusinessDetails = ({ route }) => {
             </View>
           </View>
 
-          <View style={{ marginVertical: 10 }}>
+          <View style={{marginVertical: 10}}>
             <Text
               style={{
                 paddingBottom: 4,
@@ -559,17 +635,15 @@ const BusinessDetails = ({ route }) => {
                 lineHeight: 24,
                 color: '#14142B',
                 fontFamily: 'Montserat',
-              }}
-            >
+              }}>
               Is your business sharia compliant?
             </Text>
             <View style={styles.pick}>
               <Picker
                 selectedValue={businessDetails?.shariaCom}
-                onValueChange={(text) =>
-                  setBusinessDetails({ ...businessDetails, shariaCom: text })
-                }
-              >
+                onValueChange={text =>
+                  setBusinessDetails({...businessDetails, shariaCom: text})
+                }>
                 <Picker.Item label="Select option" value={false} />
                 <Picker.Item label="Yes" value={true} />
                 <Picker.Item label="No" value={false} />
@@ -580,13 +654,16 @@ const BusinessDetails = ({ route }) => {
           <CustomInput
             label="Number of outlets"
             defaultValue={businessDetails?.NoOfOutlets?.toString()}
-            onChangeText={(text) =>
-              setBusinessDetails({ ...businessDetails, NoOfOutlets: parseInt(text, 10) })
+            onChangeText={text =>
+              setBusinessDetails({
+                ...businessDetails,
+                NoOfOutlets: parseInt(text, 10),
+              })
             }
             keyboardType="numeric"
           />
 
-          <View style={{ marginVertical: 10 }}>
+          <View style={{marginVertical: 10}}>
             <Text
               style={{
                 paddingBottom: 4,
@@ -595,35 +672,39 @@ const BusinessDetails = ({ route }) => {
                 lineHeight: 24,
                 color: '#14142B',
                 fontFamily: 'Montserat',
-              }}
-            >
+              }}>
               How do you sell
             </Text>
             <View style={styles.pick}>
               <Picker
                 selectedValue={businessDetails?.salesMethod}
-                onValueChange={(text) =>
-                  setBusinessDetails({ ...businessDetails, salesMethod: text })
-                }
-              >
+                onValueChange={text =>
+                  setBusinessDetails({...businessDetails, salesMethod: text})
+                }>
                 <Picker.Item label="Select option" value="" />
                 <Picker.Item
                   label="I sell online (Jumia, Konga etc)"
                   value="I sell online (Jumia, Konga etc)"
                 />
-                <Picker.Item label="I distribute FMCG Goods" value="I distribute FMCG Goods" />
+                <Picker.Item
+                  label="I distribute FMCG Goods"
+                  value="I distribute FMCG Goods"
+                />
                 <Picker.Item
                   label="I buy and sell Agro-Commodities"
                   value="I buy and sell Agro-Commodities"
                 />
-                <Picker.Item label="I have a physical shop" value="I have a physical shop" />
+                <Picker.Item
+                  label="I have a physical shop"
+                  value="I have a physical shop"
+                />
                 <Picker.Item label="Others" value="Others" />
               </Picker>
             </View>
           </View>
 
-          <View style={{ marginVertical: 10 }}>
-            <View style={{ flexDirection: 'row' }}>
+          <View style={{marginVertical: 10}}>
+            <View style={{flexDirection: 'row'}}>
               <Text
                 style={{
                   paddingBottom: 4,
@@ -632,49 +713,76 @@ const BusinessDetails = ({ route }) => {
                   lineHeight: 24,
                   color: '#14142B',
                   fontFamily: 'Montserat',
-                }}
-              >
+                }}>
                 Industry
               </Text>
-              <Text style={{ color: 'red', marginRight: 10 }}>*</Text>
+              <Text style={{color: 'red', marginRight: 10}}>*</Text>
             </View>
 
             <View style={styles.pick}>
               <Picker
                 selectedValue={businessDetails?.industry}
-                onValueChange={(text) => setBusinessDetails({ ...businessDetails, industry: text })}
-              >
+                onValueChange={text =>
+                  setBusinessDetails({...businessDetails, industry: text})
+                }>
                 <Picker.Item label="Select Industry" value="" />
                 <Picker.Item label="Agriculture" value="Agriculture" />
                 <Picker.Item label="Autos" value="Autos" />
                 <Picker.Item label="Agency Banking" value="Agency Banking" />
                 <Picker.Item label="Beauty products" value="Beauty products" />
-                <Picker.Item label="Consulting Services" value="Consulting Services" />
+                <Picker.Item
+                  label="Consulting Services"
+                  value="Consulting Services"
+                />
                 <Picker.Item label="Education" value="Education" />
                 <Picker.Item label="Electronics" value="Electronics" />
                 <Picker.Item label="Fashion" value="Fashion" />
-                <Picker.Item label="Food and Beverages" value="Food and Beverages" />
-                <Picker.Item label="Furniture and Fittings" value="Furniture and Fittings" />
+                <Picker.Item
+                  label="Food and Beverages"
+                  value="Food and Beverages"
+                />
+                <Picker.Item
+                  label="Furniture and Fittings"
+                  value="Furniture and Fittings"
+                />
                 <Picker.Item
                   label="Health and Pharma Products"
                   value="Health and Pharma Products"
                 />
                 <Picker.Item label="Home Services" value="Home Services" />
-                <Picker.Item label="Industrial goods" value="Industrial goods" />
-                <Picker.Item label="Media and Entertainment" value="Media and Entertainment" />
+                <Picker.Item
+                  label="Industrial goods"
+                  value="Industrial goods"
+                />
+                <Picker.Item
+                  label="Media and Entertainment"
+                  value="Media and Entertainment"
+                />
                 <Picker.Item label="Office supplies" value="Office supplies" />
-                <Picker.Item label="Packaging and Plastics" value="Packaging and Plastics" />
+                <Picker.Item
+                  label="Packaging and Plastics"
+                  value="Packaging and Plastics"
+                />
                 <Picker.Item label="Personal Care" value="Personal Care" />
-                <Picker.Item label="Professional Services" value="Professional Services" />
-                <Picker.Item label="Technology Services" value="Technology Services" />
-                <Picker.Item label="Utility Services" value="Utility Services" />
+                <Picker.Item
+                  label="Professional Services"
+                  value="Professional Services"
+                />
+                <Picker.Item
+                  label="Technology Services"
+                  value="Technology Services"
+                />
+                <Picker.Item
+                  label="Utility Services"
+                  value="Utility Services"
+                />
                 <Picker.Item label="Others" value="Others" />
               </Picker>
             </View>
           </View>
 
-          <View style={{ marginVertical: 10 }}>
-            <View style={{ flexDirection: 'row' }}>
+          <View style={{marginVertical: 10}}>
+            <View style={{flexDirection: 'row'}}>
               <Text
                 style={{
                   paddingBottom: 4,
@@ -683,32 +791,36 @@ const BusinessDetails = ({ route }) => {
                   lineHeight: 24,
                   color: '#14142B',
                   fontFamily: 'Montserat',
-                }}
-              >
+                }}>
                 Average monthly sales
               </Text>
-              <Text style={{ color: 'red', marginRight: 10 }}>*</Text>
+              <Text style={{color: 'red', marginRight: 10}}>*</Text>
             </View>
 
             <View style={styles.pick}>
               <Picker
                 selectedValue={businessDetails?.monthlySales}
-                onValueChange={(text) =>
-                  setBusinessDetails({ ...businessDetails, monthlySales: text })
-                }
-              >
+                onValueChange={text =>
+                  setBusinessDetails({...businessDetails, monthlySales: text})
+                }>
                 <Picker.Item label="Select option" value="" />
-                <Picker.Item label="Less than 10 sales" value="Less than 10 sales" />
+                <Picker.Item
+                  label="Less than 10 sales"
+                  value="Less than 10 sales"
+                />
                 <Picker.Item label="11 to 50 sales" value="11 to 50 sales" />
                 <Picker.Item label="51 to 100 sales" value="51 to 100 sales" />
-                <Picker.Item label="100 to 500 sales" value="100 to 500 sales" />
+                <Picker.Item
+                  label="100 to 500 sales"
+                  value="100 to 500 sales"
+                />
                 <Picker.Item label="Above 500 sales" value="Above 500 sales" />
               </Picker>
             </View>
           </View>
 
-          <View style={{ marginVertical: 10 }}>
-            <View style={{ flexDirection: 'row' }}>
+          <View style={{marginVertical: 10}}>
+            <View style={{flexDirection: 'row'}}>
               <Text
                 style={{
                   paddingBottom: 4,
@@ -717,30 +829,46 @@ const BusinessDetails = ({ route }) => {
                   lineHeight: 24,
                   color: '#14142B',
                   fontFamily: 'Montserat',
-                }}
-              >
+                }}>
                 Average monthly expenses
               </Text>
-              <Text style={{ color: 'red', marginRight: 10 }}>*</Text>
+              <Text style={{color: 'red', marginRight: 10}}>*</Text>
             </View>
             <View style={styles.pick}>
               <Picker
                 selectedValue={businessDetails?.monthlyExpenses}
-                onValueChange={(text) =>
-                  setBusinessDetails({ ...businessDetails, monthlyExpenses: text })
-                }
-              >
+                onValueChange={text =>
+                  setBusinessDetails({
+                    ...businessDetails,
+                    monthlyExpenses: text,
+                  })
+                }>
                 <Picker.Item label="Select option" value="" />
-                <Picker.Item label="Less than ₦10,000" value="Less than ₦10,000" />
-                <Picker.Item label="₦10,000 to ₦100,000" value="₦10,000 to ₦100,000" />
-                <Picker.Item label="₦100,000 to ₦500,000" value="₦100,000 to ₦500,000" />
-                <Picker.Item label="₦500,000 to ₦1,000,000" value="₦500,000 to ₦1,000,000" />
-                <Picker.Item label="Above ₦1,000,000" value="Above ₦1,000,000" />
+                <Picker.Item
+                  label="Less than ₦10,000"
+                  value="Less than ₦10,000"
+                />
+                <Picker.Item
+                  label="₦10,000 to ₦100,000"
+                  value="₦10,000 to ₦100,000"
+                />
+                <Picker.Item
+                  label="₦100,000 to ₦500,000"
+                  value="₦100,000 to ₦500,000"
+                />
+                <Picker.Item
+                  label="₦500,000 to ₦1,000,000"
+                  value="₦500,000 to ₦1,000,000"
+                />
+                <Picker.Item
+                  label="Above ₦1,000,000"
+                  value="Above ₦1,000,000"
+                />
               </Picker>
             </View>
           </View>
 
-          <View style={{ marginVertical: 10 }}>
+          <View style={{marginVertical: 10}}>
             <Text
               style={{
                 paddingBottom: 4,
@@ -749,17 +877,18 @@ const BusinessDetails = ({ route }) => {
                 lineHeight: 24,
                 color: '#14142B',
                 fontFamily: 'Montserat',
-              }}
-            >
+              }}>
               How long have you been in business?
             </Text>
             <View style={styles.pick}>
               <Picker
                 selectedValue={businessDetails?.businessDuration}
-                onValueChange={(text) =>
-                  setBusinessDetails({ ...businessDetails, businessDuration: text })
-                }
-              >
+                onValueChange={text =>
+                  setBusinessDetails({
+                    ...businessDetails,
+                    businessDuration: text,
+                  })
+                }>
                 <Picker.Item label="Select option" value="" />
                 <Picker.Item label="0-1 years" value="0-1 years" />
                 <Picker.Item label="1-3 years" value="1-3 years" />
@@ -773,13 +902,17 @@ const BusinessDetails = ({ route }) => {
           <CustomInput
             label="MAMERT"
             defaultValue={businessDetails?.MAMERT}
-            onChangeText={(text) => setBusinessDetails({ ...businessDetails, MAMERT: text })}
+            onChangeText={text =>
+              setBusinessDetails({...businessDetails, MAMERT: text})
+            }
             keyboardType="numeric"
           />
           <CustomInput
             label="TIN(Tax Identification Number"
             defaultValue={businessDetails?.tin}
-            onChangeText={(text) => setBusinessDetails({ ...businessDetails, tin: text })}
+            onChangeText={text =>
+              setBusinessDetails({...businessDetails, tin: text})
+            }
             keyboardType="numeric"
           />
 
@@ -789,9 +922,8 @@ const BusinessDetails = ({ route }) => {
                 ? handleCreateBusinessDetails
                 : handleUpdateBusinessDetails
             }
-            disabled={disableit}
-          >
-            <View style={{ marginBottom: 40, marginTop: 20 }}>
+            disabled={disableit}>
+            <View style={{marginBottom: 40, marginTop: 20}}>
               <Buttons label={'Save & Continue'} disabled={disableit} />
             </View>
           </TouchableOpacity>
@@ -870,7 +1002,7 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     // borderWidth:.5,
     shadowColor: 'black',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.8,
     shadowRadius: 2,
     backgroundColor: '#ffffff',

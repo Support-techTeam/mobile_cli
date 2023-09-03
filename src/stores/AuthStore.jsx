@@ -19,6 +19,7 @@ const userLogin = async (email, password) => {
     );
     const user = userCredential.user;
     await AsyncStorage.setItem('hasUser', 'true');
+    await AsyncStorage.setItem('userEmail', email);
     return {
       user: user,
       title: 'Account Login',

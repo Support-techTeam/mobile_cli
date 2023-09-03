@@ -12,10 +12,48 @@ import Verification from '../screens/Authentications/Verification';
 import PersonalDetails from '../screens/ProfileOnboardings/PersonalDetails';
 import OnboardingScreen from '../screens/Authentications/OnboardingScreen';
 import Splashscreen from './Splashscreen';
-//Styles
+import BottomTabs from './bottomTabs';
+import TransactionScreen from '../screens/HomeScreens/TransactionScreen';
+import BankDeets from '../screens/TransferScreens/BankDeets';
+import Summary from '../screens/TransferScreens/Summary';
+import Pin from '../screens/TransferScreens/Pin';
+import Success from '../screens/TransferScreens/Success';
+//Pending
+// import {AddGuatantors, GetLoan} from '../screens/LoanScreens';
+// import LoanTransactions from '../screens/LoanScreens/LoanTransaction';
+// import UpdatePersonalDetails from '../screens/ProfileOnboardings/UpdatePersonalDetails';
+// import {
+//   BankStatement,
+//   CAC,
+//   CompanySeals,
+//   Others,
+//   Passport,
+//   ProofOfAddress,
+//   Signature,
+//   ValidIdentity,
+// } from '../screens/ProfileOnboardings/AddDocuments';
+// import GuarantorDetails from '../screens/LoanScreens/GuarantorDetails';
+// import MyAccount from '../screens/MyAccountsScreens/MyAccount';
+// import FinalSubmit from '../screens/ProfileOnboardings/AddDocuments/FinalSubmit';
+// import Securindex from '../screens/SecurityScreens/Securindex';
+// import TransPin from '../screens/SecurityScreens/TransPin';
+// import PinCon from '../screens/SecurityScreens/PinCon';
+// import PinSuccess from '../screens/SecurityScreens/PinSuccess';
+// import LockPin from '../screens/SecurityScreens/LockPin';
+// import BeneficiaryList from '../screens/TransferScreens/BeneficiaryList';
+// import {Airtime, Homescreen, Paybills} from '../screens/HomeScreens';
+// import AirtimeConfirm from '../screens/paybills/AirtimeConfirm';
+// import StatusPage from '../screens/paybills/StausPage';
+// import GetData from '../screens/paybills/GetData';
+// import Electric from '../screens/paybills/ElectricityBills';
+// import Cable from '../screens/paybills/Cable';
+// import BillPin from '../screens/paybills/billPin';
+// import StatusFailed from '../screens/paybills/StatusFailed';
+// import ResetPin from '../screens/SecurityScreens/ResetPin';
+
+import {auth} from '../util/firebase/firebaseConfig';
 import {getProfileDetails} from '../stores/ProfileStore';
 import {setProfile} from '../util/redux/userProfile/user.profile.slice';
-import {auth} from '../util/firebase/firebaseConfig';
 
 const Stack = createNativeStackNavigator();
 const config = {
@@ -32,10 +70,9 @@ const config = {
 const AppStack = () => {
   const dispatch = useDispatch();
   const userData = useSelector(state => state.userAuth.user);
-  const isVerified = JSON.parse(userData)?.emailVerified
-    ? JSON.parse(userData)?.emailVerified
-    : JSON.parse(userData).user?.emailVerified;
+  const isVerified = JSON.parse(userData)?.emailVerified;
   const userProfileData = useSelector(state => state.userProfile.profile);
+  const [timeOut, setTimeOut] = useState(false);
 
   useEffect(() => {
     // fetch profile
@@ -63,86 +100,66 @@ const AppStack = () => {
     }
   }, []);
 
-  // console.log('userProfileData', userProfileData?.email);
-  // console.log('profileDetails', profileDetails?.city);
-  // console.log('JSON.parse(user)', isVerified);
-  // console.log('APPuserProfileData', userProfileData?.profileProgress);
-  // console.log('auth.currentUser', auth.currentUser?.emailVerified);
-  return (
+  useEffect(() => {
+    setTimeout(() => {
+      setTimeOut(true);
+    }, 5000);
+  });
+
+  // console.log('userProfileData', userProfileData);
+  // console.log('JSON.parse(user)->isVerified', isVerified);
+  // console.log('JSON.parse(user)', userData);
+  return !isVerified && !timeOut ? (
     <Stack.Navigator screenOptions={{headerShown: false}}>
-      {userData && !isVerified && userProfileData?.profileProgress == null && (
-        <>
-          <Stack.Screen
-            name="Verification"
-            component={Verification}
-            options={{
-              title: 'Verification',
-              transitionSpec: {
-                open: config,
-                close: config,
-              },
-            }}
-          />
-          <Stack.Screen
-            name="PersonalDetails"
-            component={PersonalDetails}
-            options={{
-              title: 'Personal Details',
-              transitionSpec: {
-                open: config,
-                close: config,
-              },
-            }}
-          />
-        </>
-      )}
-      {userData &&
-        isVerified &&
-        userProfileData &&
-        userProfileData?.profileProgress === null && (
-          <Stack.Screen
-            name="PersonalDetails"
-            component={PersonalDetails}
-            options={{
-              title: 'Personal Details',
-              transitionSpec: {
-                open: config,
-                close: config,
-              },
-            }}
-          />
-        )}
-      {userData &&
-        isVerified &&
-        userProfileData &&
-        userProfileData?.profileProgress !== null && (
-          <Stack.Screen
-            name="OnboardingScreen"
-            component={OnboardingScreen}
-            options={{
-              title: 'Onboarding',
-              transitionSpec: {
-                open: config,
-                close: config,
-              },
-            }}
-          />
-        )}
-      {userData && !userProfileData && (
+      <Stack.Screen
+        name="Splashscreen"
+        component={Splashscreen}
+        options={{
+          title: 'Splashscreen',
+          transitionSpec: {
+            open: config,
+            close: config,
+          },
+        }}
+      />
+    </Stack.Navigator>
+  ) : (
+    <Stack.Navigator screenOptions={{headerShown: false}}>
+      {userData && !isVerified && userProfileData?.profileProgress == null ? (
         <Stack.Screen
-          name="Splashscreen"
-          component={Splashscreen}
+          name="Verification"
+          component={Verification}
           options={{
-            title: 'Splashscreen',
+            title: 'Verification',
             transitionSpec: {
               open: config,
               close: config,
             },
           }}
         />
+      ) : (
+        <>
+          <Stack.Screen
+            name="BottomTabs"
+            component={BottomTabs}
+            options={{
+              title: 'BottomTabs',
+              transitionSpec: {
+                open: config,
+                close: config,
+              },
+            }}
+          />
+          <Stack.Screen name="Transaction" component={TransactionScreen} />
+          <Stack.Screen name="PersonalDetails" component={PersonalDetails} />
+          {/* Transfer Screens */}
+          <Stack.Screen name="Transfer" component={BankDeets} />
+          <Stack.Screen name="Summary" component={Summary} />
+          <Stack.Screen name="Pin" component={Pin} />
+          <Stack.Screen name="Success" component={Success} />
+        </>
       )}
     </Stack.Navigator>
-    // )
   );
 };
 

@@ -18,6 +18,7 @@ import Input from '../../component/inputField/input.component';
 import Button from '../../component/buttons/Button';
 import {forgotPassword} from '../../stores/AuthStore';
 import Toast from 'react-native-toast-message';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
@@ -88,7 +89,7 @@ const ForgotPassword = () => {
         flex: 1,
         // paddingHorizontal: 20,
         backgroundColor: '#fff',
-        paddingTop: insets.top !== 0 ? insets.top : 'auto',
+        paddingTop: insets.top !== 0 ? insets.top / 2 : 'auto',
         paddingBottom: insets.bottom !== 0 ? insets.bottom : 'auto',
         paddingLeft: insets.left !== 0 ? insets.left : 'auto',
         paddingRight: insets.right !== 0 ? insets.right : 'auto',
@@ -107,19 +108,56 @@ const ForgotPassword = () => {
               textContent={'Loading...'}
               textStyle={{color: 'white'}}
               visible={true}
-              overlayColor="rgba(16, 17, 17, 0.7)"
+              overlayColor="rgba(78, 75, 102, 0.7)"
             />
           )}
           <KeyboardAvoidingWrapper>
             <View style={{marginBottom: 40}}>
-              <View style={{alignItems: 'center'}}>
+              <View
+                style={{
+                  flex: 1,
+                  flexDirection: 'row',
+                  justifyContent: 'flex-start',
+                }}>
+                <View style={{alignItems: 'center', marginTop: insets.top / 2}}>
+                  <TouchableOpacity onPress={() => navigation.goBack()}>
+                    <View
+                      style={{
+                        borderWidth: 0.5,
+                        borderColor: '#D9DBE9',
+                        borderRadius: 5,
+                      }}>
+                      <Icon name="chevron-left" size={36} color="black" />
+                    </View>
+                  </TouchableOpacity>
+                </View>
                 <View style={{alignItems: 'center'}}>
+                  <View style={styles.signupView}>
+                    <Image
+                      source={require('../../../assets/images/HeadLogo.png')}
+                      style={{marginBottom: 24}}
+                    />
+                    <Image
+                      source={require('../../../assets/images/locked.png')}
+                    />
+                    <Text style={styles.signupText}>Forgotten Password?</Text>
+                  </View>
+                  <View style={styles.signupDetails}>
+                    <Text style={[styles.extraText, {marginBottom: 40}]}>
+                      Please enter your email address to recieve a password
+                      reset link
+                    </Text>
+                  </View>
+                </View>
+              </View>
+              {/* <View style={{alignItems: 'center'}}> */}
+              {/* <View style={{alignItems: 'center'}}>
                   <Image
                     source={require('../../../assets/images/HeadLogo.png')}
                   />
-                </View>
-              </View>
-              <View style={styles.signupView}>
+                </View> */}
+              {/* </View> */}
+              {/* <View style={styles.signupView}>
                 <Image source={require('../../../assets/images/locked.png')} />
                 <Text style={styles.signupText}>Forgotten Password?</Text>
                 <View>
@@ -128,7 +166,7 @@ const ForgotPassword = () => {
                     link
                   </Text>
                 </View>
-              </View>
+              </View> */}
               <View
                 style={{
                   paddingTop: 25,

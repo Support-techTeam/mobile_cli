@@ -14,11 +14,11 @@ const reducSetStore = store.getState().userProfile;
 let token = null;
 let headers;
 if (reduxStore !== null || reduxStore !== undefined) {
-  token =
-    JSON.parse(reduxStore.user).user?.stsTokenManager?.accessToken != null ||
-    JSON.parse(reduxStore.user).user?.stsTokenManager?.accessToken != undefined
-      ? JSON.parse(reduxStore.user).user?.stsTokenManager?.accessToken
-      : JSON.parse(reduxStore.user)?.stsTokenManager?.accessToken;
+  token = JSON.parse(reduxStore.user)?.stsTokenManager?.accessToken;
+  // JSON.parse(reduxStore.user).user?.stsTokenManager?.accessToken != null ||
+  // JSON.parse(reduxStore.user).user?.stsTokenManager?.accessToken != undefined
+  //   ? JSON.parse(reduxStore.user).user?.stsTokenManager?.accessToken
+  //   : JSON.parse(reduxStore.user)?.stsTokenManager?.accessToken;
   // headers = {
   //   accept: 'application/json',
   //   Authorization: `Bearer ${token}`,

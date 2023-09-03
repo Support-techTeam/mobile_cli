@@ -1,27 +1,33 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import React, { useContext, useEffect, useState } from 'react';
-import { Picker } from '@react-native-picker/picker';
-import { AntDesign } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+} from 'react-native';
+import React, {useContext, useEffect, useState} from 'react';
+import {Picker} from '@react-native-picker/picker';
+import {AntDesign} from '@expo/vector-icons';
+import {useNavigation} from '@react-navigation/native';
 
 import CustomInput from '../../component/custominput/CustomInput';
 import Buttons from '../../component/buttons/Buttons';
-import { observer } from 'mobx-react-lite';
-import { StoreContext } from '../../config/mobX stores/RootStore';
+import {observer} from 'mobx-react-lite';
+import {StoreContext} from '../../config/mobX stores/RootStore';
 import Spinner from 'react-native-loading-spinner-overlay/lib';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 
-const BankDetails = ({ route }) => {
+const BankDetails = ({route}) => {
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
-  const { loansStore } = useContext(StoreContext);
-  const { success, sending, credrails, loanUserdetails, loading } = loansStore;
+  // const {loansStore} = useContext(StoreContext);
+  // const {success, sending, credrails, loanUserdetails, loading} = loansStore;
 
-  useEffect(() => {
-    loansStore.getLoanUserDetails();
-  }, [loansStore]);
+  // useEffect(() => {
+  //   loansStore.getLoanUserDetails();
+  // }, [loansStore]);
 
-  const bankDeets = loanUserdetails?.bankDetails;
+  // const bankDeets = loanUserdetails?.bankDetails;
 
   const [bankDetails, setBankDetails] = useState({
     email: '',
@@ -35,19 +41,32 @@ const BankDetails = ({ route }) => {
 
   useEffect(() => {
     setBankDetails({
-      email: bankDeets && bankDeets?.email === undefined ? '' : bankDeets?.email,
-      bankName: bankDeets && bankDeets?.bankName === undefined ? '' : bankDeets?.bankName,
+      email: '',
+      // bankDeets && bankDeets?.email === undefined ? '' : bankDeets?.email,
+      bankName:
+        bankDeets && bankDeets?.bankName === undefined
+          ? ''
+          : bankDeets?.bankName,
       bankAccountNumber:
-        bankDeets && bankDeets?.bankAccountNumber === undefined ? '' : bankDeets?.bankAccountNumber,
+        bankDeets && bankDeets?.bankAccountNumber === undefined
+          ? ''
+          : bankDeets?.bankAccountNumber,
       bankAccountName:
-        bankDeets && bankDeets?.bankAccountName === undefined ? '' : bankDeets?.bankAccountName,
+        bankDeets && bankDeets?.bankAccountName === undefined
+          ? ''
+          : bankDeets?.bankAccountName,
       hasOnlineBanking:
-        bankDeets && bankDeets?.hasOnlineBanking === undefined ? true : bankDeets?.hasOnlineBanking,
+        bankDeets && bankDeets?.hasOnlineBanking === undefined
+          ? true
+          : bankDeets?.hasOnlineBanking,
       wasLoanTakenWithinTheLast12Months:
         bankDeets && bankDeets?.wasLoanTakenWithinTheLast12Months === undefined
           ? false
           : bankDeets?.wasLoanTakenWithinTheLast12Months,
-      loanAmount: bankDeets && bankDeets?.loanAmount === undefined ? '' : bankDeets?.loanAmount,
+      loanAmount:
+        bankDeets && bankDeets?.loanAmount === undefined
+          ? ''
+          : bankDeets?.loanAmount,
     });
   }, [bankDeets]);
 
@@ -66,37 +85,37 @@ const BankDetails = ({ route }) => {
     bankDetails.wasLoanTakenWithinTheLast12Months === '' ||
     !bankDetails.hasOnlineBanking;
 
-  useEffect(() => {
-    loansStore.getCredailsBanks();
-  }, [loansStore]);
+  // useEffect(() => {
+  //   loansStore.getCredailsBanks();
+  // }, [loansStore]);
 
-  const onEmailChange = (text) => {
-    setBankDetails({ ...bankDetails, email: text });
-    setCredailsDetails({ ...credailsDetails, email: text });
+  const onEmailChange = text => {
+    setBankDetails({...bankDetails, email: text});
+    setCredailsDetails({...credailsDetails, email: text});
   };
 
-  const onBankNameChange = (text) => {
-    setBankDetails({ ...bankDetails, bankName: text });
-    setCredailsDetails({ ...credailsDetails, bankName: text });
+  const onBankNameChange = text => {
+    setBankDetails({...bankDetails, bankName: text});
+    setCredailsDetails({...credailsDetails, bankName: text});
   };
 
-  const onBankAccountNameChange = (text) => {
-    setBankDetails({ ...bankDetails, bankAccountName: text });
-    setCredailsDetails({ ...credailsDetails, bankAccountName: text });
+  const onBankAccountNameChange = text => {
+    setBankDetails({...bankDetails, bankAccountName: text});
+    setCredailsDetails({...credailsDetails, bankAccountName: text});
   };
 
-  const onBankAccountNumberChange = (text) => {
-    setBankDetails({ ...bankDetails, bankAccountNumber: text });
-    setCredailsDetails({ ...credailsDetails, bankAccountNumber: text });
+  const onBankAccountNumberChange = text => {
+    setBankDetails({...bankDetails, bankAccountNumber: text});
+    setCredailsDetails({...credailsDetails, bankAccountNumber: text});
   };
 
   const handleCreateBankDetails = () => {
-    loansStore.createBankDetails(bankDetails);
-    loansStore.createCredailsDetails(credailsDetails);
+    // loansStore.createBankDetails(bankDetails);
+    // loansStore.createCredailsDetails(credailsDetails);
   };
 
   const handleUpdateBankDetails = () => {
-    loansStore.updateBankDetails(bankDetails);
+    // loansStore.updateBankDetails(bankDetails);
   };
 
   const prevRoutes = route?.params?.paramKey;
@@ -107,10 +126,11 @@ const BankDetails = ({ route }) => {
         navigation.navigate('ValidIndentity');
       } else {
         navigation.navigate('MyAccount');
-        loansStore.getLoanUserDetails();
+        // loansStore.getLoanUserDetails();
       }
     }
-  }, [loansStore, navigation, prevRoutes, success]);
+  }, [navigation, prevRoutes]);
+  // }, [loansStore, navigation, prevRoutes, success]);
 
   return (
     <SafeAreaView
@@ -121,22 +141,21 @@ const BankDetails = ({ route }) => {
         paddingBottom: insets.bottom !== 0 ? insets.bottom / 2 : 'auto',
         paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
         paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
-      }}
-    >
+      }}>
       {sending && (
         <Spinner
           textContent={'Please wait...'}
-          textStyle={{ color: 'white' }}
+          textStyle={{color: 'white'}}
           visible={true}
-          overlayColor="rgba(16, 17, 16, 0.70)"
+          overlayColor="rgba(78, 75, 102, 0.7)"
         />
       )}
-      {loading && (
+      {false && (
         <Spinner
           textContent={'Loading...'}
-          textStyle={{ color: 'white' }}
+          textStyle={{color: 'white'}}
           visible={true}
-          overlayColor="rgba(16, 17, 16, 0.70)"
+          overlayColor="rgba(78, 75, 102, 0.7)"
         />
       )}
       <View
@@ -145,16 +164,14 @@ const BankDetails = ({ route }) => {
           justifyContent: 'space-between',
           alignItems: 'center',
           marginHorizontal: 15,
-        }}
-      >
+        }}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <View
             style={{
               borderWidth: 0.5,
               borderColor: '#D9DBE9',
               borderRadius: 5,
-            }}
-          >
+            }}>
             <AntDesign name="left" size={24} color="black" />
           </View>
         </TouchableOpacity>
@@ -172,13 +189,13 @@ const BankDetails = ({ route }) => {
         bounces={false}
         showsHorizontalScrollIndicator={false}
         showsVerticalScrollIndicator={false}
-        style={[styles.innercontainer]}
-      >
+        style={[styles.innercontainer]}>
         <View style={styles.form}>
           <Text style={styles.header}>
-            Industry regulation requires us to collect this information to verify your identity.
+            Industry regulation requires us to collect this information to
+            verify your identity.
           </Text>
-          <Text style={[styles.header, { color: 'red' }]}>
+          <Text style={[styles.header, {color: 'red'}]}>
             *Please enter your valid bank account details*
           </Text>
         </View>
@@ -189,12 +206,12 @@ const BankDetails = ({ route }) => {
             autoCorrect={false}
             defaultValue={bankDetails?.email}
             autoCapitalize="none"
-            onChangeText={(text) => onEmailChange(text)}
+            onChangeText={text => onEmailChange(text)}
             isNeeded={true}
           />
 
-          <View style={{ marginVertical: 10 }}>
-            <View style={{ flexDirection: 'row' }}>
+          <View style={{marginVertical: 10}}>
+            <View style={{flexDirection: 'row'}}>
               <Text
                 style={{
                   paddingBottom: 4,
@@ -203,18 +220,16 @@ const BankDetails = ({ route }) => {
                   lineHeight: 24,
                   color: '#14142B',
                   fontFamily: 'Montserat',
-                }}
-              >
+                }}>
                 Bank name
               </Text>
-              <Text style={{ color: 'red', marginRight: 10 }}>*</Text>
+              <Text style={{color: 'red', marginRight: 10}}>*</Text>
             </View>
 
             <View style={styles.pick}>
               <Picker
                 selectedValue={bankDetails?.bankName}
-                onValueChange={(text) => onBankNameChange(text)}
-              >
+                onValueChange={text => onBankNameChange(text)}>
                 <Picker.Item label="Select Bank" value="" />
 
                 {credrails?.map((bank, i) => (
@@ -227,7 +242,7 @@ const BankDetails = ({ route }) => {
           <CustomInput
             label="Bank account name"
             defaultValue={bankDetails?.bankAccountName}
-            onChangeText={(text) => onBankAccountNameChange(text)}
+            onChangeText={text => onBankAccountNameChange(text)}
             isNeeded={true}
           />
 
@@ -235,12 +250,12 @@ const BankDetails = ({ route }) => {
             label="Bank account number"
             keyboardType="numeric"
             defaultValue={bankDetails?.bankAccountNumber}
-            onChangeText={(text) => onBankAccountNumberChange(text)}
+            onChangeText={text => onBankAccountNumberChange(text)}
             isNeeded={true}
           />
 
-          <View style={{ marginVertical: 10 }}>
-            <View style={{ flexDirection: 'row' }}>
+          <View style={{marginVertical: 10}}>
+            <View style={{flexDirection: 'row'}}>
               <Text
                 style={{
                   paddingBottom: 4,
@@ -249,17 +264,16 @@ const BankDetails = ({ route }) => {
                   lineHeight: 24,
                   color: '#14142B',
                   fontFamily: 'Montserat',
-                }}
-              >
+                }}>
                 Do you use online banking?
               </Text>
-              <Text style={{ color: 'red', marginRight: 10 }}>*</Text>
+              <Text style={{color: 'red', marginRight: 10}}>*</Text>
             </View>
 
             <View style={styles.pick}>
               <Picker
                 selectedValue={bankDetails?.hasOnlineBanking}
-                onValueChange={(text) =>
+                onValueChange={text =>
                   setBankDetails({
                     ...bankDetails,
                     hasOnlineBanking:
@@ -274,8 +288,7 @@ const BankDetails = ({ route }) => {
                           )
                         : true,
                   })
-                }
-              >
+                }>
                 <Picker.Item label="Select value" value="" />
                 <Picker.Item label="Yes" value={true} />
                 <Picker.Item label="No" value={false} />
@@ -283,8 +296,8 @@ const BankDetails = ({ route }) => {
             </View>
           </View>
 
-          <View style={{ marginVertical: 10 }}>
-            <View style={{ flexDirection: 'row' }}>
+          <View style={{marginVertical: 10}}>
+            <View style={{flexDirection: 'row'}}>
               <Text
                 style={{
                   paddingBottom: 4,
@@ -293,23 +306,21 @@ const BankDetails = ({ route }) => {
                   lineHeight: 24,
                   color: '#14142B',
                   fontFamily: 'Montserat',
-                }}
-              >
+                }}>
                 Have you taken a loan in the past 12months?
               </Text>
-              <Text style={{ color: 'red', marginRight: 10 }}>*</Text>
+              <Text style={{color: 'red', marginRight: 10}}>*</Text>
             </View>
 
             <View style={styles.pick}>
               <Picker
                 selectedValue={bankDetails?.wasLoanTakenWithinTheLast12Months}
-                onValueChange={(text) =>
+                onValueChange={text =>
                   setBankDetails({
                     ...bankDetails,
                     wasLoanTakenWithinTheLast12Months: text,
                   })
-                }
-              >
+                }>
                 <Picker.Item label="Select Value" value="" />
                 <Picker.Item label="Yes" value={true} />
                 <Picker.Item label="No" value={false} />
@@ -321,16 +332,19 @@ const BankDetails = ({ route }) => {
             label="If yes, how much?"
             keyboardType="numeric"
             defaultValue={bankDetails?.loanAmount}
-            onChangeText={(text) => setBankDetails({ ...bankDetails, loanAmount: text })}
+            onChangeText={text =>
+              setBankDetails({...bankDetails, loanAmount: text})
+            }
           />
 
           <TouchableOpacity
             onPress={
-              bankDeets?.email === undefined ? handleCreateBankDetails : handleUpdateBankDetails
+              bankDeets?.email === undefined
+                ? handleCreateBankDetails
+                : handleUpdateBankDetails
             }
-            disabled={disableit}
-          >
-            <View style={{ marginBottom: 40, marginTop: 20 }}>
+            disabled={disableit}>
+            <View style={{marginBottom: 40, marginTop: 20}}>
               <Buttons label="Save & Continue" disabled={disableit} />
             </View>
           </TouchableOpacity>
@@ -409,7 +423,7 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     // borderWidth:.5,
     shadowColor: 'black',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.8,
     shadowRadius: 2,
     backgroundColor: '#ffffff',
