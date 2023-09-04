@@ -1039,10 +1039,12 @@ const Loanscreen = () => {
                   `${
                     loanUserDetails !== undefined &&
                     loanUserDetails?.loanDocumentDetails
-                      ?.validIdentification === undefined
-                      ? 'GetLoan'
-                      : 'Home'
-                    // ? 'OnboardingHome'
+                      ?.validIdentification !== undefined
+                      ? // loanUserDetails?.loanDocumentDetails
+                        //   ?.validIdentification === undefined
+                        'GetLoan'
+                      : 'OnboardingHome'
+                    // ?'OnboardingHome'
                     // : 'GetLoan'
                   }`,
                 )

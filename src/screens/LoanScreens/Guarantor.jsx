@@ -13,6 +13,7 @@ import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useRoute} from '@react-navigation/native';
 import {getGuarantors} from '../../stores/GuarantorStore';
 import {getLoanUserDetails} from '../../stores/LoanStore';
+import AntDesign from 'react-native-vector-icons/AntDesign';
 
 const Guarantor = () => {
   const navigation = useNavigation();
@@ -225,9 +226,18 @@ const Guarantor = () => {
                   </View>
                   <View>
                     <Text style={styles.addText}>Add Guarantor</Text>
-                    <Text style={styles.addDets}>
-                      Add guarantor to be eligible to take loan
-                    </Text>
+                    <View
+                      style={{
+                        flex: 1,
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        justifyContent: 'space-evenly',
+                      }}>
+                      <Text style={[styles.addDets, {marginRight: 30}]}>
+                        Add guarantor to be eligible to take loan
+                      </Text>
+                      <AntDesign name="right" size={15} color="#14142B" />
+                    </View>
                   </View>
                 </View>
               </View>
@@ -367,6 +377,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#EFF0F6',
     padding: 20,
     borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#D9DBE9',
   },
   tresuser: {
     backgroundColor: '#D9DBE9',

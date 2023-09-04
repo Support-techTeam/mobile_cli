@@ -7,7 +7,9 @@
     "ios": "react-native run-ios",
     "lint": "eslint .",
     "start": "react-native start",
-    "test": "jest"
+    "test": "jest",
+    "postinstall": "node ./bin/postInstall",
+    "version:up": "node ./node_modules/react-native-version-up/index.js"
   },
   "dependencies": {
     "@ant-design/icons": "^5.2.5",
@@ -41,6 +43,7 @@
     "native-base": "^3.4.28",
     "react": "18.2.0",
     "react-native": "0.72.4",
+    "react-native-blob-util": "^0.19.1",
     "react-native-element-dropdown": "^2.10.0",
     "react-native-gesture-handler": "^2.12.1",
     "react-native-linear-gradient": "^2.8.2",

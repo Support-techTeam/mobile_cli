@@ -17,6 +17,7 @@ import COLORS from '../../constants/colors';
 import ViewShot from 'react-native-view-shot';
 import SendIntentAndroid from 'react-native-send-intent';
 import Share from 'react-native-share';
+import Toast from 'react-native-toast-message';
 
 const LoanTransactions = ({route}) => {
   const navigation = useNavigation();
@@ -71,7 +72,7 @@ const LoanTransactions = ({route}) => {
 
       await Share.open(shareOptions);
     } catch (error) {
-      console.error('Error sharing:', error);
+      // console.error('Error sharing:', error);
     }
   };
 
@@ -118,7 +119,6 @@ const LoanTransactions = ({route}) => {
         <TouchableOpacity
           onPress={() => {
             shareToSocialMedia();
-            console.log('Share to social media');
           }}>
           <View
             style={{
@@ -353,7 +353,7 @@ const LoanTransactions = ({route}) => {
                       </Text>
                     </View>
                   )}
-                  {loanDetails?.repaymentScheduleDates?.map((date, i) => (
+                  {loanDetails?.repaymentScheduleDates.map((date, i) => (
                     <View
                       style={{flexDirection: 'row', alignItems: 'center'}}
                       key={i}>

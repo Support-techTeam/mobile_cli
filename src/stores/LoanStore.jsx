@@ -241,7 +241,7 @@ const getLoanById = async id => {
         title: 'Get Single Loan ',
         error: true,
         data: null,
-        message: error,
+        message: 'Failed to retrieve loan data!',
       };
     }
   }
@@ -256,7 +256,7 @@ const getLoanDetails = async (amount, tenor) => {
     };
     try {
       const response = await axiosInstance.get(
-        `/loans/details?amount=${amount}&tenor=${tenor}`,
+        `/loans/details?amount=${Number(amount)}&tenor=${tenor}`,
         {
           headers,
         },
@@ -300,7 +300,7 @@ const createLoan = async details => {
         title: 'Create Loan ',
         error: true,
         data: null,
-        message: error,
+        message: 'Loan request failed',
       };
     }
   }

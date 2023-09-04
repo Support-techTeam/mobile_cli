@@ -4,6 +4,7 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  ImageBackground,
 } from 'react-native';
 import React, {useContext, useEffect, useState} from 'react';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -26,7 +27,7 @@ const titleData = [
   {value: 'Dr', label: 'Dr'},
 ];
 
-const AddGuatantors = () => {
+const AddGuarantors = () => {
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const [isLoading, setIsLoading] = useState(false);
@@ -124,106 +125,134 @@ const AddGuatantors = () => {
         </View>
       </View>
       <View style={styles.demark} />
-      <ScrollView
-        bounces={false}
-        showsHorizontalScrollIndicator={false}
-        showsVerticalScrollIndicator={false}
-        style={[styles.innercontainer]}>
-        <View style={styles.form}>
-          <Text style={styles.header}>
-            Fill the form below to add a new guarantor
-          </Text>
-          <Text style={styles.headerRed}>
-            *Please enter a valid email address and phone number*
-          </Text>
-        </View>
-        <View style={{marginVertical: 10}}>
-          <CustomDropdown
-            label="Title"
-            isNeeded={true}
-            placeholder="Select Title"
-            placeholderStyle={styles.placeholderStyle}
-            selectedTextStyle={styles.selectedTextStyle}
-            data={titleData}
-            maxHeight={300}
-            labelField="label"
-            valueField="value"
-            value={guarantorsDetails.title}
-            onChange={option => {
-              setGuarantorsDetails({...guarantorsDetails, title: option.value});
-            }}
-          />
-        </View>
-        <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-          <View style={{marginVertical: 10, paddingRight: 10, width: '50%'}}>
+      <ImageBackground
+        source={require('../../../assets/signup.png')}
+        resizeMode="stretch"
+        style={styles.image}>
+        <ScrollView
+          bounces={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+          style={[styles.innercontainer]}>
+          <View style={styles.form}>
+            <Text style={styles.header}>
+              Fill the form below to add a new guarantor
+            </Text>
+            <Text style={styles.headerRed}>
+              *Please enter a valid email address and phone number*
+            </Text>
+          </View>
+          <View
+            style={{
+              paddingTop: 25,
+              backgroundColor: '#FFFFFF',
+              borderRadius: 15,
+              paddingHorizontal: 15,
+              paddingVertical: 15,
+              opacity: 0.86,
+              borderColor: '#D9DBE9',
+              borderWidth: 2,
+            }}>
+            <View style={{marginVertical: 10}}>
+              <CustomDropdown
+                label="Title"
+                isNeeded={true}
+                placeholder="Select Title"
+                placeholderStyle={styles.placeholderStyle}
+                selectedTextStyle={styles.selectedTextStyle}
+                data={titleData}
+                maxHeight={300}
+                labelField="label"
+                valueField="value"
+                value={guarantorsDetails.title}
+                onChange={option => {
+                  setGuarantorsDetails({
+                    ...guarantorsDetails,
+                    title: option.value,
+                  });
+                }}
+              />
+            </View>
+            <View
+              style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+              <View
+                style={{marginVertical: 10, paddingRight: 10, width: '50%'}}>
+                <Input
+                  onChangeText={text =>
+                    setGuarantorsDetails({
+                      ...guarantorsDetails,
+                      firstName: text,
+                    })
+                  }
+                  iconName="account-outline"
+                  label="First Name"
+                  placeholder="Enter first name"
+                  value={guarantorsDetails.firstName}
+                  isNeeded={true}
+                />
+              </View>
+              <View style={{marginVertical: 10, paddingRight: 5, width: '50%'}}>
+                <Input
+                  onChangeText={text =>
+                    setGuarantorsDetails({...guarantorsDetails, lastName: text})
+                  }
+                  iconName="account-outline"
+                  placeholder="Enter last name"
+                  label="Last name"
+                  value={guarantorsDetails.lastName}
+                  isNeeded={true}
+                />
+              </View>
+            </View>
+
             <Input
               onChangeText={text =>
-                setGuarantorsDetails({...guarantorsDetails, firstName: text})
+                setGuarantorsDetails({...guarantorsDetails, email: text})
               }
-              iconName="account-outline"
-              label="First Name"
-              placeholder="Enter first name"
-              value={guarantorsDetails.firstName}
+              iconName="email-outline"
+              label="Email address"
+              placeholder="Enter your email"
+              value={guarantorsDetails.email}
               isNeeded={true}
+              autoCapitalize="none"
             />
-          </View>
-          <View style={{marginVertical: 10, paddingRight: 5, width: '50%'}}>
-            <Input
-              onChangeText={text =>
-                setGuarantorsDetails({...guarantorsDetails, lastName: text})
-              }
-              iconName="account-outline"
-              placeholder="Enter last name"
-              label="Last name"
-              value={guarantorsDetails.lastName}
-              isNeeded={true}
-            />
-          </View>
-        </View>
 
-        <Input
-          onChangeText={text =>
-            setGuarantorsDetails({...guarantorsDetails, email: text})
-          }
-          iconName="email-outline"
-          label="Email address"
-          placeholder="Enter your email"
-          value={guarantorsDetails.email}
-          isNeeded={true}
-          autoCapitalize="none"
-        />
+            <View style={{marginVertical: 10}}>
+              <View>
+                <InputPhone
+                  label="Phone number"
+                  layout="first"
+                  isNeeded={true}
+                  defaultCode="NG"
+                  codeTextStyle={{color: '#6E7191'}}
+                  defaultValue={guarantorsDetails?.phoneNumber}
+                  onChangeFormattedText={text =>
+                    setGuarantorsDetails({
+                      ...guarantorsDetails,
+                      phoneNumber: text,
+                    })
+                  }
+                />
+              </View>
+            </View>
 
-        <View style={{marginVertical: 10}}>
-          <View>
-            <InputPhone
-              label="Phone number"
-              layout="first"
-              isNeeded={true}
-              defaultCode="NG"
-              codeTextStyle={{color: '#6E7191'}}
-              defaultValue={guarantorsDetails?.phoneNumber}
-              onChangeFormattedText={text =>
-                setGuarantorsDetails({...guarantorsDetails, phoneNumber: text})
-              }
-            />
+            <TouchableOpacity
+              onPress={() => {
+                handleCreateGuarantor();
+              }}
+              disabled={disableit}>
+              <View style={{marginBottom: 20}}>
+                <Buttons label="Save & Continue" disabled={disableit} />
+              </View>
+            </TouchableOpacity>
           </View>
-        </View>
-
-        <TouchableOpacity
-          onPress={() => {
-            handleCreateGuarantor();
-          }}
-          disabled={disableit}>
-          <View style={{marginBottom: 20}}>
-            <Buttons label="Save & Continue" disabled={disableit} />
-          </View>
-        </TouchableOpacity>
-      </ScrollView>
+        </ScrollView>
+      </ImageBackground>
     </SafeAreaView>
   );
 };
 
-export default AddGuatantors;
+export default AddGuarantors;
 
 const styles = StyleSheet.create({
   container: {

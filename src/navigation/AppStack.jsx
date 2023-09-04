@@ -1,11 +1,6 @@
 import React, {useState, useEffect} from 'react';
-import {Text, View} from 'react-native';
-import Button from '../component/buttons/Button';
-import {userLogOut} from '../stores/AuthStore';
 import {useDispatch, useSelector} from 'react-redux';
-import {signOutUser} from '../util/redux/userAuth/user.auth.slice';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import Toast from 'react-native-toast-message';
 
 //Screens
 import Verification from '../screens/Authentications/Verification';
@@ -20,7 +15,7 @@ import Pin from '../screens/TransferScreens/Pin';
 import Success from '../screens/TransferScreens/Success';
 import LoanTransactions from '../screens/LoanScreens/LoanTransaction';
 import GuarantorDetails from '../screens/LoanScreens/GuarantorDetails';
-import {AddGuatantors, GetLoan} from '../screens/LoanScreens';
+import {AddGuarantors, GetLoan} from '../screens/LoanScreens';
 //Pending
 // import UpdatePersonalDetails from '../screens/ProfileOnboardings/UpdatePersonalDetails';
 // import {
@@ -158,9 +153,11 @@ const AppStack = () => {
           <Stack.Screen name="Summary" component={Summary} />
           <Stack.Screen name="Pin" component={Pin} />
           <Stack.Screen name="Success" component={Success} />
+          {/* Loan Screens */}
           <Stack.Screen name="LoanTransaction" component={LoanTransactions} />
           <Stack.Screen name="GuarantorDetails" component={GuarantorDetails} />
-          <Stack.Screen name="AddGuarantors" component={AddGuatantors} />
+          <Stack.Screen name="AddGuarantors" component={AddGuarantors} />
+          <Stack.Screen name="GetLoan" component={GetLoan} />
         </>
       )}
     </Stack.Navigator>
