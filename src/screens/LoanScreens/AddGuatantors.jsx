@@ -7,18 +7,29 @@ import {
 } from 'react-native';
 import React, {useContext, useEffect, useState} from 'react';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {Picker} from '@react-native-picker/picker';
 import Spinner from 'react-native-loading-spinner-overlay';
-import PhoneInput from 'react-native-phone-number-input';
+import Input from '../../component/inputField/input.component';
+import CustomDropdown from '../../component/dropDown/dropdown.component';
+import InputPhone from '../../component/inputField/phone-input.component';
 import {useNavigation} from '@react-navigation/native';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 
 import Buttons from '../../component/buttons/Buttons';
-import CustomInput from '../../component/custominput/CustomInput';
+import Toast from 'react-native-toast-message';
+import {createGuarantor} from '../../stores/GuarantorStore';
+
+const titleData = [
+  {value: '', label: 'Select Title'},
+  {value: 'Mr', label: 'Mr'},
+  {value: 'Mrs', label: 'Mrs'},
+  {value: 'Miss', label: 'Miss'},
+  {value: 'Dr', label: 'Dr'},
+];
 
 const AddGuatantors = () => {
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
+  const [isLoading, setIsLoading] = useState(false);
   const [guarantorsDetails, setGuarantorsDetails] = useState({
     title: '',
     firstName: '',
@@ -34,6 +45,40 @@ const AddGuatantors = () => {
     !guarantorsDetails.email ||
     !guarantorsDetails.phoneNumber;
 
+  const handleCreateGuarantor = async () => {
+    setIsLoading(true);
+    const res = await createGuarantor(guarantorsDetails);
+    console.log('createGuarantor', res);
+    if (res.data.error) {
+      Toast.show({
+        type: 'error',
+        position: 'top',
+        topOffset: 50,
+        text1: res.data.title,
+        text2: res.data.message,
+        visibilityTime: 5000,
+        autoHide: true,
+        onPress: () => Toast.hide(),
+      });
+    } else {
+      Toast.show({
+        type: 'success',
+        position: 'top',
+        topOffset: 50,
+        text1: res.title,
+        text2: res.message,
+        visibilityTime: 3000,
+        autoHide: true,
+        onPress: () => Toast.hide(),
+      });
+
+      setTimeout(() => {
+        navigation.navigate('Guarantor');
+      }, 2000);
+    }
+    setIsLoading(false);
+  };
+
   return (
     <SafeAreaView
       style={{
@@ -44,12 +89,12 @@ const AddGuatantors = () => {
         paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
         paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
       }}>
-      {sending && (
+      {isLoading && (
         <Spinner
-          textContent={'Loading...'}
+          textContent={'Creating profile...'}
           textStyle={{color: 'white'}}
           visible={true}
-          overlayColor="rgba(16, 17, 17, 0.7)"
+          overlayColor="rgba(78, 75, 102, 0.7)"
         />
       )}
       <View
@@ -93,73 +138,70 @@ const AddGuatantors = () => {
           </Text>
         </View>
         <View style={{marginVertical: 10}}>
-          <Text
-            style={{
-              paddingBottom: 4,
-              fontWeight: '400',
-              fontSize: 16,
-              lineHeight: 24,
-              color: '#14142B',
-              fontFamily: 'Montserat',
-            }}>
-            Title
-          </Text>
-          <View style={styles.pick}>
-            <Picker
-              selectedValue={guarantorsDetails.title}
-              onValueChange={text =>
-                setGuarantorsDetails({...guarantorsDetails, title: text})
-              }>
-              <Picker.Item label="Select title" value="" />
-              <Picker.Item label="Mr" value="Mr" />
-              <Picker.Item label="Mrs" value="Mrs" />
-              <Picker.Item label="Miss" value="Miss" />
-            </Picker>
-          </View>
+          <CustomDropdown
+            label="Title"
+            isNeeded={true}
+            placeholder="Select Title"
+            placeholderStyle={styles.placeholderStyle}
+            selectedTextStyle={styles.selectedTextStyle}
+            data={titleData}
+            maxHeight={300}
+            labelField="label"
+            valueField="value"
+            value={guarantorsDetails.title}
+            onChange={option => {
+              setGuarantorsDetails({...guarantorsDetails, title: option.value});
+            }}
+          />
         </View>
         <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
           <View style={{marginVertical: 10, paddingRight: 10, width: '50%'}}>
-            <CustomInput
-              label="First Name"
-              value={guarantorsDetails.firstName}
+            <Input
               onChangeText={text =>
                 setGuarantorsDetails({...guarantorsDetails, firstName: text})
               }
+              iconName="account-outline"
+              label="First Name"
+              placeholder="Enter first name"
+              value={guarantorsDetails.firstName}
+              isNeeded={true}
             />
           </View>
           <View style={{marginVertical: 10, paddingRight: 5, width: '50%'}}>
-            <CustomInput
-              label="Last name"
-              value={guarantorsDetails.lastName}
+            <Input
               onChangeText={text =>
                 setGuarantorsDetails({...guarantorsDetails, lastName: text})
               }
+              iconName="account-outline"
+              placeholder="Enter last name"
+              label="Last name"
+              value={guarantorsDetails.lastName}
+              isNeeded={true}
             />
           </View>
         </View>
 
-        <CustomInput
-          label="Email address"
-          value={guarantorsDetails.email}
-          autoCapitalize="none"
-          autoCorrect={false}
+        <Input
           onChangeText={text =>
             setGuarantorsDetails({...guarantorsDetails, email: text})
           }
+          iconName="email-outline"
+          label="Email address"
+          placeholder="Enter your email"
+          value={guarantorsDetails.email}
+          isNeeded={true}
+          autoCapitalize="none"
         />
 
         <View style={{marginVertical: 10}}>
-          <View style={{marginBottom: -14}}>
-            <Text style={styles.label}>Mobile number</Text>
-          </View>
           <View>
-            <PhoneInput
-              defaultCode="NG"
+            <InputPhone
+              label="Phone number"
               layout="first"
-              textContainerStyle={styles.phonetextContainer}
-              textInputStyle={styles.phonetext}
-              containerStyle={styles.phoneContainer}
+              isNeeded={true}
+              defaultCode="NG"
               codeTextStyle={{color: '#6E7191'}}
+              defaultValue={guarantorsDetails?.phoneNumber}
               onChangeFormattedText={text =>
                 setGuarantorsDetails({...guarantorsDetails, phoneNumber: text})
               }
@@ -167,7 +209,11 @@ const AddGuatantors = () => {
           </View>
         </View>
 
-        <TouchableOpacity onPress={handleCreateGuarantor} disabled={disableit}>
+        <TouchableOpacity
+          onPress={() => {
+            handleCreateGuarantor();
+          }}
+          disabled={disableit}>
           <View style={{marginBottom: 20}}>
             <Buttons label="Save & Continue" disabled={disableit} />
           </View>

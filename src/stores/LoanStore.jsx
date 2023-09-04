@@ -522,7 +522,7 @@ const updatePersonalDetails = async details => {
       'Content-Type': 'application/json',
     };
     try {
-      const response = await axiosInstance.post(`/users/update`, details, {
+      const response = await axiosInstance.put(`/users/update`, details, {
         headers,
       });
       await AsyncStorage.setItem('hasStarted', '1');
@@ -550,7 +550,7 @@ const updateBusinessDetails = async details => {
       'Content-Type': 'application/json',
     };
     try {
-      const response = await axiosInstance.post(
+      const response = await axiosInstance.put(
         `/loan-details/update/organization`,
         details,
         {
@@ -582,7 +582,7 @@ const updateNokDetails = async details => {
       'Content-Type': 'application/json',
     };
     try {
-      const response = await axiosInstance.post(
+      const response = await axiosInstance.put(
         `/loan-details/update/next-of-kin`,
         details,
         {
@@ -614,7 +614,7 @@ const updateBankDetails = async details => {
       'Content-Type': 'application/json',
     };
     try {
-      const response = await axiosInstance.post(
+      const response = await axiosInstance.put(
         `/loan-details/update/bank-details`,
         details,
         {
@@ -646,7 +646,7 @@ const updateDocumentsDetails = async details => {
       'Content-Type': 'application/json',
     };
     try {
-      const response = await axiosInstance.post(
+      const response = await axiosInstance.put(
         `/loan-details/update-documents`,
         details,
         {

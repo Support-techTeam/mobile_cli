@@ -62,6 +62,8 @@ import {userLogOut} from '../../stores/AuthStore';
 import {resetStore} from '../../util/redux/store';
 import PersonalDetails from '../ProfileOnboardings/PersonalDetails';
 import Splashscreen from '../../navigation/Splashscreen';
+import {useRoute, useIsFocused} from '@react-navigation/native';
+import {getLoansAmount} from '../../stores/LoanStore';
 // import RNRestart from 'react-native-restart';
 
 const {width, height} = Dimensions.get('window');
@@ -84,9 +86,12 @@ const Homescreen = () => {
   const [allUserTransactionsData, setAllUserTransactionsData] = useState([]);
   const [userTransactionsPages, setUserTransactionsPages] = useState([]);
   const [userTransactionsTotal, setUserTransactionsTotal] = useState([]);
+  const [userLoanAmount, setUserLoanAmount] = useState(undefined);
   const [currentPage, setCurrentPage] = useState(1);
   const [data, setString] = useClipboard();
   const [timeOut, setTimeOut] = useState(false);
+  const route = useRoute();
+  const isFocused = useIsFocused();
 
   const dispatch = useDispatch();
 
@@ -132,7 +137,7 @@ const Homescreen = () => {
   useEffect(() => {
     setTimeout(() => {
       setTimeOut(true);
-    }, 8000);
+    }, 3000);
   });
 
   useEffect(() => {
@@ -178,7 +183,7 @@ const Homescreen = () => {
     unsubGetTransactions();
   }, []);
 
-  const unsubGetTransactions = async focus => {
+  const unsubGetTransactions = async () => {
     setIsLoading(true);
     const res = await getAccountTransactions(1, 10);
     if (res.error) {
@@ -192,20 +197,32 @@ const Homescreen = () => {
     setIsLoading(false);
   };
 
+  const unsubGetLoanAmount = async () => {
+    setIsLoading(true);
+    const res = await getLoansAmount();
+    if (res.error) {
+      // TODO: handle error
+    } else {
+      setUserLoanAmount(res?.data);
+    }
+    setIsLoading(false);
+  };
+  //Navigation useEffect Hook
   useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', async () => {
-      // This function will be called when the screen comes into focus
-      // Perform actions or call functions here
-      console.log('Screen focused. Calling a function...');
-      unsubGetWallet();
-      unsubGetAllTransactions();
-      unsubGetTransactions();
-    });
-    // Clean up the event listener when the component unmounts
-    return unsubscribe;
+    if (route.name === 'Home') {
+      const unsubscribe = navigation.addListener('focus', async () => {
+        console.log('Home Screen focused. Calling a function...');
+        unsubGetWallet();
+        unsubGetAllTransactions();
+        unsubGetTransactions();
+        unsubGetLoanAmount();
+      });
+      return unsubscribe;
+    }
+    // return () => unsubscribe.remove();
   }, [navigation]);
 
-  // Timed use Effect
+  // Timed useEffect
   useEffect(() => {
     const interval = setInterval(async () => {
       const res = await getAccountWallet();
@@ -321,10 +338,19 @@ const Homescreen = () => {
     {
       id: '2',
       title: 'Loan balance',
-      balance: '0.00',
+      balance: `${
+        userLoanAmount?.totalLoanAmount === undefined
+          ? '0.00'
+          : `${
+              userLoanAmount?.totalLoanAmount === 0
+                ? '0.00'
+                : userLoanAmount?.totalLoanAmount
+                    ?.toString()
+                    ?.replace(/\B(?=(\d{3})+\b)/g, ',')
+            }`
+      }`,
       button: 'Get loan',
       extra: 'Loan details',
-      image: require('../../../assets/icons/wallet_background.png'),
     },
 
     {

@@ -62,7 +62,6 @@ const TransactionScreen = ({route}) => {
     <SafeAreaView
       style={{
         flex: 1,
-        paddingHorizontal: 16,
         backgroundColor: '#fff',
         paddingTop: insets.top !== 0 ? insets.top / 2 : 'auto',
         paddingBottom: insets.bottom !== 0 ? insets.bottom / 2 : 'auto',
@@ -107,147 +106,154 @@ const TransactionScreen = ({route}) => {
       <ScrollView
         bounces={false}
         showsHorizontalScrollIndicator={false}
-        showsVerticalScrollIndicator={false}
-        style={{
-          backgroundColor: '#fff',
-          flexGrow: 1,
-          height: '100%',
-          marginBottom: 20,
-        }}>
+        showsVerticalScrollIndicator={false}>
         <ViewShot
           ref={viewShotRef}
           options={{
             format: 'png',
             quality: 1,
           }}>
-          <View style={{alignItems: 'center', marginTop: 24}}>
-            <View style={styles.titleView}>
+          <View
+            style={[
+              styles.container,
+              {
+                backgroundColor: '#fff',
+                flexGrow: 1,
+                height: '100%',
+                marginBottom: 20,
+              },
+            ]}>
+            <View style={{alignItems: 'center', marginTop: 24}}>
+              <View style={styles.titleView}>
+                <View
+                  style={{
+                    width: 32,
+                    height: 32,
+                  }}>
+                  <Image
+                    source={require('../../../assets/images/transfer_out.png')}
+                  />
+                </View>
+                <Text style={styles.title}>{transaction.transactionType}</Text>
+              </View>
+              <Text
+                style={{
+                  fontFamily: 'Montserat',
+                  fontWeight: '400',
+                  marginTop: 8,
+                }}>
+                On<Text style={{fontWeight: 'bold'}}> {day}</Text> at{' '}
+                <Text style={{fontWeight: 'bold'}}>{time}</Text>
+              </Text>
+            </View>
+            <View style={{marginTop: 40}}>
+              <Text style={styles.infotext}>Amount</Text>
+              {transaction.credit === null ? (
+                <Text style={styles.values}>₦{transaction.debit}.00</Text>
+              ) : (
+                <Text style={styles.values}>₦{transaction.credit}.00</Text>
+              )}
+            </View>
+            <View style={styles.demark} />
+            <View style={{marginTop: 15}}>
+              <Text style={styles.infotext}>To</Text>
               <View
                 style={{
-                  width: 32,
-                  height: 32,
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
                 }}>
-                <Image
-                  source={require('../../../assets/images/transfer_out.png')}
-                />
+                <View>
+                  <Text style={styles.values}>
+                    {transaction.toWalletAccountNumber}
+                  </Text>
+                </View>
               </View>
-              <Text style={styles.title}>{transaction.transactionType}</Text>
             </View>
-            <Text
-              style={{
-                fontFamily: 'Montserat',
-                fontWeight: '400',
-                marginTop: 8,
-              }}>
-              On<Text style={{fontWeight: 'bold'}}> {day}</Text> at{' '}
-              <Text style={{fontWeight: 'bold'}}>{time}</Text>
-            </Text>
-          </View>
-          <View style={{marginTop: 40}}>
-            <Text style={styles.infotext}>Amount</Text>
-            {transaction.credit === null ? (
-              <Text style={styles.values}>₦{transaction.debit}.00</Text>
-            ) : (
-              <Text style={styles.values}>₦{transaction.credit}.00</Text>
-            )}
-          </View>
-          <View style={styles.demark} />
-          <View style={{marginTop: 15}}>
-            <Text style={styles.infotext}>To</Text>
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-              }}>
-              <View>
+            <View style={styles.demark} />
+            <View style={{marginTop: 15}}>
+              <Text style={styles.infotext}>Beneficiary Name</Text>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                }}>
+                <View>
+                  <Text style={styles.values}>{transaction.toAccountName}</Text>
+                </View>
+              </View>
+            </View>
+            <View style={styles.demark} />
+            <View style={{marginTop: 15}}>
+              <Text style={styles.infotext}>Description</Text>
+              <Text style={styles.values}>{transaction.narration}</Text>
+            </View>
+            <View style={styles.demark} />
+            <View style={{marginTop: 15}}>
+              <Text style={styles.infotext}>Status</Text>
+              <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                <View
+                  style={{
+                    height: 12,
+                    width: 12,
+                    backgroundColor:
+                      transaction.transactionStatus === 'Failed'
+                        ? '#ED2E7E'
+                        : transaction.transactionStatus === 'Pending'
+                        ? '#eb7c0e'
+                        : '#44AB3B',
+                    borderRadius: 20,
+                    marginRight: 10,
+                  }}
+                />
                 <Text style={styles.values}>
-                  {transaction.toWalletAccountNumber}
+                  {transaction.transactionStatus}
                 </Text>
               </View>
             </View>
-          </View>
-          <View style={styles.demark} />
-          <View style={{marginTop: 15}}>
-            <Text style={styles.infotext}>Beneficiary Name</Text>
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-              }}>
-              <View>
-                <Text style={styles.values}>{transaction.toAccountName}</Text>
+            <View style={styles.demark} />
+            <TouchableWithoutFeedback
+              onLongPress={() => handleLongPress(transaction.transactionRef)}>
+              <View style={{marginTop: 15}}>
+                <Text style={styles.infotext}>Transaction ID</Text>
+                <Text style={styles.values}>{transaction.transactionRef}</Text>
               </View>
-            </View>
-          </View>
-          <View style={styles.demark} />
-          <View style={{marginTop: 15}}>
-            <Text style={styles.infotext}>Description</Text>
-            <Text style={styles.values}>{transaction.narration}</Text>
-          </View>
-          <View style={styles.demark} />
-          <View style={{marginTop: 15}}>
-            <Text style={styles.infotext}>Status</Text>
-            <View style={{flexDirection: 'row', alignItems: 'center'}}>
-              <View
-                style={{
-                  height: 12,
-                  width: 12,
-                  backgroundColor:
-                    transaction.transactionStatus === 'Failed'
-                      ? '#ED2E7E'
-                      : transaction.transactionStatus === 'Pending'
-                      ? '#eb7c0e'
-                      : '#44AB3B',
-                  borderRadius: 20,
-                  marginRight: 10,
-                }}
-              />
-              <Text style={styles.values}>{transaction.transactionStatus}</Text>
-            </View>
-          </View>
-          <View style={styles.demark} />
-          <TouchableWithoutFeedback
-            onLongPress={() => handleLongPress(transaction.transactionRef)}>
-            <View style={{marginTop: 15}}>
-              <Text style={styles.infotext}>Transaction ID</Text>
-              <Text style={styles.values}>{transaction.transactionRef}</Text>
-            </View>
-          </TouchableWithoutFeedback>
-          <View style={styles.demark} />
+            </TouchableWithoutFeedback>
+            <View style={styles.demark} />
 
-          <View style={{marginTop: 30}}>
-            <Text style={styles.values}>More Action</Text>
-            <View style={{flexDirection: 'row', alignItems: 'center'}}>
-              <TouchableOpacity
-                onPress={() => openSendSms(transaction.transactionRef)}>
-                <View
-                  style={{
-                    borderWidth: 0.5,
-                    borderColor: '#ffffff',
-                    borderRadius: 5,
-                    marginRight: 8,
-                    padding: 2,
-                    flexDirection: 'row',
-                    width: '100%',
-                  }}>
+            <View style={{marginTop: 30}}>
+              <Text style={styles.values}>More Action</Text>
+              <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                <TouchableOpacity
+                  onPress={() => openSendSms(transaction.transactionRef)}>
                   <View
                     style={{
-                      marginHorizontal: 5,
-                      marginVertical: 5,
+                      borderWidth: 0.5,
+                      borderColor: '#ffffff',
+                      borderRadius: 5,
+                      marginRight: 8,
+                      padding: 2,
+                      flexDirection: 'row',
+                      width: '100%',
                     }}>
-                    <Icon name="alert-octagon" size={24} color="#ED2E7E" />
-                  </View>
+                    <View
+                      style={{
+                        marginHorizontal: 5,
+                        marginVertical: 5,
+                      }}>
+                      <Icon name="alert-octagon" size={24} color="#ED2E7E" />
+                    </View>
 
-                  <View>
-                    <Text style={styles.report}>Report Transaction</Text>
-                    <Text style={styles.reportdesc}>
-                      Report an issue with this transaction
-                    </Text>
+                    <View>
+                      <Text style={styles.report}>Report Transaction</Text>
+                      <Text style={styles.reportdesc}>
+                        Report an issue with this transaction
+                      </Text>
+                    </View>
                   </View>
-                </View>
-              </TouchableOpacity>
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
         </ViewShot>
@@ -260,9 +266,9 @@ export default TransactionScreen;
 
 const styles = StyleSheet.create({
   container: {
-    // flex: 1,
-    // paddingHorizontal: 16,
-    // backgroundColor: '#fff',
+    flex: 1,
+    paddingHorizontal: 16,
+    backgroundColor: '#fff',
   },
   HeadView: {
     alignItems: 'center',

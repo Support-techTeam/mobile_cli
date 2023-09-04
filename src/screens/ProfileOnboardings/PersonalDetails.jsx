@@ -29,8 +29,8 @@ import Spinner from 'react-native-loading-spinner-overlay';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 import CustomInput from '../../component/custominput/CustomInput';
 import Input from '../../component/inputField/input.component';
-import InputPhone from '../../component/inputField/phone-input.component';
 import CustomDropdown from '../../component/dropDown/dropdown.component';
+import InputPhone from '../../component/inputField/phone-input.component';
 import Buttons from '../../component/buttons/Buttons';
 import {Dropdown} from 'react-native-element-dropdown';
 import COLORS from '../../constants/colors';
@@ -360,10 +360,8 @@ const PersonalDetails = ({navigation}) => {
         onPress: () => Toast.hide(),
       });
       dispatch(setProfile(res.data));
-      // To test new implementation
-      // RNRestart.restart();
     }
-    setIsLoading(true);
+    setIsLoading(false);
   };
 
   const pickerRef = useRef();

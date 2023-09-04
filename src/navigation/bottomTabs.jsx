@@ -167,7 +167,8 @@ export default function BottomTabs() {
             }}
           />
         )}
-        {userProfileData && userProfileData?.profileProgress === null ? null : (
+
+        {/* {userProfileData && userProfileData?.profileProgress === null ? null : (
           <Tab.Screen
             name="Invest"
             component={InvestScreen}
@@ -209,7 +210,7 @@ export default function BottomTabs() {
               },
             }}
           />
-        )}
+        )} */}
 
         <Tab.Screen
           name="More"
@@ -256,21 +257,6 @@ export default function BottomTabs() {
     </View>
   );
 }
-
-// function HomeScreen() {
-//   return (
-//     <View style={styles.container}>
-//       <Text variant="headlineMedium">Home!</Text>
-//     </View>
-//   );
-// }
-// function LoanScreen() {
-//   return (
-//     <View style={styles.container}>
-//       <Text variant="headlineMedium">LoanScreen!</Text>
-//     </View>
-//   );
-// }
 
 function InvestScreen() {
   return (

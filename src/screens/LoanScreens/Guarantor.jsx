@@ -6,36 +6,85 @@ import {
   Image,
   ScrollView,
 } from 'react-native';
-import React, {useContext, useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {useNavigation} from '@react-navigation/native';
-// import { observer } from 'mobx-react-lite';
 import {Skeleton} from '@rneui/base';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
-// import { StoreContext } from '../../config/mobX stores/RootStore';
+import {useRoute} from '@react-navigation/native';
+import {getGuarantors} from '../../stores/GuarantorStore';
+import {getLoanUserDetails} from '../../stores/LoanStore';
 
 const Guarantor = () => {
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
-  // const { guarantorStore, loansStore } = useContext(StoreContext);
-  // const { loadingData, guarantors } = guarantorStore;
-  // const { loanUserdetails } = loansStore;
-  const loadingList = ['string', 'string', 'string', 'string'];
+  const [isLoading, setIsLoading] = useState(false);
+  const [loanUserdetails, setLoanUserdetails] = useState([]);
+  const [guarantors, setGuarantors] = useState([]);
+  const route = useRoute();
 
-  // useEffect(() => {
-  //   guarantorStore.getGuarantors();
-  // }, [guarantorStore]);
+  useEffect(() => {
+    if (route.name === 'Guarantor') {
+      const unsubscribe = navigation.addListener('focus', async () => {
+        getGuarantorsData();
+        getLoanuserData();
+      });
+      return unsubscribe;
+    }
+  }, [navigation]);
+
+  const getGuarantorsData = async () => {
+    setIsLoading(true);
+    const res = await getGuarantors();
+    if (res.error) {
+      Toast.show({
+        type: 'error',
+        position: 'top',
+        topOffset: 50,
+        text1: res.title,
+        text2: res.message,
+        visibilityTime: 5000,
+        autoHide: true,
+        onPress: () => Toast.hide(),
+      });
+    } else {
+      setGuarantors(res?.data);
+    }
+    setIsLoading(false);
+  };
+
+  const getLoanuserData = async () => {
+    setIsLoading(true);
+    const res = await getLoanUserDetails();
+    if (res.error) {
+      Toast.show({
+        type: 'error',
+        position: 'top',
+        topOffset: 50,
+        text1: res.title,
+        text2: res.message,
+        visibilityTime: 5000,
+        autoHide: true,
+        onPress: () => Toast.hide(),
+      });
+    } else {
+      setLoanUserdetails(res?.data);
+    }
+    setIsLoading(false);
+  };
+
+  const loadingList = ['string', 'string', 'string', 'string'];
 
   return (
     <>
-      {false ? (
+      {isLoading ? (
         <SafeAreaView
           style={{
             flex: 1,
             backgroundColor: '#fff',
-            paddingTop: insets.top !== 0 ? insets.top / 2 : 'auto',
-            paddingBottom: insets.bottom !== 0 ? insets.bottom / 2 : 'auto',
-            paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
-            paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
+            paddingTop: insets.top !== 0 ? insets.top : 'auto',
+            paddingBottom: insets.bottom !== 0 ? insets.bottom : 'auto',
+            paddingLeft: insets.left !== 0 ? insets.left : 'auto',
+            paddingRight: insets.right !== 0 ? insets.right : 'auto',
           }}>
           <View style={styles.innerContainer}>
             <View style={{flexDirection: 'row', width: '45%'}}>
@@ -63,7 +112,7 @@ const Guarantor = () => {
                     showsHorizontalScrollIndicator={false}
                     showsVerticalScrollIndicator={false}>
                     <Skeleton animation="wave" width={80} height={20} />
-                    {/* 
+
                     {loadingList.map((guarator, index) => (
                       <View key={index}>
                         <View style={{}}>
@@ -106,7 +155,7 @@ const Guarantor = () => {
                           </View>
                         </View>
                       </View>
-                    ))} */}
+                    ))}
                   </ScrollView>
                 </View>
               </View>

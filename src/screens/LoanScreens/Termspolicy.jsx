@@ -1,13 +1,19 @@
-import { StyleSheet, Text, View, TouchableOpacity, Dimensions } from 'react-native';
-import React, { useState } from 'react';
-import { AntDesign } from '@expo/vector-icons';
-import { getStatusBarHeight } from 'react-native-status-bar-height';
-import { ScrollView } from 'react-native-gesture-handler';
-import { useNavigation } from '@react-navigation/native';
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  Dimensions,
+} from 'react-native';
+import React, {useState} from 'react';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import {getStatusBarHeight} from 'react-native-status-bar-height';
+import {ScrollView} from 'react-native-gesture-handler';
+import {useNavigation} from '@react-navigation/native';
 import Pdf from 'react-native-pdf';
 import Buttons from '../../component/buttons/Buttons';
 
-const source = { uri: 'https://tradelenda.com/LOAN%20POLICY.pdf', cache: true };
+const source = {uri: 'https://tradelenda.com/LOAN%20POLICY.pdf', cache: true};
 
 const handleClosePdf = () => {
   setShowPdf(false);
@@ -26,17 +32,15 @@ const Termspolicy = () => {
           alignItems: 'center',
           marginHorizontal: 15,
           marginTop: 30,
-        }}
-      >
+        }}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <View
             style={{
               borderWidth: 0.5,
               borderColor: '#D9DBE9',
               borderRadius: 5,
-            }}
-          >
-            <AntDesign name="left" size={24} color="black" />
+            }}>
+            <Icon name="chevron-left" size={36} color="black" />
           </View>
         </TouchableOpacity>
         <View style={styles.HeadView}>
@@ -60,21 +64,26 @@ const Termspolicy = () => {
         }}
       />
       {showBut && (
-        <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
+        <View style={{flexDirection: 'row', justifyContent: 'space-around'}}>
           <View>
-            <TouchableOpacity style={{ margin: 20 }} onPress={handleClosePdf}>
+            <TouchableOpacity style={{margin: 20}} onPress={handleClosePdf}>
               <View
                 style={[
                   styles.getLoan,
-                  { backgroundColor: 'white', borderWidth: 1, borderColor: '#054B99' },
-                ]}
-              >
-                <Text style={[styles.getText, { color: '#054B99' }]}>Go back</Text>
+                  {
+                    backgroundColor: 'white',
+                    borderWidth: 1,
+                    borderColor: '#054B99',
+                  },
+                ]}>
+                <Text style={[styles.getText, {color: '#054B99'}]}>
+                  Go back
+                </Text>
               </View>
             </TouchableOpacity>
           </View>
 
-          <TouchableOpacity style={{ margin: 20 }} onPress={handleClosePdf}>
+          <TouchableOpacity style={{margin: 20}} onPress={handleClosePdf}>
             <View style={styles.getLoan}>
               <Text style={styles.getText}>Get Loan</Text>
             </View>

@@ -18,9 +18,10 @@ import BankDeets from '../screens/TransferScreens/BankDeets';
 import Summary from '../screens/TransferScreens/Summary';
 import Pin from '../screens/TransferScreens/Pin';
 import Success from '../screens/TransferScreens/Success';
+import LoanTransactions from '../screens/LoanScreens/LoanTransaction';
+import GuarantorDetails from '../screens/LoanScreens/GuarantorDetails';
+import {AddGuatantors, GetLoan} from '../screens/LoanScreens';
 //Pending
-// import {AddGuatantors, GetLoan} from '../screens/LoanScreens';
-// import LoanTransactions from '../screens/LoanScreens/LoanTransaction';
 // import UpdatePersonalDetails from '../screens/ProfileOnboardings/UpdatePersonalDetails';
 // import {
 //   BankStatement,
@@ -157,6 +158,9 @@ const AppStack = () => {
           <Stack.Screen name="Summary" component={Summary} />
           <Stack.Screen name="Pin" component={Pin} />
           <Stack.Screen name="Success" component={Success} />
+          <Stack.Screen name="LoanTransaction" component={LoanTransactions} />
+          <Stack.Screen name="GuarantorDetails" component={GuarantorDetails} />
+          <Stack.Screen name="AddGuarantors" component={AddGuatantors} />
         </>
       )}
     </Stack.Navigator>

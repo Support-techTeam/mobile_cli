@@ -1,8 +1,14 @@
-import {View, Text, StyleSheet, Image, TouchableOpacity} from 'react-native';
-import React, {useContext, useEffect, useState} from 'react';
-import {FlatList} from 'react-native-gesture-handler';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  ScrollView,
+  FlatList,
+} from 'react-native';
+import React, {useEffect, useState} from 'react';
 import {TabView, SceneMap} from 'react-native-tab-view';
-import {ScrollView} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {Skeleton} from '@rneui/base';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -16,93 +22,7 @@ import {
   getPaidLoans,
   getLoanUserDetails,
 } from '../../stores/LoanStore';
-
-const Slide = ({item}) => {
-  return (
-    <>
-      {true ? (
-        <View
-          style={{
-            width: 120,
-            height: 120,
-            marginRight: 15,
-
-            borderRadius: 20,
-            borderColor: '#F7F7FC',
-            borderWidth: 1,
-            overflow: 'hidden',
-          }}>
-          <View>
-            <Skeleton animation="wave" width={120} height={120} />
-          </View>
-        </View>
-      ) : (
-        <View
-          style={{
-            width: 150,
-            height: 170,
-            marginRight: 16,
-
-            borderRadius: 20,
-            borderColor: '#F7F7FC',
-            borderWidth: 1,
-            overflow: 'hidden',
-          }}>
-          <View style={{padding: 10}}>
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-              }}>
-              <View style={{width: '70%'}}>
-                <Text style={styles.state}>{item.state}</Text>
-              </View>
-              <Image source={item.icon} />
-            </View>
-            <Text style={styles.amount}>{item.amount}</Text>
-            <View
-              style={{
-                width: 140,
-                height: 170,
-                borderRadius: 100,
-                borderWidth: 12,
-                bottom: -185,
-                right: -20,
-                position: 'absolute',
-                borderColor:
-                  item.id === 1
-                    ? '#E6EDF5'
-                    : item.id === 2
-                    ? 'rgba(244, 183, 64, 0.2)'
-                    : '#DAEED8',
-                opacity: 0.5,
-              }}
-            />
-            <View
-              style={{
-                width: 100,
-                height: 120,
-                borderRadius: 100,
-                borderWidth: 12,
-                bottom: -155,
-                right: item.id === 1 ? -15 : item.id === 2 ? 20 : -15,
-                position: 'absolute',
-                borderColor:
-                  item.id === 1
-                    ? 'linear-gradient(114.44deg, rgba(36, 52, 139, 0.5) 0%, rgba(99, 168, 235, 0.5) 100%)'
-                    : item.id === 2
-                    ? 'linear-gradient(114.44deg, rgba(235, 0, 85, 1) 100%, rgba(255, 250, 128, 1) 100%)'
-                    : 'linear-gradient(180deg, rgba(68, 171, 59, 1) 0%, #D8FF69 100%)',
-                opacity: 0.3,
-              }}
-            />
-          </View>
-        </View>
-      )}
-    </>
-  );
-};
+import {useRoute, useIsFocused} from '@react-navigation/native';
 
 const Loanscreen = () => {
   const navigation = useNavigation();
@@ -114,7 +34,8 @@ const Loanscreen = () => {
   const [allLoansData, setAllLoansData] = useState([]);
   const [loanUserDetails, setLoanUserDetails] = useState(undefined);
   const [isLoading, setIsLoading] = useState(false);
-
+  const route = useRoute();
+  const isFocused = useIsFocused();
   //total approvedLoans
   let totalApprovedLoanAmount = 0;
 
@@ -136,21 +57,19 @@ const Loanscreen = () => {
     totalPaidLoanAmount += loan.amount;
   }
 
-  // useEffect(() => {
-  //   const unsubscribe = navigation.addListener('focus', async () => {
-  //     console.log('Loan focused..');
-  //     getApprovedLoansData();
-  //   });
-  //   return unsubscribe;
-  // }, [navigation]);
-
   useEffect(() => {
-    getLoanuserData();
-    getApprovedLoansData();
-    getPendingLoansData();
-    getAllLoansData();
-    getPaidLoansData();
-  }, []);
+    if (route.name === 'LoanHome') {
+      const unsubscribe = navigation.addListener('focus', async () => {
+        // console.log('Loan focused..');
+        getLoanuserData();
+        getApprovedLoansData();
+        getPendingLoansData();
+        getAllLoansData();
+        getPaidLoansData();
+      });
+      return unsubscribe;
+    }
+  }, [navigation]);
 
   const getLoanuserData = async () => {
     setIsLoading(true);
@@ -167,7 +86,6 @@ const Loanscreen = () => {
         onPress: () => Toast.hide(),
       });
     } else {
-      console.log('res', res);
       setLoanUserDetails(res?.data);
     }
     setIsLoading(false);
@@ -250,6 +168,93 @@ const Loanscreen = () => {
   };
 
   const loadingList = ['string', 'string', 'string', 'string'];
+
+  const Slide = ({item}) => {
+    return (
+      <>
+        {isLoading ? (
+          <View
+            style={{
+              width: 120,
+              height: 120,
+              marginRight: 15,
+
+              borderRadius: 20,
+              borderColor: '#F7F7FC',
+              borderWidth: 1,
+              overflow: 'hidden',
+            }}>
+            <View>
+              <Skeleton animation="wave" width={120} height={120} />
+            </View>
+          </View>
+        ) : (
+          <View
+            style={{
+              width: 150,
+              height: 170,
+              marginRight: 16,
+
+              borderRadius: 20,
+              borderColor: '#F7F7FC',
+              borderWidth: 1,
+              overflow: 'hidden',
+            }}>
+            <View style={{padding: 10}}>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                }}>
+                <View style={{width: '70%'}}>
+                  <Text style={styles.state}>{item.state}</Text>
+                </View>
+                <Image source={item.icon} />
+              </View>
+              <Text style={styles.amount}>{item.amount}</Text>
+              <View
+                style={{
+                  width: 140,
+                  height: 170,
+                  borderRadius: 100,
+                  borderWidth: 12,
+                  bottom: -185,
+                  right: -20,
+                  position: 'absolute',
+                  borderColor:
+                    item.id === 1
+                      ? '#E6EDF5'
+                      : item.id === 2
+                      ? 'rgba(244, 183, 64, 0.2)'
+                      : '#DAEED8',
+                  opacity: 0.5,
+                }}
+              />
+              <View
+                style={{
+                  width: 100,
+                  height: 120,
+                  borderRadius: 100,
+                  borderWidth: 12,
+                  bottom: -155,
+                  right: item.id === 1 ? -15 : item.id === 2 ? 20 : -15,
+                  position: 'absolute',
+                  borderColor:
+                    item.id === 1
+                      ? 'linear-gradient(114.44deg, rgba(36, 52, 139, 0.5) 0%, rgba(99, 168, 235, 0.5) 100%)'
+                      : item.id === 2
+                      ? 'linear-gradient(114.44deg, rgba(235, 0, 85, 1) 100%, rgba(255, 250, 128, 1) 100%)'
+                      : 'linear-gradient(180deg, rgba(68, 171, 59, 1) 0%, #D8FF69 100%)',
+                  opacity: 0.3,
+                }}
+              />
+            </View>
+          </View>
+        )}
+      </>
+    );
+  };
 
   const FirstRoute = () => (
     <>
@@ -891,7 +896,6 @@ const Loanscreen = () => {
             }`
       }`,
       icon: require('../../../assets/images/unapprovedBox.png'),
-      //   bottomIcon:require('')
     },
     {
       id: 2,
@@ -908,7 +912,6 @@ const Loanscreen = () => {
             }`
       }`,
       icon: require('../../../assets/images/approvedbox.png'),
-      //   bottomIcon:require('')
     },
     {
       id: 3,
@@ -1031,18 +1034,18 @@ const Loanscreen = () => {
             </View>
 
             <TouchableOpacity
-              onPress={
-                console.log('loanUserDetails', loanUserDetails)
-                // navigation.navigate(
-
-                // `${
-                //   loanUserDetails !== undefined &&
-                //   loanUserDetails?.loanDocumentDetails?.validIdentification ===
-                //     undefined
-                //     ? 'OnboardingHome'
-                //     : 'GetLoan'
-                // }`,
-                // )
+              onPress={() =>
+                navigation.navigate(
+                  `${
+                    loanUserDetails !== undefined &&
+                    loanUserDetails?.loanDocumentDetails
+                      ?.validIdentification === undefined
+                      ? 'GetLoan'
+                      : 'Home'
+                    // ? 'OnboardingHome'
+                    // : 'GetLoan'
+                  }`,
+                )
               }>
               <View style={styles.getLoan}>
                 <Text style={styles.getText}>Get Loan</Text>
