@@ -4,31 +4,71 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  Pressable,
+  Platform,
+  Image,
+  ImageBackground,
+  Dimensions,
 } from 'react-native';
 import React, {useContext, useEffect, useState} from 'react';
-import {Picker} from '@react-native-picker/picker';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useRoute} from '@react-navigation/native';
 import Spinner from 'react-native-loading-spinner-overlay/lib';
-import {observer} from 'mobx-react-lite';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
-
-import CustomInput from '../../component/custominput/CustomInput';
+import Toast from 'react-native-toast-message';
+import Input from '../../component/inputField/input.component';
+import CustomDropdown from '../../component/dropDown/dropdown.component';
+import InputPhone from '../../component/inputField/phone-input.component';
 import Buttons from '../../component/buttons/Buttons';
-import PhoneInput from 'react-native-phone-number-input';
-import {StoreContext} from '../../config/mobX stores/RootStore';
+import {
+  createNextOfKin,
+  getLoanUserDetails,
+  updateNokDetails,
+} from '../../stores/LoanStore';
 
-const NextOfKin = ({route}) => {
+const genderData = [
+  {value: '', label: 'Select Gender'},
+  {value: 'Female', label: 'Female'},
+  {value: 'Male', label: 'Male'},
+  {value: 'Prefer Not To Say', label: 'Prefer Not To Say'},
+];
+
+const screenHeight = Dimensions.get('window').height;
+const screenWidth = Dimensions.get('window').width;
+
+const NextOfKin = () => {
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
-  const {loansStore} = useContext(StoreContext);
-  const {success, sending, loanUserdetails, loading} = loansStore;
+  const [nokDetails, setNokDetails] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const route = useRoute();
+  const curentRoute = route.name;
+  const previousRoute = navigation.getState()?.routes.slice(-2)[0]?.name;
 
   useEffect(() => {
-    loansStore.getLoanUserDetails();
-  }, [loansStore]);
+    if (route.name === 'NextOfKin') {
+      const unsubscribe = navigation.addListener('focus', async () => {
+        unSubNOKDetails();
+      });
+      return unsubscribe;
+    }
+  }, [navigation]);
 
-  const nokDetails = loanUserdetails?.nextOfKinDetails;
+  useEffect(() => {
+    unSubNOKDetails();
+  }, []);
+
+  const unSubNOKDetails = async () => {
+    setIsLoading(true);
+    const res = await getLoanUserDetails();
+    if (res.error) {
+      // TODO: handle error
+    } else {
+      setNokDetails(res?.data?.nextOfKinDetails);
+    }
+    setIsLoading(false);
+  };
 
   const [kinDetails, setKinDetails] = useState({
     firstName: '',
@@ -69,7 +109,7 @@ const NextOfKin = ({route}) => {
           ? ''
           : nokDetails?.gender,
     });
-  }, [nokDetails]);
+  }, [nokDetails, navigation]);
 
   const disableit =
     !kinDetails.firstName ||
@@ -80,26 +120,77 @@ const NextOfKin = ({route}) => {
     !kinDetails.phoneNumber ||
     !kinDetails.gender;
 
-  const handleCreateNokDetails = () => {
-    loansStore.createNextOfKin(kinDetails);
-  };
-
-  const handleUpdateNokDetails = () => {
-    loansStore.updateNokDetails(kinDetails);
-  };
-
-  const prevRoutes = route?.params?.paramKey;
-
-  useEffect(() => {
-    if (success === 'nok successful') {
-      if (prevRoutes !== 'myAccount') {
-        navigation.navigate('BankDetails');
-      } else {
-        navigation.navigate('MyAccount');
-        loansStore.getLoanUserDetails();
-      }
+  const handleCreateNokDetails = async () => {
+    setIsUpdating(true);
+    const res = await createNextOfKin(kinDetails);
+    if (res.error) {
+      Toast.show({
+        type: 'error',
+        position: 'top',
+        topOffset: 50,
+        text1: res.title,
+        text2: res.message,
+        visibilityTime: 5000,
+        autoHide: true,
+        onPress: () => Toast.hide(),
+      });
+    } else {
+      Toast.show({
+        type: 'success',
+        position: 'top',
+        topOffset: 50,
+        text1: res.title,
+        text2: res.message,
+        visibilityTime: 3000,
+        autoHide: true,
+        onPress: () => Toast.hide(),
+      });
+      setTimeout(() => {
+        if (previousRoute !== 'MyAccount') {
+          navigation.navigate('BankDetails');
+        } else {
+          navigation.navigate('MyAccount');
+        }
+      }, 1000);
     }
-  }, [loansStore, navigation, prevRoutes, success]);
+    setIsUpdating(false);
+  };
+
+  const handleUpdateNokDetails = async () => {
+    setIsUpdating(true);
+    const res = await updateNokDetails(kinDetails);
+    if (res.error) {
+      Toast.show({
+        type: 'error',
+        position: 'top',
+        topOffset: 50,
+        text1: res.title,
+        text2: res.message,
+        visibilityTime: 5000,
+        autoHide: true,
+        onPress: () => Toast.hide(),
+      });
+    } else {
+      Toast.show({
+        type: 'success',
+        position: 'top',
+        topOffset: 50,
+        text1: res.title,
+        text2: res.message,
+        visibilityTime: 3000,
+        autoHide: true,
+        onPress: () => Toast.hide(),
+      });
+      setTimeout(() => {
+        if (previousRoute !== 'MyAccount') {
+          navigation.navigate('BankDetails');
+        } else {
+          navigation.navigate('MyAccount');
+        }
+      }, 1000);
+    }
+    setIsUpdating(false);
+  };
 
   return (
     <SafeAreaView
@@ -111,7 +202,7 @@ const NextOfKin = ({route}) => {
         paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
         paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
       }}>
-      {sending && (
+      {isUpdating && (
         <Spinner
           textContent={'Please wait...'}
           textStyle={{color: 'white'}}
@@ -119,7 +210,7 @@ const NextOfKin = ({route}) => {
           overlayColor="rgba(78, 75, 102, 0.7)"
         />
       )}
-      {loading && (
+      {isLoading && (
         <Spinner
           textContent={'Loading...'}
           textStyle={{color: 'white'}}
@@ -127,7 +218,6 @@ const NextOfKin = ({route}) => {
           overlayColor="rgba(78, 75, 102, 0.7)"
         />
       )}
-
       <View
         style={{
           flexDirection: 'row',
@@ -145,145 +235,158 @@ const NextOfKin = ({route}) => {
             <AntDesign name="left" size={24} color="black" />
           </View>
         </TouchableOpacity>
-        <View>
-          <View>
-            <Text style={styles.TextHead}>NEXT OF KIN</Text>
+        <View style={[styles.HeadView, {justifyContent: 'center', flex: 1}]}>
+          <View style={styles.TopView}>
+            <Text style={[styles.TextHead, {marginBottom: 5}]}>
+              NEXT OF KIN
+            </Text>
           </View>
-        </View>
-        <View>
-          <Text> </Text>
+
+          <View>
+            <Image source={require('../../../assets/images/indicator3.png')} />
+          </View>
         </View>
       </View>
-      <View style={styles.demark} />
-      <ScrollView
-        bounces={false}
-        showsHorizontalScrollIndicator={false}
-        showsVerticalScrollIndicator={false}
-        style={[styles.innercontainer]}>
-        <View style={styles.form}>
-          <Text style={styles.header}>
-            Trade Lenda requires this information of your next of kin
-          </Text>
-        </View>
-        <View>
-          <CustomInput
-            label="First name"
-            defaultValue={kinDetails.firstName}
-            onChangeText={text =>
-              setKinDetails({...kinDetails, firstName: text})
-            }
-            isNeeded={true}
-          />
-          <CustomInput
-            label="Last name"
-            defaultValue={kinDetails.lastName}
-            onChangeText={text =>
-              setKinDetails({...kinDetails, lastName: text})
-            }
-            isNeeded={true}
-          />
-          <View style={{marginVertical: 10}}>
-            <View style={{flexDirection: 'row'}}>
-              <Text
-                style={{
-                  paddingBottom: 4,
-                  fontWeight: '400',
-                  fontSize: 16,
-                  lineHeight: 24,
-                  color: '#14142B',
-                  fontFamily: 'Montserat',
-                }}>
-                Gender
-              </Text>
-              <Text style={{color: 'red', marginRight: 10}}>*</Text>
-            </View>
+      <View style={[styles.form, {marginBottom: 10, justifyContent: 'center'}]}>
+        <Text style={styles.header}>
+          Trade Lenda requires this information of your next of kin
+        </Text>
+      </View>
+      <ImageBackground
+        source={require('../../../assets/signup.png')}
+        resizeMode="stretch"
+        style={styles.image}>
+        <ScrollView
+          bounces={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+          style={{
+            paddingHorizontal: 10,
+            marginTop: 10,
+            marginBottom: insets.top + 60,
+          }}>
+          <View
+            style={{
+              paddingTop: 25,
+              backgroundColor: '#FFFFFF',
+              borderRadius: 15,
+              paddingHorizontal: 15,
+              paddingVertical: 15,
+              opacity: 0.86,
+              borderColor: '#D9DBE9',
+              borderWidth: 2,
+            }}>
+            <Input
+              iconName="account-outline"
+              label="First Name"
+              placeholder="Enter kin's first name"
+              isNeeded={true}
+              defaultValue={kinDetails?.firstName}
+              onChangeText={text =>
+                setKinDetails({...kinDetails, firstName: text})
+              }
+              Needed={true}
+            />
 
-            <View style={styles.pick}>
-              <Picker
-                selectedValue={kinDetails.gender}
-                onValueChange={itemValue =>
-                  setKinDetails({...kinDetails, gender: itemValue})
-                }>
-                <Picker.Item label="Select Gender" value="" />
-                <Picker.Item label="Male" value="Male" />
-                <Picker.Item label="Female" value="Female" />
-              </Picker>
-            </View>
-          </View>
-
-          <CustomInput
-            label="Next of kin's Relationship"
-            value={kinDetails.relationship}
-            onChangeText={text =>
-              setKinDetails({...kinDetails, relationship: text})
-            }
-            isNeeded={true}
-          />
-
-          <CustomInput
-            label="Email"
-            keyboardType="email-address"
-            autoCorrect={false}
-            autoCapitalize="none"
-            defaultValue={kinDetails.email}
-            onChangeText={text => setKinDetails({...kinDetails, email: text})}
-            isNeeded={true}
-          />
-
-          <View style={{marginVertical: 10}}>
-            <View style={{marginBottom: -14}}>
-              <View style={{flexDirection: 'row'}}>
-                <Text style={styles.label}>Phone number</Text>
-                <Text style={{color: 'red', marginRight: 10}}>*</Text>
-              </View>
-            </View>
-            <View>
-              <PhoneInput
-                defaultCode="NG"
-                layout="first"
-                textContainerStyle={styles.phonetextContainer}
-                textInputStyle={styles.phonetext}
-                containerStyle={styles.phoneContainer}
-                placeholder=" "
-                defaultValue={kinDetails?.phoneNumber}
-                codeTextStyle={{color: '#6E7191'}}
-                onChangeFormattedText={text =>
-                  setKinDetails({...kinDetails, phoneNumber: text})
-                }
+            <Input
+              iconName="account-outline"
+              label="Last Name"
+              placeholder="Enter kin's last name"
+              defaultValue={kinDetails?.lastName}
+              onChangeText={text =>
+                setKinDetails({...kinDetails, lastName: text})
+              }
+              isNeeded={true}
+            />
+            <View style={{marginVertical: 10}}>
+              <CustomDropdown
+                label="Gender"
+                isNeeded={true}
+                iconName="gender-male-female"
+                placeholder="Select Gender"
+                placeholderStyle={styles.placeholderStyle}
+                selectedTextStyle={styles.selectedTextStyle}
+                data={genderData}
+                maxHeight={300}
+                labelField="label"
+                valueField="value"
+                value={kinDetails.gender}
+                onChange={option => {
+                  setKinDetails({...kinDetails, gender: option.value});
+                }}
               />
             </View>
+            <Input
+              label="Next of kin's Relationship"
+              placeholder="Enter kin's Relationship"
+              defaultValue={kinDetails?.relationship}
+              onChangeText={text =>
+                setKinDetails({...kinDetails, relationship: text})
+              }
+              isNeeded={true}
+            />
+
+            <Input
+              iconName="email-outline"
+              label="Email"
+              placeholder="Enter kin's email"
+              keyboardType="email-address"
+              defaultValue={kinDetails?.email}
+              onChangeText={text =>
+                setKinDetails({...kinDetails, email: text.trim()})
+              }
+              isNeeded={true}
+            />
+
+            <InputPhone
+              label="Phone number"
+              layout="first"
+              isNeeded={true}
+              defaultCode="NG"
+              codeTextStyle={{color: '#6E7191'}}
+              defaultValue={kinDetails?.phoneNumber}
+              onChangeFormattedText={text =>
+                setKinDetails({...kinDetails, phoneNumber: text})
+              }
+            />
+            <Input
+              label="Address"
+              defaultValue={kinDetails?.Address}
+              onChangeText={text =>
+                setKinDetails({...kinDetails, Address: text})
+              }
+              iconName="map-marker-outline"
+              placeholder="Enter address"
+            />
+            <TouchableOpacity
+              onPress={
+                nokDetails?.firstName === undefined
+                  ? handleCreateNokDetails
+                  : handleUpdateNokDetails
+              }
+              disabled={disableit}>
+              <View style={{marginBottom: 40, marginTop: 20}}>
+                <Buttons label="Save & Continue" disabled={disableit} />
+              </View>
+            </TouchableOpacity>
           </View>
-
-          <CustomInput
-            label="Address"
-            defaultValue={kinDetails.Address}
-            onChangeText={text => setKinDetails({...kinDetails, Address: text})}
-            isNeeded={true}
-          />
-
-          <TouchableOpacity
-            onPress={
-              nokDetails?.firstName === undefined
-                ? handleCreateNokDetails
-                : handleUpdateNokDetails
-            }
-            disabled={disableit}>
-            <View style={{marginBottom: 40, marginTop: 20}}>
-              <Buttons label="Save & Continue" disabled={disableit} />
-            </View>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
+        </ScrollView>
+      </ImageBackground>
     </SafeAreaView>
   );
 };
 
-export default observer(NextOfKin);
+export default NextOfKin;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
+  },
+  image: {
+    height: screenHeight,
+    width: screenWidth,
+    justifyContent: 'center',
   },
   demark: {
     width: '150%',
@@ -306,7 +409,7 @@ const styles = StyleSheet.create({
   },
   HeadView: {
     alignItems: 'center',
-    marginTop: 34,
+    // marginTop: 34,
     // backgroundColor:'blue'
   },
   TopView: {

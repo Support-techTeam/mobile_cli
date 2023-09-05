@@ -1,30 +1,45 @@
-import { View, StyleSheet, ScrollView, Pressable, Linking, TouchableOpacity } from 'react-native';
-import React, { useContext, useEffect } from 'react';
-import { useNavigation } from '@react-navigation/native';
+import {
+  View,
+  StyleSheet,
+  ScrollView,
+  Pressable,
+  Linking,
+  TouchableOpacity,
+} from 'react-native';
+import React, {useContext, useEffect, useState} from 'react';
+import {useNavigation} from '@react-navigation/native';
 
 import CustomView from './AccountView/CustomView';
-import { StoreContext } from '../../config/mobX stores/RootStore';
 import Buttons from '../buttons/Buttons';
+import {getLoanUserDetails} from '../../stores/LoanStore';
 
 const Document = () => {
   const navigation = useNavigation();
-  const { loansStore } = useContext(StoreContext);
-  const { loanUserdetails } = loansStore;
+  const [docsDeets, setDocsDeets] = useState([]);
 
-  const docsDeets = loanUserdetails?.loanDocumentDetails;
   useEffect(() => {
-    loansStore.getLoanUserDetails();
-  }, [loansStore]);
+    unSubBankDetails();
+  }, []);
+
+  const unSubBankDetails = async () => {
+    const res = await getLoanUserDetails();
+    if (res.error) {
+      // TODO: handle error
+    } else {
+      setDocsDeets(res?.data?.loanDocumentDetails);
+    }
+  };
   return (
     <View style={styles.container}>
       <TouchableOpacity
         onPress={() => navigation.navigate('ValidIndentity')}
-        style={{ marginBottom: 20 }}
-      >
+        style={{marginBottom: 20}}>
         <Buttons label={'Update Documents'} />
       </TouchableOpacity>
 
-      <ScrollView showsHorizontalScrollIndicator={false} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}>
         <CustomView
           label={`${
             docsDeets?.validIdentificationType === undefined
@@ -36,7 +51,9 @@ const Document = () => {
 
         <CustomView
           label={`${
-            docsDeets?.validIdentification === undefined ? 'N/A' : docsDeets?.validIdentification
+            docsDeets?.validIdentification === undefined
+              ? 'N/A'
+              : docsDeets?.validIdentification
           } `}
           subLabel="Valid ID"
         />
@@ -46,8 +63,7 @@ const Document = () => {
             if (docsDeets?.utilityBill && docsDeets?.utilityBill !== '') {
               Linking.openURL(docsDeets?.utilityBill);
             }
-          }}
-        >
+          }}>
           <CustomView
             label={`${
               docsDeets?.utilityBill === undefined
@@ -63,8 +79,7 @@ const Document = () => {
             if (docsDeets?.signature && docsDeets?.signature !== '') {
               Linking.openURL(docsDeets?.signature);
             }
-          }}
-        >
+          }}>
           <CustomView
             label={`${
               docsDeets?.signature === undefined
@@ -80,8 +95,7 @@ const Document = () => {
             if (docsDeets?.passport && docsDeets?.passport !== '') {
               Linking.openURL(docsDeets?.passport);
             }
-          }}
-        >
+          }}>
           <CustomView
             label={`${
               docsDeets?.passport === undefined
@@ -97,8 +111,7 @@ const Document = () => {
             if (docsDeets?.bankStatement && docsDeets?.bankStatement !== '') {
               Linking.openURL(docsDeets?.bankStatement);
             }
-          }}
-        >
+          }}>
           <CustomView
             label={`${
               docsDeets?.bankStatement === undefined
@@ -114,8 +127,7 @@ const Document = () => {
             if (docsDeets?.seal && docsDeets?.seal !== '') {
               Linking.openURL(docsDeets?.seal);
             }
-          }}
-        >
+          }}>
           <CustomView
             label={`${
               docsDeets?.seal === undefined
@@ -131,8 +143,7 @@ const Document = () => {
             if (docsDeets?.cac7 && docsDeets?.cac7 !== '') {
               Linking.openURL(docsDeets?.cac7);
             }
-          }}
-        >
+          }}>
           <CustomView
             label={`${
               docsDeets?.cac7 === undefined
@@ -148,8 +159,7 @@ const Document = () => {
             if (docsDeets?.cac2 && docsDeets?.cac2 !== '') {
               Linking.openURL(docsDeets?.cac2);
             }
-          }}
-        >
+          }}>
           <CustomView
             label={`${
               docsDeets?.cac2 === undefined
@@ -165,13 +175,14 @@ const Document = () => {
             if (docsDeets?.cacCertificate && docsDeets?.cacCertificate !== '') {
               Linking.openURL(docsDeets?.cacCertificate);
             }
-          }}
-        >
+          }}>
           <CustomView
             label={`${
               docsDeets?.cacCertificate === undefined
                 ? 'N/A'
-                : `${docsDeets?.cacCertificate === '' ? 'N/A' : 'Open Document'}`
+                : `${
+                    docsDeets?.cacCertificate === '' ? 'N/A' : 'Open Document'
+                  }`
             } `}
             subLabel="CAC certificate"
           />
@@ -182,8 +193,7 @@ const Document = () => {
             if (docsDeets?.lpoFile && docsDeets?.lpoFile !== '') {
               Linking.openURL(docsDeets?.lpoFile);
             }
-          }}
-        >
+          }}>
           <CustomView
             label={`${
               docsDeets?.lpoFile === undefined
@@ -199,8 +209,7 @@ const Document = () => {
             if (docsDeets?.proformaFile && docsDeets?.proformaFile !== '') {
               Linking.openURL(docsDeets?.proformaFile);
             }
-          }}
-        >
+          }}>
           <CustomView
             label={`${
               docsDeets?.proformaFile === undefined
@@ -216,8 +225,7 @@ const Document = () => {
             if (docsDeets?.MERMAT && docsDeets?.MERMAT !== '') {
               Linking.openURL(docsDeets?.MERMAT);
             }
-          }}
-        >
+          }}>
           <CustomView
             label={`${
               docsDeets?.MERMAT === undefined
@@ -233,8 +241,7 @@ const Document = () => {
             if (docsDeets?.others && docsDeets?.others !== '') {
               Linking.openURL(docsDeets?.others);
             }
-          }}
-        >
+          }}>
           <CustomView
             label={`${
               docsDeets?.others === undefined

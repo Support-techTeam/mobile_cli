@@ -4,30 +4,77 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  Pressable,
+  Platform,
+  Image,
+  ImageBackground,
+  Dimensions,
 } from 'react-native';
 import React, {useContext, useEffect, useState} from 'react';
 import {Picker} from '@react-native-picker/picker';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-import {useNavigation} from '@react-navigation/native';
-
-import CustomInput from '../../component/custominput/CustomInput';
+import {useNavigation, useRoute} from '@react-navigation/native';
+import Toast from 'react-native-toast-message';
+import Input from '../../component/inputField/input.component';
+import CustomDropdown from '../../component/dropDown/dropdown.component';
 import Buttons from '../../component/buttons/Buttons';
-import {observer} from 'mobx-react-lite';
-import {StoreContext} from '../../config/mobX stores/RootStore';
 import Spinner from 'react-native-loading-spinner-overlay/lib';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
+import {
+  createBankDetails,
+  getLoanUserDetails,
+  updateBankDetails,
+} from '../../stores/LoanStore';
+import {getAllBankDetails} from '../../stores/WalletStore';
 
-const BankDetails = ({route}) => {
+const screenHeight = Dimensions.get('window').height;
+const screenWidth = Dimensions.get('window').width;
+
+const defaultData = [
+  {value: '', label: 'Select Option'},
+  {value: '', label: 'N/A'},
+];
+
+const onlinebankData = [
+  {value: '', label: 'Select Option'},
+  {value: true, label: 'Yes'},
+  {value: false, label: 'No'},
+];
+
+const BankDetails = () => {
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
-  // const {loansStore} = useContext(StoreContext);
-  // const {success, sending, credrails, loanUserdetails, loading} = loansStore;
+  const [bankDeets, setBankDeets] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const route = useRoute();
+  const curentRoute = route.name;
+  const previousRoute = navigation.getState()?.routes.slice(-2)[0]?.name;
+  const [currentBanks, setCurrentBanks] = useState(undefined);
 
-  // useEffect(() => {
-  //   loansStore.getLoanUserDetails();
-  // }, [loansStore]);
+  useEffect(() => {
+    if (route.name === 'BankDetails') {
+      const unsubscribe = navigation.addListener('focus', async () => {
+        unSubBankDetails();
+      });
+      return unsubscribe;
+    }
+  }, [navigation]);
 
-  // const bankDeets = loanUserdetails?.bankDetails;
+  useEffect(() => {
+    unSubBankDetails();
+  }, []);
+
+  const unSubBankDetails = async () => {
+    setIsLoading(true);
+    const res = await getLoanUserDetails();
+    if (res.error) {
+      // TODO: handle error
+    } else {
+      setBankDeets(res?.data?.bankDetails);
+    }
+    setIsLoading(false);
+  };
 
   const [bankDetails, setBankDetails] = useState({
     email: '',
@@ -41,8 +88,8 @@ const BankDetails = ({route}) => {
 
   useEffect(() => {
     setBankDetails({
-      email: '',
-      // bankDeets && bankDeets?.email === undefined ? '' : bankDeets?.email,
+      email:
+        bankDeets && bankDeets?.email === undefined ? '' : bankDeets?.email,
       bankName:
         bankDeets && bankDeets?.bankName === undefined
           ? ''
@@ -68,7 +115,7 @@ const BankDetails = ({route}) => {
           ? ''
           : bankDeets?.loanAmount,
     });
-  }, [bankDeets]);
+  }, [bankDeets, navigation]);
 
   const [credailsDetails, setCredailsDetails] = React.useState({
     email: '',
@@ -82,12 +129,7 @@ const BankDetails = ({route}) => {
     !bankDetails.email ||
     !bankDetails.bankAccountNumber ||
     !bankDetails.bankAccountName ||
-    bankDetails.wasLoanTakenWithinTheLast12Months === '' ||
     !bankDetails.hasOnlineBanking;
-
-  // useEffect(() => {
-  //   loansStore.getCredailsBanks();
-  // }, [loansStore]);
 
   const onEmailChange = text => {
     setBankDetails({...bankDetails, email: text});
@@ -109,28 +151,106 @@ const BankDetails = ({route}) => {
     setCredailsDetails({...credailsDetails, bankAccountNumber: text});
   };
 
-  const handleCreateBankDetails = () => {
-    // loansStore.createBankDetails(bankDetails);
-    // loansStore.createCredailsDetails(credailsDetails);
+  const handleCreateBankDetails = async () => {
+    setIsUpdating(true);
+    const res = await createBankDetails(bankDetails);
+    if (res.error) {
+      Toast.show({
+        type: 'error',
+        position: 'top',
+        topOffset: 50,
+        text1: res.title,
+        text2: res.message,
+        visibilityTime: 5000,
+        autoHide: true,
+        onPress: () => Toast.hide(),
+      });
+    } else {
+      Toast.show({
+        type: 'success',
+        position: 'top',
+        topOffset: 50,
+        text1: res.title,
+        text2: res.message,
+        visibilityTime: 3000,
+        autoHide: true,
+        onPress: () => Toast.hide(),
+      });
+      setTimeout(() => {
+        if (previousRoute !== 'MyAccount') {
+          navigation.navigate('ValidIndentity');
+        } else {
+          navigation.navigate('MyAccount');
+        }
+      }, 1000);
+    }
+    setIsUpdating(false);
   };
 
-  const handleUpdateBankDetails = () => {
+  const handleUpdateBankDetails = async () => {
+    setIsUpdating(true);
+    const res = await updateBankDetails(bankDetails);
+    if (res.error) {
+      Toast.show({
+        type: 'error',
+        position: 'top',
+        topOffset: 50,
+        text1: res.title,
+        text2: res.message,
+        visibilityTime: 5000,
+        autoHide: true,
+        onPress: () => Toast.hide(),
+      });
+    } else {
+      Toast.show({
+        type: 'success',
+        position: 'top',
+        topOffset: 50,
+        text1: res.title,
+        text2: res.message,
+        visibilityTime: 3000,
+        autoHide: true,
+        onPress: () => Toast.hide(),
+      });
+      setTimeout(() => {
+        if (previousRoute !== 'MyAccount') {
+          navigation.navigate('ValidIndentity');
+        } else {
+          navigation.navigate('MyAccount');
+        }
+      }, 1000);
+    }
+    setIsUpdating(false);
     // loansStore.updateBankDetails(bankDetails);
   };
 
-  const prevRoutes = route?.params?.paramKey;
-
   useEffect(() => {
-    if (success === 'bank successful') {
-      if (prevRoutes !== 'myAccount') {
-        navigation.navigate('ValidIndentity');
-      } else {
-        navigation.navigate('MyAccount');
-        // loansStore.getLoanUserDetails();
+    handleGetAllBanks();
+  }, []);
+
+  const handleGetAllBanks = async () => {
+    const res = await getAllBankDetails();
+    if (res.error) {
+      Toast.show({
+        type: 'error',
+        position: 'top',
+        topOffset: 50,
+        text1: res.title,
+        text2: res?.data?.message,
+        visibilityTime: 5000,
+        autoHide: true,
+        onPress: () => Toast.hide(),
+      });
+    } else {
+      const bankData = res?.data?.map((banks, i) => {
+        return {value: banks?.bankName, label: banks?.bankName, key: i};
+      });
+
+      if (currentBanks == undefined || currentBanks == '') {
+        setCurrentBanks(bankData);
       }
     }
-  }, [navigation, prevRoutes]);
-  // }, [loansStore, navigation, prevRoutes, success]);
+  };
 
   return (
     <SafeAreaView
@@ -142,7 +262,7 @@ const BankDetails = ({route}) => {
         paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
         paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
       }}>
-      {sending && (
+      {isUpdating && (
         <Spinner
           textContent={'Please wait...'}
           textStyle={{color: 'white'}}
@@ -150,7 +270,7 @@ const BankDetails = ({route}) => {
           overlayColor="rgba(78, 75, 102, 0.7)"
         />
       )}
-      {false && (
+      {isLoading && (
         <Spinner
           textContent={'Loading...'}
           textStyle={{color: 'white'}}
@@ -175,191 +295,193 @@ const BankDetails = ({route}) => {
             <AntDesign name="left" size={24} color="black" />
           </View>
         </TouchableOpacity>
-        <View>
-          <View>
-            <Text style={styles.TextHead}>BANK DETAILS</Text>
+        <View style={[styles.HeadView, {justifyContent: 'center', flex: 1}]}>
+          <View style={styles.TopView}>
+            <Text style={[styles.TextHead, {marginBottom: 5}]}>
+              BANK DETAILS
+            </Text>
           </View>
-        </View>
-        <View>
-          <Text> </Text>
+
+          <View>
+            <Image source={require('../../../assets/images/indicator4.png')} />
+          </View>
         </View>
       </View>
-      <View style={styles.demark} />
-      <ScrollView
-        bounces={false}
-        showsHorizontalScrollIndicator={false}
-        showsVerticalScrollIndicator={false}
-        style={[styles.innercontainer]}>
-        <View style={styles.form}>
-          <Text style={styles.header}>
-            Industry regulation requires us to collect this information to
-            verify your identity.
-          </Text>
-          <Text style={[styles.header, {color: 'red'}]}>
-            *Please enter your valid bank account details*
-          </Text>
-        </View>
-
-        <View>
-          <CustomInput
-            label="Email"
-            autoCorrect={false}
-            defaultValue={bankDetails?.email}
-            autoCapitalize="none"
-            onChangeText={text => onEmailChange(text)}
-            isNeeded={true}
-          />
-
-          <View style={{marginVertical: 10}}>
-            <View style={{flexDirection: 'row'}}>
-              <Text
-                style={{
-                  paddingBottom: 4,
-                  fontWeight: '400',
-                  fontSize: 16,
-                  lineHeight: 24,
-                  color: '#14142B',
-                  fontFamily: 'Montserat',
-                }}>
-                Bank name
-              </Text>
-              <Text style={{color: 'red', marginRight: 10}}>*</Text>
+      <View style={[styles.form, {marginBottom: 10, justifyContent: 'center'}]}>
+        <Text style={styles.header}>
+          Industry regulation requires us to collect this information to verify
+          your identity.
+        </Text>
+        <Text style={[styles.header, {color: 'red'}]}>
+          *Please enter your valid bank account details*
+        </Text>
+      </View>
+      <ImageBackground
+        source={require('../../../assets/signup.png')}
+        resizeMode="stretch"
+        style={styles.image}>
+        <ScrollView
+          bounces={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+          style={{
+            paddingHorizontal: 10,
+            marginTop: 10,
+            marginBottom: insets.top + 116,
+          }}>
+          <View
+            style={{
+              paddingTop: 25,
+              backgroundColor: '#FFFFFF',
+              borderRadius: 15,
+              paddingHorizontal: 15,
+              paddingVertical: 15,
+              opacity: 0.86,
+              borderColor: '#D9DBE9',
+              borderWidth: 2,
+            }}>
+            <Input
+              iconName="email-outline"
+              label="Email"
+              placeholder="Enter email"
+              keyboardType="email-address"
+              defaultValue={bankDetails?.email}
+              onChangeText={text => onEmailChange(text)}
+              isNeeded={true}
+              autoCapitalize="none"
+            />
+            <View style={{marginVertical: 10}}>
+              <CustomDropdown
+                label="Bank Name"
+                isNeeded={true}
+                iconName="bank-outline"
+                placeholder="Select Bank"
+                placeholderStyle={styles.placeholderStyle}
+                selectedTextStyle={styles.selectedTextStyle}
+                inputSearchStyle={styles.inputSearchStyle}
+                search
+                data={currentBanks ? currentBanks : defaultData}
+                maxHeight={300}
+                labelField="label"
+                valueField="value"
+                value={bankDetails?.receiverBankName}
+                onChange={text => onBankNameChange(text.value)}
+              />
             </View>
+            <Input
+              label="Bank account name"
+              placeholder="Enter account name"
+              defaultValue={bankDetails?.bankAccountName}
+              onChangeText={text => onBankAccountNameChange(text)}
+              isNeeded={true}
+            />
+            <Input
+              label="Bank account number"
+              placeholder="Enter account number"
+              keyboardType="numeric"
+              defaultValue={bankDetails?.bankAccountNumber}
+              onChangeText={text => onBankAccountNumberChange(text)}
+              isNeeded={true}
+            />
 
-            <View style={styles.pick}>
-              <Picker
-                selectedValue={bankDetails?.bankName}
-                onValueChange={text => onBankNameChange(text)}>
-                <Picker.Item label="Select Bank" value="" />
-
-                {credrails?.map((bank, i) => (
-                  <Picker.Item label={bank} value={bank} key={i} />
-                ))}
-              </Picker>
-            </View>
-          </View>
-
-          <CustomInput
-            label="Bank account name"
-            defaultValue={bankDetails?.bankAccountName}
-            onChangeText={text => onBankAccountNameChange(text)}
-            isNeeded={true}
-          />
-
-          <CustomInput
-            label="Bank account number"
-            keyboardType="numeric"
-            defaultValue={bankDetails?.bankAccountNumber}
-            onChangeText={text => onBankAccountNumberChange(text)}
-            isNeeded={true}
-          />
-
-          <View style={{marginVertical: 10}}>
-            <View style={{flexDirection: 'row'}}>
-              <Text
-                style={{
-                  paddingBottom: 4,
-                  fontWeight: '400',
-                  fontSize: 16,
-                  lineHeight: 24,
-                  color: '#14142B',
-                  fontFamily: 'Montserat',
-                }}>
-                Do you use online banking?
-              </Text>
-              <Text style={{color: 'red', marginRight: 10}}>*</Text>
-            </View>
-
-            <View style={styles.pick}>
-              <Picker
-                selectedValue={bankDetails?.hasOnlineBanking}
-                onValueChange={text =>
+            <View style={{marginVertical: 10}}>
+              <CustomDropdown
+                label="Do you use online banking?"
+                isNeeded={true}
+                placeholder="Select Option"
+                placeholderStyle={styles.placeholderStyle}
+                selectedTextStyle={styles.selectedTextStyle}
+                inputSearchStyle={styles.inputSearchStyle}
+                data={onlinebankData}
+                maxHeight={300}
+                labelField="label"
+                valueField="value"
+                value={bankDetails?.hasOnlineBanking}
+                onChange={text =>
                   setBankDetails({
                     ...bankDetails,
                     hasOnlineBanking:
-                      text === false
-                        ? // eslint-disable-next-line no-undef
-                          toast.show(
-                            'Please open a mobile application with your bank to continue with this process!',
-                            {
-                              type: 'danger',
-                              duration: 6000,
-                            },
-                          )
+                      text.value === false
+                        ? Toast.show({
+                            type: 'error',
+                            position: 'top',
+                            topOffset: 50,
+                            text1: 'Online Banking',
+                            text2:
+                              'Please open a mobile application with your bank to continue with this process!',
+                            visibilityTime: 5000,
+                            autoHide: true,
+                            onPress: () => Toast.hide(),
+                          })
                         : true,
                   })
-                }>
-                <Picker.Item label="Select value" value="" />
-                <Picker.Item label="Yes" value={true} />
-                <Picker.Item label="No" value={false} />
-              </Picker>
+                }
+              />
             </View>
-          </View>
-
-          <View style={{marginVertical: 10}}>
-            <View style={{flexDirection: 'row'}}>
-              <Text
-                style={{
-                  paddingBottom: 4,
-                  fontWeight: '400',
-                  fontSize: 16,
-                  lineHeight: 24,
-                  color: '#14142B',
-                  fontFamily: 'Montserat',
-                }}>
-                Have you taken a loan in the past 12months?
-              </Text>
-              <Text style={{color: 'red', marginRight: 10}}>*</Text>
-            </View>
-
-            <View style={styles.pick}>
-              <Picker
-                selectedValue={bankDetails?.wasLoanTakenWithinTheLast12Months}
-                onValueChange={text =>
+            <View style={{marginVertical: 10}}>
+              <CustomDropdown
+                label="Have you taken a loan in the past 12months?"
+                isNeeded={true}
+                placeholder="Select Option"
+                placeholderStyle={styles.placeholderStyle}
+                selectedTextStyle={styles.selectedTextStyle}
+                inputSearchStyle={styles.inputSearchStyle}
+                data={onlinebankData}
+                maxHeight={300}
+                labelField="label"
+                valueField="value"
+                value={bankDetails?.wasLoanTakenWithinTheLast12Months}
+                onChange={text =>
                   setBankDetails({
                     ...bankDetails,
-                    wasLoanTakenWithinTheLast12Months: text,
+                    wasLoanTakenWithinTheLast12Months: text.value,
                   })
-                }>
-                <Picker.Item label="Select Value" value="" />
-                <Picker.Item label="Yes" value={true} />
-                <Picker.Item label="No" value={false} />
-              </Picker>
+                }
+              />
             </View>
+            <Input
+              label="If yes, how much?"
+              keyboardType="numeric"
+              placeholder="Enter loan amount"
+              defaultValue={bankDetails?.loanAmount}
+              onChangeText={text =>
+                setBankDetails({...bankDetails, loanAmount: text})
+              }
+            />
+            <TouchableOpacity
+              onPress={
+                bankDeets?.email === undefined
+                  ? handleCreateBankDetails
+                  : handleUpdateBankDetails
+              }
+              disabled={disableit}>
+              <View style={{marginBottom: 40, marginTop: 20}}>
+                <Buttons label="Save & Continue" disabled={disableit} />
+              </View>
+            </TouchableOpacity>
           </View>
-
-          <CustomInput
-            label="If yes, how much?"
-            keyboardType="numeric"
-            defaultValue={bankDetails?.loanAmount}
-            onChangeText={text =>
-              setBankDetails({...bankDetails, loanAmount: text})
-            }
-          />
-
-          <TouchableOpacity
-            onPress={
-              bankDeets?.email === undefined
-                ? handleCreateBankDetails
-                : handleUpdateBankDetails
-            }
-            disabled={disableit}>
-            <View style={{marginBottom: 40, marginTop: 20}}>
-              <Buttons label="Save & Continue" disabled={disableit} />
-            </View>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
+        </ScrollView>
+      </ImageBackground>
     </SafeAreaView>
   );
 };
 
-export default observer(BankDetails);
+export default BankDetails;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
+  },
+  image: {
+    height: screenHeight,
+    width: screenWidth,
+    justifyContent: 'center',
+  },
+  inputSearchStyle: {
+    borderColor: 'gray',
+    height: 40,
+    fontSize: 16,
   },
   demark: {
     width: '150%',

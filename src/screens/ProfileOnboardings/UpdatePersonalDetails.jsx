@@ -305,20 +305,18 @@ const UpdatePersonalDetails = () => {
     }
 
     if (isValid) {
-      console.log('previous', previousRoute);
       profileDetails?.email === undefined
         ? handleCreatePersonalDetails()
         : handleUpdatePersonalDetails();
 
-      if (previousRoute !== 'myAccount') {
+      if (previousRoute !== 'MyAccount') {
         setTimeout(() => {
           navigation.navigate('BusinessDetails');
-        }, 2000);
+        }, 1000);
       } else {
         setTimeout(() => {
-          // navigation.navigate('MyAccount');
-        }, 2000);
-        console.log('my account');
+          navigation.navigate('MyAccount');
+        }, 1000);
       }
     }
   };
@@ -335,7 +333,7 @@ const UpdatePersonalDetails = () => {
           setState(res.data);
         }
       } catch (error) {
-        console.error(error);
+        // console.error(error);
       }
     };
 
@@ -373,7 +371,7 @@ const UpdatePersonalDetails = () => {
           setCity(res.data);
         }
       } catch (error) {
-        console.error(error);
+        // console.error(error);
       }
     };
 
@@ -448,7 +446,6 @@ const UpdatePersonalDetails = () => {
   const handleUpdatePersonalDetails = async () => {
     setIsUpdating(true);
     const res = await updatePersonalDetails(userDetails);
-    console.log(res);
     if (res.error) {
       Toast.show({
         type: 'error',
@@ -602,7 +599,7 @@ const UpdatePersonalDetails = () => {
             <Input
               iconName="account-outline"
               label="Last Name"
-              placeholder="Enter your first name"
+              placeholder="Enter your last name"
               defaultValue={profileDetails?.lastName}
               onChangeText={text =>
                 setUserDetails({...userDetails, lastName: text.trim()})

@@ -8,24 +8,20 @@ import {
 } from 'react-native';
 import React, {useContext, useEffect, useState} from 'react';
 import {useNavigation} from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-// import { MaterialCommunityIcons } from '@expo/vector-icons';
-// import { Ionicons } from '@expo/vector-icons';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {SafeAreaView} from 'react-native-safe-area-context';
-
+import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 import CustomView from '../../component/accountsView/MoreViews';
 import VerifyModal from '../../component/modals/verifyModal';
 import {userLogOut} from '../../stores/AuthStore';
 import Toast from 'react-native-toast-message';
 import {resetStore} from '../../util/redux/store';
+import {useSelector} from 'react-redux';
 
 const Morescreen = () => {
   const navigation = useNavigation();
   const [visibility, setVisibility] = useState(false);
-  // const { authStore } = useContext(StoreContext);
-
-  // const { profile } = authStore;
+  const profile = useSelector(state => state.userProfile.profile);
+  const insets = useSafeAreaInsets();
 
   const handleLogout = async () => {
     const res = await userLogOut();
@@ -45,12 +41,17 @@ const Morescreen = () => {
     }
   };
 
-  // useEffect(() => {
-  //   authStore.getProfileDetails();
-  // }, [authStore]);
-
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView
+      style={[
+        styles.container,
+        {
+          paddingTop: insets.top !== 0 ? insets.top / 2 : 'auto',
+          paddingBottom: insets.bottom !== 0 ? insets.bottom / 2 : 'auto',
+          paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
+          paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
+        },
+      ]}>
       <VerifyModal visible={visibility}>
         <View style={{alignItems: 'center'}}>
           <Image source={require('../../../assets/images/signoutIcon.png')} />
@@ -89,8 +90,7 @@ const Morescreen = () => {
               <View style={styles.profileHeadView}>
                 <Icon name="account-circle-outline" size={48} color="#6E7191" />
                 <Text style={styles.ProfileText}>
-                  {/* {profile?.firstName} {profile?.lastName} */}
-                  Bamidele Efunnuga
+                  {profile?.firstName} {profile?.lastName}
                 </Text>
               </View>
             </TouchableOpacity>
@@ -108,7 +108,7 @@ const Morescreen = () => {
                 selectable={true}
                 selectionColor={'#CED4DA'}
                 style={{fontFamily: 'Montserat', fontSize: 18}}>
-                {/* {profile?.personalReferalCode} */}
+                {profile?.personalReferalCode}
               </Text>
             </View>
           </View>
@@ -121,8 +121,8 @@ const Morescreen = () => {
             <TouchableOpacity onPress={() => navigation.navigate('MyAccount')}>
               <CustomView isSettings={true} label="Profile" />
             </TouchableOpacity>
-
-            {/* <TouchableOpacity>
+            {/* 
+            <TouchableOpacity>
               <CustomView isSupport={true} label="Support" />
             </TouchableOpacity>
 

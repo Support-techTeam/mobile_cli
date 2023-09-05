@@ -1,1 +1,1 @@
-export {default as Morescreens} from './Morescreen'
+export {default as Morescreens} from './Morescreen';

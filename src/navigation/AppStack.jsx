@@ -16,26 +16,26 @@ import LoanTransactions from '../screens/LoanScreens/LoanTransaction';
 import GuarantorDetails from '../screens/LoanScreens/GuarantorDetails';
 import {AddGuarantors, GetLoan} from '../screens/LoanScreens';
 import {
-  // BankDetails,
+  BankDetails,
   BusinessDetails,
-  // NextOfKin,
+  NextOfKin,
   OnboardingHome,
 } from '../screens/ProfileOnboardings';
 import UpdatePersonalDetails from '../screens/ProfileOnboardings/UpdatePersonalDetails';
+import MyAccount from '../screens/MyAccountsScreens/MyAccount';
+import {
+  // BankStatement,
+  // CAC,
+  // CompanySeals,
+  // Others,
+  // Passport,
+  // Signature,
+  // ProofOfAddress,
+  ValidIdentity,
+} from '../screens/ProfileOnboardings/AddDocuments';
+import FinalSubmit from '../screens/ProfileOnboardings/AddDocuments/FinalSubmit';
+
 //Pending
-// import {
-//   BankStatement,
-//   CAC,
-//   CompanySeals,
-//   Others,
-//   Passport,
-//   ProofOfAddress,
-//   Signature,
-//   ValidIdentity,
-// } from '../screens/ProfileOnboardings/AddDocuments';
-// import GuarantorDetails from '../screens/LoanScreens/GuarantorDetails';
-// import MyAccount from '../screens/MyAccountsScreens/MyAccount';
-// import FinalSubmit from '../screens/ProfileOnboardings/AddDocuments/FinalSubmit';
 // import Securindex from '../screens/SecurityScreens/Securindex';
 // import TransPin from '../screens/SecurityScreens/TransPin';
 // import PinCon from '../screens/SecurityScreens/PinCon';
@@ -107,9 +107,6 @@ const AppStack = () => {
     }, 5000);
   });
 
-  // console.log('userProfileData', userProfileData);
-  // console.log('JSON.parse(user)->isVerified', isVerified);
-  // console.log('JSON.parse(user)', userData);
   return !isVerified && !timeOut ? (
     <Stack.Navigator screenOptions={{headerShown: false}}>
       <Stack.Screen
@@ -170,6 +167,20 @@ const AppStack = () => {
             component={UpdatePersonalDetails}
           />
           <Stack.Screen name="BusinessDetails" component={BusinessDetails} />
+          <Stack.Screen name="NextOfKin" component={NextOfKin} />
+          <Stack.Screen name="BankDetails" component={BankDetails} />
+          {/* Settings */}
+          <Stack.Screen name="MyAccount" component={MyAccount} />
+          {/* Documents */}
+          <Stack.Screen name="ValidIdentity" component={ValidIdentity} />
+          {/* <Stack.Screen name="ProofOfAddress" component={ProofOfAddress} /> */}
+          {/* <Stack.Screen name="CompanySeals" component={CompanySeals} />
+          <Stack.Screen name="CAC" component={CAC} />
+          <Stack.Screen name="BankStatement" component={BankStatement} />
+          <Stack.Screen name="Passport" component={Passport} />
+          <Stack.Screen name="Signature" component={Signature} />
+          <Stack.Screen name="SubmitDocs" component={FinalSubmit} />
+          <Stack.Screen name="Others" component={Others} /> */}
         </>
       )}
     </Stack.Navigator>

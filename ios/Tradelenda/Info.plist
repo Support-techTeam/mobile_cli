@@ -117,6 +117,7 @@
 			<string>fonts/MaterialCommunityIcons.ttf</string>
 			<string>fonts/MaterialIcons.ttf</string>
 		</array>
-
+		<key>NSPhotoLibraryUsageDescription</key>
+		<string>We need access to your photo library to select images.</string>
 	</dict>
 </plist>

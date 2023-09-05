@@ -16,13 +16,10 @@ import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import Spinner from 'react-native-loading-spinner-overlay/lib';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
-import CustomInput from '../../component/custominput/CustomInput';
 import Input from '../../component/inputField/input.component';
 import CustomDropdown from '../../component/dropDown/dropdown.component';
-import InputPhone from '../../component/inputField/phone-input.component';
 import Buttons from '../../component/buttons/Buttons';
 import Toast from 'react-native-toast-message';
-import {useSelector} from 'react-redux';
 import {getCity, getState} from '../../stores/ProfileStore';
 import {
   createBusinessDetails,
@@ -381,13 +378,12 @@ const BusinessDetails = () => {
         onPress: () => Toast.hide(),
       });
       setTimeout(() => {
-        if (previousRoute !== 'myAccount') {
+        if (previousRoute !== 'MyAccount') {
           navigation.navigate('NextOfKin');
         } else {
           navigation.navigate('MyAccount');
-          loansStore.getLoanUserDetails();
         }
-      }, 2000);
+      }, 1000);
     }
     setIsUpdating(false);
   };
@@ -395,8 +391,6 @@ const BusinessDetails = () => {
   const handleUpdateBusinessDetails = async () => {
     setIsUpdating(true);
     const res = await updateBusinessDetails(businessDetails);
-    console.log('Update businessDetails', businessDetails);
-    console.log(res);
     if (res.error) {
       Toast.show({
         type: 'error',
@@ -420,13 +414,12 @@ const BusinessDetails = () => {
         onPress: () => Toast.hide(),
       });
       setTimeout(() => {
-        if (previousRoute !== 'myAccount') {
+        if (previousRoute !== 'MyAccount') {
           navigation.navigate('NextOfKin');
         } else {
           navigation.navigate('MyAccount');
-          loansStore.getLoanUserDetails();
         }
-      }, 2000);
+      }, 1000);
     }
     setIsUpdating(false);
   };
@@ -1029,10 +1022,9 @@ const BusinessDetails = () => {
                   ? handleCreateBusinessDetails
                   : handleUpdateBusinessDetails
               }
-              // disabled={disableit}
-            >
+              disabled={disableit}>
               <View style={{marginBottom: 40, marginTop: 20}}>
-                <Buttons label={'Save & Continue'} />
+                <Buttons label={'Save & Continue'} disabled={disableit} />
               </View>
             </TouchableOpacity>
           </View>

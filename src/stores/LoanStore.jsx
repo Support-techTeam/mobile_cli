@@ -525,7 +525,6 @@ const updatePersonalDetails = async details => {
       const response = await axiosInstance.put(`/users/update`, details, {
         headers,
       });
-      await AsyncStorage.setItem('hasStarted', '1');
       return {
         title: 'Update Profile ',
         error: false,

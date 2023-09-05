@@ -1,37 +1,55 @@
-import { View, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import React, { useContext, useEffect } from 'react';
-import { useNavigation } from '@react-navigation/native';
+import {View, StyleSheet, ScrollView, TouchableOpacity} from 'react-native';
+import React, {useContext, useEffect, useState} from 'react';
+import {useNavigation, useRoute} from '@react-navigation/native';
 
 import CustomView from './AccountView/CustomView';
-import { StoreContext } from '../../config/mobX stores/RootStore';
-import { observer } from 'mobx-react-lite';
 import Buttons from '../buttons/Buttons';
+import {getLoanUserDetails} from '../../stores/LoanStore';
 
 const NextOfKin = () => {
   const navigation = useNavigation();
-  const { loansStore } = useContext(StoreContext);
-  const { loanUserdetails } = loansStore;
-
-  const nokDeets = loanUserdetails?.nextOfKinDetails;
+  const [nokDeets, setNokDeets] = useState([]);
+  const route = useRoute();
 
   useEffect(() => {
-    loansStore.getLoanUserDetails();
-  }, [loansStore]);
+    if (route.name === 'MyAccount') {
+      const unsubscribe = navigation.addListener('focus', async () => {
+        unSubNOKDetails();
+      });
+      return unsubscribe;
+    }
+  }, [navigation]);
+
+  useEffect(() => {
+    unSubNOKDetails();
+  }, []);
+
+  const unSubNOKDetails = async () => {
+    const res = await getLoanUserDetails();
+    if (res.error) {
+      // TODO: handle error
+    } else {
+      setNokDeets(res?.data?.nextOfKinDetails);
+    }
+  };
 
   return (
     <View style={styles.container}>
       <TouchableOpacity
-        onPress={() => navigation.navigate('NextOfKin', { paramKey: 'myAccount' })}
-        style={{ marginBottom: 20 }}
-      >
+        onPress={() =>
+          navigation.navigate('NextOfKin', {paramKey: 'myAccount'})
+        }
+        style={{marginBottom: 20}}>
         <Buttons label={'Update Next Of Kin Details'} />
       </TouchableOpacity>
 
-      <ScrollView showsHorizontalScrollIndicator={false} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}>
         <CustomView
-          label={`${nokDeets?.firstName === undefined ? 'N/A' : nokDeets?.firstName} ${
-            nokDeets?.lastName === undefined ? 'N/A' : nokDeets?.lastName
-          }`}
+          label={`${
+            nokDeets?.firstName === undefined ? 'N/A' : nokDeets?.firstName
+          } ${nokDeets?.lastName === undefined ? 'N/A' : nokDeets?.lastName}`}
           subLabel="Full name"
         />
 
@@ -46,17 +64,25 @@ const NextOfKin = () => {
         />
 
         <CustomView
-          label={`${nokDeets?.phoneNumber === undefined ? 'N/A' : nokDeets?.phoneNumber}`}
+          label={`${
+            nokDeets?.phoneNumber === undefined ? 'N/A' : nokDeets?.phoneNumber
+          }`}
           subLabel="Phone number"
         />
 
         <CustomView
-          label={`${nokDeets?.relationship === undefined ? 'N/A' : nokDeets?.relationship}`}
+          label={`${
+            nokDeets?.relationship === undefined
+              ? 'N/A'
+              : nokDeets?.relationship
+          }`}
           subLabel="Next of kin's Relationship"
         />
 
         <CustomView
-          label={`${nokDeets?.Address === undefined ? 'N/A' : nokDeets?.Address}`}
+          label={`${
+            nokDeets?.Address === undefined ? 'N/A' : nokDeets?.Address
+          }`}
           subLabel="Address"
         />
       </ScrollView>
@@ -64,7 +90,7 @@ const NextOfKin = () => {
   );
 };
 
-export default observer(NextOfKin);
+export default NextOfKin;
 const styles = StyleSheet.create({
   container: {
     marginVertical: 28,

@@ -27,7 +27,7 @@ import {
 } from '../../stores/WalletStore';
 import Toast from 'react-native-toast-message';
 
-const gdefaultData = [
+const defaultData = [
   {value: '', label: 'Select Option'},
   {value: '', label: 'N/A'},
 ];
@@ -376,7 +376,7 @@ const BankDeets = ({route}) => {
                   selectedTextStyle={styles.selectedTextStyle}
                   inputSearchStyle={styles.inputSearchStyle}
                   search
-                  data={currentBanks ? currentBanks : gdefaultData}
+                  data={currentBanks ? currentBanks : defaultData}
                   maxHeight={300}
                   labelField="label"
                   valueField="value"

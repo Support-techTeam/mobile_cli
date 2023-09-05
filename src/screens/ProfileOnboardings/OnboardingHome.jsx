@@ -28,7 +28,6 @@ const OnboardingHome = () => {
   }, []);
 
   const navigation = useNavigation();
-
   return (
     <SafeAreaView
       style={{
@@ -100,7 +99,7 @@ const OnboardingHome = () => {
 
             <TouchableOpacity
               disabled={true}
-              onPress={() => navigation.navigate('ValidIndentity')}>
+              onPress={() => navigation.navigate('ValidIdentity')}>
               <CustomView label="Add Documents" status="Pending" />
             </TouchableOpacity>
 
@@ -222,12 +221,12 @@ const OnboardingHome = () => {
             </TouchableOpacity>
 
             <TouchableOpacity
-              onPress={() => navigation.navigate('ValidIndentity')}>
+              onPress={() => navigation.navigate('ValidIdentity')}>
               <CustomView label="Add Documents" status="[0/7]Pending" />
             </TouchableOpacity>
 
             <TouchableOpacity
-              onPress={() => navigation.navigate('ValidIndentity')}>
+              onPress={() => navigation.navigate('ValidIdentity')}>
               <Buttons label={'Complete Profile'} />
             </TouchableOpacity>
           </View>

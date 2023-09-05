@@ -1,48 +1,80 @@
-import { View, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import React, { useContext, useEffect } from 'react';
-import { useNavigation } from '@react-navigation/native';
+import {View, StyleSheet, ScrollView, TouchableOpacity} from 'react-native';
+import React, {useContext, useEffect, useState} from 'react';
+import {useNavigation, useRoute} from '@react-navigation/native';
 
 import CustomView from './AccountView/CustomView';
-import { StoreContext } from '../../config/mobX stores/RootStore';
-import { observer } from 'mobx-react-lite';
 import Buttons from '../buttons/Buttons';
+import {getLoanUserDetails} from '../../stores/LoanStore';
 
 const Business = () => {
   const navigation = useNavigation();
-  const { loansStore } = useContext(StoreContext);
-  const { loanUserdetails } = loansStore;
-
-  const orgDeets = loanUserdetails?.organizationDetails;
+  const [orgDeets, setOrgDeets] = useState([]);
+  const route = useRoute();
 
   useEffect(() => {
-    loansStore.getLoanUserDetails();
-  }, [loansStore]);
+    if (route.name === 'MyAccount') {
+      const unsubscribe = navigation.addListener('focus', async () => {
+        unSubBusinessDetails();
+      });
+      return unsubscribe;
+    }
+  }, [navigation]);
+
+  useEffect(() => {
+    unSubBusinessDetails();
+  }, []);
+
+  const unSubBusinessDetails = async () => {
+    const res = await getLoanUserDetails();
+    if (res.error) {
+      // TODO: handle error
+    } else {
+      setOrgDeets(res?.data?.organizationDetails);
+    }
+  };
 
   return (
     <View style={styles.container}>
       <TouchableOpacity
-        onPress={() => navigation.navigate('BusinessDetails', { paramKey: 'myAccount' })}
-        style={{ marginBottom: 20 }}
-      >
+        onPress={() =>
+          navigation.navigate('BusinessDetails', {paramKey: 'myAccount'})
+        }
+        style={{marginBottom: 20}}>
         <Buttons label={'Update Business Details'} />
       </TouchableOpacity>
 
-      <ScrollView showsHorizontalScrollIndicator={false} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}>
         <CustomView
-          label={`${orgDeets?.businessType === undefined ? 'N/A' : orgDeets?.businessType}`}
+          label={`${
+            orgDeets?.businessType === undefined
+              ? 'N/A'
+              : orgDeets?.businessType
+          }`}
           subLabel="Business type"
         />
 
         <CustomView
-          label={`${orgDeets?.businessName === undefined ? 'N/A' : orgDeets?.businessName}`}
+          label={`${
+            orgDeets?.businessName === undefined
+              ? 'N/A'
+              : orgDeets?.businessName
+          }`}
           subLabel="Business name"
         />
         <CustomView
-          label={`${orgDeets?.positionInOrg === undefined ? 'N/A' : orgDeets?.positionInOrg}`}
+          label={`${
+            orgDeets?.positionInOrg === undefined
+              ? 'N/A'
+              : orgDeets?.positionInOrg
+          }`}
           subLabel="Position in company"
         />
         <CustomView
-          label={`${orgDeets?.shareInOrg === undefined ? 'N/A' : orgDeets?.shareInOrg}`}
+          label={`${
+            orgDeets?.shareInOrg === undefined ? 'N/A' : orgDeets?.shareInOrg
+          }`}
           subLabel="Share in company"
         />
 
@@ -61,12 +93,18 @@ const Business = () => {
         />
 
         <CustomView
-          label={`${orgDeets?.businessAddress === undefined ? 'N/A' : orgDeets?.businessAddress}`}
+          label={`${
+            orgDeets?.businessAddress === undefined
+              ? 'N/A'
+              : orgDeets?.businessAddress
+          }`}
           subLabel="Business address"
         />
 
         <CustomView
-          label={`${orgDeets?.country === undefined ? 'N/A' : orgDeets?.country}`}
+          label={`${
+            orgDeets?.country === undefined ? 'N/A' : orgDeets?.country
+          }`}
           subLabel="Country"
         />
 
@@ -90,37 +128,59 @@ const Business = () => {
         />
 
         <CustomView
-          label={`${orgDeets?.NoOfOutlets === undefined ? 'N/A' : orgDeets?.NoOfOutlets}`}
+          label={`${
+            orgDeets?.NoOfOutlets === undefined ? 'N/A' : orgDeets?.NoOfOutlets
+          }`}
           subLabel="Number of outlets"
         />
 
         <CustomView
-          label={`${orgDeets?.totalEmployees === undefined ? 'N/A' : orgDeets?.totalEmployees}`}
+          label={`${
+            orgDeets?.totalEmployees === undefined
+              ? 'N/A'
+              : orgDeets?.totalEmployees
+          }`}
           subLabel="Total employees"
         />
 
         <CustomView
-          label={`${orgDeets?.salesMethod === undefined ? 'N/A' : orgDeets?.salesMethod}`}
+          label={`${
+            orgDeets?.salesMethod === undefined ? 'N/A' : orgDeets?.salesMethod
+          }`}
           subLabel="Sales method"
         />
 
         <CustomView
-          label={`${orgDeets?.industry === undefined ? 'N/A' : orgDeets?.industry}`}
+          label={`${
+            orgDeets?.industry === undefined ? 'N/A' : orgDeets?.industry
+          }`}
           subLabel="Industry"
         />
 
         <CustomView
-          label={`${orgDeets?.monthlySales === undefined ? 'N/A' : orgDeets?.monthlySales}`}
+          label={`${
+            orgDeets?.monthlySales === undefined
+              ? 'N/A'
+              : orgDeets?.monthlySales
+          }`}
           subLabel="Monthly sales"
         />
 
         <CustomView
-          label={`${orgDeets?.monthlyExpenses === undefined ? 'N/A' : orgDeets?.monthlyExpenses}`}
+          label={`${
+            orgDeets?.monthlyExpenses === undefined
+              ? 'N/A'
+              : orgDeets?.monthlyExpenses
+          }`}
           subLabel="Monthly expenses"
         />
 
         <CustomView
-          label={`${orgDeets?.businessDuration === undefined ? 'N/A' : orgDeets?.businessDuration}`}
+          label={`${
+            orgDeets?.businessDuration === undefined
+              ? 'N/A'
+              : orgDeets?.businessDuration
+          }`}
           subLabel="Business duration"
         />
 
@@ -165,7 +225,7 @@ const Business = () => {
   );
 };
 
-export default observer(Business);
+export default Business;
 const styles = StyleSheet.create({
   container: {
     marginVertical: 28,
