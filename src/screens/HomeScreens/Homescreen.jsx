@@ -63,7 +63,7 @@ import {resetStore} from '../../util/redux/store';
 import PersonalDetails from '../ProfileOnboardings/PersonalDetails';
 import Splashscreen from '../../navigation/Splashscreen';
 import {useRoute, useIsFocused} from '@react-navigation/native';
-import {getLoansAmount} from '../../stores/LoanStore';
+import {getLoanUserDetails, getLoansAmount} from '../../stores/LoanStore';
 // import RNRestart from 'react-native-restart';
 
 const {width, height} = Dimensions.get('window');
@@ -92,6 +92,7 @@ const Homescreen = () => {
   const [timeOut, setTimeOut] = useState(false);
   const route = useRoute();
   const isFocused = useIsFocused();
+  const [loanUserDetails, setLoanUserDetails] = useState(undefined);
 
   const dispatch = useDispatch();
 
@@ -207,6 +208,7 @@ const Homescreen = () => {
     }
     setIsLoading(false);
   };
+
   //Navigation useEffect Hook
   useEffect(() => {
     if (route.name === 'Home') {
@@ -216,10 +218,10 @@ const Homescreen = () => {
         unsubGetAllTransactions();
         unsubGetTransactions();
         unsubGetLoanAmount();
+        getLoanUserData();
       });
       return unsubscribe;
     }
-    // return () => unsubscribe.remove();
   }, [navigation]);
 
   // Timed useEffect
@@ -464,16 +466,16 @@ const Homescreen = () => {
               }}>
               {item.button === 'Get loan' && (
                 <TouchableOpacity
-                  onPress={() => console.log('get loan')}
-                  // navigation.navigate(
-                  //   `${
-                  //     loanUserdetails?.loanDocumentDetails
-                  //       ?.validIdentification === undefined
-                  //       ? 'OnboardingHome'
-                  //       : 'GetLoan'
-                  //   }`,
-                  // )
-
+                  onPress={() =>
+                    navigation.navigate(
+                      `${
+                        loanUserDetails?.loanDocumentDetails
+                          ?.validIdentification === undefined
+                          ? 'OnboardingHome'
+                          : 'GetLoan'
+                      }`,
+                    )
+                  }
                   style={styles.fundView}>
                   <Text style={styles.FundButton}>{item.button}</Text>
                 </TouchableOpacity>
@@ -607,6 +609,24 @@ const Homescreen = () => {
     }
   }, []);
 
+  useEffect(() => {
+    getLoanUserData();
+  }, []);
+
+  const getLoanUserData = async () => {
+    setIsLoading(true);
+    const res = await getLoanUserDetails();
+    if (res.error) {
+      // Todo : error handling
+    } else {
+      if (res.data === undefined || res.data == null || res.data.length <= 0) {
+        setLoanUserDetails(undefined);
+      } else {
+        setLoanUserDetails(res?.data);
+      }
+    }
+    setIsLoading(false);
+  };
   // useEffect(() => {
   //   // Resetting default value for the input on restart
   //   console.log('Resetting default value');
@@ -1313,7 +1333,8 @@ const Homescreen = () => {
         </View>
 
         {/* Optional Section */}
-        {false && (
+        {loanUserDetails == undefined ||
+        loanUserDetails?.loanDocumentDetails === undefined ? (
           <TouchableOpacity
             style={{
               height: '9%',
@@ -1323,7 +1344,7 @@ const Homescreen = () => {
               borderRadius: 8,
               justifyContent: 'center',
             }}
-            onPress={() => console.log('Complete Profile')}>
+            onPress={() => navigation.navigate('OnboardingHome')}>
             <View
               style={{
                 flexDirection: 'row',
@@ -1361,7 +1382,7 @@ const Homescreen = () => {
               </View>
             </View>
           </TouchableOpacity>
-        )}
+        ) : null}
         {/* Third Section */}
         <View style={styles.transView}>
           <Pressable

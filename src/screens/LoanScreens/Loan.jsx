@@ -1037,15 +1037,11 @@ const Loanscreen = () => {
               onPress={() =>
                 navigation.navigate(
                   `${
-                    loanUserDetails !== undefined &&
+                    loanUserDetails === undefined ||
                     loanUserDetails?.loanDocumentDetails
-                      ?.validIdentification !== undefined
-                      ? // loanUserDetails?.loanDocumentDetails
-                        //   ?.validIdentification === undefined
-                        'GetLoan'
-                      : 'OnboardingHome'
-                    // ?'OnboardingHome'
-                    // : 'GetLoan'
+                      ?.validIdentification === undefined
+                      ? 'OnboardingHome'
+                      : 'GetLoan'
                   }`,
                 )
               }>

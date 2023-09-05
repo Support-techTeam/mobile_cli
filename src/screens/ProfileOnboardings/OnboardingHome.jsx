@@ -1,9 +1,16 @@
-import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView } from 'react-native';
-import React, { useState, useEffect } from 'react';
-import { useNavigation } from '@react-navigation/native';
-import { AntDesign } from '@expo/vector-icons';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  ScrollView,
+} from 'react-native';
+import React, {useState, useEffect} from 'react';
+import {useNavigation} from '@react-navigation/native';
+import AntDesign from 'react-native-vector-icons/AntDesign';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 
 import CustomView from '../../component/profileOnboardSelects/CustomView';
 import CustomView2 from '../../component/profileOnboardSelects/CustomView2';
@@ -20,14 +27,6 @@ const OnboardingHome = () => {
     getStartedStatus();
   }, []);
 
-  // useEffect(() => {
-  //   const getStartedIdStatus = async () => {
-  //     const startedId = await AsyncStorage.getItem('StatedID');
-  //     setStartedId(startedId);
-  //   };
-  //   getStartedIdStatus();
-  // }, []);
-
   const navigation = useNavigation();
 
   return (
@@ -40,27 +39,23 @@ const OnboardingHome = () => {
         paddingBottom: insets.bottom !== 0 ? insets.bottom / 2 : 'auto',
         paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
         paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
-      }}
-    >
+      }}>
       <ScrollView
         bounces={false}
         showsHorizontalScrollIndicator={false}
-        showsVerticalScrollIndicator={false}
-      >
+        showsVerticalScrollIndicator={false}>
         <View
           style={{
             flexDirection: 'row',
             justifyContent: 'space-between',
-          }}
-        >
+          }}>
           <TouchableOpacity onPress={() => navigation.goBack()}>
             <View
               style={{
                 borderWidth: 0.5,
                 borderColor: '#D9DBE9',
                 borderRadius: 5,
-              }}
-            >
+              }}>
               <AntDesign name="left" size={24} color="black" />
             </View>
           </TouchableOpacity>
@@ -71,50 +66,59 @@ const OnboardingHome = () => {
             <Text />
           </View>
         </View>
-        <View style={{ alignItems: 'center' }}>
+        <View style={{alignItems: 'center'}}>
           <Text style={styles.ProfileText}>Complete Your Profile</Text>
           <Text style={styles.PDT}>
-            The Securities and Exchange Commission requires that we collect and verify the details
-            below
+            The Securities and Exchange Commission requires that we collect and
+            verify the details below
           </Text>
         </View>
         {!hasStarted && (
           <View style={styles.selectView}>
-            <TouchableOpacity onPress={() => navigation.navigate('UpdatePersonalDetails')}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('UpdatePersonalDetails')}>
               <CustomView label="Personal Details" status="Pending" />
             </TouchableOpacity>
 
             <TouchableOpacity
               disabled={true}
-              onPress={() => navigation.navigate('BusinessDetails')}
-            >
+              onPress={() => navigation.navigate('BusinessDetails')}>
               <CustomView label="Business Details" status="Pending" />
             </TouchableOpacity>
 
-            <TouchableOpacity disabled={true} onPress={() => navigation.navigate('NextOfKin')}>
+            <TouchableOpacity
+              disabled={true}
+              onPress={() => navigation.navigate('NextOfKin')}>
               <CustomView label="Next Of Kin Details" status="Pending" />
             </TouchableOpacity>
 
-            <TouchableOpacity disabled={true} onPress={() => navigation.navigate('BankDetails')}>
+            <TouchableOpacity
+              disabled={true}
+              onPress={() => navigation.navigate('BankDetails')}>
               <CustomView label="Bank Details" status="Pending" />
             </TouchableOpacity>
 
-            <TouchableOpacity disabled={true} onPress={() => navigation.navigate('ValidIndentity')}>
+            <TouchableOpacity
+              disabled={true}
+              onPress={() => navigation.navigate('ValidIndentity')}>
               <CustomView label="Add Documents" status="Pending" />
             </TouchableOpacity>
 
-            <TouchableOpacity onPress={() => navigation.navigate('UpdatePersonalDetails')}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('UpdatePersonalDetails')}>
               <Buttons label={'Complete Profile'} />
             </TouchableOpacity>
           </View>
         )}
         {hasStarted === '1' && (
           <View style={styles.selectView}>
-            <TouchableOpacity onPress={() => navigation.navigate('UpdatePersonalDetails')}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('UpdatePersonalDetails')}>
               <CustomView2 label="Personal Details" status="Filled" />
             </TouchableOpacity>
 
-            <TouchableOpacity onPress={() => navigation.navigate('BusinessDetails')}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('BusinessDetails')}>
               <CustomView label="Business Details" status="Pending" />
             </TouchableOpacity>
 
@@ -130,18 +134,21 @@ const OnboardingHome = () => {
               <CustomView label="Add Documents" status="[0/7]Pending" />
             </TouchableOpacity>
 
-            <TouchableOpacity onPress={() => navigation.navigate('BusinessDetails')}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('BusinessDetails')}>
               <Buttons label={'Complete Profile'} />
             </TouchableOpacity>
           </View>
         )}
         {hasStarted === '2' && (
           <View style={styles.selectView}>
-            <TouchableOpacity onPress={() => navigation.navigate('UpdatePersonalDetails')}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('UpdatePersonalDetails')}>
               <CustomView2 label="Personal Details" status="Filled" />
             </TouchableOpacity>
 
-            <TouchableOpacity onPress={() => navigation.navigate('BusinessDetails')}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('BusinessDetails')}>
               <CustomView2 label="Business Details" status="Filled" />
             </TouchableOpacity>
 
@@ -164,11 +171,13 @@ const OnboardingHome = () => {
         )}
         {hasStarted === '3' && (
           <View style={styles.selectView}>
-            <TouchableOpacity onPress={() => navigation.navigate('UpdatePersonalDetails')}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('UpdatePersonalDetails')}>
               <CustomView2 label="Personal Details" status="Filled" />
             </TouchableOpacity>
 
-            <TouchableOpacity onPress={() => navigation.navigate('BusinessDetails')}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('BusinessDetails')}>
               <CustomView2 label="Business Details" status="Filled" />
             </TouchableOpacity>
 
@@ -176,7 +185,8 @@ const OnboardingHome = () => {
               <CustomView2 label="Next Of Kin Details" status="Filled" />
             </TouchableOpacity>
 
-            <TouchableOpacity onPress={() => navigation.navigate('BankDetails')}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('BankDetails')}>
               <CustomView label="Bank Details" status="Pending" />
             </TouchableOpacity>
 
@@ -184,18 +194,21 @@ const OnboardingHome = () => {
               <CustomView label="Add Documents" status="[0/7]Pending" />
             </TouchableOpacity>
 
-            <TouchableOpacity onPress={() => navigation.navigate('BankDetails')}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('BankDetails')}>
               <Buttons label={'Complete Profile'} />
             </TouchableOpacity>
           </View>
         )}
         {hasStarted === '4' && (
           <View style={styles.selectView}>
-            <TouchableOpacity onPress={() => navigation.navigate('UpdatePersonalDetails')}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('UpdatePersonalDetails')}>
               <CustomView2 label="Personal Details" status="Filled" />
             </TouchableOpacity>
 
-            <TouchableOpacity onPress={() => navigation.navigate('BusinessDetails')}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('BusinessDetails')}>
               <CustomView2 label="Business Details" status="Filled" />
             </TouchableOpacity>
 
@@ -203,15 +216,18 @@ const OnboardingHome = () => {
               <CustomView2 label="Next Of Kin Details" status="Filled" />
             </TouchableOpacity>
 
-            <TouchableOpacity onPress={() => navigation.navigate('BankDetails')}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('BankDetails')}>
               <CustomView2 label="Bank Details" status="Filled" />
             </TouchableOpacity>
 
-            <TouchableOpacity onPress={() => navigation.navigate('ValidIndentity')}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('ValidIndentity')}>
               <CustomView label="Add Documents" status="[0/7]Pending" />
             </TouchableOpacity>
 
-            <TouchableOpacity onPress={() => navigation.navigate('ValidIndentity')}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('ValidIndentity')}>
               <Buttons label={'Complete Profile'} />
             </TouchableOpacity>
           </View>

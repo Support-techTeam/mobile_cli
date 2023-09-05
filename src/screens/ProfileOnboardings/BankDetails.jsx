@@ -7,7 +7,7 @@ import {
 } from 'react-native';
 import React, {useContext, useEffect, useState} from 'react';
 import {Picker} from '@react-native-picker/picker';
-import {AntDesign} from '@expo/vector-icons';
+import AntDesign from 'react-native-vector-icons/AntDesign';
 import {useNavigation} from '@react-navigation/native';
 
 import CustomInput from '../../component/custominput/CustomInput';

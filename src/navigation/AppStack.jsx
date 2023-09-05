@@ -5,7 +5,6 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 //Screens
 import Verification from '../screens/Authentications/Verification';
 import PersonalDetails from '../screens/ProfileOnboardings/PersonalDetails';
-import OnboardingScreen from '../screens/Authentications/OnboardingScreen';
 import Splashscreen from './Splashscreen';
 import BottomTabs from './bottomTabs';
 import TransactionScreen from '../screens/HomeScreens/TransactionScreen';
@@ -16,8 +15,14 @@ import Success from '../screens/TransferScreens/Success';
 import LoanTransactions from '../screens/LoanScreens/LoanTransaction';
 import GuarantorDetails from '../screens/LoanScreens/GuarantorDetails';
 import {AddGuarantors, GetLoan} from '../screens/LoanScreens';
+import {
+  // BankDetails,
+  BusinessDetails,
+  // NextOfKin,
+  OnboardingHome,
+} from '../screens/ProfileOnboardings';
+import UpdatePersonalDetails from '../screens/ProfileOnboardings/UpdatePersonalDetails';
 //Pending
-// import UpdatePersonalDetails from '../screens/ProfileOnboardings/UpdatePersonalDetails';
 // import {
 //   BankStatement,
 //   CAC,
@@ -158,6 +163,13 @@ const AppStack = () => {
           <Stack.Screen name="GuarantorDetails" component={GuarantorDetails} />
           <Stack.Screen name="AddGuarantors" component={AddGuarantors} />
           <Stack.Screen name="GetLoan" component={GetLoan} />
+          {/* Profile Screens */}
+          <Stack.Screen name="OnboardingHome" component={OnboardingHome} />
+          <Stack.Screen
+            name="UpdatePersonalDetails"
+            component={UpdatePersonalDetails}
+          />
+          <Stack.Screen name="BusinessDetails" component={BusinessDetails} />
         </>
       )}
     </Stack.Navigator>

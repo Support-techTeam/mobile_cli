@@ -1,8 +1,8 @@
-import { View, Text, StyleSheet } from 'react-native';
+import {View, Text, StyleSheet} from 'react-native';
 import React from 'react';
-import { AntDesign } from '@expo/vector-icons';
+import AntDesign from 'react-native-vector-icons/AntDesign';
 
-const CustomView = ({ label, status, isAirtime }) => {
+const CustomView = ({label, status, isAirtime}) => {
   return (
     <View style={styles.container}>
       <View style={styles.rowView}>
@@ -24,7 +24,7 @@ const styles = StyleSheet.create({
   },
   rowView: {
     flexDirection: 'row',
-    backgroundColor: '#EFF0F7',
+    backgroundColor: '#EFF0F6',
     paddingVertical: 15,
     paddingHorizontal: 10,
     justifyContent: 'space-between',
@@ -32,7 +32,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   statusView: {
-    backgroundColor: '#FFF4B74033',
+    backgroundColor: '#FDF1D9',
     opacity: 1,
     paddingVertical: 8,
     paddingHorizontal: 16,

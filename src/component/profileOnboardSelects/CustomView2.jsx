@@ -1,8 +1,8 @@
-import { View, Text, StyleSheet } from 'react-native';
+import {View, Text, StyleSheet} from 'react-native';
 import React from 'react';
-import { AntDesign } from '@expo/vector-icons';
+import AntDesign from 'react-native-vector-icons/AntDesign';
 
-const CustomView2 = ({ label, status, isAirtime }) => {
+const CustomView2 = ({label, status, isAirtime}) => {
   return (
     <View style={styles.container}>
       <View style={styles.rowView}>

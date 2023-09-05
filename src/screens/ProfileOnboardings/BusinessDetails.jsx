@@ -5,37 +5,164 @@ import {
   ScrollView,
   TouchableOpacity,
   Pressable,
+  Platform,
+  Image,
+  ImageBackground,
+  Dimensions,
 } from 'react-native';
-import React, {useContext, useEffect, useState} from 'react';
-import {Picker} from '@react-native-picker/picker';
-import {AntDesign} from '@expo/vector-icons';
+import React, {useEffect, useState} from 'react';
+import AntDesign from 'react-native-vector-icons/AntDesign';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
-import {useNavigation} from '@react-navigation/native';
-import {observer} from 'mobx-react-lite';
+import {useNavigation, useRoute} from '@react-navigation/native';
 import Spinner from 'react-native-loading-spinner-overlay/lib';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
-import {toJS} from 'mobx';
-
 import CustomInput from '../../component/custominput/CustomInput';
+import Input from '../../component/inputField/input.component';
+import CustomDropdown from '../../component/dropDown/dropdown.component';
+import InputPhone from '../../component/inputField/phone-input.component';
 import Buttons from '../../component/buttons/Buttons';
-import {StoreContext} from '../../config/mobX stores/RootStore';
+import Toast from 'react-native-toast-message';
+import {useSelector} from 'react-redux';
+import {getCity, getState} from '../../stores/ProfileStore';
+import {
+  createBusinessDetails,
+  getLoanUserDetails,
+  updateBusinessDetails,
+} from '../../stores/LoanStore';
 
-const BusinessDetails = ({route}) => {
+const businessTypeData = [
+  {value: '', label: 'Select type'},
+  {value: 'Sole Proprietorship', label: 'Sole Proprietorship'},
+  {value: 'Private Limited Company', label: 'Private Limited Company'},
+  {value: 'Public Limited Company', label: 'Public Limited Company'},
+  {
+    value: 'Public Company Limited by Guarantee',
+    label: 'Public Company Limited by Guarantee',
+  },
+  {value: 'Private Unlimited Company', label: 'Private Unlimited Company'},
+  {value: 'Others', label: 'Others'},
+];
+
+const businessRegData = [
+  {value: '', label: 'Select Option'},
+  {value: true, label: 'Yes'},
+  {value: false, label: 'No'},
+];
+
+const stateData = [{value: '', label: 'Select State'}];
+
+const cityData = [
+  {value: '', label: 'Select LGA'},
+  {value: '', label: 'N/A'},
+];
+
+const ownedOrRentedData = [
+  {value: '', label: 'Select Option'},
+  {value: 'Owned', label: 'Owned'},
+  {value: 'Rented', label: 'Rented'},
+];
+
+const womanLedData = [
+  {value: '', label: 'Select Option'},
+  {value: false, label: 'Yes'},
+  {value: false, label: 'No'},
+];
+
+const sharComData = [
+  {value: '', label: 'Select Option'},
+  {value: false, label: 'Yes'},
+  {value: false, label: 'No'},
+];
+
+const salesMethodData = [
+  {value: '', label: 'Select Option'},
+  {
+    value: 'I sell online (Jumia, Konga etc)',
+    label: 'I sell online (Jumia, Konga etc)',
+  },
+  {value: 'I distribute FMCG Goods', label: 'I distribute FMCG Goods'},
+  {
+    value: 'I buy and sell Agro-Commodities',
+    label: 'I buy and sell Agro-Commodities',
+  },
+  {value: 'I have a physical shop', label: 'I have a physical shop'},
+  {value: 'Others', label: 'Others'},
+];
+
+const industryData = [
+  {value: '', label: 'Select Industry'},
+  {value: 'Agriculture', label: 'Agriculture'},
+  {value: 'Autos', label: 'Autos'},
+  {value: 'Agency Banking', label: 'Agency Banking'},
+  {value: 'Beauty products', label: 'Beauty products'},
+  {value: 'Consulting Services', label: 'Consulting Services'},
+  {value: 'Education', label: 'Education'},
+  {value: 'Electronics', label: 'Electronics'},
+  {value: 'Fashion', label: 'Fashion'},
+  {value: 'Food and Beverages', label: 'Food and Beverages'},
+  {value: 'Furniture and Fittings', label: 'Furniture and Fittings'},
+  {value: 'Health and Pharma Products', label: 'Health and Pharma Products'},
+  {value: 'Home Services', label: 'Home Services'},
+  {value: 'Industrial goods', label: 'Industrial goods'},
+  {value: 'Media and Entertainment', label: 'Media and Entertainment'},
+  {value: 'Office supplies', label: 'Office supplies'},
+  {value: 'Packaging and Plastics', label: 'Packaging and Plastics'},
+  {value: 'Personal Care', label: 'Personal Care'},
+  {value: 'Professional Services', label: 'Professional Services'},
+  {value: 'Technology Services', label: 'Technology Services'},
+  {value: 'Utility Services', label: 'Utility Services'},
+  {value: 'Others', label: 'Others'},
+];
+
+const monthlySalesData = [
+  {value: '', label: 'Select Option'},
+  {value: 'Less than 10 sales', label: 'Less than 10 sales'},
+  {value: '51 to 100 sales', label: '51 to 100 sales'},
+  {value: '100 to 500 sales', label: '100 to 500 sales'},
+  {value: 'Above 500 sales', label: 'Above 500 sales'},
+];
+
+const businessDurationData = [
+  {value: '', label: 'Select Option'},
+  {value: '0-1 years', label: '0-1 years'},
+  {value: '1-3 years', label: '1-3 years'},
+  {value: '3-5 years', label: '3-5 years'},
+  {value: '5-10 years', label: '5-10 years'},
+  {value: '10+ years', label: '10+ years'},
+];
+
+const monthlyExpData = [
+  {value: '', label: 'Select Option'},
+  {value: 'Less than ₦10,000', label: 'Less than ₦10,000'},
+  {value: '₦10,000 to ₦100,000', label: '₦10,000 to ₦100,000'},
+  {value: '₦100,000 to ₦500,000', label: '₦100,000 to ₦500,000'},
+  {value: '₦500,000 to ₦1,000,000', label: '₦500,000 to ₦1,000,000'},
+  {value: 'Above ₦1,000,000', label: 'Above ₦1,000,000'},
+  {value: 'Dr', label: 'Dr'},
+];
+
+const screenHeight = Dimensions.get('window').height;
+const screenWidth = Dimensions.get('window').width;
+
+const BusinessDetails = () => {
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const [show, setShow] = useState(false);
   const [showDate, setShowDate] = useState(false);
   const date = new Date(2000, 0, 1);
   const addressDate = new Date(2000, 0, 1);
+  const [orgDetails, setOrgDetails] = useState([]);
+  const [currentState, setCurrentState] = useState(undefined);
+  const [currentCity, setCurrentCity] = useState(undefined);
+  const [state, setState] = useState();
+  const [cityByState, setCitybyState] = useState([]);
+  const [city, setCity] = useState();
+  const [isLoading, setIsLoading] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
 
-  const {loansStore} = useContext(StoreContext);
-  const {success, sending, loanUserdetails, loading} = loansStore;
-
-  useEffect(() => {
-    loansStore.getLoanUserDetails();
-  }, [loansStore]);
-
-  const orgDetails = loanUserdetails?.organizationDetails;
+  const route = useRoute();
+  const curentRoute = route.name;
+  const previousRoute = navigation.getState()?.routes.slice(-2)[0]?.name;
 
   const [businessDetails, setBusinessDetails] = useState({
     businessType: '',
@@ -63,6 +190,30 @@ const BusinessDetails = ({route}) => {
     MAMERT: '',
     whenDidYouMoveToThisBusinessLocation: '',
   });
+
+  useEffect(() => {
+    if (route.name === 'BusinessDetails') {
+      const unsubscribe = navigation.addListener('focus', async () => {
+        unSubBusinessDetails();
+      });
+      return unsubscribe;
+    }
+  }, [navigation]);
+
+  useEffect(() => {
+    unSubBusinessDetails();
+  }, []);
+
+  const unSubBusinessDetails = async () => {
+    setIsLoading(true);
+    const res = await getLoanUserDetails();
+    if (res.error) {
+      // TODO: handle error
+    } else {
+      setOrgDetails(res?.data?.organizationDetails);
+    }
+    setIsLoading(false);
+  };
 
   useEffect(() => {
     setBusinessDetails({
@@ -155,7 +306,7 @@ const BusinessDetails = ({route}) => {
           ? ''
           : orgDetails?.whenDidYouMoveToThisBusinessLocation?.substr(0, 10),
     });
-  }, [orgDetails]);
+  }, [orgDetails, navigation]);
 
   const disableit =
     !businessDetails.businessType ||
@@ -168,28 +319,6 @@ const BusinessDetails = ({route}) => {
     !businessDetails.industry ||
     !businessDetails.monthlyExpenses ||
     !businessDetails.monthlySales;
-
-  const [state, setState] = useState([]);
-  const [cityByState, setCitybyState] = useState([]);
-  const [city, setCity] = useState([]);
-
-  useEffect(() => {
-    setState(toJS(loansStore.state));
-    setCity(toJS(loansStore.city));
-  }, [loansStore.state, loansStore.city]);
-
-  useEffect(() => {
-    if (businessDetails.state !== '') {
-      setCitybyState(state?.filter(statee => statee === businessDetails.state));
-    }
-  }, [businessDetails.state, state]);
-
-  const stateCity = cityByState[0];
-
-  useEffect(() => {
-    loansStore.getState();
-    loansStore.getCity(stateCity);
-  }, [loansStore, stateCity]);
 
   const showDatePicker = () => {
     setShow(true);
@@ -224,26 +353,156 @@ const BusinessDetails = ({route}) => {
     setShowDate(false);
   };
 
-  const handleCreateBusinessDetails = () => {
-    loansStore.createBusinessDetails(businessDetails);
+  const handleCreateBusinessDetails = async () => {
+    setIsUpdating(true);
+    const res = await createBusinessDetails(businessDetails);
+    console.log('businessDetails', businessDetails);
+    console.log(res);
+    if (res.error) {
+      Toast.show({
+        type: 'error',
+        position: 'top',
+        topOffset: 50,
+        text1: res.title,
+        text2: res.message,
+        visibilityTime: 5000,
+        autoHide: true,
+        onPress: () => Toast.hide(),
+      });
+    } else {
+      Toast.show({
+        type: 'success',
+        position: 'top',
+        topOffset: 50,
+        text1: res.title,
+        text2: res.message,
+        visibilityTime: 3000,
+        autoHide: true,
+        onPress: () => Toast.hide(),
+      });
+      setTimeout(() => {
+        if (previousRoute !== 'myAccount') {
+          navigation.navigate('NextOfKin');
+        } else {
+          navigation.navigate('MyAccount');
+          loansStore.getLoanUserDetails();
+        }
+      }, 2000);
+    }
+    setIsUpdating(false);
   };
 
-  const handleUpdateBusinessDetails = () => {
-    loansStore.updateBusinessDetails(businessDetails);
+  const handleUpdateBusinessDetails = async () => {
+    setIsUpdating(true);
+    const res = await updateBusinessDetails(businessDetails);
+    console.log('Update businessDetails', businessDetails);
+    console.log(res);
+    if (res.error) {
+      Toast.show({
+        type: 'error',
+        position: 'top',
+        topOffset: 50,
+        text1: res.title,
+        text2: res.message,
+        visibilityTime: 5000,
+        autoHide: true,
+        onPress: () => Toast.hide(),
+      });
+    } else {
+      Toast.show({
+        type: 'success',
+        position: 'top',
+        topOffset: 50,
+        text1: res.title,
+        text2: res.message,
+        visibilityTime: 3000,
+        autoHide: true,
+        onPress: () => Toast.hide(),
+      });
+      setTimeout(() => {
+        if (previousRoute !== 'myAccount') {
+          navigation.navigate('NextOfKin');
+        } else {
+          navigation.navigate('MyAccount');
+          loansStore.getLoanUserDetails();
+        }
+      }, 2000);
+    }
+    setIsUpdating(false);
   };
-
-  const prevRoutes = route?.params?.paramKey;
 
   useEffect(() => {
-    if (success === 'business successful') {
-      if (prevRoutes !== 'myAccount') {
-        navigation.navigate('NextOfKin');
-      } else {
-        navigation.navigate('MyAccount');
-        loansStore.getLoanUserDetails();
+    const fetchState = async () => {
+      try {
+        const res = await getState();
+        if (res.data !== undefined) {
+          setState(res.data);
+        }
+      } catch (error) {
+        console.error(error);
       }
+    };
+
+    fetchState();
+    return () => {
+      fetchState();
+    };
+  }, []);
+
+  useEffect(() => {
+    const stateData =
+      state &&
+      state.map((item, index) => {
+        return {value: item, label: item, key: index};
+      });
+
+    if (currentState == undefined || currentState == '') {
+      setCurrentState(stateData);
     }
-  }, [loansStore, navigation, prevRoutes, success]);
+  }, [state]);
+
+  useEffect(() => {
+    if (businessDetails?.state !== '' && state !== undefined) {
+      setCitybyState(state?.filter(statee => statee === businessDetails.state));
+    }
+  }, [state, businessDetails.state]);
+
+  const stateCity = cityByState[0];
+
+  useEffect(() => {
+    const fetchCity = async () => {
+      try {
+        const res = await getCity(stateCity);
+        if (res.data !== undefined) {
+          setCity(res.data);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchCity();
+    return () => {
+      fetchCity();
+    };
+  }, [stateCity]);
+
+  useEffect(() => {
+    const cityData =
+      city &&
+      city.map((item, index) => {
+        return {value: item, label: item, key: index};
+      });
+
+    setCurrentCity(cityData);
+  }, [city]);
+
+  useEffect(() => {
+    setIsLoading(true);
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 2000);
+  }, []);
 
   return (
     <SafeAreaView
@@ -255,17 +514,17 @@ const BusinessDetails = ({route}) => {
         paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
         paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
       }}>
-      {sending && (
+      {isLoading && (
         <Spinner
-          textContent={'Please wait...'}
+          textContent={'Loading...'}
           textStyle={{color: 'white'}}
           visible={true}
           overlayColor="rgba(78, 75, 102, 0.7)"
         />
       )}
-      {loading && (
+      {isUpdating && (
         <Spinner
-          textContent={'Loading...'}
+          textContent={'Please wait...'}
           textStyle={{color: 'white'}}
           visible={true}
           overlayColor="rgba(78, 75, 102, 0.7)"
@@ -288,657 +547,512 @@ const BusinessDetails = ({route}) => {
             <AntDesign name="left" size={24} color="black" />
           </View>
         </TouchableOpacity>
-        <View>
-          <View>
-            <Text style={styles.TextHead}>BUSINESS DETAILS</Text>
+        <View style={[styles.HeadView, {justifyContent: 'center', flex: 1}]}>
+          <View style={styles.TopView}>
+            <Text style={[styles.TextHead, {marginBottom: 5}]}>
+              BUSINESS DETAILS
+            </Text>
           </View>
-        </View>
-        <View>
-          <Text> </Text>
+
+          <View>
+            <Image source={require('../../../assets/images/indicator2.png')} />
+          </View>
         </View>
       </View>
-      <View style={styles.demark} />
-      <ScrollView
-        bounces={false}
-        showsHorizontalScrollIndicator={false}
-        showsVerticalScrollIndicator={false}
-        style={[styles.innercontainer]}>
-        <View style={styles.form}>
-          <Text style={styles.header}>
-            Trade Lenda requires this information to give you a better
-            experience
-          </Text>
-        </View>
-
-        <View>
-          <View style={{marginVertical: 10}}>
-            <View style={{flexDirection: 'row'}}>
-              <Text
-                style={{
-                  paddingBottom: 4,
-                  fontWeight: '400',
-                  fontSize: 16,
-                  lineHeight: 24,
-                  color: '#14142B',
-                  fontFamily: 'Montserat',
-                }}>
-                Type of business
-              </Text>
-              <Text style={{color: 'red', marginRight: 10}}>*</Text>
-            </View>
-
-            <View style={styles.pick}>
-              <Picker
-                selectedValue={businessDetails?.businessType}
-                onValueChange={text =>
-                  setBusinessDetails({...businessDetails, businessType: text})
-                }>
-                <Picker.Item label="Select type" value="" />
-                <Picker.Item
-                  label="Sole Proprietorship"
-                  value="Sole Proprietorship"
-                />
-                <Picker.Item
-                  label="Private Limited Company"
-                  value="Private Limited Company"
-                />
-                <Picker.Item
-                  label="Public Limited Company"
-                  value="Public Limited Company"
-                />
-                <Picker.Item
-                  label="Public Company Limited by Guarantee"
-                  value="Public Company Limited by Guarantee"
-                />
-                <Picker.Item
-                  label="Private Unlimited Company"
-                  value="Private Unlimited Company"
-                />
-                <Picker.Item label="Others" value="Others" />
-              </Picker>
-            </View>
-          </View>
-
-          <CustomInput
-            label="Name of business"
-            defaultValue={businessDetails?.businessName}
-            onChangeText={text =>
-              setBusinessDetails({...businessDetails, businessName: text})
-            }
-            isNeeded={true}
-          />
-
-          <View style={{marginVertical: 10}}>
-            <Text
-              style={{
-                paddingBottom: 4,
-                fontWeight: '400',
-                fontSize: 16,
-                lineHeight: 24,
-                color: '#14142B',
-                fontFamily: 'Montserat',
-              }}>
-              Is your business registered?
-            </Text>
-            <View style={styles.pick}>
-              <Picker
-                selectedValue={businessDetails?.registered}
-                onValueChange={text =>
-                  setBusinessDetails({...businessDetails, registered: text})
-                }>
-                <Picker.Item label="Select status" value={false} />
-                <Picker.Item label="Yes" value={true} />
-                <Picker.Item label="No" value={false} />
-              </Picker>
-            </View>
-          </View>
-
-          <CustomInput
-            label="Position in the company"
-            defaultValue={businessDetails?.positionInOrg}
-            onChangeText={text =>
-              setBusinessDetails({...businessDetails, positionInOrg: text})
-            }
-            isNeeded={true}
-          />
-          <CustomInput
-            label="Shares in the company"
-            defaultValue={businessDetails?.shareInOrg}
-            onChangeText={text =>
-              setBusinessDetails({...businessDetails, shareInOrg: text})
-            }
-          />
-
-          <Pressable onPress={showDatePicker}>
-            <CustomInput
-              label="Date of establishment"
-              placeholder="2000 - 01 - 01"
-              defaultValue={
-                businessDetails.establishmentDate
-                  ? businessDetails.establishmentDate?.substr(0, 10)
-                  : ''
-              }
-              isDate={true}
-              editable={false}
-              showDatePicker={showDatePicker}
-              onChangeValue={text =>
-                setBusinessDetails({
-                  ...businessDetails,
-                  establishmentDate: text,
-                })
-              }
-              isNeeded={true}
-            />
-          </Pressable>
-
-          <DateTimePickerModal
-            isVisible={show}
-            testID="dateTimePicker"
-            defaultValue={businessDetails?.establishmentDate}
-            mode="date"
-            is24Hour={true}
-            onConfirm={handleConfirm}
-            onCancel={hideDatePicker}
-            textColor="#054B99"
-          />
-
-          <CustomInput
-            label="RC/BN Number"
-            defaultValue={businessDetails?.rcNum}
-            onChangeText={text =>
-              setBusinessDetails({...businessDetails, rcNum: text})
-            }
-            keyboardType="numeric"
-          />
-
-          <CustomInput
-            label="Business address"
-            defaultValue={businessDetails?.businessAddress}
-            onChangeText={text =>
-              setBusinessDetails({...businessDetails, businessAddress: text})
-            }
-            isNeeded={true}
-          />
-
-          <Pressable onPress={showAddressDatePicker}>
-            <CustomInput
-              label="When did you move to this address?"
-              placeholder="2000 - 01 - 01"
-              defaultValue={
-                businessDetails.whenDidYouMoveToThisBusinessLocation
-                  ? businessDetails.whenDidYouMoveToThisBusinessLocation?.substr(
-                      0,
-                      10,
-                    )
-                  : ''
-              }
-              isDate={true}
-              editable={false}
-              showDatePicker={showAddressDatePicker}
-              onChangeValue={text =>
-                setBusinessDetails({
-                  ...businessDetails,
-                  whenDidYouMoveToThisBusinessLocation: text,
-                })
-              }
-              isNeeded={true}
-            />
-          </Pressable>
-
-          <DateTimePickerModal
-            isVisible={showDate}
-            testID="dateTimePicker"
-            defaultValue={businessDetails?.whenDidYouMoveToThisBusinessLocation}
-            mode="date"
-            is24Hour={true}
-            onConfirm={handleConfirmAddressDate}
-            onCancel={hideAddressDatePicker}
-            textColor="#054B99"
-          />
-
-          <CustomInput
-            label="Country"
-            defaultValue={businessDetails?.country}
-            onChangeText={text =>
-              setBusinessDetails({...businessDetails, country: text})
-            }
-          />
-
-          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-            <View style={{marginVertical: 10, paddingRight: 5, width: '50%'}}>
-              <View style={{flexDirection: 'row'}}>
-                <Text
-                  style={{
-                    paddingBottom: 4,
-                    fontWeight: '400',
-                    fontSize: 16,
-                    lineHeight: 24,
-                    color: '#14142B',
-                    fontFamily: 'Montserat',
-                  }}>
-                  State
-                </Text>
-                <Text style={{color: 'red', marginRight: 10}}>*</Text>
-              </View>
-
-              <View style={styles.pick}>
-                <Picker
-                  selectedValue={businessDetails?.state}
-                  onValueChange={text =>
-                    setBusinessDetails({...businessDetails, state: text})
-                  }>
-                  <Picker.Item label="Select state" value="" />
-
-                  {state?.map((stateee, i) => (
-                    <Picker.Item label={stateee} value={stateee} key={i} />
-                  ))}
-                </Picker>
-              </View>
-            </View>
-            <View style={{marginVertical: 10, paddingLeft: 5, width: '50%'}}>
-              <Text
-                style={{
-                  paddingBottom: 4,
-                  fontWeight: '400',
-                  fontSize: 16,
-                  lineHeight: 24,
-                  color: '#14142B',
-                  fontFamily: 'Montserat',
-                }}>
-                LGA
-              </Text>
-              <View style={styles.pick}>
-                {city && (
-                  <Picker
-                    selectedValue={businessDetails?.city}
-                    onValueChange={text =>
-                      setBusinessDetails({...businessDetails, city: text})
-                    }>
-                    {city.map((lg, i) => (
-                      <Picker.Item label={lg} value={lg} key={i} />
-                    ))}
-                  </Picker>
-                )}
-              </View>
-            </View>
-          </View>
-
-          <View style={{marginVertical: 10}}>
-            <Text
-              style={{
-                paddingBottom: 4,
-                fontWeight: '400',
-                fontSize: 16,
-                lineHeight: 24,
-                color: '#14142B',
-                fontFamily: 'Montserat',
-              }}>
-              Is your business location owned or rented
-            </Text>
-            <View style={styles.pick}>
-              <Picker
-                selectedValue={businessDetails?.ownedOrRented}
-                onValueChange={text =>
-                  setBusinessDetails({...businessDetails, ownedOrRented: text})
-                }>
-                <Picker.Item label="Select option" value="" />
-                <Picker.Item label="Owned" value="Owned" />
-                <Picker.Item label="Rented" value="Rented" />
-              </Picker>
-            </View>
-          </View>
-
-          <CustomInput
-            label="Number of employees"
-            defaultValue={businessDetails?.totalEmployees?.toString()}
-            onChangeText={text =>
-              setBusinessDetails({
-                ...businessDetails,
-                totalEmployees: parseInt(text, 10),
-              })
-            }
-            keyboardType="numeric"
-            isNeeded={true}
-          />
-
-          <View style={{marginVertical: 10}}>
-            <Text
-              style={{
-                paddingBottom: 4,
-                fontWeight: '400',
-                fontSize: 16,
-                lineHeight: 24,
-                color: '#14142B',
-                fontFamily: 'Montserat',
-              }}>
-              Is your business women led?
-            </Text>
-            <View style={styles.pick}>
-              <Picker
-                selectedValue={businessDetails?.womenLed}
-                onValueChange={text =>
-                  setBusinessDetails({...businessDetails, womenLed: text})
-                }>
-                <Picker.Item label="Select option" value={false} />
-                <Picker.Item label="Yes" value={true} />
-                <Picker.Item label="No" value={false} />
-              </Picker>
-            </View>
-          </View>
-
-          <View style={{marginVertical: 10}}>
-            <Text
-              style={{
-                paddingBottom: 4,
-                fontWeight: '400',
-                fontSize: 16,
-                lineHeight: 24,
-                color: '#14142B',
-                fontFamily: 'Montserat',
-              }}>
-              Is your business sharia compliant?
-            </Text>
-            <View style={styles.pick}>
-              <Picker
-                selectedValue={businessDetails?.shariaCom}
-                onValueChange={text =>
-                  setBusinessDetails({...businessDetails, shariaCom: text})
-                }>
-                <Picker.Item label="Select option" value={false} />
-                <Picker.Item label="Yes" value={true} />
-                <Picker.Item label="No" value={false} />
-              </Picker>
-            </View>
-          </View>
-
-          <CustomInput
-            label="Number of outlets"
-            defaultValue={businessDetails?.NoOfOutlets?.toString()}
-            onChangeText={text =>
-              setBusinessDetails({
-                ...businessDetails,
-                NoOfOutlets: parseInt(text, 10),
-              })
-            }
-            keyboardType="numeric"
-          />
-
-          <View style={{marginVertical: 10}}>
-            <Text
-              style={{
-                paddingBottom: 4,
-                fontWeight: '400',
-                fontSize: 16,
-                lineHeight: 24,
-                color: '#14142B',
-                fontFamily: 'Montserat',
-              }}>
-              How do you sell
-            </Text>
-            <View style={styles.pick}>
-              <Picker
-                selectedValue={businessDetails?.salesMethod}
-                onValueChange={text =>
-                  setBusinessDetails({...businessDetails, salesMethod: text})
-                }>
-                <Picker.Item label="Select option" value="" />
-                <Picker.Item
-                  label="I sell online (Jumia, Konga etc)"
-                  value="I sell online (Jumia, Konga etc)"
-                />
-                <Picker.Item
-                  label="I distribute FMCG Goods"
-                  value="I distribute FMCG Goods"
-                />
-                <Picker.Item
-                  label="I buy and sell Agro-Commodities"
-                  value="I buy and sell Agro-Commodities"
-                />
-                <Picker.Item
-                  label="I have a physical shop"
-                  value="I have a physical shop"
-                />
-                <Picker.Item label="Others" value="Others" />
-              </Picker>
-            </View>
-          </View>
-
-          <View style={{marginVertical: 10}}>
-            <View style={{flexDirection: 'row'}}>
-              <Text
-                style={{
-                  paddingBottom: 4,
-                  fontWeight: '400',
-                  fontSize: 16,
-                  lineHeight: 24,
-                  color: '#14142B',
-                  fontFamily: 'Montserat',
-                }}>
-                Industry
-              </Text>
-              <Text style={{color: 'red', marginRight: 10}}>*</Text>
-            </View>
-
-            <View style={styles.pick}>
-              <Picker
-                selectedValue={businessDetails?.industry}
-                onValueChange={text =>
-                  setBusinessDetails({...businessDetails, industry: text})
-                }>
-                <Picker.Item label="Select Industry" value="" />
-                <Picker.Item label="Agriculture" value="Agriculture" />
-                <Picker.Item label="Autos" value="Autos" />
-                <Picker.Item label="Agency Banking" value="Agency Banking" />
-                <Picker.Item label="Beauty products" value="Beauty products" />
-                <Picker.Item
-                  label="Consulting Services"
-                  value="Consulting Services"
-                />
-                <Picker.Item label="Education" value="Education" />
-                <Picker.Item label="Electronics" value="Electronics" />
-                <Picker.Item label="Fashion" value="Fashion" />
-                <Picker.Item
-                  label="Food and Beverages"
-                  value="Food and Beverages"
-                />
-                <Picker.Item
-                  label="Furniture and Fittings"
-                  value="Furniture and Fittings"
-                />
-                <Picker.Item
-                  label="Health and Pharma Products"
-                  value="Health and Pharma Products"
-                />
-                <Picker.Item label="Home Services" value="Home Services" />
-                <Picker.Item
-                  label="Industrial goods"
-                  value="Industrial goods"
-                />
-                <Picker.Item
-                  label="Media and Entertainment"
-                  value="Media and Entertainment"
-                />
-                <Picker.Item label="Office supplies" value="Office supplies" />
-                <Picker.Item
-                  label="Packaging and Plastics"
-                  value="Packaging and Plastics"
-                />
-                <Picker.Item label="Personal Care" value="Personal Care" />
-                <Picker.Item
-                  label="Professional Services"
-                  value="Professional Services"
-                />
-                <Picker.Item
-                  label="Technology Services"
-                  value="Technology Services"
-                />
-                <Picker.Item
-                  label="Utility Services"
-                  value="Utility Services"
-                />
-                <Picker.Item label="Others" value="Others" />
-              </Picker>
-            </View>
-          </View>
-
-          <View style={{marginVertical: 10}}>
-            <View style={{flexDirection: 'row'}}>
-              <Text
-                style={{
-                  paddingBottom: 4,
-                  fontWeight: '400',
-                  fontSize: 16,
-                  lineHeight: 24,
-                  color: '#14142B',
-                  fontFamily: 'Montserat',
-                }}>
-                Average monthly sales
-              </Text>
-              <Text style={{color: 'red', marginRight: 10}}>*</Text>
-            </View>
-
-            <View style={styles.pick}>
-              <Picker
-                selectedValue={businessDetails?.monthlySales}
-                onValueChange={text =>
-                  setBusinessDetails({...businessDetails, monthlySales: text})
-                }>
-                <Picker.Item label="Select option" value="" />
-                <Picker.Item
-                  label="Less than 10 sales"
-                  value="Less than 10 sales"
-                />
-                <Picker.Item label="11 to 50 sales" value="11 to 50 sales" />
-                <Picker.Item label="51 to 100 sales" value="51 to 100 sales" />
-                <Picker.Item
-                  label="100 to 500 sales"
-                  value="100 to 500 sales"
-                />
-                <Picker.Item label="Above 500 sales" value="Above 500 sales" />
-              </Picker>
-            </View>
-          </View>
-
-          <View style={{marginVertical: 10}}>
-            <View style={{flexDirection: 'row'}}>
-              <Text
-                style={{
-                  paddingBottom: 4,
-                  fontWeight: '400',
-                  fontSize: 16,
-                  lineHeight: 24,
-                  color: '#14142B',
-                  fontFamily: 'Montserat',
-                }}>
-                Average monthly expenses
-              </Text>
-              <Text style={{color: 'red', marginRight: 10}}>*</Text>
-            </View>
-            <View style={styles.pick}>
-              <Picker
-                selectedValue={businessDetails?.monthlyExpenses}
-                onValueChange={text =>
+      <View style={[styles.form, {marginBottom: 10, justifyContent: 'center'}]}>
+        <Text style={styles.header}>
+          Trade Lenda requires this information to give you a better experience
+        </Text>
+      </View>
+      {/* <View style={styles.demark} /> */}
+      <ImageBackground
+        source={require('../../../assets/signup.png')}
+        resizeMode="stretch"
+        style={styles.image}>
+        <ScrollView
+          bounces={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+          // style={[styles.innercontainer]}
+          style={{
+            paddingHorizontal: 10,
+            marginBottom: insets.top + 60,
+          }}>
+          <View
+            style={{
+              paddingTop: 25,
+              backgroundColor: '#FFFFFF',
+              borderRadius: 15,
+              paddingHorizontal: 15,
+              paddingVertical: 15,
+              opacity: 0.86,
+              borderColor: '#D9DBE9',
+              borderWidth: 2,
+            }}>
+            <View style={{marginVertical: 10}}>
+              <CustomDropdown
+                label="Type of business"
+                isNeeded={true}
+                placeholder="Select type"
+                placeholderStyle={styles.placeholderStyle}
+                selectedTextStyle={styles.selectedTextStyle}
+                data={businessTypeData}
+                maxHeight={300}
+                labelField="label"
+                valueField="value"
+                value={businessDetails.businessType}
+                onChange={option => {
                   setBusinessDetails({
                     ...businessDetails,
-                    monthlyExpenses: text,
-                  })
-                }>
-                <Picker.Item label="Select option" value="" />
-                <Picker.Item
-                  label="Less than ₦10,000"
-                  value="Less than ₦10,000"
-                />
-                <Picker.Item
-                  label="₦10,000 to ₦100,000"
-                  value="₦10,000 to ₦100,000"
-                />
-                <Picker.Item
-                  label="₦100,000 to ₦500,000"
-                  value="₦100,000 to ₦500,000"
-                />
-                <Picker.Item
-                  label="₦500,000 to ₦1,000,000"
-                  value="₦500,000 to ₦1,000,000"
-                />
-                <Picker.Item
-                  label="Above ₦1,000,000"
-                  value="Above ₦1,000,000"
-                />
-              </Picker>
+                    businessType: option.value,
+                  });
+                }}
+              />
             </View>
-          </View>
 
-          <View style={{marginVertical: 10}}>
-            <Text
-              style={{
-                paddingBottom: 4,
-                fontWeight: '400',
-                fontSize: 16,
-                lineHeight: 24,
-                color: '#14142B',
-                fontFamily: 'Montserat',
-              }}>
-              How long have you been in business?
-            </Text>
-            <View style={styles.pick}>
-              <Picker
-                selectedValue={businessDetails?.businessDuration}
-                onValueChange={text =>
+            <Input
+              iconName="domain"
+              label="Name of business"
+              placeholder="Enter name of business"
+              isNeeded={true}
+              defaultValue={businessDetails?.businessName}
+              onChangeText={text =>
+                setBusinessDetails({
+                  ...businessDetails,
+                  businessName: text.trim(),
+                })
+              }
+            />
+
+            <View style={{marginVertical: 10}}>
+              <CustomDropdown
+                label="Is your business registered?"
+                isNeeded={true}
+                placeholder="Select status"
+                placeholderStyle={styles.placeholderStyle}
+                selectedTextStyle={styles.selectedTextStyle}
+                data={businessRegData}
+                maxHeight={300}
+                labelField="label"
+                valueField="value"
+                value={businessDetails.registered}
+                onChange={option => {
                   setBusinessDetails({
                     ...businessDetails,
-                    businessDuration: text,
+                    registered: option.value,
+                  });
+                }}
+              />
+            </View>
+
+            <Input
+              label="Position in the company"
+              placeholder="Enter your position"
+              isNeeded={true}
+              defaultValue={businessDetails?.positionInOrg}
+              onChangeText={text =>
+                setBusinessDetails({...businessDetails, positionInOrg: text})
+              }
+            />
+
+            <Input
+              label="Shares in the company"
+              placeholder="Enter your shares percentage"
+              defaultValue={businessDetails?.shareInOrg}
+              onChangeText={text =>
+                setBusinessDetails({...businessDetails, shareInOrg: text})
+              }
+            />
+
+            <Pressable onPress={showDatePicker}>
+              <Input
+                label="Date of establishment"
+                placeholder="2000 - 01 - 01"
+                iconName="calendar-month-outline"
+                defaultValue={
+                  businessDetails.establishmentDate
+                    ? businessDetails.establishmentDate?.substr(0, 10)
+                    : ''
+                }
+                isDate={true}
+                editable={false}
+                showDatePicker={showDatePicker}
+                onChangeValue={text =>
+                  setBusinessDetails({
+                    ...businessDetails,
+                    establishmentDate: text,
                   })
-                }>
-                <Picker.Item label="Select option" value="" />
-                <Picker.Item label="0-1 years" value="0-1 years" />
-                <Picker.Item label="1-3 years" value="1-3 years" />
-                <Picker.Item label="3-5 years" value="3-5 years" />
-                <Picker.Item label="5-10 years" value="5-10 years" />
-                <Picker.Item label="10+ years" value="10+ years" />
-              </Picker>
+                }
+                isNeeded={true}
+              />
+            </Pressable>
+
+            <DateTimePickerModal
+              isVisible={show}
+              testID="dateTimePicker"
+              defaultValue={businessDetails?.establishmentDate}
+              mode="date"
+              is24Hour={true}
+              onConfirm={handleConfirm}
+              onCancel={hideDatePicker}
+              textColor="#054B99"
+            />
+
+            <Input
+              label="RC/BN Number"
+              placeholder="Enter RC/BN number"
+              defaultValue={businessDetails?.rcNum}
+              onChangeText={text =>
+                setBusinessDetails({...businessDetails, rcNum: text})
+              }
+              keyboardType="numeric"
+            />
+
+            <Input
+              label="Business address"
+              placeholder="Enter business address"
+              isNeeded={true}
+              defaultValue={businessDetails?.businessAddress}
+              iconName="home-outline"
+              onChangeText={text =>
+                setBusinessDetails({...businessDetails, businessAddress: text})
+              }
+            />
+
+            <Pressable onPress={showAddressDatePicker}>
+              <Input
+                label="When did you move to this address?"
+                placeholder="2000 - 01 - 01"
+                defaultValue={
+                  businessDetails.whenDidYouMoveToThisBusinessLocation
+                    ? businessDetails.whenDidYouMoveToThisBusinessLocation?.substr(
+                        0,
+                        10,
+                      )
+                    : ''
+                }
+                iconName="calendar-month-outline"
+                isDate={true}
+                editable={false}
+                showDatePicker={showAddressDatePicker}
+                onChangeValue={text =>
+                  setBusinessDetails({
+                    ...businessDetails,
+                    whenDidYouMoveToThisBusinessLocation: text,
+                  })
+                }
+                isNeeded={true}
+              />
+            </Pressable>
+
+            <DateTimePickerModal
+              isVisible={showDate}
+              testID="dateTimePicker"
+              defaultValue={
+                businessDetails?.whenDidYouMoveToThisBusinessLocation
+              }
+              mode="date"
+              is24Hour={true}
+              onConfirm={handleConfirmAddressDate}
+              onCancel={hideAddressDatePicker}
+              textColor="#054B99"
+            />
+
+            <Input
+              label="Country"
+              placeholder="Enter country"
+              iconName="flag-outline"
+              isNeeded={true}
+              defaultValue={businessDetails?.country}
+              onChangeText={text =>
+                setBusinessDetails({...businessDetails, country: text})
+              }
+            />
+
+            <View
+              style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+              <View style={{marginVertical: 10, paddingRight: 5, width: '50%'}}>
+                <CustomDropdown
+                  label="State"
+                  isNeeded={true}
+                  placeholder="Select State"
+                  placeholderStyle={styles.placeholderStyle}
+                  selectedTextStyle={styles.selectedTextStyle}
+                  data={currentState ? currentState : stateData}
+                  // data={stateData}
+                  maxHeight={300}
+                  labelField="label"
+                  valueField="value"
+                  value={businessDetails.state}
+                  onChange={option => {
+                    setBusinessDetails({
+                      ...businessDetails,
+                      state: option.value,
+                    });
+                  }}
+                />
+              </View>
+              <View style={{marginVertical: 10, paddingLeft: 5, width: '50%'}}>
+                <CustomDropdown
+                  label="City"
+                  isNeeded={true}
+                  placeholder="Select LGA"
+                  placeholderStyle={styles.placeholderStyle}
+                  selectedTextStyle={styles.selectedTextStyle}
+                  data={currentCity ? currentCity : cityData}
+                  // data={cityData}
+                  maxHeight={300}
+                  labelField="label"
+                  valueField="value"
+                  value={businessDetails.city}
+                  onChange={option => {
+                    setBusinessDetails({
+                      ...businessDetails,
+                      city: option.value,
+                    });
+                  }}
+                />
+              </View>
             </View>
+
+            <View style={{marginVertical: 10}}>
+              <CustomDropdown
+                label="Is your business location owned or rented"
+                isNeeded={true}
+                placeholderStyle={styles.placeholderStyle}
+                selectedTextStyle={styles.selectedTextStyle}
+                data={ownedOrRentedData}
+                maxHeight={300}
+                labelField="label"
+                valueField="value"
+                value={businessDetails.residentialStatus}
+                onChange={option => {
+                  setBusinessDetails({
+                    ...businessDetails,
+                    ownedOrRented: option.value,
+                  });
+                }}
+              />
+            </View>
+
+            <Input
+              label="Number of employees"
+              placeholder="Enter number of employees"
+              iconName="account-group-outline"
+              isNeeded={true}
+              keyboardType="numeric"
+              defaultValue={businessDetails?.totalEmployees?.toString()}
+              onChangeText={text =>
+                setBusinessDetails({
+                  ...businessDetails,
+                  totalEmployees: Number(text),
+                })
+              }
+            />
+
+            <View style={{marginVertical: 10}}>
+              <CustomDropdown
+                label="Is your business women led?"
+                isNeeded={true}
+                placeholderStyle={styles.placeholderStyle}
+                selectedTextStyle={styles.selectedTextStyle}
+                data={womanLedData}
+                maxHeight={300}
+                labelField="label"
+                valueField="value"
+                value={businessDetails.womenLed}
+                onChange={option => {
+                  setBusinessDetails({
+                    ...businessDetails,
+                    womenLed: option.value,
+                  });
+                }}
+              />
+            </View>
+
+            <View style={{marginVertical: 10}}>
+              <CustomDropdown
+                label="Is your business sharia compliant?"
+                isNeeded={true}
+                placeholderStyle={styles.placeholderStyle}
+                selectedTextStyle={styles.selectedTextStyle}
+                data={sharComData}
+                maxHeight={300}
+                labelField="label"
+                valueField="value"
+                value={businessDetails.shariaCom}
+                onChange={option => {
+                  setBusinessDetails({
+                    ...businessDetails,
+                    shariaCom: option.value,
+                  });
+                }}
+              />
+            </View>
+            <Input
+              label="Number of outlets"
+              placeholder="Enter number of outlets"
+              isNeeded={true}
+              keyboardType="numeric"
+              defaultValue={businessDetails?.NoOfOutlets?.toString()}
+              onChangeText={text =>
+                setBusinessDetails({
+                  ...businessDetails,
+                  NoOfOutlets: Number(text),
+                })
+              }
+            />
+
+            <View style={{marginVertical: 10}}>
+              <CustomDropdown
+                label="How do you sell"
+                isNeeded={true}
+                placeholderStyle={styles.placeholderStyle}
+                selectedTextStyle={styles.selectedTextStyle}
+                data={salesMethodData}
+                maxHeight={300}
+                labelField="label"
+                valueField="value"
+                value={businessDetails.salesMethod}
+                onChange={option => {
+                  setBusinessDetails({
+                    ...businessDetails,
+                    salesMethod: option.value,
+                  });
+                }}
+              />
+            </View>
+
+            <View style={{marginVertical: 10}}>
+              <CustomDropdown
+                label="Industry"
+                isNeeded={true}
+                placeholderStyle={styles.placeholderStyle}
+                selectedTextStyle={styles.selectedTextStyle}
+                data={industryData}
+                maxHeight={300}
+                labelField="label"
+                valueField="value"
+                value={businessDetails.industry}
+                onChange={option => {
+                  setBusinessDetails({
+                    ...businessDetails,
+                    industry: option.value,
+                  });
+                }}
+              />
+            </View>
+
+            <View style={{marginVertical: 10}}>
+              <CustomDropdown
+                label="Average monthly sales"
+                isNeeded={true}
+                placeholderStyle={styles.placeholderStyle}
+                selectedTextStyle={styles.selectedTextStyle}
+                data={monthlySalesData}
+                maxHeight={300}
+                labelField="label"
+                valueField="value"
+                value={businessDetails.monthlySales}
+                onChange={option => {
+                  setBusinessDetails({
+                    ...businessDetails,
+                    monthlySales: option.value,
+                  });
+                }}
+              />
+            </View>
+
+            <View style={{marginVertical: 10}}>
+              <CustomDropdown
+                label="Average monthly expenses"
+                isNeeded={true}
+                placeholderStyle={styles.placeholderStyle}
+                selectedTextStyle={styles.selectedTextStyle}
+                data={monthlyExpData}
+                maxHeight={300}
+                labelField="label"
+                valueField="value"
+                value={businessDetails.monthlyExpenses}
+                onChange={option => {
+                  setBusinessDetails({
+                    ...businessDetails,
+                    monthlyExpenses: option.value,
+                  });
+                }}
+              />
+            </View>
+
+            <View style={{marginVertical: 10}}>
+              <CustomDropdown
+                label="How long have you been in business?"
+                isNeeded={true}
+                placeholderStyle={styles.placeholderStyle}
+                selectedTextStyle={styles.selectedTextStyle}
+                data={businessDurationData}
+                maxHeight={300}
+                labelField="label"
+                valueField="value"
+                value={businessDetails.businessDuration}
+                onChange={option => {
+                  setBusinessDetails({
+                    ...businessDetails,
+                    businessDuration: option.value,
+                  });
+                }}
+              />
+            </View>
+
+            <Input
+              label="MAMERT"
+              placeholder="Enter mamert"
+              keyboardType="numeric"
+              defaultValue={businessDetails?.MAMERT}
+              onChangeText={text =>
+                setBusinessDetails({...businessDetails, MAMERT: text})
+              }
+            />
+
+            <Input
+              label="TIN"
+              placeholder="Enter Tax Id Number"
+              keyboardType="numeric"
+              defaultValue={businessDetails?.tin}
+              onChangeText={text =>
+                setBusinessDetails({...businessDetails, tin: text})
+              }
+            />
+
+            <TouchableOpacity
+              onPress={
+                orgDetails?.businessName === undefined
+                  ? handleCreateBusinessDetails
+                  : handleUpdateBusinessDetails
+              }
+              // disabled={disableit}
+            >
+              <View style={{marginBottom: 40, marginTop: 20}}>
+                <Buttons label={'Save & Continue'} />
+              </View>
+            </TouchableOpacity>
           </View>
-
-          <CustomInput
-            label="MAMERT"
-            defaultValue={businessDetails?.MAMERT}
-            onChangeText={text =>
-              setBusinessDetails({...businessDetails, MAMERT: text})
-            }
-            keyboardType="numeric"
-          />
-          <CustomInput
-            label="TIN(Tax Identification Number"
-            defaultValue={businessDetails?.tin}
-            onChangeText={text =>
-              setBusinessDetails({...businessDetails, tin: text})
-            }
-            keyboardType="numeric"
-          />
-
-          <TouchableOpacity
-            onPress={
-              orgDetails?.businessName === undefined
-                ? handleCreateBusinessDetails
-                : handleUpdateBusinessDetails
-            }
-            disabled={disableit}>
-            <View style={{marginBottom: 40, marginTop: 20}}>
-              <Buttons label={'Save & Continue'} disabled={disableit} />
-            </View>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
+        </ScrollView>
+      </ImageBackground>
     </SafeAreaView>
   );
 };
 
-export default observer(BusinessDetails);
+export default BusinessDetails;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
+  },
+  image: {
+    height: screenHeight,
+    width: screenWidth,
+    justifyContent: 'center',
   },
   innercontainer: {
     paddingHorizontal: 16,
@@ -953,7 +1067,7 @@ const styles = StyleSheet.create({
   },
   HeadView: {
     alignItems: 'center',
-    marginTop: 34,
+    // marginTop: 34,
     // backgroundColor:'blue'
   },
   TopView: {

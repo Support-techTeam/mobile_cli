@@ -6,49 +6,24 @@ import {
   TouchableOpacity,
   Pressable,
   Platform,
-  TextInput,
   Image,
-  AppState,
-  Alert,
   ImageBackground,
   Dimensions,
 } from 'react-native';
-import React, {
-  useContext,
-  useEffect,
-  useState,
-  useRef,
-  useLayoutEffect,
-} from 'react';
-import {Picker} from '@react-native-picker/picker';
-// import { getStatusBarHeight } from 'react-native-status-bar-height';
-import PhoneInput from 'react-native-phone-number-input';
+import React, {useEffect, useState, useRef} from 'react';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
-import {useNavigation} from '@react-navigation/native';
 import Spinner from 'react-native-loading-spinner-overlay';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
-import CustomInput from '../../component/custominput/CustomInput';
 import Input from '../../component/inputField/input.component';
 import CustomDropdown from '../../component/dropDown/dropdown.component';
 import InputPhone from '../../component/inputField/phone-input.component';
 import Buttons from '../../component/buttons/Buttons';
-import {Dropdown} from 'react-native-element-dropdown';
-import COLORS from '../../constants/colors';
 import {useSelector, useDispatch} from 'react-redux';
-import {
-  createUserProfile,
-  getCity,
-  getProfileDetails,
-  getState,
-} from '../../stores/ProfileStore';
-import axios from 'axios';
+import {createUserProfile, getCity, getState} from '../../stores/ProfileStore';
 import {setReduxState} from '../../util/redux/locationData/location.data.slice';
 import Toast from 'react-native-toast-message';
-import {userLogOut} from '../../stores/AuthStore';
-import {resetStore} from '../../util/redux/store';
 import {setProfile} from '../../util/redux/userProfile/user.profile.slice';
 import {useBottomTabBarHeight} from '@react-navigation/bottom-tabs';
-import RNRestart from 'react-native-restart';
 
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
@@ -125,14 +100,12 @@ const referralOptionData = [
   {value: 'Others', label: 'Others'},
 ];
 
-const PersonalDetails = ({navigation}) => {
-  // const navigation = useNavigation();
+const PersonalDetails = () => {
   const [show, setShow] = useState(false);
   const date = new Date(2000, 0, 1);
   const insets = useSafeAreaInsets();
   const [currentState, setCurrentState] = useState(undefined);
   const [currentCity, setCurrentCity] = useState(undefined);
-  const [isFocused, setIsFocused] = useState(false);
   const [errors, setErrors] = useState({});
   const [state, setState] = useState();
   const [cityByState, setCitybyState] = useState([]);

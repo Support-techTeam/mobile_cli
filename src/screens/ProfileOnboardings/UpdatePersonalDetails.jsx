@@ -5,38 +5,120 @@ import {
   ScrollView,
   TouchableOpacity,
   Pressable,
+  Platform,
+  Image,
+  ImageBackground,
+  Dimensions,
 } from 'react-native';
-import React, {useContext, useEffect, useState} from 'react';
-import {Picker} from '@react-native-picker/picker';
-import PhoneInput from 'react-native-phone-number-input';
+import React, {useEffect, useState, useRef} from 'react';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
-import {useNavigation} from '@react-navigation/native';
-import {AntDesign} from '@expo/vector-icons';
-import {toJS} from 'mobx';
-import {observer} from 'mobx-react-lite';
+import {useNavigation, useRoute} from '@react-navigation/native';
+import AntDesign from 'react-native-vector-icons/AntDesign';
 import Spinner from 'react-native-loading-spinner-overlay/lib';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
-
-import CustomInput from '../../component/custominput/CustomInput';
+import Input from '../../component/inputField/input.component';
+import CustomDropdown from '../../component/dropDown/dropdown.component';
+import InputPhone from '../../component/inputField/phone-input.component';
 import Buttons from '../../component/buttons/Buttons';
-import {StoreContext} from '../../config/mobX stores/RootStore';
+import Toast from 'react-native-toast-message';
+import {useSelector} from 'react-redux';
+import {getCity, getState} from '../../stores/ProfileStore';
+import {createUserProfile, updatePersonalDetails} from '../../stores/LoanStore';
 
-const UpdatePersonalDetails = ({route}) => {
+const screenHeight = Dimensions.get('window').height;
+const screenWidth = Dimensions.get('window').width;
+
+const titleData = [
+  {value: '', label: 'Select Title'},
+  {value: 'Mr', label: 'Mr'},
+  {value: 'Mrs', label: 'Mrs'},
+  {value: 'Miss', label: 'Miss'},
+  {value: 'Dr', label: 'Dr'},
+];
+
+const genderData = [
+  {value: '', label: 'Select Gender'},
+  {value: 'Female', label: 'Female'},
+  {value: 'Male', label: 'Male'},
+  {value: 'Prefer Not To Say', label: 'Prefer Not To Say'},
+];
+
+const stateData = [{value: '', label: 'Select State'}];
+
+const cityData = [
+  {value: '', label: 'Select LGA'},
+  {value: '', label: 'N/A'},
+];
+const residencyData = [
+  {value: '', label: 'Select Residential Status'},
+  {value: 'Renting', label: 'Renting'},
+  {value: 'Owner', label: 'Owner'},
+  {value: 'Subletting', label: 'Subletting'},
+];
+
+const wdymttaData = [
+  {value: '', label: 'Select Duration'},
+  {value: '0-1 years', label: '0-1 years'},
+  {value: '1-3 years', label: '1-3 years'},
+  {value: '3-5 years', label: '3-5 years'},
+  {value: '5-10 years', label: '5-10 years'},
+  {value: '10+ years', label: '10+ years'},
+];
+
+const maritalData = [
+  {value: '', label: 'Select Marital Status'},
+  {value: 'Single', label: 'Single'},
+  {value: 'Married', label: 'Married'},
+  {value: 'Divorced', label: 'Divorced'},
+  {value: 'Widowed', label: 'Widowed'},
+  {value: 'Separated', label: 'Separated'},
+];
+
+const educationalData = [
+  {value: '', label: 'Select Educational Status'},
+  {
+    value: 'Ordinary National Diploma (OND)',
+    label: 'Ordinary National Diploma (OND)',
+  },
+  {
+    value: 'Higher National Diploma (HND)',
+    label: 'Higher National Diploma (HND)',
+  },
+  {value: 'Bachelors', label: 'Bachelors'},
+  {value: 'Masters', label: 'Masters'},
+  {value: 'PHD', label: 'PHD'},
+  {value: 'Post Graduate Diploma', label: 'Post Graduate Diploma'},
+];
+
+const referralOptionData = [
+  {value: '', label: 'Select answer'},
+  {value: 'By Referral', label: 'By Referral'},
+  {value: 'From a friend', label: 'From a friend'},
+  {value: 'Social Media', label: 'Social Media'},
+  {value: 'Community or Influencer', label: 'Community or Influencer'},
+  {value: 'TradeLenda Partner', label: 'TradeLenda Partner'},
+  {value: 'Others', label: 'Others'},
+];
+
+const UpdatePersonalDetails = () => {
   const navigation = useNavigation();
   const [show, setShow] = useState(false);
   const date = new Date(2000, 0, 1);
   const insets = useSafeAreaInsets();
-  // const [profileDetails, setProfileDetails] = useState({});
+  const [currentState, setCurrentState] = useState(undefined);
+  const [currentCity, setCurrentCity] = useState(undefined);
+  const [errors, setErrors] = useState({});
+  const [state, setState] = useState();
+  const [cityByState, setCitybyState] = useState([]);
+  const [city, setCity] = useState();
+  const [isLoading, setIsLoading] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const profileDetails = useSelector(state => state.userProfile.profile);
+  const route = useRoute();
+  const curentRoute = route.name;
+  const previousRoute = navigation.getState()?.routes.slice(-2)[0]?.name;
 
-  const {loansStore, authStore} = useContext(StoreContext);
-  const {loadingProfile, profile} = authStore;
-  const {success, sending} = loansStore;
-
-  useEffect(() => {
-    authStore.getProfileDetails();
-  }, [authStore]);
-
-  const profileDetails = profile;
+  // const profileDetails = profile;
 
   const [userDetails, setUserDetails] = useState({
     title: '',
@@ -131,7 +213,185 @@ const UpdatePersonalDetails = ({route}) => {
           ? 0
           : profileDetails?.NoOfDependents,
     });
-  }, [profileDetails]);
+  }, [profileDetails, navigation]);
+
+  const validate = () => {
+    let isValid = true;
+
+    if (!userDetails.email) {
+      handleError('Please input email', 'email');
+      isValid = false;
+    } else if (!userDetails.email.match(/\S+@\S+\.\S+/)) {
+      handleError('Please input a valid email', 'email');
+      isValid = false;
+    }
+
+    if (!userDetails.firstName) {
+      handleError('Please input firstname', 'firstName');
+      isValid = false;
+    }
+
+    if (!userDetails.lastName) {
+      handleError('Please input lastname', 'lastName');
+      isValid = false;
+    }
+
+    if (!userDetails.title) {
+      handleError('Please input title', 'title');
+      isValid = false;
+    }
+
+    if (!userDetails.phoneNumber) {
+      handleError('Please input phone number', 'phoneNumber');
+      isValid = false;
+    }
+
+    if (!userDetails.bvn) {
+      handleError('Please input bvn', 'bvn');
+      isValid = false;
+    }
+    if (!userDetails.dob) {
+      handleError('Please input dob', 'dob');
+      isValid = false;
+    }
+    if (!userDetails.address) {
+      handleError('Please input address', 'address');
+      isValid = false;
+    }
+    if (!userDetails.country) {
+      handleError('Please input country', 'country');
+      isValid = false;
+    }
+    if (!userDetails.state) {
+      handleError('Please input state', 'state');
+      isValid = false;
+    }
+
+    if (!userDetails.city) {
+      handleError('Please input city', 'city');
+      isValid = false;
+    }
+
+    if (!userDetails.maritalStatus) {
+      handleError('Please input marital status', 'maritalStatus');
+      isValid = false;
+    }
+    if (!userDetails.eduLevel) {
+      handleError('Please input educational level', 'eduLevel');
+      isValid = false;
+    }
+
+    if (!userDetails.gender) {
+      handleError('Please input gender', 'gender');
+      isValid = false;
+    }
+
+    if (!userDetails.residentialStatus) {
+      handleError('Please input residential status', 'residentialStatus');
+      isValid = false;
+    }
+
+    if (!userDetails.yearYouMovedToCurrentAddress) {
+      handleError(
+        'Please input year you moved to current address',
+        'yearYouMovedToCurrentAddress',
+      );
+      isValid = false;
+    }
+
+    if (!userDetails.NoOfDependents) {
+      handleError('Please input No of dependents', 'NoOfDependents');
+      isValid = false;
+    }
+
+    if (isValid) {
+      console.log('previous', previousRoute);
+      profileDetails?.email === undefined
+        ? handleCreatePersonalDetails()
+        : handleUpdatePersonalDetails();
+
+      if (previousRoute !== 'myAccount') {
+        setTimeout(() => {
+          navigation.navigate('BusinessDetails');
+        }, 2000);
+      } else {
+        setTimeout(() => {
+          // navigation.navigate('MyAccount');
+        }, 2000);
+        console.log('my account');
+      }
+    }
+  };
+
+  const handleError = (error, input) => {
+    setErrors(prevState => ({...prevState, [input]: error}));
+  };
+
+  useEffect(() => {
+    const fetchState = async () => {
+      try {
+        const res = await getState();
+        if (res.data !== undefined) {
+          setState(res.data);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchState();
+    return () => {
+      fetchState();
+    };
+  }, []);
+
+  useEffect(() => {
+    const stateData =
+      state &&
+      state.map((item, index) => {
+        return {value: item, label: item, key: index};
+      });
+
+    if (currentState == undefined || currentState == '') {
+      setCurrentState(stateData);
+    }
+  }, [state]);
+
+  useEffect(() => {
+    if (userDetails?.state !== '' && state !== undefined) {
+      setCitybyState(state?.filter(statee => statee === userDetails.state));
+    }
+  }, [state, userDetails.state]);
+
+  const stateCity = cityByState[0];
+
+  useEffect(() => {
+    const fetchCity = async () => {
+      try {
+        const res = await getCity(stateCity);
+        if (res.data !== undefined) {
+          setCity(res.data);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchCity();
+    return () => {
+      fetchCity();
+    };
+  }, [stateCity]);
+
+  useEffect(() => {
+    const cityData =
+      city &&
+      city.map((item, index) => {
+        return {value: item, label: item, key: index};
+      });
+
+    setCurrentCity(cityData);
+  }, [city]);
 
   const disableit =
     !userDetails.phoneNumber ||
@@ -140,28 +400,6 @@ const UpdatePersonalDetails = ({route}) => {
     !userDetails.firstName ||
     !userDetails.lastName ||
     !userDetails.email;
-
-  const [state, setState] = useState([]);
-  const [cityByState, setCitybyState] = useState([]);
-  const [city, setCity] = useState([]);
-
-  useEffect(() => {
-    setState(toJS(loansStore.state));
-    setCity(toJS(loansStore.city));
-  }, [loansStore.state, loansStore.city]);
-
-  useEffect(() => {
-    if (userDetails.state !== '') {
-      setCitybyState(state.filter(statee => statee === userDetails.state));
-    }
-  }, [userDetails.state, state]);
-
-  const stateCity = cityByState[0];
-
-  useEffect(() => {
-    loansStore.getState();
-    loansStore.getCity(stateCity);
-  }, [loansStore, stateCity]);
 
   const showDatePicker = () => {
     setShow(true);
@@ -178,39 +416,83 @@ const UpdatePersonalDetails = ({route}) => {
     setShow(false);
   };
 
-  const handleCreatePersonalDetails = () => {
-    loansStore.createUserProfile(userDetails);
+  const handleCreatePersonalDetails = async () => {
+    setIsLoading(true);
+    const res = await createUserProfile(userDetails);
+    if (res.error) {
+      Toast.show({
+        type: 'error',
+        position: 'top',
+        topOffset: 50,
+        text1: res.title,
+        text2: res.data.message,
+        visibilityTime: 5000,
+        autoHide: true,
+        onPress: () => Toast.hide(),
+      });
+    } else {
+      Toast.show({
+        type: 'success',
+        position: 'top',
+        topOffset: 50,
+        text1: res.title,
+        text2: res.message,
+        visibilityTime: 3000,
+        autoHide: true,
+        onPress: () => Toast.hide(),
+      });
+    }
+    setIsLoading(false);
   };
 
-  const handleUpdatePersonalDetails = () => {
-    loansStore.updatePersonalDetails(userDetails);
+  const handleUpdatePersonalDetails = async () => {
+    setIsUpdating(true);
+    const res = await updatePersonalDetails(userDetails);
+    console.log(res);
+    if (res.error) {
+      Toast.show({
+        type: 'error',
+        position: 'top',
+        topOffset: 50,
+        text1: res.title,
+        text2: res.data.message,
+        visibilityTime: 5000,
+        autoHide: true,
+        onPress: () => Toast.hide(),
+      });
+    } else {
+      Toast.show({
+        type: 'success',
+        position: 'top',
+        topOffset: 50,
+        text1: res.title,
+        text2: res.message,
+        visibilityTime: 3000,
+        autoHide: true,
+        onPress: () => Toast.hide(),
+      });
+    }
+    setIsUpdating(false);
   };
-
-  const prevRoutes = route?.params?.paramKey;
 
   useEffect(() => {
-    if (success === 'profile successful') {
-      if (prevRoutes !== 'myAccount') {
-        navigation.navigate('BusinessDetails');
-      } else {
-        navigation.navigate('MyAccount');
-        authStore.getProfileDetails();
-      }
-    }
-  }, [authStore, navigation, prevRoutes, success]);
+    setIsLoading(true);
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 2000);
+  }, []);
 
   return (
     <SafeAreaView
       style={{
         flex: 1,
         backgroundColor: '#fff',
-        paddingHorizontal: 16,
         paddingTop: insets.top !== 0 ? insets.top / 2 : 'auto',
         paddingBottom: insets.bottom !== 0 ? insets.bottom / 2 : 'auto',
         paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
         paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
       }}>
-      {loadingProfile && (
+      {isLoading && (
         <Spinner
           textContent={'Loading...'}
           textStyle={{color: 'white'}}
@@ -218,9 +500,9 @@ const UpdatePersonalDetails = ({route}) => {
           overlayColor="rgba(78, 75, 102, 0.7)"
         />
       )}
-      {sending && (
+      {isUpdating && (
         <Spinner
-          textContent={'Updating Profile Details...'}
+          textContent={'Please wait...'}
           textStyle={{color: 'white'}}
           visible={true}
           overlayColor="rgba(78, 75, 102, 0.7)"
@@ -231,6 +513,7 @@ const UpdatePersonalDetails = ({route}) => {
           flexDirection: 'row',
           justifyContent: 'space-between',
           alignItems: 'center',
+          paddingHorizontal: 16,
         }}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <View
@@ -242,412 +525,390 @@ const UpdatePersonalDetails = ({route}) => {
             <AntDesign name="left" size={24} color="black" />
           </View>
         </TouchableOpacity>
-        <View style={styles.HeadView}>
+        <View style={[styles.HeadView, {justifyContent: 'center', flex: 1}]}>
           <View style={styles.TopView}>
-            <Text style={styles.TextHead}>PERSONAL DETAILS</Text>
+            <Text style={[styles.TextHead, {marginBottom: 5}]}>
+              PERSONAL DETAILS
+            </Text>
           </View>
-        </View>
-        <View>
-          <Text> </Text>
+
+          <View>
+            <Image source={require('../../../assets/images/indicator.png')} />
+          </View>
         </View>
       </View>
-      <ScrollView
-        bounces={false}
-        showsHorizontalScrollIndicator={false}
-        showsVerticalScrollIndicator={false}>
-        <View>
-          <View style={styles.HeadView}>
-            <Text style={styles.extraText}>
-              Please update your personal details to get started.
-            </Text>
-          </View>
-
-          <View style={{marginVertical: 10}}>
-            <View style={{flexDirection: 'row'}}>
-              <Text
-                style={{
-                  paddingBottom: 4,
-                  fontWeight: '400',
-                  fontSize: 16,
-                  lineHeight: 24,
-                  color: '#14142B',
-                  fontFamily: 'Montserat',
-                }}>
-                Title
-              </Text>
-              <Text style={{color: 'red', marginRight: 10}}>*</Text>
-            </View>
-
-            <View style={styles.pick}>
-              <Picker
-                selectedValue={userDetails.title}
-                onValueChange={text =>
-                  setUserDetails({...userDetails, title: text})
-                }>
-                <Picker.Item label="Select Title" value="" />
-                <Picker.Item label="Mr" value="Mr" />
-                <Picker.Item label="Mrs" value="Mrs" />
-                <Picker.Item label="Miss" value="Miss" />
-                <Picker.Item label="Dr" value="Dr" />
-              </Picker>
-            </View>
-          </View>
-
-          <CustomInput
-            label="First name"
-            defaultValue={profileDetails?.firstName}
-            onChangeText={text =>
-              setUserDetails({...userDetails, firstName: text.trim()})
-            }
-            isNeeded={true}
-          />
-
-          <CustomInput
-            label="Last name"
-            defaultValue={profileDetails?.lastName}
-            onChangeText={text =>
-              setUserDetails({...userDetails, lastName: text.trim()})
-            }
-            isNeeded={true}
-          />
-
-          <CustomInput
-            label="Email"
-            keyboardType="email-address"
-            defaultValue={profileDetails?.email}
-            onChangeText={text =>
-              setUserDetails({...userDetails, email: text.trim()})
-            }
-            isNeeded={true}
-          />
-
-          <View style={{marginVertical: 10}}>
-            <View style={{marginBottom: -14}}>
-              <View style={{flexDirection: 'row'}}>
-                <Text style={styles.label}>Phone number</Text>
-                <Text style={{color: 'red', marginRight: 10}}>*</Text>
-              </View>
-            </View>
-            <View>
-              <PhoneInput
-                defaultCode="NG"
-                layout="first"
-                textContainerStyle={styles.phonetextContainer}
-                textInputStyle={styles.phonetext}
-                containerStyle={styles.phoneContainer}
-                placeholder=" "
-                defaultValue={profileDetails?.phoneNumber}
-                codeTextStyle={{color: '#6E7191'}}
-                onChangeFormattedText={text =>
-                  setUserDetails({...userDetails, phoneNumber: text})
-                }
+      <View
+        style={[styles.HeadView, {marginBottom: 10, justifyContent: 'center'}]}>
+        <Text style={styles.extraText}>
+          Please update your personal details to get started.
+        </Text>
+      </View>
+      <ImageBackground
+        source={require('../../../assets/signup.png')}
+        resizeMode="stretch"
+        style={styles.image}>
+        <ScrollView
+          bounces={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+          style={{
+            paddingHorizontal: 10,
+            marginBottom: insets.top + 60,
+          }}>
+          <View
+            style={{
+              paddingTop: 25,
+              backgroundColor: '#FFFFFF',
+              borderRadius: 15,
+              paddingHorizontal: 15,
+              paddingVertical: 15,
+              opacity: 0.86,
+              borderColor: '#D9DBE9',
+              borderWidth: 2,
+            }}>
+            <View style={{marginVertical: 20}}>
+              <CustomDropdown
+                label="Title"
+                isNeeded={true}
+                placeholder="Select Title"
+                placeholderStyle={styles.placeholderStyle}
+                selectedTextStyle={styles.selectedTextStyle}
+                data={titleData}
+                maxHeight={300}
+                labelField="label"
+                valueField="value"
+                value={userDetails.title}
+                onChange={option => {
+                  setUserDetails({...userDetails, title: option.value});
+                }}
+                onFocus={() => handleError(null, 'title')}
+                error={errors.title}
               />
             </View>
-          </View>
 
-          <View style={{marginVertical: 10}}>
-            <Text
-              style={{
-                paddingBottom: 4,
-                fontWeight: '400',
-                fontSize: 16,
-                lineHeight: 24,
-                color: '#14142B',
-                fontFamily: 'Montserat',
-              }}>
-              Gender
-            </Text>
-            <View style={styles.pick}>
-              <Picker
-                selectedValue={userDetails.gender}
-                onValueChange={text =>
-                  setUserDetails({...userDetails, gender: text})
-                }>
-                <Picker.Item label="Select Gender" value="" />
-                <Picker.Item label="Female" value="Female" />
-                <Picker.Item label="Male" value="Male" />
-                <Picker.Item
-                  label="Prefer Not To Say"
-                  value="Prefer Not To Say"
-                />
-              </Picker>
-            </View>
-          </View>
+            <Input
+              iconName="account-outline"
+              label="First Name"
+              placeholder="Enter your first name"
+              isNeeded={true}
+              defaultValue={profileDetails?.firstName}
+              onChangeText={text =>
+                setUserDetails({...userDetails, firstName: text.trim()})
+              }
+              onFocus={() => handleError(null, 'firstName')}
+              error={errors.firstname}
+            />
 
-          <CustomInput
-            label="BVN"
-            defaultValue={userDetails.bvn}
-            onChangeText={text =>
-              setUserDetails({...userDetails, bvn: text.trim()})
-            }
-            keyboardType="numeric"
-          />
-
-          <Pressable onPress={showDatePicker}>
-            <CustomInput
-              label="Date of Birth"
-              placeholder="2000 - 01 - 01"
-              defaultValue={userDetails.dob ? userDetails.dob.toString() : ''}
-              isDate={true}
-              editable={false}
-              showDatePicker={showDatePicker}
-              onChangeValue={text =>
-                setUserDetails({...userDetails, dob: text})
+            <Input
+              iconName="account-outline"
+              label="Last Name"
+              placeholder="Enter your first name"
+              defaultValue={profileDetails?.lastName}
+              onChangeText={text =>
+                setUserDetails({...userDetails, lastName: text.trim()})
               }
               isNeeded={true}
+              onFocus={() => handleError(null, 'lastName')}
+              error={errors.lastName}
             />
-          </Pressable>
 
-          <DateTimePickerModal
-            isVisible={show}
-            testID="dateTimePicker"
-            defaultValue={userDetails.dob}
-            mode="date"
-            is24Hour={true}
-            onConfirm={handleConfirm}
-            onCancel={hideDatePicker}
-            textColor="#054B99"
-          />
+            <Input
+              iconName="email-outline"
+              label="Email"
+              placeholder="Enter your email"
+              keyboardType="email-address"
+              defaultValue={profileDetails?.email}
+              onChangeText={text =>
+                setUserDetails({...userDetails, email: text.trim()})
+              }
+              isNeeded={true}
+              onFocus={() => handleError(null, 'email')}
+              error={errors.email}
+            />
 
-          <CustomInput
-            label="Address"
-            defaultValue={userDetails.address}
-            onChangeText={text =>
-              setUserDetails({...userDetails, address: text})
-            }
-            isNeeded={true}
-          />
+            <InputPhone
+              label="Phone number"
+              layout="first"
+              isNeeded={true}
+              defaultCode="NG"
+              codeTextStyle={{color: '#6E7191'}}
+              defaultValue={profileDetails?.phoneNumber}
+              onChangeFormattedText={text =>
+                setUserDetails({...userDetails, phoneNumber: text})
+              }
+              onFocus={() => handleError(null, 'phoneNumber')}
+              error={errors.phoneNumber}
+            />
 
-          <CustomInput
-            label="Country"
-            defaultValue={userDetails.country}
-            onChangeText={text =>
-              setUserDetails({...userDetails, country: text})
-            }
-          />
+            <View style={{marginVertical: 10}}>
+              <CustomDropdown
+                label="Gender"
+                onFocus={() => handleError(null, 'gender')}
+                // search
+                isNeeded={true}
+                iconName="gender-male-female"
+                placeholder="Select Gender"
+                placeholderStyle={styles.placeholderStyle}
+                selectedTextStyle={styles.selectedTextStyle}
+                data={genderData}
+                maxHeight={300}
+                labelField="label"
+                valueField="value"
+                value={userDetails.gender}
+                onChange={option => {
+                  setUserDetails({...userDetails, gender: option.value});
+                }}
+                error={errors.gender}
+              />
+            </View>
 
-          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-            <View style={{marginVertical: 10, paddingRight: 5, width: '50%'}}>
-              <Text
-                style={{
-                  paddingBottom: 4,
-                  fontWeight: '400',
-                  fontSize: 16,
-                  lineHeight: 24,
-                  color: '#14142B',
-                  fontFamily: 'Montserat',
-                }}>
-                State
-              </Text>
-              <View style={styles.pick}>
-                <Picker
-                  selectedValue={userDetails.state}
-                  onValueChange={text =>
-                    setUserDetails({...userDetails, state: text})
-                  }>
-                  {state.map(stateee => (
-                    <Picker.Item
-                      label={stateee}
-                      value={stateee}
-                      key={stateee}
-                    />
-                  ))}
-                </Picker>
+            <Input
+              // onChangeText={text =>
+              //   setUserDetails({...userDetails, bvn: text.trim()})
+              // }
+              onFocus={() => handleError(null, 'bvn')}
+              iconName="shield-lock-outline"
+              label="BVN"
+              placeholder="Enter your BVN"
+              error={errors.bvn}
+              keyboardType="numeric"
+              isNeeded={true}
+              defaultValue={userDetails.bvn}
+            />
+
+            <Pressable onPress={showDatePicker}>
+              <Input
+                label="Date of Birth"
+                onFocus={() => handleError(null, 'dob')}
+                iconName="calendar-month-outline"
+                placeholder="2000 - 01 - 01"
+                defaultValue={userDetails.dob ? userDetails.dob.toString() : ''}
+                isDate={true}
+                editable={false}
+                showDatePicker={showDatePicker}
+                onChangeValue={text =>
+                  setUserDetails({...userDetails, dob: text})
+                }
+                isNeeded={true}
+                error={errors.dob}
+              />
+            </Pressable>
+
+            <DateTimePickerModal
+              isVisible={show}
+              testID="dateTimePicker"
+              defaultValue={userDetails.dob}
+              mode="date"
+              is24Hour={true}
+              onConfirm={handleConfirm}
+              onCancel={hideDatePicker}
+              textColor="#054B99"
+            />
+
+            <Input
+              label="Address"
+              defaultValue={userDetails.address}
+              onChangeText={text =>
+                setUserDetails({...userDetails, address: text})
+              }
+              onFocus={() => handleError(null, 'address')}
+              iconName="map-marker-outline"
+              placeholder="Enter your address"
+              error={errors.address}
+              isNeeded={true}
+            />
+
+            <Input
+              label="Country"
+              defaultValue={userDetails.country}
+              onChangeText={text =>
+                setUserDetails({...userDetails, country: text})
+              }
+              onFocus={() => handleError(null, 'country')}
+              iconName="flag-outline"
+              placeholder="Enter your country"
+              error={errors.country}
+              isNeeded={true}
+            />
+
+            <View
+              style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+              <View style={{marginVertical: 10, paddingRight: 5, width: '50%'}}>
+                <CustomDropdown
+                  label="State"
+                  onFocus={() => handleError(null, 'state')}
+                  isNeeded={true}
+                  placeholder="Select State"
+                  placeholderStyle={styles.placeholderStyle}
+                  selectedTextStyle={styles.selectedTextStyle}
+                  data={currentState ? currentState : stateData}
+                  // data={stateData}
+                  maxHeight={300}
+                  labelField="label"
+                  valueField="value"
+                  value={userDetails.state}
+                  onChange={option => {
+                    setUserDetails({...userDetails, state: option.value});
+                  }}
+                  error={errors.state}
+                />
+              </View>
+              <View style={{marginVertical: 10, paddingLeft: 5, width: '50%'}}>
+                <CustomDropdown
+                  label="City"
+                  onFocus={() => handleError(null, 'city')}
+                  isNeeded={true}
+                  placeholder="Select LGA"
+                  placeholderStyle={styles.placeholderStyle}
+                  selectedTextStyle={styles.selectedTextStyle}
+                  data={currentCity ? currentCity : cityData}
+                  // data={cityData}
+                  maxHeight={300}
+                  labelField="label"
+                  valueField="value"
+                  value={userDetails.city}
+                  onChange={option => {
+                    setUserDetails({...userDetails, city: option.value});
+                  }}
+                  error={errors.city}
+                />
               </View>
             </View>
-            <View style={{marginVertical: 10, paddingLeft: 5, width: '50%'}}>
-              <Text
-                style={{
-                  paddingBottom: 4,
-                  fontWeight: '400',
-                  fontSize: 16,
-                  lineHeight: 24,
-                  color: '#14142B',
-                  fontFamily: 'Montserat',
-                }}>
-                LGA
-              </Text>
-              <View style={styles.pick}>
-                {city && (
-                  <Picker
-                    selectedValue={userDetails.city}
-                    onValueChange={text =>
-                      setUserDetails({...userDetails, city: text})
-                    }>
-                    {city.map(lg => (
-                      <Picker.Item label={lg} value={lg} key={lg} />
-                    ))}
-                  </Picker>
-                )}
-              </View>
-            </View>
-          </View>
 
-          <View style={{marginVertical: 10}}>
-            <Text
-              style={{
-                paddingBottom: 4,
-                fontWeight: '400',
-                fontSize: 16,
-                lineHeight: 24,
-                color: '#14142B',
-                fontFamily: 'Montserat',
-              }}>
-              Residential Status
-            </Text>
-            <View style={styles.pick}>
-              <Picker
-                selectedValue={userDetails.residentialStatus}
-                onValueChange={text =>
-                  setUserDetails({...userDetails, residentialStatus: text})
-                }>
-                <Picker.Item label="Select status" value="" />
-                <Picker.Item label="Renting" value="Renting" />
-                <Picker.Item label="Owner" value="Owner" />
-                <Picker.Item label="Subletting" value="Subletting" />
-              </Picker>
-            </View>
-          </View>
-
-          <View style={{marginVertical: 10}}>
-            <Text
-              style={{
-                paddingBottom: 4,
-                fontWeight: '400',
-                fontSize: 16,
-                lineHeight: 24,
-                color: '#14142B',
-                fontFamily: 'Montserat',
-              }}>
-              When did you move to that address?
-            </Text>
-            <View style={styles.pick}>
-              <Picker
-                selectedValue={userDetails.yearYouMovedToCurrentAddress}
-                onValueChange={text =>
+            <View style={{marginVertical: 10}}>
+              <CustomDropdown
+                label="Residential Status"
+                onFocus={() => handleError(null, 'residentialStatus')}
+                iconName="home-outline"
+                isNeeded={true}
+                placeholderStyle={styles.placeholderStyle}
+                selectedTextStyle={styles.selectedTextStyle}
+                data={residencyData}
+                maxHeight={300}
+                labelField="label"
+                valueField="value"
+                value={userDetails.residentialStatus}
+                onChange={option => {
                   setUserDetails({
                     ...userDetails,
-                    yearYouMovedToCurrentAddress: text,
-                  })
-                }>
-                <Picker.Item label="Select status" value="" />
-                <Picker.Item label="0-1 years" value="0-1 years" />
-                <Picker.Item label="1-3 years" value="1-3 years" />
-                <Picker.Item label="3-5 years" value="3-5 years" />
-                <Picker.Item label="5-10 years" value="5-10 years" />
-                <Picker.Item label="10+ years" value="10+ years" />
-              </Picker>
+                    residentialStatus: option.value,
+                  });
+                }}
+                error={errors.residentialStatus}
+              />
             </View>
+
+            <View style={{marginVertical: 10}}>
+              <CustomDropdown
+                label="When did you move to that address?"
+                onFocus={() =>
+                  handleError(null, 'yearYouMovedToCurrentAddress')
+                }
+                isNeeded={true}
+                placeholderStyle={styles.placeholderStyle}
+                selectedTextStyle={styles.selectedTextStyle}
+                data={wdymttaData}
+                maxHeight={300}
+                labelField="label"
+                valueField="value"
+                value={userDetails.yearYouMovedToCurrentAddress}
+                onChange={option => {
+                  setUserDetails({
+                    ...userDetails,
+                    yearYouMovedToCurrentAddress: option.value,
+                  });
+                }}
+                error={errors.yearYouMovedToCurrentAddress}
+              />
+            </View>
+
+            <View style={{marginVertical: 10}}>
+              <CustomDropdown
+                label="Marital Status"
+                onFocus={() => handleError(null, 'maritalStatus')}
+                isNeeded={true}
+                placeholderStyle={styles.placeholderStyle}
+                selectedTextStyle={styles.selectedTextStyle}
+                data={maritalData}
+                maxHeight={300}
+                labelField="label"
+                valueField="value"
+                value={userDetails.maritalStatus}
+                onChange={option => {
+                  setUserDetails({
+                    ...userDetails,
+                    maritalStatus: option.value,
+                  });
+                }}
+                error={errors.maritalStatus}
+              />
+            </View>
+
+            <View style={{marginVertical: 10}}>
+              <CustomDropdown
+                label="Educational Level"
+                onFocus={() => handleError(null, 'eduLevel')}
+                iconName="school-outline"
+                isNeeded={true}
+                placeholderStyle={styles.placeholderStyle}
+                selectedTextStyle={styles.selectedTextStyle}
+                data={educationalData}
+                maxHeight={300}
+                labelField="label"
+                valueField="value"
+                value={userDetails.eduLevel}
+                onChange={option => {
+                  setUserDetails({
+                    ...userDetails,
+                    eduLevel: option.value,
+                  });
+                }}
+                error={errors.eduLevel}
+              />
+            </View>
+
+            <Input
+              label="Number of dependents"
+              onChangeText={text =>
+                setUserDetails({
+                  ...userDetails,
+                  NoOfDependents: parseInt(text, 10),
+                })
+              }
+              onFocus={() => handleError(null, 'NoOfDependents')}
+              error={errors.NoOfDependents}
+              defaultValue={profileDetails?.NoOfDependents?.toString()}
+              keyboardType="numeric"
+              isNeeded={true}
+            />
+
+            <TouchableOpacity
+              onPress={validate}
+              disabled={disableit}
+              style={{marginBottom: 30}}>
+              <View style={{marginBottom: 30, marginTop: 20}}>
+                <Buttons label="Save & Continue" disabled={disableit} />
+              </View>
+            </TouchableOpacity>
           </View>
-
-          <View style={{marginVertical: 10}}>
-            <Text
-              style={{
-                paddingBottom: 4,
-                fontWeight: '400',
-                fontSize: 16,
-                lineHeight: 24,
-                color: '#14142B',
-                fontFamily: 'Montserat',
-              }}>
-              Marital Status
-            </Text>
-            <View style={styles.pick}>
-              <Picker
-                selectedValue={userDetails.maritalStatus}
-                onValueChange={text =>
-                  setUserDetails({...userDetails, maritalStatus: text})
-                }>
-                <Picker.Item label="Select status" value="" />
-                <Picker.Item label="Single" value="Single" />
-                <Picker.Item label="Married" value="Married" />
-                <Picker.Item label="Divorced" value="Divorced" />
-                <Picker.Item label="Widowed" value="Widowed" />
-                <Picker.Item label="Separated" value="Separated" />
-              </Picker>
-            </View>
-          </View>
-
-          <View style={{marginVertical: 10}}>
-            <Text
-              style={{
-                paddingBottom: 4,
-                fontWeight: '400',
-                fontSize: 16,
-                lineHeight: 24,
-                color: '#14142B',
-                fontFamily: 'Montserat',
-              }}>
-              Educational Level
-            </Text>
-            <View style={styles.pick}>
-              <Picker
-                selectedValue={userDetails.eduLevel}
-                onValueChange={text =>
-                  setUserDetails({...userDetails, eduLevel: text})
-                }>
-                <Picker.Item label="Select status" value="" />
-                <Picker.Item label="Primary School" value="Primary School" />
-                <Picker.Item
-                  label="Secondary School"
-                  value="Secondary School"
-                />
-                <Picker.Item
-                  label="Ordinary National Diploma (OND)"
-                  value="Ordinary National Diploma (OND)"
-                />
-                <Picker.Item
-                  label="Higher National Diploma (HND)"
-                  value="Higher National Diploma (HND)"
-                />
-                <Picker.Item label="Bachelors" value="Bachelors" />
-                <Picker.Item label="Masters" value="Masters" />
-                <Picker.Item label="PHD" value="PHD" />
-                <Picker.Item
-                  label="Post Graduate Diploma"
-                  value="Post Graduate Diploma"
-                />
-              </Picker>
-            </View>
-          </View>
-
-          <CustomInput
-            label="Number of dependents"
-            defaultValue={profileDetails?.NoOfDependents?.toString()}
-            onChangeText={text =>
-              setUserDetails({
-                ...userDetails,
-                NoOfDependents: parseInt(text, 10),
-              })
-            }
-            keyboardType="numeric"
-          />
-
-          <TouchableOpacity
-            onPress={
-              profileDetails?.email === undefined
-                ? handleCreatePersonalDetails
-                : handleUpdatePersonalDetails
-            }
-            disabled={disableit}
-            style={{marginBottom: 30}}>
-            <View style={{marginBottom: 30, marginTop: 20}}>
-              <Buttons label="Save & Continue" disabled={disableit} />
-            </View>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
+        </ScrollView>
+      </ImageBackground>
     </SafeAreaView>
   );
 };
 
-export default observer(UpdatePersonalDetails);
+export default UpdatePersonalDetails;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: 30,
     backgroundColor: '#fff',
+  },
+  image: {
+    height: screenHeight,
+    width: screenWidth,
+    justifyContent: 'center',
   },
   HeadView: {
     alignItems: 'center',

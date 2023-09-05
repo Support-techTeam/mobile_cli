@@ -365,7 +365,7 @@ const createBusinessDetails = async details => {
         title: 'Create Business Details ',
         error: true,
         data: null,
-        message: error,
+        message: `Failed | ${error.response.data.message}`,
       };
     }
   }
@@ -398,7 +398,7 @@ const createNextOfKin = async details => {
         title: 'Create Next Of Kin ',
         error: true,
         data: null,
-        message: error,
+        message: `Failed | ${error.response.data.message}`,
       };
     }
   }
@@ -431,7 +431,7 @@ const createBankDetails = async details => {
         title: 'Create Bank Details ',
         error: true,
         data: null,
-        message: error,
+        message: `Failed | ${error.response.data.message}`,
       };
     }
   }
@@ -463,7 +463,7 @@ const createDocumentsDetails = async details => {
         title: 'Create Document Details ',
         error: true,
         data: null,
-        message: error,
+        message: `Failed | ${error.response.data.message}`,
       };
     }
   }
@@ -508,7 +508,7 @@ const createUploadDocument = async (details, documentName) => {
         title: 'Document Upload ',
         error: true,
         data: null,
-        message: error,
+        message: `Failed | ${error.response.data.message}`,
       };
     }
   }
@@ -537,7 +537,7 @@ const updatePersonalDetails = async details => {
         title: 'Update Profile ',
         error: true,
         data: null,
-        message: error,
+        message: `Failed | ${error.response.data.message}`,
       };
     }
   }
@@ -568,7 +568,7 @@ const updateBusinessDetails = async details => {
         title: 'Update Business Details ',
         error: true,
         data: null,
-        message: error,
+        message: `Failed | ${error.response.data.message}`,
       };
     }
   }
@@ -600,7 +600,7 @@ const updateNokDetails = async details => {
         title: 'Update Next Of Kin ',
         error: true,
         data: null,
-        message: error,
+        message: `Failed | ${error.response.data.message}`,
       };
     }
   }
@@ -632,7 +632,7 @@ const updateBankDetails = async details => {
         title: 'Update Bank Details ',
         error: true,
         data: null,
-        message: error,
+        message: `Failed | ${error.response.data.message}`,
       };
     }
   }
@@ -664,7 +664,7 @@ const updateDocumentsDetails = async details => {
         title: 'Update Document Details ',
         error: true,
         data: null,
-        message: error,
+        message: `Failed | ${error.response.data.message}`,
       };
     }
   }
