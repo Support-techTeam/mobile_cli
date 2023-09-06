@@ -353,7 +353,7 @@ const LoanTransactions = ({route}) => {
                       </Text>
                     </View>
                   )}
-                  {loanDetails?.repaymentScheduleDates.map((date, i) => (
+                  {loanDetails?.repaymentScheduleDates?.map((date, i) => (
                     <View
                       style={{flexDirection: 'row', alignItems: 'center'}}
                       key={i}>

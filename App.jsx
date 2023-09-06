@@ -40,6 +40,8 @@ import {Provider} from 'react-redux';
 import {PersistGate} from 'redux-persist/integration/react';
 import {persistor, store} from './src/util/redux/store';
 import {LightTheme} from './src/constants/lightTheme';
+import EnterPin from './src/screens/SecurityScreens/EnterPinScreen';
+import {getAllPin} from './src/stores/SecurityStore';
 
 const inAppUpdates = new SpInAppUpdates(false);
 LogBox.ignoreAllLogs();
@@ -69,15 +71,8 @@ function App() {
   const appMainState = useRef(AppState.currentState);
   const [appState, setAppState] = useState(appMainState.current);
   const [isLocked, setIsLocked] = useState('');
+  const [hasPin, setHasPin] = useState(false);
   const {getItem, setItem} = useAsyncStorage('@lockState');
-
-  useEffect(() => {
-    if (Platform.OS === 'android') {
-      if (isLocked !== '') {
-        // SplashScreen.hide();
-      }
-    }
-  });
 
   const readItemFromStorage = async () => {
     const item = await getItem();
@@ -92,6 +87,23 @@ function App() {
   useEffect(() => {
     readItemFromStorage();
   });
+
+  useEffect(() => {
+    checkIfPinIsSet();
+  }, []);
+
+  const checkIfPinIsSet = async () => {
+    const res = await getAllPin();
+    if (res?.data?.length > 0) {
+      setHasPin(true);
+    } else if (res?.data == null) {
+      toggleVisibility();
+      setHasPin(false);
+    } else {
+      toggleVisibility();
+      setHasPin(false);
+    }
+  };
 
   //update check
   useEffect(() => {
@@ -145,11 +157,9 @@ function App() {
       if (appState === 'active' && nextAppState.match(/inactive|background/)) {
         // App becomes inactive or goes to background
         const lockTimer = setTimeout(async () => {
-          // setIsLocked(true);
-          // writeItemToStorage('true');
-          setIsLocked(false);
-          writeItemToStorage('false');
-        }, 30000); // Lock after 30 seconds of inactivity
+          setIsLocked(true);
+          writeItemToStorage('true');
+        }, 1000); // Lock after 30 seconds of inactivity
 
         return () => clearTimeout(lockTimer);
       } else if (
@@ -157,8 +167,8 @@ function App() {
         nextAppState === 'active'
       ) {
         // App resumes from background or inactive state
-        setIsLocked(false);
-        writeItemToStorage('false');
+        setIsLocked(true);
+        writeItemToStorage('true');
       }
       setAppState(nextAppState);
     };
@@ -171,25 +181,16 @@ function App() {
     return () => {
       appStateListener.remove();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [appState]);
 
   // Toggle lock state
-  const toggleLock = () => {
-    writeItemToStorage(isLocked === 'true' ? 'false' : 'true');
+  const toggleVisibility = () => {
+    setIsLocked(false);
+    writeItemToStorage('false');
   };
 
   const theme = {
     ...LightTheme,
-    // ...MD3LightTheme, // or MD3DarkTheme
-    // roundness: 2,
-    // colors: {
-    //   ...MD3LightTheme.colors,
-    //   primary: '#3498db',
-    //   secondary: '#f1c40f',
-    //   tertiary: '#a1b2c3',
-    //   secondaryContainer: '#054B99',
-    // },
   };
 
   useEffect(() => {
@@ -212,17 +213,8 @@ function App() {
       <PaperProvider theme={theme}>
         <DatadogProvider configuration={datadogConfiguration}>
           <StatusBar translucent={true} />
-          {isLocked && isLocked === 'true' ? (
-            <View
-              style={{
-                justifyContent: 'center',
-                alignItems: 'center',
-                alignContent: 'center',
-              }}>
-              <Text>Locked: Reauthentication Required</Text>
-
-              <Button title="Toggle Lock" onPress={toggleLock} />
-            </View>
+          {isLocked && isLocked === 'true' && hasPin ? (
+            <EnterPin toggleVisibility={() => toggleVisibility()} />
           ) : (
             <View style={styles.container}>
               <Provider store={store}>

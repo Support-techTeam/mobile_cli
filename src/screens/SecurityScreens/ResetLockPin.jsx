@@ -14,57 +14,34 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 import Spinner from 'react-native-loading-spinner-overlay';
 
 import {useNavigation} from '@react-navigation/native';
-
-import CustomInput from '../../component/custominput/CustomInput';
+import InputPhone from '../../component/inputField/phone-input.component';
 import Buttons from '../../component/buttons/Buttons';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
-import {changePin} from '../../stores/ProfileStore';
 import Toast from 'react-native-toast-message';
 import COLORS from '../../constants/colors';
-import OTPInput from 'react-native-otp-withpaste';
-import {useSelector} from 'react-redux';
-import {createLockPin} from '../../stores/SecurityStore';
+import {resetPin} from '../../stores/SecurityStore';
 
 const {height, width} = Dimensions.get('window');
 
-const SetLockPin = () => {
+const ResetLockPin = () => {
   const navigation = useNavigation();
   const [isLoading, setIsLoading] = useState(false);
-  const userProfileData = useSelector(state => state.userProfile.profile);
-  const [pinDetails, setPinDetails] = useState({
-    newPin: '',
-    confirmPin: '',
+  const [resetDetails, setResetDetails] = useState({
+    phoneNumber: '',
   });
   const insets = useSafeAreaInsets();
 
-  const handleCreatePin = async () => {
-    if (
-      pinDetails.newPin === pinDetails.confirmPin &&
-      pinDetails.newPin !== 0 &&
-      pinDetails.newPin !== ''
-    ) {
-      const data = {
-        userId: userProfileData?._id.toString(),
-        pin: pinDetails.newPin.toString(),
-        mobileNumber: userProfileData?.phoneNumber.toString(),
-      };
+  const handleResetPin = async () => {
+    if (resetDetails.phoneNumber !== '') {
       setIsLoading(true);
-      const res = await createLockPin(data);
-      //   const res = await resetPin(userProfileData?.phoneNumber);
-      //   const res = await getAllPin();
-      //   const res = await validatePin('0055', '64f4520aaf10bb399be2c6f7');
-      //   const res = await changeCurrentPin(
-      //     '64f4520aaf10bb399be2c6f7',
-      //     '1234',
-      //     '0055',
-      //   );
-      if (res?.error) {
+      const res = await resetPin(resetDetails.phoneNumber);
+      if (res.error) {
         Toast.show({
           type: 'error',
           position: 'top',
           topOffset: 50,
-          text1: res?.title,
-          text2: res?.message,
+          text1: res.title,
+          text2: res.message,
           visibilityTime: 5000,
           autoHide: true,
           onPress: () => Toast.hide(),
@@ -74,8 +51,8 @@ const SetLockPin = () => {
           type: 'success',
           position: 'top',
           topOffset: 50,
-          text1: res?.title,
-          text2: res?.message,
+          text1: res.title,
+          text2: res.message,
           visibilityTime: 3000,
           autoHide: true,
           onPress: () => Toast.hide(),
@@ -84,15 +61,14 @@ const SetLockPin = () => {
           navigation.navigate('Security');
         }, 1000);
       }
-
       setIsLoading(false);
     } else {
       Toast.show({
         type: 'error',
         position: 'top',
         topOffset: 50,
-        text1: 'Create Pin',
-        text2: 'Pin code is not a match!',
+        text1: 'Reset Pin',
+        text2: 'Phone number is invalid!',
         visibilityTime: 5000,
         autoHide: true,
         onPress: () => Toast.hide(),
@@ -113,7 +89,7 @@ const SetLockPin = () => {
       }}>
       {isLoading && (
         <Spinner
-          textContent={'Creating Lock Pin...'}
+          textContent={'Resetting Pin...'}
           textStyle={{color: 'white'}}
           visible={true}
           overlayColor="rgba(78, 75, 102, 0.7)"
@@ -137,7 +113,7 @@ const SetLockPin = () => {
         </TouchableOpacity>
         <View style={styles.HeadView}>
           <View style={styles.TopView}>
-            <Text style={styles.TextHead}>CREATE APP LOCK PIN</Text>
+            <Text style={styles.TextHead}>RESET APP LOCK PIN</Text>
           </View>
         </View>
 
@@ -151,31 +127,19 @@ const SetLockPin = () => {
         showsHorizontalScrollIndicator={false}
         showsVerticalScrollIndicator={false}>
         <View style={{marginTop: 30}}>
-          <OTPInput
-            title="Enter Pin"
-            type="outline"
-            numberOfInputs={4}
-            onChange={code => {
-              setPinDetails({...pinDetails, newPin: code});
-            }}
-            onFilledCode={true}
-            secureTextEntry={true}
-            onPasted={pinDetails.newPin}
-          />
-
-          <OTPInput
-            title="Confirm Pin"
-            type="outline"
-            numberOfInputs={4}
-            onFilledCode={true}
-            onChange={code => {
-              setPinDetails({...pinDetails, confirmPin: code});
-            }}
-            secureTextEntry={true}
-            onPasted={pinDetails.confirmPin}
+          <InputPhone
+            label="Phone number"
+            layout="first"
+            isNeeded={true}
+            defaultCode="NG"
+            codeTextStyle={{color: '#6E7191'}}
+            defaultValue={resetDetails?.phoneNumber}
+            onChangeFormattedText={text =>
+              setResetDetails({...resetDetails, phoneNumber: text})
+            }
           />
         </View>
-        <TouchableOpacity style={{marginTop: 30}} onPress={handleCreatePin}>
+        <TouchableOpacity style={{marginTop: 30}} onPress={handleResetPin}>
           <Buttons label={'Submit'} />
         </TouchableOpacity>
       </ScrollView>
@@ -183,7 +147,7 @@ const SetLockPin = () => {
   );
 };
 
-export default SetLockPin;
+export default ResetLockPin;
 
 const styles = StyleSheet.create({
   container: {

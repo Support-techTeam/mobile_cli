@@ -1,32 +1,38 @@
-import { View, Text, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
-import React, { useState, useEffect, useContext } from 'react';
-import { Entypo } from '@expo/vector-icons';
-import { AntDesign } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
-import * as DocumentPicker from 'expo-document-picker';
-import { SafeAreaView } from 'react-native-safe-area-context';
-
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  FlatList,
+  ScrollView,
+} from 'react-native';
+import React, {useState, useEffect, useContext} from 'react';
+import AntDesign from 'react-native-vector-icons/AntDesign';
+import Entypo from 'react-native-vector-icons/Entypo';
+import {useNavigation, useRoute} from '@react-navigation/native';
+import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
+import DocumentPicker from 'react-native-document-picker';
+import Input from '../../../component/inputField/input.component';
 import CustomInput from '../../../component/custominput/CustomInput';
 import Buttons from '../../../component/buttons/Buttons';
-import { ScrollView } from 'react-native-gesture-handler';
-import { StoreContext } from '../../../config/mobX stores/RootStore';
-import { observer } from 'mobx-react-lite';
+import {createUploadDocument, uploadProgress} from '../../../stores/LoanStore';
+import Toast from 'react-native-toast-message';
 
 const ITEM_HEIGHT = 100;
 
 const TobTabs = [
-  { name: 'Valid Identity', key: 'ValidIndentity' },
-  { name: 'Proof of Address', key: 'ProofOfAddress' },
-  { name: 'Bank Statement', key: 'BankStatement' },
-  { name: 'Passport', key: 'Passport' },
-  { name: 'Signature', key: 'Signature' },
-  { name: 'Company Seals', key: 'CompanySeals' },
-  { name: 'CAC', key: 'CAC' },
-  { name: 'Others', key: 'Others' },
-  { name: 'Submit All', key: 'SubmitDocs' },
+  {name: 'Valid Identity', key: 'ValidIndentity'},
+  {name: 'Proof of Address', key: 'ProofOfAddress'},
+  {name: 'Bank Statement', key: 'BankStatement'},
+  {name: 'Passport', key: 'Passport'},
+  {name: 'Signature', key: 'Signature'},
+  {name: 'Company Seals', key: 'CompanySeals'},
+  {name: 'CAC', key: 'CAC'},
+  {name: 'Others', key: 'Others'},
+  {name: 'Submit All', key: 'SubmitDocs'},
 ];
 
-const Others = ({ route }) => {
+const Others = ({route}) => {
   const docsDetails = route?.params?.paramKey;
 
   const [userDocs, setUserDocs] = useState({
@@ -49,32 +55,52 @@ const Others = ({ route }) => {
           ? ''
           : docsDetails?.validIdentificationType,
       validIdentification:
-        docsDetails?.validIdentification === undefined ? '' : docsDetails?.validIdentification,
-      utilityBill: docsDetails?.utilityBill === undefined ? '' : docsDetails?.utilityBill,
-      bankStatement: docsDetails?.bankStatement === undefined ? '' : docsDetails?.bankStatement,
-      passport: docsDetails?.passport === undefined ? '' : docsDetails?.passport,
-      signature: docsDetails?.signature === undefined ? '' : docsDetails?.signature,
+        docsDetails?.validIdentification === undefined
+          ? ''
+          : docsDetails?.validIdentification,
+      utilityBill:
+        docsDetails?.utilityBill === undefined ? '' : docsDetails?.utilityBill,
+      bankStatement:
+        docsDetails?.bankStatement === undefined
+          ? ''
+          : docsDetails?.bankStatement,
+      passport:
+        docsDetails?.passport === undefined ? '' : docsDetails?.passport,
+      signature:
+        docsDetails?.signature === undefined ? '' : docsDetails?.signature,
       seal: docsDetails?.seal === undefined ? '' : docsDetails?.seal,
       cac: docsDetails?.cac === undefined ? '' : docsDetails?.cac,
-      othersName: docsDetails?.othersName === undefined ? '' : docsDetails?.othersName,
+      othersName:
+        docsDetails?.othersName === undefined ? '' : docsDetails?.othersName,
       others: docsDetails?.others === undefined ? '' : docsDetails?.others,
     });
   }, [docsDetails]);
 
   const activeTab = 'Others';
   const navigation = useNavigation();
+  const insets = useSafeAreaInsets();
   const [selectedDocument, setSelectedDocument] = useState(null);
-
-  const { loansStore } = useContext(StoreContext);
-  const { success, othersSus, uploadProgress, fileString } = loansStore;
 
   const disableit = !userDocs.othersName || !selectedDocument;
 
   const pickDocument = async () => {
-    let result = await DocumentPicker.getDocumentAsync({});
-
-    setSelectedDocument(result);
-    setFile({ name: result?.name, type: result?.mimeType, uri: result?.uri });
+    try {
+      let result = await DocumentPicker.pick({});
+      console.log(
+        result.uri, // The URI of the selected document
+        result.type, // Mime type
+        result.name, // The name of the file
+        result.size, // File size (in bytes)
+      );
+      setSelectedDocument(result);
+      setFile({name: result?.name, type: result?.mimeType, uri: result?.uri});
+    } catch (err) {
+      if (DocumentPicker.isCancel(err)) {
+        // User cancelled the document picker
+      } else {
+        // Handle other errors
+      }
+    }
   };
 
   const [fileUri, setFile] = useState({
@@ -83,59 +109,89 @@ const Others = ({ route }) => {
     uri: '',
   });
 
-  const s3UploadFunction = () => {
-    loansStore.createUploadDocument(fileUri, 'signature');
+  const s3UploadFunction = async () => {
+    // setIsUpdating(true);
+    const res = await createUploadDocument(fileUri, 'signature');
+    if (res.error) {
+      Toast.show({
+        type: 'error',
+        position: 'top',
+        topOffset: 50,
+        text1: res.title,
+        text2: res.message,
+        visibilityTime: 5000,
+        autoHide: true,
+        onPress: () => Toast.hide(),
+      });
+    } else {
+      Toast.show({
+        type: 'success',
+        position: 'top',
+        topOffset: 50,
+        text1: res.title,
+        text2: res.message,
+        visibilityTime: 3000,
+        autoHide: true,
+        onPress: () => Toast.hide(),
+      });
+
+      console.log('res', res);
+      // setUserDocs(deetss => {
+      //   return {
+      //     ...deetss,
+      //     others: `${fileString}`,
+      //   };
+      // });
+    }
+    // setIsUpdating(false);
   };
 
-  useEffect(() => {
-    if (success === 'upload successful') {
-      setUserDocs((deetss) => {
-        return {
-          ...deetss,
-          others: `${fileString}`,
-        };
-      });
-    }
-  }, [fileString, success]);
+  // useEffect(() => {
+  //   if (othersSus === 'othersscs') {
+  //     setTimeout(() => {
+  //       navigation.navigate('SubmitDocs', { paramKey: userDocs });
+  //     }, 1000);
+  //   }
+  // }, [navigation, othersSus, userDocs]);
 
-  useEffect(() => {
-    if (othersSus === 'othersscs') {
-      setTimeout(() => {
-        navigation.navigate('SubmitDocs', { paramKey: userDocs });
-      }, 1000);
-    }
-  }, [navigation, othersSus, userDocs]);
-
-  const renderItem = ({ item }) => {
+  const renderItem = ({item}) => {
     const isActive = item.key === activeTab;
 
     return (
       <View>
         <View style={[styles.tobTab, isActive && styles.activeTab]}>
-          <Text style={[styles.tabText, isActive && styles.activeTabText]}>{item.name}</Text>
+          <Text style={[styles.tabText, isActive && styles.activeTabText]}>
+            {item.name}
+          </Text>
         </View>
       </View>
     );
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView
+      style={{
+        flex: 1,
+        backgroundColor: '#fff',
+        paddingTop: insets.top !== 0 ? insets.top / 2 : 'auto',
+        paddingBottom: insets.bottom !== 0 ? insets.bottom / 2 : 'auto',
+        paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
+        paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
+      }}>
       <View
         style={{
           flexDirection: 'row',
           justifyContent: 'space-between',
           alignItems: 'center',
           marginHorizontal: 15,
-        }}
-      >
+        }}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <View
             style={{
               borderWidth: 0.5,
               borderColor: '#D9DBE9',
               borderRadius: 5,
-            }}
-          >
+            }}>
             <AntDesign name="left" size={24} color="black" />
           </View>
         </TouchableOpacity>
@@ -156,7 +212,7 @@ const Others = ({ route }) => {
         <FlatList
           data={TobTabs}
           renderItem={renderItem}
-          keyExtractor={(item) => item.key}
+          keyExtractor={item => item.key}
           horizontal
           scrollEnabled={true}
           showsHorizontalScrollIndicator={false}
@@ -169,11 +225,13 @@ const Others = ({ route }) => {
         />
       </View>
 
-      <ScrollView style={styles.innercontainer} showsVerticalScrollIndicator={false}>
-        <CustomInput
+      <ScrollView
+        style={styles.innercontainer}
+        showsVerticalScrollIndicator={false}>
+        <Input
           label="Document Name"
           value={userDocs.othersName}
-          onChangeText={(text) => setUserDocs({ ...userDocs, othersName: text })}
+          onChangeText={text => setUserDocs({...userDocs, othersName: text})}
           autoCorrect={false}
         />
 
@@ -185,22 +243,35 @@ const Others = ({ route }) => {
           ) : (
             <>
               <TouchableOpacity
-                style={{ backgroundColor: '#24348B', padding: 10, borderRadius: 5 }}
-                onPress={pickDocument}
-              >
+                style={{
+                  backgroundColor: '#24348B',
+                  padding: 10,
+                  borderRadius: 5,
+                }}
+                onPress={pickDocument}>
                 <Entypo name="upload-to-cloud" size={30} color="#FCFCFC" />
               </TouchableOpacity>
               <Text style={{}}>Browse Files</Text>
-              <Text style={{}}>File format: JPG, JPEG, PNG | Max File Size 3mb</Text>
+              <Text style={{}}>
+                File format: JPG, JPEG, PNG | Max File Size 3mb
+              </Text>
             </>
           )}
         </View>
 
-        <TouchableOpacity onPress={s3UploadFunction} disabled={disableit} style={{ marginTop: 20 }}>
+        <TouchableOpacity
+          onPress={s3UploadFunction}
+          disabled={disableit}
+          style={{marginTop: 20}}>
           <Buttons label={'Submit'} disabled={disableit} />
         </TouchableOpacity>
         {uploadProgress > 0 && (
-          <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: 20 }}>
+          <View
+            style={{
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginTop: 20,
+            }}>
             <Text>{uploadProgress}% complete</Text>
           </View>
         )}
@@ -212,16 +283,18 @@ const Others = ({ route }) => {
           alignItems: 'center',
           marginVertical: 16,
           marginHorizontal: 16,
-        }}
-      >
+        }}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <View style={[styles.tobTab, { backgroundColor: '#054B99' }]}>
-            <Text style={[styles.tabText, { color: 'white' }]}>Prev.</Text>
+          <View style={[styles.tobTab, {backgroundColor: '#054B99'}]}>
+            <Text style={[styles.tabText, {color: 'white'}]}>Prev.</Text>
           </View>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate('SubmitDocs', { paramKey: userDocs })}>
-          <View style={[styles.tobTab, { backgroundColor: '#054B99' }]}>
-            <Text style={[styles.tabText, { color: 'white' }]}>Skip</Text>
+        <TouchableOpacity
+          onPress={() =>
+            navigation.navigate('SubmitDocs', {paramKey: userDocs})
+          }>
+          <View style={[styles.tobTab, {backgroundColor: '#054B99'}]}>
+            <Text style={[styles.tabText, {color: 'white'}]}>Skip</Text>
           </View>
         </TouchableOpacity>
       </View>
@@ -229,7 +302,7 @@ const Others = ({ route }) => {
   );
 };
 
-export default observer(Others);
+export default Others;
 const styles = StyleSheet.create({
   innercontainer: {
     marginTop: 16,

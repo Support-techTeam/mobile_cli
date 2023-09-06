@@ -12,7 +12,7 @@ import {getStatusBarHeight} from 'react-native-status-bar-height';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import {useNavigation} from '@react-navigation/native';
-import ImagePicker from 'react-native-image-picker';
+import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import {TabView, SceneMap, TabBar} from 'react-native-tab-view';
 
 import Personal from '../../component/MyAccountTabs/PersonalTab';
@@ -34,25 +34,42 @@ const MyAccount = () => {
   };
 
   const launchCameraAsync = async () => {
-    const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
+    const permissionResult = await PermissionsAndroid.requestMultiple([
+      PermissionsAndroid.PERMISSIONS.CAMERA,
+      PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+    ]);
 
-    if (permissionResult.granted === false) {
+    if (
+      permissionResult['android.permission.CAMERA'] ===
+        PermissionsAndroid.RESULTS.GRANTED &&
+      permissionResult['android.permission.WRITE_EXTERNAL_STORAGE'] ===
+        PermissionsAndroid.RESULTS.GRANTED
+    ) {
+      console.log('Grantd');
+      await launchCamera(
+        {
+          mediaType: 'photo', // Specify 'photo' to capture images
+          maxWidth: 800, // Maximum width for the captured image
+          maxHeight: 600, // Maximum height for the captured image
+          quality: 1,
+        },
+        response => {
+          if (response.didCancel) {
+            console.log('User cancelled the camera');
+          } else if (response.error) {
+            console.error('ImagePicker Error:', response.error);
+          } else {
+            handleImageSelection(response);
+          }
+        },
+      );
+    } else {
       Alert.alert(
         'Permission Required',
         'Permission to access camera is required.',
       );
       return;
     }
-
-    try {
-      const result = await ImagePicker.launchCameraAsync({
-        allowsEditing: true,
-        aspect: [1, 1],
-        quality: 1,
-      });
-
-      handleImageSelection(result);
-    } catch (error) {}
   };
 
   const navigation = useNavigation();

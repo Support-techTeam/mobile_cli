@@ -8,27 +8,27 @@ import {
   TouchableOpacity,
   Alert,
 } from 'react-native';
-import React, { useState } from 'react';
-import * as ImagePicker from 'expo-image-picker';
-import { AntDesign } from '@expo/vector-icons';
-import { Feather } from '@expo/vector-icons';
-import { Entypo } from '@expo/vector-icons';
-import { getStatusBarHeight } from 'react-native-status-bar-height';
+import React, {useState} from 'react';
+import ImagePicker from 'react-native-image-picker';
+import AntDesign from 'react-native-vector-icons/AntDesign';
+import Feather from 'react-native-vector-icons/Feather';
+import Entypo from 'react-native-vector-icons/Entypo';
+import {getStatusBarHeight} from 'react-native-status-bar-height';
 import Buttons from '../buttons/Buttons';
 import VerifyModal from '../modals/verifyModal';
-import { useNavigation } from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
 import CustomInput from '../custominput/CustomInput';
 
 const statusBarHeight = getStatusBarHeight();
 
-const Nin = ({ isCam }) => {
+const Nin = ({isCam}) => {
   const [image, setImage] = useState(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [successmodalVisible, setSuccessModalVisible] = useState(false);
   const navigation = useNavigation();
   const disableit = !image;
 
-  const handleImageSelection = async (result) => {
+  const handleImageSelection = async result => {
     if (!result.canceled) {
       setImage(result.assets[0].uri);
       setShowConfirmModal(true);
@@ -36,15 +36,19 @@ const Nin = ({ isCam }) => {
   };
 
   const openImagePickerAsync = async () => {
-    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    const permissionResult =
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
 
     if (permissionResult.granted === false) {
-      Alert.alert('Permission Required', 'Permission to access camera roll is required.');
+      Alert.alert(
+        'Permission Required',
+        'Permission to access camera roll is required.',
+      );
       return;
     }
 
     try {
-      const result = await ImagePicker.launchImageLibraryAsync({
+      const result = await ImagePicker.launchImageLibrary({
         allowsEditing: true,
         aspect: [4, 2],
         quality: 1,
@@ -55,15 +59,19 @@ const Nin = ({ isCam }) => {
   };
 
   const launchCameraAsync = async () => {
-    const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
+    const permissionResult =
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
 
     if (permissionResult.granted === false) {
-      Alert.alert('Permission Required', 'Permission to access camera is required.');
+      Alert.alert(
+        'Permission Required',
+        'Permission to access camera is required.',
+      );
       return;
     }
 
     try {
-      const result = await ImagePicker.launchCameraAsync({
+      const result = await ImagePicker.launchCamera({
         allowsEditing: true,
         aspect: [4, 2],
         quality: 1,
@@ -91,8 +99,7 @@ const Nin = ({ isCam }) => {
     <ScrollView
       bounces={false}
       showsHorizontalScrollIndicator={false}
-      showsVerticalScrollIndicator={false}
-    >
+      showsVerticalScrollIndicator={false}>
       <Modal visible={showConfirmModal}>
         <View style={styles.modalContainer}>
           <View
@@ -101,16 +108,14 @@ const Nin = ({ isCam }) => {
               justifyContent: 'space-between',
               alignItems: 'center',
               marginHorizontal: 15,
-            }}
-          >
+            }}>
             <TouchableOpacity>
               <View
                 style={{
                   borderWidth: 0.5,
                   borderColor: '#D9DBE9',
                   borderRadius: 5,
-                }}
-              >
+                }}>
                 <TouchableOpacity onPress={() => noPhoto()}>
                   <AntDesign name="left" size={24} color="black" />
                 </TouchableOpacity>
@@ -126,20 +131,22 @@ const Nin = ({ isCam }) => {
             </View>
           </View>
           <View style={styles.demark} />
-          <Text style={styles.extraText}>Ensure that your image is clear and, not blurry</Text>
+          <Text style={styles.extraText}>
+            Ensure that your image is clear and, not blurry
+          </Text>
           <View style={styles.imageContainer}>
-            <Image source={{ uri: image }} style={styles.modalImage} />
+            <Image source={{uri: image}} style={styles.modalImage} />
           </View>
-          <View style={{ paddingHorizontal: 22, marginVertical: 20 }}>
+          <View style={{paddingHorizontal: 22, marginVertical: 20}}>
             <TouchableOpacity onPress={confirmPhoto}>
               <Buttons label="Confirm Photo" />
             </TouchableOpacity>
           </View>
 
-          <View style={{ paddingHorizontal: 22, marginVertical: 20 }}>
+          <View style={{paddingHorizontal: 22, marginVertical: 20}}>
             <TouchableOpacity onPress={retakePhoto}>
               <View style={styles.signUpactivity}>
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <View style={{flexDirection: 'row', alignItems: 'center'}}>
                   <Feather name="camera" size={25} color="#054B99" />
                   <Text style={styles.retake}>Retake Photo</Text>
                 </View>
@@ -155,7 +162,9 @@ const Nin = ({ isCam }) => {
             <Image source={require('../../../assets/images/checked.png')} />
             <Text style={styles.checkedText}>Verification Successful</Text>
           </View>
-          <TouchableOpacity style={{ marginTop: 10 }} onPress={() => navigation.navigate('root')}>
+          <TouchableOpacity
+            style={{marginTop: 10}}
+            onPress={() => navigation.navigate('root')}>
             <Buttons label="Continue" />
           </TouchableOpacity>
         </View>
@@ -165,10 +174,10 @@ const Nin = ({ isCam }) => {
         <View>
           <Text style={styles.Head}>Document Requirements </Text>
         </View>
-        <View style={{ marginBottom: 10 }}>
+        <View style={{marginBottom: 10}}>
           <Text style={styles.textHead}>
-            Take a clear picture or upload an original copy of your govt issued ID; Passport,
-            Driver's license, Voter's card or NIN slip.
+            Take a clear picture or upload an original copy of your govt issued
+            ID; Passport, Driver's license, Voter's card or NIN slip.
           </Text>
         </View>
       </View>
@@ -184,18 +193,17 @@ const Nin = ({ isCam }) => {
           marginTop: 10,
           height: 235,
           backgroundColor: '#F7F7FC',
-        }}
-      >
-        <View style={{ marginVertical: 10 }}>
+        }}>
+        <View style={{marginVertical: 10}}>
           {image ? (
             <Image
-              source={{ uri: image }}
-              style={{ width: '100%', height: '100%', resizeMode: 'contain' }}
+              source={{uri: image}}
+              style={{width: '100%', height: '100%', resizeMode: 'contain'}}
             />
           ) : (
             <Image
               source={require('../../../assets/images/nin.png')}
-              style={{ width: '100%', height: '100%', resizeMode: 'contain' }}
+              style={{width: '100%', height: '100%', resizeMode: 'contain'}}
             />
           )}
         </View>
@@ -212,7 +220,7 @@ const Nin = ({ isCam }) => {
       {!image && (
         <>
           {isCam ? (
-            <View style={{ marginTop: 20, marginBottom: 20 }}>
+            <View style={{marginTop: 20, marginBottom: 20}}>
               <TouchableOpacity onPress={launchCameraAsync}>
                 <View style={styles.opencam}>
                   <Feather name="camera" size={24} color="black" />
@@ -221,7 +229,7 @@ const Nin = ({ isCam }) => {
               </TouchableOpacity>
             </View>
           ) : (
-            <View style={{ marginTop: 20, marginBottom: 20 }}>
+            <View style={{marginTop: 20, marginBottom: 20}}>
               <TouchableOpacity onPress={openImagePickerAsync}>
                 <View style={styles.opencam}>
                   <Entypo name="upload-to-cloud" size={24} color="#054B99" />
@@ -235,9 +243,8 @@ const Nin = ({ isCam }) => {
 
       <TouchableOpacity
         disabled={disableit}
-        style={{ marginBottom: 150 }}
-        onPress={() => setSuccessModalVisible(true)}
-      >
+        style={{marginBottom: 150}}
+        onPress={() => setSuccessModalVisible(true)}>
         <Buttons label="Submit" disabled={disableit} />
       </TouchableOpacity>
     </ScrollView>
@@ -350,7 +357,7 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     // borderWidth:.5,
     shadowColor: 'black',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.8,
     shadowRadius: 2,
     backgroundColor: '#ffffff',

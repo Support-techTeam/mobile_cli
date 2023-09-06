@@ -75,16 +75,16 @@ const Loanscreen = () => {
     setIsLoading(true);
     const res = await getLoanUserDetails();
     if (res.error) {
-      Toast.show({
-        type: 'error',
-        position: 'top',
-        topOffset: 50,
-        text1: res.title,
-        text2: res.message,
-        visibilityTime: 5000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
+      // Toast.show({
+      //   type: 'error',
+      //   position: 'top',
+      //   topOffset: 50,
+      //   text1: res.title,
+      //   text2: res.message,
+      //   visibilityTime: 5000,
+      //   autoHide: true,
+      //   onPress: () => Toast.hide(),
+      // });
     } else {
       setLoanUserDetails(res?.data);
     }
@@ -94,16 +94,16 @@ const Loanscreen = () => {
     setIsLoading(true);
     const res = await getApprovedLoans();
     if (res.error) {
-      Toast.show({
-        type: 'error',
-        position: 'top',
-        topOffset: 50,
-        text1: res.title,
-        text2: res.message,
-        visibilityTime: 5000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
+      // Toast.show({
+      //   type: 'error',
+      //   position: 'top',
+      //   topOffset: 50,
+      //   text1: res.title,
+      //   text2: res.message,
+      //   visibilityTime: 5000,
+      //   autoHide: true,
+      //   onPress: () => Toast.hide(),
+      // });
     } else {
       setApprovedLoansData(res?.data);
     }
@@ -113,16 +113,16 @@ const Loanscreen = () => {
     setIsLoading(true);
     const res = await getPendingLoans();
     if (res.error) {
-      Toast.show({
-        type: 'error',
-        position: 'top',
-        topOffset: 50,
-        text1: res.title,
-        text2: res.message,
-        visibilityTime: 5000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
+      // Toast.show({
+      //   type: 'error',
+      //   position: 'top',
+      //   topOffset: 50,
+      //   text1: res.title,
+      //   text2: res.message,
+      //   visibilityTime: 5000,
+      //   autoHide: true,
+      //   onPress: () => Toast.hide(),
+      // });
     } else {
       setPendingLoansData(res?.data);
     }
@@ -132,16 +132,16 @@ const Loanscreen = () => {
     setIsLoading(true);
     const res = await getAllLoans();
     if (res.error) {
-      Toast.show({
-        type: 'error',
-        position: 'top',
-        topOffset: 50,
-        text1: res.title,
-        text2: res.message,
-        visibilityTime: 5000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
+      // Toast.show({
+      //   type: 'error',
+      //   position: 'top',
+      //   topOffset: 50,
+      //   text1: res.title,
+      //   text2: res.message,
+      //   visibilityTime: 5000,
+      //   autoHide: true,
+      //   onPress: () => Toast.hide(),
+      // });
     } else {
       setAllLoansData(res?.data);
     }
@@ -151,16 +151,16 @@ const Loanscreen = () => {
     setIsLoading(true);
     const res = await getPaidLoans();
     if (res.error) {
-      Toast.show({
-        type: 'error',
-        position: 'top',
-        topOffset: 50,
-        text1: res.title,
-        text2: res.message,
-        visibilityTime: 5000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
+      // Toast.show({
+      //   type: 'error',
+      //   position: 'top',
+      //   topOffset: 50,
+      //   text1: res.title,
+      //   text2: res.message,
+      //   visibilityTime: 5000,
+      //   autoHide: true,
+      //   onPress: () => Toast.hide(),
+      // });
     } else {
       setPaidLoansData(res?.data);
     }

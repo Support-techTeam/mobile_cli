@@ -34,13 +34,18 @@ import {
   ValidIdentity,
 } from '../screens/ProfileOnboardings/AddDocuments';
 import FinalSubmit from '../screens/ProfileOnboardings/AddDocuments/FinalSubmit';
-
+import Securindex from '../screens/SecurityScreens/Securindex';
+import TransPin from '../screens/SecurityScreens/TransPin';
+import PinCon from '../screens/SecurityScreens/PinCon';
+import PinSuccess from '../screens/SecurityScreens/PinSuccess';
+import LockPin from '../screens/SecurityScreens/LockPin';
+import ResetPin from '../screens/SecurityScreens/ResetPin';
+import SetLockPin from '../screens/SecurityScreens/SetPinScreen';
+import ResetLockPin from '../screens/SecurityScreens/ResetLockPin';
+// import EnterPin from '../screens/SecurityScreens/EnterPinScreen';
+import ChangeLockPin from '../screens/SecurityScreens/ChangeLockPin';
 //Pending
-// import Securindex from '../screens/SecurityScreens/Securindex';
-// import TransPin from '../screens/SecurityScreens/TransPin';
-// import PinCon from '../screens/SecurityScreens/PinCon';
-// import PinSuccess from '../screens/SecurityScreens/PinSuccess';
-// import LockPin from '../screens/SecurityScreens/LockPin';
+
 // import BeneficiaryList from '../screens/TransferScreens/BeneficiaryList';
 // import {Airtime, Homescreen, Paybills} from '../screens/HomeScreens';
 // import AirtimeConfirm from '../screens/paybills/AirtimeConfirm';
@@ -50,7 +55,6 @@ import FinalSubmit from '../screens/ProfileOnboardings/AddDocuments/FinalSubmit'
 // import Cable from '../screens/paybills/Cable';
 // import BillPin from '../screens/paybills/billPin';
 // import StatusFailed from '../screens/paybills/StatusFailed';
-// import ResetPin from '../screens/SecurityScreens/ResetPin';
 
 import {auth} from '../util/firebase/firebaseConfig';
 import {getProfileDetails} from '../stores/ProfileStore';
@@ -171,6 +175,18 @@ const AppStack = () => {
           <Stack.Screen name="BankDetails" component={BankDetails} />
           {/* Settings */}
           <Stack.Screen name="MyAccount" component={MyAccount} />
+          {/* Security */}
+          <Stack.Screen name="Security" component={Securindex} />
+          <Stack.Screen name="PinSuccess" component={PinSuccess} />
+          <Stack.Screen name="PinCon" component={PinCon} />
+          <Stack.Screen name="LockPin" component={LockPin} />
+          <Stack.Screen name="SetPin" component={TransPin} />
+          <Stack.Screen name="ResetPin" component={ResetPin} />
+          {/* App Lock */}
+          <Stack.Screen name="SetLockPin" component={SetLockPin} />
+          <Stack.Screen name="ResetLockPin" component={ResetLockPin} />
+          {/* <Stack.Screen name="EnterPin" component={EnterPin} /> */}
+          <Stack.Screen name="ChangeLockPin" component={ChangeLockPin} />
           {/* Documents */}
           <Stack.Screen name="ValidIdentity" component={ValidIdentity} />
           {/* <Stack.Screen name="ProofOfAddress" component={ProofOfAddress} /> */}

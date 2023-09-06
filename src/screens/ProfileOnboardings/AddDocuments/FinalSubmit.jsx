@@ -1,13 +1,15 @@
 import {View, Text, StyleSheet, TouchableOpacity, FlatList} from 'react-native';
 import React, {useContext, useEffect} from 'react';
-import {AntDesign} from '@expo/vector-icons';
+import AntDesign from 'react-native-vector-icons/AntDesign';
 import {useNavigation} from '@react-navigation/native';
 import Spinner from 'react-native-loading-spinner-overlay/lib';
-import {observer} from 'mobx-react-lite';
 import {SafeAreaView} from 'react-native-safe-area-context';
-
+import Toast from 'react-native-toast-message';
 import Buttons from '../../../component/buttons/Buttons';
-import {StoreContext} from '../../../config/mobX stores/RootStore';
+import {
+  createDocumentsDetails,
+  updateDocumentsDetails,
+} from '../../../stores/LoanStore';
 
 const ITEM_HEIGHT = 100;
 
@@ -25,7 +27,8 @@ const TobTabs = [
 
 const FinalSubmit = ({route}) => {
   const docsDetails = route?.params?.paramKey;
-
+  const [isLoading, setIsLoading] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
   const navigation = useNavigation();
   const activeTab = 'SubmitDocs';
   const renderItem = ({item}) => {
@@ -41,9 +44,6 @@ const FinalSubmit = ({route}) => {
       </View>
     );
   };
-
-  const {loansStore} = useContext(StoreContext);
-  const {sending, success, docs} = loansStore;
 
   const formDetails = {
     validIdentificationType:
@@ -75,29 +75,73 @@ const FinalSubmit = ({route}) => {
     MERMAT: '',
   };
 
-  const handleCreateDocs = () => {
-    loansStore.createDocumentsDetails(formDetails);
+  const handleCreateDocs = async () => {
+    setIsUpdating(true);
+    const res = await createDocumentsDetails(formDetails);
+    if (res.error) {
+      Toast.show({
+        type: 'error',
+        position: 'top',
+        topOffset: 50,
+        text1: res.title,
+        text2: res.message,
+        visibilityTime: 5000,
+        autoHide: true,
+        onPress: () => Toast.hide(),
+      });
+    } else {
+      Toast.show({
+        type: 'success',
+        position: 'top',
+        topOffset: 50,
+        text1: res.title,
+        text2: res.message,
+        visibilityTime: 3000,
+        autoHide: true,
+        onPress: () => Toast.hide(),
+      });
+      // setTimeout(() => {
+      // navigation.navigate('GetLoan');
+      // }, 1000);
+    }
+    setIsUpdating(false);
   };
 
-  const handleUpdateDocs = () => {
-    loansStore.updateDocumentsDetails(formDetails);
+  const handleUpdateDocs = async () => {
+    setIsUpdating(true);
+    const res = await updateDocumentsDetails(formDetails);
+    if (res.error) {
+      Toast.show({
+        type: 'error',
+        position: 'top',
+        topOffset: 50,
+        text1: res.title,
+        text2: res.message,
+        visibilityTime: 5000,
+        autoHide: true,
+        onPress: () => Toast.hide(),
+      });
+    } else {
+      Toast.show({
+        type: 'success',
+        position: 'top',
+        topOffset: 50,
+        text1: res.title,
+        text2: res.message,
+        visibilityTime: 3000,
+        autoHide: true,
+        onPress: () => Toast.hide(),
+      });
+      // setTimeout(() => {
+      // navigation.navigate('MyAccount');
+      // }, 1000);
+    }
+    setIsUpdating(false);
   };
-
-  useEffect(() => {
-    if (success === 'Document details updated successfully') {
-      navigation.navigate('GetLoan');
-    }
-  }, [navigation, success]);
-
-  useEffect(() => {
-    if (docs === 'Document details updated successfully') {
-      navigation.navigate('MyAccount');
-    }
-  }, [navigation, docs]);
 
   return (
     <SafeAreaView style={styles.container}>
-      {sending && (
+      {isLoading && (
         <Spinner
           textContent={'Submitting ...'}
           textStyle={{color: 'white'}}
@@ -184,7 +228,7 @@ const FinalSubmit = ({route}) => {
   );
 };
 // write a 30 word write up telling the user that submitted documents will be processed after they click submit
-export default observer(FinalSubmit);
+export default FinalSubmit;
 
 const styles = StyleSheet.create({
   innercontainer: {

@@ -22,42 +22,36 @@ import {changePin} from '../../stores/ProfileStore';
 import Toast from 'react-native-toast-message';
 import COLORS from '../../constants/colors';
 import OTPInput from 'react-native-otp-withpaste';
+import {changeCurrentPin} from '../../stores/SecurityStore';
 import {useSelector} from 'react-redux';
-import {createLockPin} from '../../stores/SecurityStore';
 
 const {height, width} = Dimensions.get('window');
 
-const SetLockPin = () => {
+const ChangeLockPin = () => {
   const navigation = useNavigation();
   const [isLoading, setIsLoading] = useState(false);
-  const userProfileData = useSelector(state => state.userProfile.profile);
-  const [pinDetails, setPinDetails] = useState({
+  const [resetDetails, setResetDetails] = useState({
+    oldPin: '',
     newPin: '',
     confirmPin: '',
   });
+  const userProfileData = useSelector(state => state.userProfile.profile);
   const insets = useSafeAreaInsets();
 
-  const handleCreatePin = async () => {
+  const handleChangePin = async () => {
     if (
-      pinDetails.newPin === pinDetails.confirmPin &&
-      pinDetails.newPin !== 0 &&
-      pinDetails.newPin !== ''
+      resetDetails.newPin === resetDetails.confirmPin &&
+      resetDetails.newPin !== 0 &&
+      resetDetails.newPin !== '' &&
+      resetDetails.oldPin !== ''
     ) {
-      const data = {
-        userId: userProfileData?._id.toString(),
-        pin: pinDetails.newPin.toString(),
-        mobileNumber: userProfileData?.phoneNumber.toString(),
-      };
       setIsLoading(true);
-      const res = await createLockPin(data);
-      //   const res = await resetPin(userProfileData?.phoneNumber);
-      //   const res = await getAllPin();
-      //   const res = await validatePin('0055', '64f4520aaf10bb399be2c6f7');
-      //   const res = await changeCurrentPin(
-      //     '64f4520aaf10bb399be2c6f7',
-      //     '1234',
-      //     '0055',
-      //   );
+      const res = await changeCurrentPin(
+        userProfileData?._id.toString(),
+        resetDetails.oldPin.toString(),
+        resetDetails.newPin.toString(),
+      );
+
       if (res?.error) {
         Toast.show({
           type: 'error',
@@ -91,7 +85,7 @@ const SetLockPin = () => {
         type: 'error',
         position: 'top',
         topOffset: 50,
-        text1: 'Create Pin',
+        text1: 'Change Pin',
         text2: 'Pin code is not a match!',
         visibilityTime: 5000,
         autoHide: true,
@@ -113,7 +107,7 @@ const SetLockPin = () => {
       }}>
       {isLoading && (
         <Spinner
-          textContent={'Creating Lock Pin...'}
+          textContent={'Updating Pin...'}
           textStyle={{color: 'white'}}
           visible={true}
           overlayColor="rgba(78, 75, 102, 0.7)"
@@ -137,7 +131,7 @@ const SetLockPin = () => {
         </TouchableOpacity>
         <View style={styles.HeadView}>
           <View style={styles.TopView}>
-            <Text style={styles.TextHead}>CREATE APP LOCK PIN</Text>
+            <Text style={styles.TextHead}>CHANGE APP LOCK PIN</Text>
           </View>
         </View>
 
@@ -152,15 +146,27 @@ const SetLockPin = () => {
         showsVerticalScrollIndicator={false}>
         <View style={{marginTop: 30}}>
           <OTPInput
-            title="Enter Pin"
+            title="Old Pin"
             type="outline"
             numberOfInputs={4}
             onChange={code => {
-              setPinDetails({...pinDetails, newPin: code});
+              setResetDetails({...resetDetails, oldPin: code});
             }}
             onFilledCode={true}
             secureTextEntry={true}
-            onPasted={pinDetails.newPin}
+            onPasted={resetDetails.oldPin}
+          />
+
+          <OTPInput
+            title="New Pin"
+            type="outline"
+            numberOfInputs={4}
+            onChange={code => {
+              setResetDetails({...resetDetails, newPin: code});
+            }}
+            onFilledCode={true}
+            secureTextEntry={true}
+            onPasted={resetDetails.newPin}
           />
 
           <OTPInput
@@ -169,13 +175,13 @@ const SetLockPin = () => {
             numberOfInputs={4}
             onFilledCode={true}
             onChange={code => {
-              setPinDetails({...pinDetails, confirmPin: code});
+              setResetDetails({...resetDetails, confirmPin: code});
             }}
             secureTextEntry={true}
-            onPasted={pinDetails.confirmPin}
+            onPasted={resetDetails.confirmPin}
           />
         </View>
-        <TouchableOpacity style={{marginTop: 30}} onPress={handleCreatePin}>
+        <TouchableOpacity style={{marginTop: 30}} onPress={handleChangePin}>
           <Buttons label={'Submit'} />
         </TouchableOpacity>
       </ScrollView>
@@ -183,7 +189,7 @@ const SetLockPin = () => {
   );
 };
 
-export default SetLockPin;
+export default ChangeLockPin;
 
 const styles = StyleSheet.create({
   container: {

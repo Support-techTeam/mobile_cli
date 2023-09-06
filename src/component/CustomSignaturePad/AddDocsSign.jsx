@@ -1,27 +1,36 @@
-import React, { useContext, useEffect, useRef, useState } from 'react';
-import { Image, View, TouchableOpacity, Modal, Text, StyleSheet } from 'react-native';
-import { AntDesign } from '@expo/vector-icons';
-import { Feather } from '@expo/vector-icons';
-
-import { getStatusBarHeight } from 'react-native-status-bar-height';
+import React, {useContext, useEffect, useRef, useState} from 'react';
+import {
+  Image,
+  View,
+  TouchableOpacity,
+  Modal,
+  Text,
+  StyleSheet,
+} from 'react-native';
+import AntDesign from 'react-native-vector-icons/AntDesign';
+import Feather from 'react-native-vector-icons/Feather';
+import {getStatusBarHeight} from 'react-native-status-bar-height';
 import SignatureScreen from 'react-native-signature-canvas';
-import * as FileSystem from 'expo-file-system';
-import * as MediaLibrary from 'expo-media-library';
+// import * as FileSystem from 'expo-file-system';
+// import * as FileSystem from 'react-native-fs';
+// import * as MediaLibrary from 'expo-media-library';
+// import * as MediaLibrary from 'react-native-media-meta';
+// import MediaMeta from 'react-native-media-meta';
+import RNFS from 'react-native-fs';
 import Buttons from '../buttons/Buttons';
-import { StoreContext } from '../../config/mobX stores/RootStore';
-import { observer } from 'mobx-react-lite';
-import { useNavigation } from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
+import {createUploadDocument, uploadProgress} from '../../stores/LoanStore';
 
 const statusBarHeight = getStatusBarHeight();
 
-const SignaturePad = ({ deets }) => {
+const SignaturePad = ({deets}) => {
   const ref = useRef();
   const [signature, setSign] = useState(null);
   const [image, setImage] = useState(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
 
-  const { loansStore } = useContext(StoreContext);
-  const { success, sucsMsg, uploadProgress, fileString } = loansStore;
+  // const { loansStore } = useContext(StoreContext);
+  // const { success, sucsMsg, uploadProgress, fileString } = loansStore;
   const navigation = useNavigation();
 
   const [fileUri, setFile] = useState({
@@ -33,7 +42,7 @@ const SignaturePad = ({ deets }) => {
   const disableit = !signature;
 
   // Called after ref.current.readSignature() reads a non-empty base64 string
-  const handleOK = (sig) => {
+  const handleOK = sig => {
     setSign(sig);
   };
 
@@ -55,7 +64,7 @@ const SignaturePad = ({ deets }) => {
     ref.current.readSignature();
   };
 
-  const handleSave = async (sign) => {
+  const handleSave = async sign => {
     try {
       const dirs = FileSystem.documentDirectory;
       var image_data = sign?.split('data:image/png;base64,');
@@ -73,7 +82,11 @@ const SignaturePad = ({ deets }) => {
       });
 
       const asset = await MediaLibrary.createAssetAsync(filePath);
-      await MediaLibrary.createAlbumAsync('TradeLenda Signatures Captures', asset, false);
+      await MediaLibrary.createAlbumAsync(
+        'TradeLenda Signatures Captures',
+        asset,
+        false,
+      );
     } catch (error) {}
   };
 
@@ -103,38 +116,81 @@ const SignaturePad = ({ deets }) => {
         ? ''
         : docsDetails?.validIdentificationType,
     validIdentification:
-      docsDetails?.validIdentification === undefined ? '' : docsDetails?.validIdentification,
-    utilityBill: docsDetails?.utilityBill === undefined ? '' : docsDetails?.utilityBill,
-    bankStatement: docsDetails?.bankStatement === undefined ? '' : docsDetails?.bankStatement,
+      docsDetails?.validIdentification === undefined
+        ? ''
+        : docsDetails?.validIdentification,
+    utilityBill:
+      docsDetails?.utilityBill === undefined ? '' : docsDetails?.utilityBill,
+    bankStatement:
+      docsDetails?.bankStatement === undefined
+        ? ''
+        : docsDetails?.bankStatement,
     passport: docsDetails?.passport === undefined ? '' : docsDetails?.passport,
-    signature: docsDetails?.signature === undefined ? '' : docsDetails?.signature,
+    signature:
+      docsDetails?.signature === undefined ? '' : docsDetails?.signature,
     seal: docsDetails?.seal === undefined ? '' : docsDetails?.seal,
     cac: docsDetails?.cac === undefined ? '' : docsDetails?.cac,
     others: docsDetails?.others === undefined ? '' : docsDetails?.others,
   });
 
-  const s3UploadFunction = () => {
-    loansStore.createUploadDocument(fileUri, 'signature');
+  // const s3UploadFunction = () => {
+  //   loansStore.createUploadDocument(fileUri, 'signature');
+  // };
+  const s3UploadFunction = async () => {
+    // setIsUpdating(true);
+    const res = await createUploadDocument(fileUri, 'signature');
+    if (res.error) {
+      Toast.show({
+        type: 'error',
+        position: 'top',
+        topOffset: 50,
+        text1: res.title,
+        text2: res.message,
+        visibilityTime: 5000,
+        autoHide: true,
+        onPress: () => Toast.hide(),
+      });
+    } else {
+      Toast.show({
+        type: 'success',
+        position: 'top',
+        topOffset: 50,
+        text1: res.title,
+        text2: res.message,
+        visibilityTime: 3000,
+        autoHide: true,
+        onPress: () => Toast.hide(),
+      });
+
+      console.log('res Add Signature', res);
+      // setUserDocs(deetss => {
+      //   return {
+      //     ...deetss,
+      //     others: `${fileString}`,
+      //   };
+      // });
+    }
+    // setIsUpdating(false);
   };
 
-  useEffect(() => {
-    if (success === 'upload successful') {
-      setUserDocs((deetss) => {
-        return {
-          ...deetss,
-          signature: `${fileString}`,
-        };
-      });
-    }
-  }, [fileString, success]);
+  // useEffect(() => {
+  //   if (success === 'upload successful') {
+  //     setUserDocs((deetss) => {
+  //       return {
+  //         ...deetss,
+  //         signature: `${fileString}`,
+  //       };
+  //     });
+  //   }
+  // }, [fileString, success]);
 
-  useEffect(() => {
-    if (sucsMsg === 'success') {
-      setTimeout(() => {
-        navigation.navigate('CompanySeals', { paramKey: userDocs });
-      }, 1000);
-    }
-  }, [navigation, sucsMsg, userDocs]);
+  // useEffect(() => {
+  //   if (sucsMsg === 'success') {
+  //     setTimeout(() => {
+  //       navigation.navigate('CompanySeals', { paramKey: userDocs });
+  //     }, 1000);
+  //   }
+  // }, [navigation, sucsMsg, userDocs]);
 
   return (
     <View style={styles.container}>
@@ -146,16 +202,14 @@ const SignaturePad = ({ deets }) => {
               justifyContent: 'space-between',
               alignItems: 'center',
               marginHorizontal: 15,
-            }}
-          >
+            }}>
             <TouchableOpacity>
               <View
                 style={{
                   borderWidth: 0.5,
                   borderColor: '#D9DBE9',
                   borderRadius: 5,
-                }}
-              >
+                }}>
                 <TouchableOpacity onPress={() => noSign()}>
                   <AntDesign name="left" size={24} color="black" />
                 </TouchableOpacity>
@@ -171,7 +225,9 @@ const SignaturePad = ({ deets }) => {
             </View>
           </View>
           <View style={styles.demark} />
-          <Text style={styles.extraText}>Ensure that your image is clear and, not blurry</Text>
+          <Text style={styles.extraText}>
+            Ensure that your image is clear and, not blurry
+          </Text>
           <View style={styles.imageContainer}>
             <View
               style={{
@@ -182,23 +238,24 @@ const SignaturePad = ({ deets }) => {
                 aspectRatio: 1,
                 justifyContent: 'center',
                 alignContent: 'center',
-              }}
-            >
-              <Image source={{ uri: signature }} style={styles.modalImage} />
+              }}>
+              <Image source={{uri: signature}} style={styles.modalImage} />
             </View>
           </View>
-          <View style={{ paddingHorizontal: 22, marginVertical: 20 }}>
+          <View style={{paddingHorizontal: 22, marginVertical: 20}}>
             <TouchableOpacity onPress={handleConfirm}>
               <Buttons label="Confirm Photo" />
             </TouchableOpacity>
           </View>
 
-          <View style={{ paddingHorizontal: 22, marginVertical: 20 }}>
+          <View style={{paddingHorizontal: 22, marginVertical: 20}}>
             <TouchableOpacity onPress={retakePhoto}>
               <View style={styles.signUpactivity}>
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <View style={{flexDirection: 'row', alignItems: 'center'}}>
                   <Feather name="camera" size={25} color="#054B99" />
-                  <Text style={styles.retake}>Retake Signature / or use camera</Text>
+                  <Text style={styles.retake}>
+                    Retake Signature / or use camera
+                  </Text>
                 </View>
               </View>
             </TouchableOpacity>
@@ -222,7 +279,7 @@ const SignaturePad = ({ deets }) => {
 
       {image && (
         <Image
-          source={{ uri: image }}
+          source={{uri: image}}
           style={{
             height: 300,
             resizeMode: 'contain',
@@ -234,22 +291,20 @@ const SignaturePad = ({ deets }) => {
         />
       )}
 
-      <View style={{ marginTop: -190 }}>
+      <View style={{marginTop: -190}}>
         {!image && (
           <View style={{}}>
-            <View style={{ top: 15 }}>
+            <View style={{top: 15}}>
               <TouchableOpacity
-                style={{ marginTop: 20 }}
+                style={{marginTop: 20}}
                 onPress={() => setShowConfirmModal(true)}
-                disabled={disableit}
-              >
+                disabled={disableit}>
                 <Buttons label="Confirm" disabled={disableit} />
               </TouchableOpacity>
               <TouchableOpacity
-                style={{ marginBottom: 5, marginTop: 10 }}
+                style={{marginBottom: 5, marginTop: 10}}
                 disabled={disableit}
-                onPress={handleEmpty}
-              >
+                onPress={handleEmpty}>
                 <Buttons label="Clear" disabled={disableit} />
               </TouchableOpacity>
             </View>
@@ -258,23 +313,26 @@ const SignaturePad = ({ deets }) => {
         {image && (
           <>
             <TouchableOpacity
-              style={{ marginTop: 200 }}
+              style={{marginTop: 200}}
               disabled={disableit}
-              onPress={s3UploadFunction}
-            >
+              onPress={s3UploadFunction}>
               <Buttons label="Upload signature" disabled={disableit} />
             </TouchableOpacity>
             <TouchableOpacity
-              style={{ marginBottom: 5, marginTop: 10 }}
+              style={{marginBottom: 5, marginTop: 10}}
               onPress={retakeImage}
-              disabled={disableit}
-            >
+              disabled={disableit}>
               <Buttons label="Retake" disabled={disableit} />
             </TouchableOpacity>
           </>
         )}
         {uploadProgress > 0 && (
-          <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: 20 }}>
+          <View
+            style={{
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginTop: 20,
+            }}>
             <Text>{uploadProgress}% complete</Text>
           </View>
         )}
@@ -283,7 +341,7 @@ const SignaturePad = ({ deets }) => {
   );
 };
 
-export default observer(SignaturePad);
+export default SignaturePad;
 
 const styles = StyleSheet.create({
   container: {

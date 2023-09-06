@@ -15,15 +15,6 @@ let token = null;
 let headers;
 if (reduxStore !== null || reduxStore !== undefined) {
   token = JSON.parse(reduxStore.user)?.stsTokenManager?.accessToken;
-  // JSON.parse(reduxStore.user).user?.stsTokenManager?.accessToken != null ||
-  // JSON.parse(reduxStore.user).user?.stsTokenManager?.accessToken != undefined
-  //   ? JSON.parse(reduxStore.user).user?.stsTokenManager?.accessToken
-  //   : JSON.parse(reduxStore.user)?.stsTokenManager?.accessToken;
-  // headers = {
-  //   accept: 'application/json',
-  //   Authorization: `Bearer ${token}`,
-  //   'Content-Type': 'application/json',
-  // };
 }
 const axiosInstance = axios.create({baseURL: BASE_API_URL});
 
@@ -119,4 +110,121 @@ const createUserProfile = async details => {
   }
 };
 
-export {getState, getCity, getProfileDetails, createUserProfile};
+const checkPin = async () => {
+  if (auth?.currentUser?.stsTokenManager?.accessToken) {
+    headers = {
+      accept: 'application/json',
+      Authorization: `Bearer ${auth.currentUser?.stsTokenManager?.accessToken}`,
+      'Content-Type': 'application/json',
+    };
+    try {
+      const response = await axiosInstance.get(`/transaction-pin/check-pin`, {
+        headers,
+      });
+      return {
+        title: 'Check Pin ',
+        error: false,
+        data: response.data,
+        message: 'success',
+      };
+    } catch (error) {
+      return {
+        title: 'Check Pin ',
+        error: true,
+        data: null,
+        message: `Failed | ${error.response.data.message}`,
+      };
+    }
+  }
+};
+
+const createTransactionPin = async details => {
+  if (auth?.currentUser?.stsTokenManager?.accessToken) {
+    headers = {
+      accept: 'application/json',
+      Authorization: `Bearer ${auth.currentUser?.stsTokenManager?.accessToken}`,
+      'Content-Type': 'application/json',
+    };
+    try {
+      const response = await axiosInstance.post(
+        `/transaction-pin/create-pin`,
+        details,
+        {
+          headers,
+        },
+      );
+      // console.log(response?.data?.error);
+      if (response?.data?.error) {
+        return {
+          title: 'Create Transaction Pin',
+          error: true,
+          data: null,
+          message: `Failed | ${response?.data?.message}`,
+        };
+      }
+      return {
+        title: 'Create Transaction Pin',
+        error: false,
+        data: null,
+        message: 'success',
+      };
+    } catch (error) {
+      return {
+        title: 'Create Transaction Pin',
+        error: true,
+        data: null,
+        message: `Failed | ${error.response.data.message}`,
+      };
+    }
+  }
+};
+
+const changePin = async details => {
+  if (auth?.currentUser?.stsTokenManager?.accessToken) {
+    headers = {
+      accept: 'application/json',
+      Authorization: `Bearer ${auth.currentUser?.stsTokenManager?.accessToken}`,
+      'Content-Type': 'application/json',
+    };
+    try {
+      const response = await axiosInstance.post(
+        `/transaction-pin/reset-pin`,
+        details,
+        {
+          headers,
+        },
+      );
+      if (response?.data?.error) {
+        return {
+          title: 'Change Transaction Pin',
+          error: true,
+          data: null,
+          message: `Failed | ${response?.data?.message}`,
+        };
+      }
+      return {
+        title: 'Change Transaction Pin',
+        error: false,
+        data: response.data,
+        message: 'success',
+      };
+    } catch (error) {
+      return {
+        title: 'Change Transaction Pin',
+        error: true,
+        data: null,
+        message: `Failed | ${error.response.data.message}`,
+      };
+    }
+  }
+};
+
+export {
+  getState,
+  getCity,
+  getProfileDetails,
+  createUserProfile,
+  checkPin,
+  createTransactionPin,
+  changePin,
+};

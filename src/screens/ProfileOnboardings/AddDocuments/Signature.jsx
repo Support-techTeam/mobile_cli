@@ -1,11 +1,11 @@
 /* eslint-disable no-shadow */
 /* eslint-disable react/no-unstable-nested-components */
-import { View, Text, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
-import React, { useState } from 'react';
-import { AntDesign } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
-import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import {View, Text, StyleSheet, TouchableOpacity, FlatList} from 'react-native';
+import React, {useState} from 'react';
+import AntDesign from 'react-native-vector-icons/AntDesign';
+import {useNavigation, useRoute} from '@react-navigation/native';
+import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
+import {TabView, SceneMap, TabBar} from 'react-native-tab-view';
 
 import ProofofAdd from '../../../component/Idtypes/ProofOfAddress';
 import SignaturePad from '../../../component/CustomSignaturePad/AddDocsSign';
@@ -13,18 +13,18 @@ import SignaturePad from '../../../component/CustomSignaturePad/AddDocsSign';
 const ITEM_HEIGHT = 100;
 
 const TobTabs = [
-  { name: 'Valid Identity', key: 'ValidIndentity' },
-  { name: 'Proof of Address', key: 'ProofOfAddress' },
-  { name: 'Bank Statement', key: 'BankStatement' },
-  { name: 'Passport', key: 'Passport' },
-  { name: 'Signature', key: 'Signature' },
-  { name: 'Company Seals', key: 'CompanySeals' },
-  { name: 'CAC', key: 'CAC' },
-  { name: 'Others', key: 'Others' },
-  { name: 'Submit All', key: 'SubmitDocs' },
+  {name: 'Valid Identity', key: 'ValidIndentity'},
+  {name: 'Proof of Address', key: 'ProofOfAddress'},
+  {name: 'Bank Statement', key: 'BankStatement'},
+  {name: 'Passport', key: 'Passport'},
+  {name: 'Signature', key: 'Signature'},
+  {name: 'Company Seals', key: 'CompanySeals'},
+  {name: 'CAC', key: 'CAC'},
+  {name: 'Others', key: 'Others'},
+  {name: 'Submit All', key: 'SubmitDocs'},
 ];
 
-const Signature = ({ route }) => {
+const Signature = ({route}) => {
   const docsDetails = route?.params?.paramKey;
 
   const userDocs = {
@@ -33,11 +33,18 @@ const Signature = ({ route }) => {
         ? ''
         : docsDetails?.validIdentificationType,
     validIdentification:
-      docsDetails?.validIdentification === undefined ? '' : docsDetails?.validIdentification,
-    utilityBill: docsDetails?.utilityBill === undefined ? '' : docsDetails?.utilityBill,
-    bankStatement: docsDetails?.bankStatement === undefined ? '' : docsDetails?.bankStatement,
+      docsDetails?.validIdentification === undefined
+        ? ''
+        : docsDetails?.validIdentification,
+    utilityBill:
+      docsDetails?.utilityBill === undefined ? '' : docsDetails?.utilityBill,
+    bankStatement:
+      docsDetails?.bankStatement === undefined
+        ? ''
+        : docsDetails?.bankStatement,
     passport: docsDetails?.passport === undefined ? '' : docsDetails?.passport,
-    signature: docsDetails?.signature === undefined ? '' : docsDetails?.signature,
+    signature:
+      docsDetails?.signature === undefined ? '' : docsDetails?.signature,
     seal: docsDetails?.seal === undefined ? '' : docsDetails?.seal,
     cac: docsDetails?.cac === undefined ? '' : docsDetails?.cac,
   };
@@ -45,14 +52,20 @@ const Signature = ({ route }) => {
   const activeTab = 'Signature';
   const [index, setIndex] = useState(0);
   const navigation = useNavigation();
+  const insets = useSafeAreaInsets();
+  // const route = useRoute();
+  // const curentRoute = route.name;
+  // const previousRoute = navigation.getState()?.routes.slice(-2)[0]?.name;
 
-  const renderItem = ({ item }) => {
+  const renderItem = ({item}) => {
     const isActive = item.key === activeTab;
 
     return (
       <View>
         <View style={[styles.tobTab, isActive && styles.activeTab]}>
-          <Text style={[styles.tabText, isActive && styles.activeTabText]}>{item.name}</Text>
+          <Text style={[styles.tabText, isActive && styles.activeTabText]}>
+            {item.name}
+          </Text>
         </View>
       </View>
     );
@@ -60,7 +73,7 @@ const Signature = ({ route }) => {
 
   const FirstRoute = () => {
     return (
-      <View style={{ flex: 1, marginHorizontal: 10 }}>
+      <View style={{flex: 1, marginHorizontal: 10}}>
         <SignaturePad deets={route} />
       </View>
     );
@@ -72,9 +85,8 @@ const Signature = ({ route }) => {
         style={{
           flex: 1,
           marginHorizontal: 19,
-        }}
-      >
-        <View style={{ marginHorizontal: 10, marginVertical: 20 }}>
+        }}>
+        <View style={{marginHorizontal: 10, marginVertical: 20}}>
           <ProofofAdd isSign={true} deets={route} />
         </View>
       </View>
@@ -82,8 +94,8 @@ const Signature = ({ route }) => {
   };
 
   const [routes] = useState([
-    { key: 'upload', title: 'UPLOAD' },
-    { key: 'draw', title: 'Draw' },
+    {key: 'upload', title: 'UPLOAD'},
+    {key: 'draw', title: 'Draw'},
   ]);
   const renderScene = SceneMap({
     upload: SecondRoute,
@@ -91,23 +103,29 @@ const Signature = ({ route }) => {
   });
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView
+      style={{
+        flex: 1,
+        backgroundColor: '#fff',
+        paddingTop: insets.top !== 0 ? insets.top / 2 : 'auto',
+        paddingBottom: insets.bottom !== 0 ? insets.bottom / 2 : 'auto',
+        paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
+        paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
+      }}>
       <View
         style={{
           flexDirection: 'row',
           justifyContent: 'space-between',
           alignItems: 'center',
           marginHorizontal: 15,
-        }}
-      >
+        }}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <View
             style={{
               borderWidth: 0.5,
               borderColor: '#D9DBE9',
               borderRadius: 5,
-            }}
-          >
+            }}>
             <AntDesign name="left" size={24} color="black" />
           </View>
         </TouchableOpacity>
@@ -128,7 +146,7 @@ const Signature = ({ route }) => {
         <FlatList
           data={TobTabs}
           renderItem={renderItem}
-          keyExtractor={(item) => item.key}
+          keyExtractor={item => item.key}
           horizontal
           scrollEnabled={true}
           showsHorizontalScrollIndicator={false}
@@ -150,15 +168,17 @@ const Signature = ({ route }) => {
         onIndexChange={setIndex}
         tabBarPosition="top"
         swipeEnabled={false}
-        renderTabBar={(props) => (
+        renderTabBar={props => (
           <TabBar
             {...props}
             // tabStyle={styles.tabBar}
             labelStyle={styles.label}
             indicatorStyle={styles.indicator}
             style={styles.tabBar}
-            renderLabel={({ route, focused }) => (
-              <Text style={[styles.tabText2, focused && { color: '#054B99' }]}>{route.title}</Text>
+            renderLabel={({route, focused}) => (
+              <Text style={[styles.tabText2, focused && {color: '#054B99'}]}>
+                {route.title}
+              </Text>
             )}
             // contentContainerStyle={styles.tabBar}
           />
@@ -171,19 +191,19 @@ const Signature = ({ route }) => {
           alignItems: 'center',
           marginVertical: 16,
           marginHorizontal: 16,
-        }}
-      >
+        }}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <View style={[styles.tobTab, { backgroundColor: '#054B99' }]}>
-            <Text style={[styles.tabText, { color: 'white' }]}>Prev.</Text>
+          <View style={[styles.tobTab, {backgroundColor: '#054B99'}]}>
+            <Text style={[styles.tabText, {color: 'white'}]}>Prev.</Text>
           </View>
         </TouchableOpacity>
 
         <TouchableOpacity
-          onPress={() => navigation.navigate('CompanySeals', { paramKey: userDocs })}
-        >
-          <View style={[styles.tobTab, { backgroundColor: '#054B99' }]}>
-            <Text style={[styles.tabText, { color: 'white' }]}>Skip</Text>
+          onPress={() =>
+            navigation.navigate('CompanySeals', {paramKey: userDocs})
+          }>
+          <View style={[styles.tobTab, {backgroundColor: '#054B99'}]}>
+            <Text style={[styles.tabText, {color: 'white'}]}>Skip</Text>
           </View>
         </TouchableOpacity>
       </View>

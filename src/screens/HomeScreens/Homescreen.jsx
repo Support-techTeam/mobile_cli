@@ -64,6 +64,7 @@ import PersonalDetails from '../ProfileOnboardings/PersonalDetails';
 import Splashscreen from '../../navigation/Splashscreen';
 import {useRoute, useIsFocused} from '@react-navigation/native';
 import {getLoanUserDetails, getLoansAmount} from '../../stores/LoanStore';
+import {checkPin} from '../../stores/ProfileStore';
 // import RNRestart from 'react-native-restart';
 
 const {width, height} = Dimensions.get('window');
@@ -93,6 +94,7 @@ const Homescreen = () => {
   const route = useRoute();
   const isFocused = useIsFocused();
   const [loanUserDetails, setLoanUserDetails] = useState(undefined);
+  const [userPin, setUserPin] = useState(true);
 
   const dispatch = useDispatch();
 
@@ -207,6 +209,20 @@ const Homescreen = () => {
       setUserLoanAmount(res?.data);
     }
     setIsLoading(false);
+  };
+
+  useEffect(() => {
+    unsubCheckPin();
+  }, []);
+
+  const unsubCheckPin = async () => {
+    const res = await checkPin(1, 10);
+    if (res.error) {
+      // TODO: handle error
+    } else {
+      console.log('PIN', res?.data);
+      setUserPin(res?.data?.data?.hasPin);
+    }
   };
 
   //Navigation useEffect Hook
@@ -1331,6 +1347,59 @@ const Homescreen = () => {
           />
           <Footer />
         </View>
+
+        {/* Optional Section */}
+        {!userPin ? (
+          <TouchableOpacity
+            style={{
+              height: '9%',
+              backgroundColor: '#CDDBEB',
+              marginHorizontal: 15,
+              marginVertical: 5,
+              borderRadius: 8,
+              justifyContent: 'center',
+            }}
+            onPress={() => navigation.navigate('SetPin')}>
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+              }}>
+              <View
+                style={{
+                  width: 30,
+                  height: 30,
+                  borderRadius: 5,
+                  marginRight: 16,
+                  marginLeft: 16,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
+                <Image source={require('../../../assets/images/badge.png')} />
+              </View>
+
+              <View style={{flex: 1, marginHorizontal: 10}}>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                  }}>
+                  <Text style={styles.title}>Attention Needed !!!</Text>
+                </View>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                  }}>
+                  <Text style={styles.desc}>
+                    Click here to create your transaction pin
+                  </Text>
+                </View>
+              </View>
+            </View>
+          </TouchableOpacity>
+        ) : null}
 
         {/* Optional Section */}
         {loanUserDetails == undefined ||
