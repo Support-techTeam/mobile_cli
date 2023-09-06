@@ -42,19 +42,18 @@ import LockPin from '../screens/SecurityScreens/LockPin';
 import ResetPin from '../screens/SecurityScreens/ResetPin';
 import SetLockPin from '../screens/SecurityScreens/SetPinScreen';
 import ResetLockPin from '../screens/SecurityScreens/ResetLockPin';
-// import EnterPin from '../screens/SecurityScreens/EnterPinScreen';
 import ChangeLockPin from '../screens/SecurityScreens/ChangeLockPin';
+import {Airtime, Homescreen, Paybills} from '../screens/HomeScreens';
+import AirtimeConfirm from '../screens/paybills/AirtimeConfirm';
+import BillPin from '../screens/paybills/billPin';
+import StatusFailed from '../screens/paybills/StatusFailed';
+import StatusPage from '../screens/paybills/StausPage';
+import GetData from '../screens/paybills/GetData';
+import Electric from '../screens/paybills/ElectricityBills';
+import Cable from '../screens/paybills/Cable';
 //Pending
 
 // import BeneficiaryList from '../screens/TransferScreens/BeneficiaryList';
-// import {Airtime, Homescreen, Paybills} from '../screens/HomeScreens';
-// import AirtimeConfirm from '../screens/paybills/AirtimeConfirm';
-// import StatusPage from '../screens/paybills/StausPage';
-// import GetData from '../screens/paybills/GetData';
-// import Electric from '../screens/paybills/ElectricityBills';
-// import Cable from '../screens/paybills/Cable';
-// import BillPin from '../screens/paybills/billPin';
-// import StatusFailed from '../screens/paybills/StatusFailed';
 
 import {auth} from '../util/firebase/firebaseConfig';
 import {getProfileDetails} from '../stores/ProfileStore';
@@ -197,6 +196,17 @@ const AppStack = () => {
           <Stack.Screen name="Signature" component={Signature} />
           <Stack.Screen name="SubmitDocs" component={FinalSubmit} />
           <Stack.Screen name="Others" component={Others} /> */}
+
+          {/* Bill payment */}
+          <Stack.Screen name="Paybills" component={Paybills} />
+          <Stack.Screen name="airtime" component={Airtime} />
+          <Stack.Screen name="data_bundle" component={GetData} />
+          <Stack.Screen name="electricity" component={Electric} />
+          <Stack.Screen name="cable_tv" component={Cable} />
+          <Stack.Screen name="AirtimeConfirm" component={AirtimeConfirm} />
+          <Stack.Screen name="BillPin" component={BillPin} />
+          <Stack.Screen name="StatusFailed" component={StatusFailed} />
+          <Stack.Screen name="StatusSuc" component={StatusPage} />
         </>
       )}
     </Stack.Navigator>

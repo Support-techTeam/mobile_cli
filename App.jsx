@@ -159,7 +159,7 @@ function App() {
         const lockTimer = setTimeout(async () => {
           setIsLocked(true);
           writeItemToStorage('true');
-        }, 1000); // Lock after 30 seconds of inactivity
+        }, 5000); // Lock after 30 seconds of inactivity
 
         return () => clearTimeout(lockTimer);
       } else if (

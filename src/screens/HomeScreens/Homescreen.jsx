@@ -220,7 +220,7 @@ const Homescreen = () => {
     if (res.error) {
       // TODO: handle error
     } else {
-      console.log('PIN', res?.data);
+      // console.log('PIN', res?.data);
       setUserPin(res?.data?.data?.hasPin);
     }
   };
@@ -229,7 +229,7 @@ const Homescreen = () => {
   useEffect(() => {
     if (route.name === 'Home') {
       const unsubscribe = navigation.addListener('focus', async () => {
-        console.log('Home Screen focused. Calling a function...');
+        // console.log('Home Screen focused. Calling a function...');
         unsubGetWallet();
         unsubGetAllTransactions();
         unsubGetTransactions();
@@ -459,7 +459,6 @@ const Homescreen = () => {
                 color={item.title === 'Wallet balance' ? '#054B99' : '#FFFFFF'}
                 name={hideBalance ? 'eye' : 'eye-slash'}
                 onPress={toggleHideBalance}
-                //    style={{paddingRight:10}}
               />
             </View>
 
@@ -499,7 +498,9 @@ const Homescreen = () => {
 
               {item.button === 'View investment' && (
                 <TouchableOpacity
-                  onPress={() => console.log('get investment')}
+                  onPress={() => {
+                    // console.log('get investment')
+                  }}
                   style={styles.fundView}>
                   <Text style={styles.FundButton}>{item.button}</Text>
                 </TouchableOpacity>
@@ -551,8 +552,7 @@ const Homescreen = () => {
 
               <TouchableOpacity
                 onPress={() => {
-                  console.log('Clicking on');
-                  // navigation.navigate('Loan')
+                  navigation.navigate('Loan');
                 }}>
                 <Text
                   style={[styles.extrat, {color: '#fff', fontWeight: 'bold'}]}>
@@ -1511,10 +1511,7 @@ const Homescreen = () => {
           </Pressable>
 
           <Pressable
-            onPress={() => {
-              console.log('Bill Payment');
-              // toggleModal3()
-            }}
+            onPress={() => navigation.navigate('Paybills')}
             style={({pressed}) => [
               {
                 backgroundColor: pressed ? COLORS.Danger : COLORS.Secondary,

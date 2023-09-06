@@ -1,12 +1,30 @@
-import { View, Text, StyleSheet, Image } from 'react-native';
+import {View, Text, StyleSheet, Image} from 'react-native';
 import React from 'react';
-import { AntDesign, Ionicons, MaterialCommunityIcons, FontAwesome } from '@expo/vector-icons';
+import AntDesign from 'react-native-vector-icons/AntDesign';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
-const CustomView = ({ label }) => {
+const CustomView = ({label}) => {
   return (
     <View style={styles.container}>
       <View style={styles.rowView}>
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+        <View style={{flexDirection: 'row', alignItems: 'center'}}>
+          {label == 'Airtime' && (
+            <Image source={require('../../../assets/images/airtime.png')} />
+          )}
+
+          {label == 'Electricity' && (
+            <Image source={require('../../../assets/images/Electricity.png')} />
+          )}
+
+          {label == 'Data Bundle' && (
+            <Image source={require('../../../assets/images/databuy.png')} />
+          )}
+
+          {label == 'Cable TV' && (
+            <Image source={require('../../../assets/images/cable.png')} />
+          )}
           <Text style={styles.pageText}>{label}</Text>
         </View>
 
@@ -41,7 +59,7 @@ const styles = StyleSheet.create({
   pageText: {
     fontFamily: 'MontSBold',
     fontSize: 16,
-
+    marginLeft: 10,
     color: '#4E4B66',
     lineHeight: 24,
   },

@@ -37,8 +37,8 @@ const ResetPin = () => {
   const handleResetPin = async () => {
     setIsLoading(true);
     const res = await changePin(resetDetails);
-    console.log(res);
-    console.log(resetDetails);
+    // console.log(res);
+    // console.log(resetDetails);
     if (res.error) {
       Toast.show({
         type: 'error',

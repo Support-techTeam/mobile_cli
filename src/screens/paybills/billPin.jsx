@@ -7,20 +7,24 @@ import {
   TextInput,
 } from 'react-native';
 import React, {useState, useRef, useEffect, useContext} from 'react';
-
+import Spinner from 'react-native-loading-spinner-overlay';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import {useNavigation} from '@react-navigation/native';
-
-import Spinner from 'react-native-loading-spinner-overlay/lib';
-import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
-
-import Buttons from '../../component/buttons/Buttons';
 import Toast from 'react-native-toast-message';
-import {createTransactionPin} from '../../stores/ProfileStore';
+import Buttons from '../../component/buttons/Buttons';
+import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
+import {
+  purchaseAirtime,
+  purchaseDataPlan,
+  purchaseElectricity,
+  renewSubscription,
+  updateSubscription,
+} from '../../stores/BillStore';
 
-const PinCon = ({route}) => {
-  const navigation = useNavigation();
+const BillPin = ({route}) => {
+  const {airtimeDetails, acctNumber, selectedPackageData} = route.params;
   const insets = useSafeAreaInsets();
+  const navigation = useNavigation();
   const [isLoading, setIsLoading] = useState(false);
   const firstInput = useRef();
   const secondInput = useRef();
@@ -29,56 +33,194 @@ const PinCon = ({route}) => {
   const [otp, setOtp] = useState({f: '', s: '', t: '', fo: ''});
   const disableit = !otp.f || !otp.s || !otp.t || !otp.fo;
 
-  const pinString = route?.params?.pinString;
+  const [pinString, setPinString] = useState('');
+  useEffect(() => {
+    setPinString(`${otp.f + otp.s + otp.t + otp.fo}`);
+  }, [otp]);
 
-  const [pinValue, setPinValue] = useState({});
-
-  const handleCreatePin = async () => {
-    setIsLoading(true);
-    const res = await createTransactionPin(pinValue);
-    // console.log(res);
-    if (res.error) {
-      Toast.show({
-        type: 'error',
-        position: 'top',
-        topOffset: 50,
-        text1: res.title,
-        text2: res.message,
-        visibilityTime: 5000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
-    } else {
-      Toast.show({
-        type: 'success',
-        position: 'top',
-        topOffset: 50,
-        text1: res.title,
-        text2: res.message,
-        visibilityTime: 3000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
-      setTimeout(() => {
-        navigation.navigate('PinSuccess');
-      }, 1000);
-    }
-    setIsLoading(false);
+  const details = {
+    serviceType: airtimeDetails.network,
+    amount: Number(airtimeDetails.amount),
+    phone: airtimeDetails.number,
+    transactionPin: pinString,
+    // transactionPin: `${otp.f + otp.s + otp.t + otp.fo}`,
+  };
+  const dataDetails = {
+    serviceType: airtimeDetails.network,
+    amount: Number(airtimeDetails.amount),
+    phone: airtimeDetails.number,
+    transactionPin: pinString,
+    DataCode: airtimeDetails.package,
   };
 
-  useEffect(() => {
-    setPinValue({
-      newPin: pinString === undefined ? '' : pinString,
-      confirmPin: `${otp.f + otp.s + otp.t + otp.fo}`,
-    });
-  }, [otp, pinString]);
+  const powerDetails = {
+    serviceType: airtimeDetails.network,
+    amount: Number(airtimeDetails.amount),
+    phone: airtimeDetails.number,
+    transactionPin: pinString,
+    meterNumber: airtimeDetails.meter,
+  };
+  const cableDetails = {
+    serviceType: airtimeDetails.network,
+    amount: Number(airtimeDetails.amount),
+    phone: airtimeDetails.number,
+    transactionPin: pinString,
+    variationCode: airtimeDetails.variationCode,
+    cardNumber: airtimeDetails.cardNumber,
+  };
+
+  const createPayment = async () => {
+    if (airtimeDetails.service === 'airtime purchase') {
+      setIsLoading(true);
+      const res = await purchaseAirtime(details);
+      if (res.error || res?.data?.error) {
+        Toast.show({
+          type: 'error',
+          position: 'top',
+          topOffset: 50,
+          text1: res.title,
+          text2: res?.data?.message ? res?.data?.message : res.message,
+          visibilityTime: 5000,
+          autoHide: true,
+          onPress: () => Toast.hide(),
+        });
+        setTimeout(() => {
+          navigation.navigate('StatusFailed');
+        }, 1000);
+      } else {
+        Toast.show({
+          type: 'success',
+          position: 'top',
+          topOffset: 50,
+          text1: res.title,
+          text2: res.message,
+          visibilityTime: 3000,
+          autoHide: true,
+          onPress: () => Toast.hide(),
+        });
+        setTimeout(() => {
+          navigation.navigate('StatusSuc');
+        }, 1000);
+      }
+      setIsLoading(false);
+    }
+
+    if (airtimeDetails.service === 'data purchase') {
+      setIsLoading(true);
+      const res = await purchaseDataPlan(dataDetails);
+      if (res.error || res?.data?.error) {
+        Toast.show({
+          type: 'error',
+          position: 'top',
+          topOffset: 50,
+          text1: res.title,
+          text2: res?.data?.message ? res?.data?.message : res.message,
+          visibilityTime: 5000,
+          autoHide: true,
+          onPress: () => Toast.hide(),
+        });
+        setTimeout(() => {
+          navigation.navigate('StatusFailed');
+        }, 1000);
+      } else {
+        Toast.show({
+          type: 'success',
+          position: 'top',
+          topOffset: 50,
+          text1: res.title,
+          text2: res.message,
+          visibilityTime: 3000,
+          autoHide: true,
+          onPress: () => Toast.hide(),
+        });
+        setTimeout(() => {
+          navigation.navigate('StatusSuc');
+        }, 1000);
+      }
+      setIsLoading(false);
+    }
+
+    if (airtimeDetails.service === 'electricity purchase') {
+      setIsLoading(true);
+      const res = await purchaseElectricity(powerDetails);
+      if (res.error || res?.data?.error) {
+        Toast.show({
+          type: 'error',
+          position: 'top',
+          topOffset: 50,
+          text1: res.title,
+          text2: res?.data?.message ? res?.data?.message : res.message,
+          visibilityTime: 5000,
+          autoHide: true,
+          onPress: () => Toast.hide(),
+        });
+        setTimeout(() => {
+          navigation.navigate('StatusFailed');
+        }, 1000);
+      } else {
+        Toast.show({
+          type: 'success',
+          position: 'top',
+          topOffset: 50,
+          text1: res.title,
+          text2: res.message,
+          visibilityTime: 3000,
+          autoHide: true,
+          onPress: () => Toast.hide(),
+        });
+        setTimeout(() => {
+          navigation.navigate('StatusSuc');
+        }, 1000);
+      }
+      setIsLoading(false);
+    }
+
+    if (airtimeDetails.service === 'cable_tv purchase') {
+      setIsLoading(true);
+      let res;
+      if (airtimeDetails.status == 'update') {
+        res = await updateSubscription(cableDetails);
+      } else {
+        res = await renewSubscription(cableDetails);
+      }
+      if (res.error || res?.data?.error) {
+        Toast.show({
+          type: 'error',
+          position: 'top',
+          topOffset: 50,
+          text1: res.title,
+          text2: res?.data?.message ? res?.data?.message : res.message,
+          visibilityTime: 5000,
+          autoHide: true,
+          onPress: () => Toast.hide(),
+        });
+        setTimeout(() => {
+          navigation.navigate('StatusFailed');
+        }, 1000);
+      } else {
+        Toast.show({
+          type: 'success',
+          position: 'top',
+          topOffset: 50,
+          text1: res.title,
+          text2: res.message,
+          visibilityTime: 3000,
+          autoHide: true,
+          onPress: () => Toast.hide(),
+        });
+        setTimeout(() => {
+          navigation.navigate('StatusSuc');
+        }, 1000);
+      }
+      setIsLoading(false);
+    }
+  };
 
   return (
     <SafeAreaView
       style={{
         flex: 1,
         backgroundColor: '#fff',
-        paddingHorizontal: 16,
         paddingTop: insets.top !== 0 ? insets.top / 2 : 'auto',
         paddingBottom: insets.bottom !== 0 ? insets.bottom / 2 : 'auto',
         paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
@@ -86,13 +228,12 @@ const PinCon = ({route}) => {
       }}>
       {isLoading && (
         <Spinner
-          textContent={'Please wait...'}
+          textContent={'Processing...'}
           textStyle={{color: 'white'}}
           visible={true}
           overlayColor="rgba(78, 75, 102, 0.7)"
         />
       )}
-
       <View
         style={{
           flexDirection: 'row',
@@ -111,7 +252,7 @@ const PinCon = ({route}) => {
         </TouchableOpacity>
         <View style={styles.HeadView}>
           <View style={styles.TopView}>
-            <Text style={styles.TextHead}>TRANSACTION PIN</Text>
+            <Text style={styles.TextHead}>Enter PIN</Text>
           </View>
         </View>
 
@@ -123,7 +264,10 @@ const PinCon = ({route}) => {
       <ScrollView
         bounces={false}
         showsHorizontalScrollIndicator={false}
-        showsVerticalScrollIndicator={false}>
+        showsVerticalScrollIndicator={false}
+        style={{
+          marginHorizontal: 15,
+        }}>
         <View
           style={{
             marginHorizontal: 20,
@@ -133,7 +277,7 @@ const PinCon = ({route}) => {
           }}>
           <Text
             style={{color: '#14142B', fontFamily: 'Montserat', fontSize: 16}}>
-            Confirm transaction pin
+            Enter your transaction pin
           </Text>
         </View>
         <View style={styles.pinView}>
@@ -200,15 +344,15 @@ const PinCon = ({route}) => {
         <TouchableOpacity
           style={{marginTop: 40}}
           disabled={disableit}
-          onPress={handleCreatePin}>
-          <Buttons label={'Confirm Pin'} disabled={disableit} />
+          onPress={createPayment}>
+          <Buttons label={'Submit'} disabled={disableit} />
         </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
   );
 };
 
-export default PinCon;
+export default BillPin;
 
 const styles = StyleSheet.create({
   container: {
@@ -264,8 +408,8 @@ const styles = StyleSheet.create({
     fontFamily: 'Montserat',
     fontSize: 20,
     textAlign: 'center',
-    height: 40,
-    width: 40,
+    paddingHorizontal: 5,
+    paddingVertical: 2,
   },
   signUp: {
     marginTop: 10,
