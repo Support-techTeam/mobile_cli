@@ -37,13 +37,13 @@ const PinCon = ({route}) => {
     setIsLoading(true);
     const res = await createTransactionPin(pinValue);
     // console.log(res);
-    if (res.error) {
+    if (res?.error) {
       Toast.show({
         type: 'error',
         position: 'top',
         topOffset: 50,
-        text1: res.title,
-        text2: res.message,
+        text1: res?.title,
+        text2: res?.message,
         visibilityTime: 5000,
         autoHide: true,
         onPress: () => Toast.hide(),
@@ -53,8 +53,8 @@ const PinCon = ({route}) => {
         type: 'success',
         position: 'top',
         topOffset: 50,
-        text1: res.title,
-        text2: res.message,
+        text1: res?.title,
+        text2: res?.message,
         visibilityTime: 3000,
         autoHide: true,
         onPress: () => Toast.hide(),
@@ -131,8 +131,7 @@ const PinCon = ({route}) => {
             justifyContent: 'center',
             alignItems: 'center',
           }}>
-          <Text
-            style={{color: '#14142B', fontFamily: 'Montserat', fontSize: 16}}>
+          <Text style={{color: '#14142B', fontSize: 16}}>
             Confirm transaction pin
           </Text>
         </View>
@@ -223,7 +222,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   TextHead: {
-    fontFamily: 'Montserat',
     fontWeight: '700',
     fontSize: 16,
     lineHeight: 20,
@@ -261,7 +259,6 @@ const styles = StyleSheet.create({
     borderColor: '#054B99',
   },
   otpText: {
-    fontFamily: 'Montserat',
     fontSize: 20,
     textAlign: 'center',
     height: 40,
@@ -285,12 +282,12 @@ const styles = StyleSheet.create({
   },
   desc: {
     color: '#4E4B66',
-    fontFamily: 'Montserat',
+
     fontWeight: '500',
     fontSize: 14,
   },
   amount: {
-    fontFamily: 'MontSBold',
+    fontFamily: 'serif',
     fontSize: 16,
   },
 });

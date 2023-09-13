@@ -49,7 +49,7 @@ const Airtime = () => {
   const fetchingAllNetworkProvider = async () => {
     setIsLoading(true);
     const res = await getNetworkProvider();
-    if (res.error) {
+    if (res?.error) {
       // TODO: handle error
     } else {
       // console.log(res?.data?.data?.data?.providers);
@@ -243,7 +243,6 @@ const styles = StyleSheet.create({
     // backgroundColor: '#fff',
   },
   notihead: {
-    fontFamily: 'Montserat',
     fontSize: 14,
     lineHeight: 24,
     color: '#6E7191',
@@ -291,7 +290,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 24,
     color: '#14142B',
-    fontFamily: 'Montserat',
   },
   cont: {
     position: 'relative',
@@ -313,7 +311,6 @@ const styles = StyleSheet.create({
     marginRight: 16,
   },
   hello: {
-    fontFamily: 'Montserat',
     fontWeight: '800',
     fontSize: 16,
     lineHeight: 24,
@@ -327,14 +324,13 @@ const styles = StyleSheet.create({
     borderColor: '#D9DBE9',
   },
   tabtexts: {
-    fontFamily: 'Montserat',
     fontSize: 12,
     fontWeight: '600',
     lineHeight: 18,
     textAlign: 'center',
   },
   TextHead: {
-    fontFamily: 'MontSBold',
+    fontFamily: 'serif',
 
     fontSize: 16,
     lineHeight: 24,
@@ -358,14 +354,13 @@ const styles = StyleSheet.create({
   },
   wallet: {
     color: '#fff',
-    fontFamily: 'Montserat',
+
     fontWeight: '400',
     fontSize: 14,
     lineHeight: 18,
     paddingLeft: 10,
   },
   prices: {
-    fontFamily: 'Montserat',
     fontSize: 20,
     fontWeight: '500',
     color: '#fff',
@@ -379,7 +374,7 @@ const styles = StyleSheet.create({
     // paddingHorizontal:12,
     textAlign: 'center',
     color: '#054B99',
-    fontFamily: 'Montserat',
+
     fontWeight: '500',
     fontSize: 16,
     marginTop: 20,
@@ -393,7 +388,6 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   extrat: {
-    fontFamily: 'Montserat',
     color: '#fff',
     fontWeight: '500',
     fontSize: 14,
@@ -416,21 +410,18 @@ const styles = StyleSheet.create({
   },
 
   title: {
-    fontFamily: 'Montserat',
     fontSize: 14,
     fontWeight: '800',
     lineHeight: 21,
     color: '#14142B',
   },
   price: {
-    fontFamily: 'Montserat',
     fontSize: 16,
     fontWeight: '800',
     lineHeight: 24,
     color: '#14142B',
   },
   desc: {
-    fontFamily: 'Montserat',
     fontSize: 12,
     fontWeight: '400',
     lineHeight: 18,

@@ -35,13 +35,13 @@ const ForgotPassword = () => {
   const handleForgotPassword = async () => {
     setIsLoading(true);
     const res = await forgotPassword(userDetails.email);
-    if (res.error) {
+    if (res?.error) {
       Toast.show({
         type: 'error',
         position: 'top',
         topOffset: 50,
-        text1: res.title,
-        text2: res.message,
+        text1: res?.title,
+        text2: res?.message,
         visibilityTime: 3000,
         autoHide: true,
         onPress: () => Toast.hide(),
@@ -51,8 +51,8 @@ const ForgotPassword = () => {
         type: 'success',
         position: 'top',
         topOffset: 50,
-        text1: res.title,
-        text2: res.message,
+        text1: res?.title,
+        text2: res?.message,
         visibilityTime: 3000,
         autoHide: true,
         onPress: () => Toast.hide(),
@@ -87,12 +87,11 @@ const ForgotPassword = () => {
     <SafeAreaView
       style={{
         flex: 1,
-        // paddingHorizontal: 20,
         backgroundColor: '#fff',
         paddingTop: insets.top !== 0 ? insets.top / 2 : 'auto',
-        paddingBottom: insets.bottom !== 0 ? insets.bottom : 'auto',
-        paddingLeft: insets.left !== 0 ? insets.left : 'auto',
-        paddingRight: insets.right !== 0 ? insets.right : 'auto',
+        paddingBottom: insets.bottom !== 0 ? insets.bottom / 2 : 'auto',
+        paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
+        paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
       }}>
       <ImageBackground
         source={require('../../../assets/forgotPass.png')}
@@ -113,34 +112,40 @@ const ForgotPassword = () => {
           )}
           <KeyboardAvoidingWrapper>
             <View style={{marginBottom: 40}}>
-              <View
-                style={{
-                  flex: 1,
-                  flexDirection: 'row',
-                  justifyContent: 'flex-start',
-                }}>
-                <View style={{alignItems: 'center', marginTop: insets.top / 2}}>
-                  <TouchableOpacity onPress={() => navigation.goBack()}>
-                    <View
-                      style={{
-                        borderWidth: 0.5,
-                        borderColor: '#D9DBE9',
-                        borderRadius: 5,
-                      }}>
-                      <Icon name="chevron-left" size={36} color="black" />
+              <View>
+                <View style={{alignItems: 'center', paddingHorizontal: 12}}>
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      justifyContent: 'center',
+                      marginTop: 30,
+                    }}>
+                    <View>
+                      <TouchableOpacity
+                        onPress={() => navigation.goBack()}
+                        style={{
+                          borderWidth: 0.5,
+                          borderColor: '#D9DBE9',
+                          borderRadius: 5,
+                          flexDirection: 'row',
+                          justifyContent: 'flex-start',
+                          // flexGrow: 1,
+                        }}>
+                        <View>
+                          <Icon name="chevron-left" size={30} color="black" />
+                        </View>
+                      </TouchableOpacity>
                     </View>
-                  </TouchableOpacity>
-                </View>
-                <View style={{alignItems: 'center'}}>
-                  <View style={styles.signupView}>
-                    <Image
-                      source={require('../../../assets/images/HeadLogo.png')}
-                      style={{marginBottom: 24}}
-                    />
-                    <Image
-                      source={require('../../../assets/images/locked.png')}
-                    />
-                    <Text style={styles.signupText}>Forgotten Password?</Text>
+                    <View style={styles.signupView}>
+                      <Image
+                        source={require('../../../assets/images/HeadLogo.png')}
+                        style={{width: 83, height: 32, marginBottom: 24}}
+                      />
+                      <Image
+                        source={require('../../../assets/images/locked.png')}
+                      />
+                      <Text style={styles.signupText}>Forgotten Password?</Text>
+                    </View>
                   </View>
                   <View style={styles.signupDetails}>
                     <Text style={[styles.extraText, {marginBottom: 40}]}>
@@ -150,23 +155,6 @@ const ForgotPassword = () => {
                   </View>
                 </View>
               </View>
-              {/* <View style={{alignItems: 'center'}}> */}
-              {/* <View style={{alignItems: 'center'}}>
-                  <Image
-                    source={require('../../../assets/images/HeadLogo.png')}
-                  />
-                </View> */}
-              {/* </View> */}
-              {/* <View style={styles.signupView}>
-                <Image source={require('../../../assets/images/locked.png')} />
-                <Text style={styles.signupText}>Forgotten Password?</Text>
-                <View>
-                  <Text style={[styles.extraText, {marginBottom: 40}]}>
-                    Please enter your email address to recieve a password reset
-                    link
-                  </Text>
-                </View>
-              </View> */}
               <View
                 style={{
                   paddingTop: 25,
@@ -207,11 +195,7 @@ const ForgotPassword = () => {
 export default ForgotPassword;
 
 const styles = StyleSheet.create({
-  container: {
-    // flex: 1,
-    // paddingHorizontal: 20,
-    // backgroundColor: '#f4f4f4',
-  },
+  container: {},
   demark: {
     width: '100%',
     height: 2,
@@ -221,15 +205,14 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   signupView: {
-    marginTop: 30,
-    // backgroundColor:'red',
     alignItems: 'center',
+    width: '93%',
   },
   signupText: {
     fontWeight: '700',
-    fontSize: 32,
+    fontSize: 30,
     // letterSpacing: 3.5,
-    fontFamily: 'Montserat',
+    fontFamily: 'serif',
     paddingTop: 16,
     lineHeight: 48,
     color: '#14142B',
@@ -237,11 +220,13 @@ const styles = StyleSheet.create({
   },
   extraText: {
     textAlign: 'center',
-    fontFamily: 'Montserat',
+    fontFamily: 'serif',
+    marginLeft: 10,
     fontSize: 14,
     lineHeight: 21,
     color: '#000000',
     paddingHorizontal: 15,
+    // marginLeft:-20.5
   },
 
   signUp: {

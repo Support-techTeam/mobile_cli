@@ -329,8 +329,8 @@ const UpdatePersonalDetails = () => {
     const fetchState = async () => {
       try {
         const res = await getState();
-        if (res.data !== undefined) {
-          setState(res.data);
+        if (res?.data !== undefined) {
+          setState(res?.data);
         }
       } catch (error) {
         // console.error(error);
@@ -361,14 +361,17 @@ const UpdatePersonalDetails = () => {
     }
   }, [state, userDetails.state]);
 
-  const stateCity = cityByState[0];
+  const stateCity = cityByState?.length > 0 ? cityByState[0] : null;
 
   useEffect(() => {
     const fetchCity = async () => {
       try {
         const res = await getCity(stateCity);
-        if (res.data !== undefined) {
-          setCity(res.data);
+        if (
+          (res?.data && res?.data !== undefined) ||
+          (res?.data && res?.data !== null)
+        ) {
+          setCity(res?.data);
         }
       } catch (error) {
         // console.error(error);
@@ -417,13 +420,13 @@ const UpdatePersonalDetails = () => {
   const handleCreatePersonalDetails = async () => {
     setIsLoading(true);
     const res = await createUserProfile(userDetails);
-    if (res.error) {
+    if (res?.error) {
       Toast.show({
         type: 'error',
         position: 'top',
         topOffset: 50,
-        text1: res.title,
-        text2: res.data.message,
+        text1: res?.title,
+        text2: res?.data?.message,
         visibilityTime: 5000,
         autoHide: true,
         onPress: () => Toast.hide(),
@@ -433,8 +436,8 @@ const UpdatePersonalDetails = () => {
         type: 'success',
         position: 'top',
         topOffset: 50,
-        text1: res.title,
-        text2: res.message,
+        text1: res?.title,
+        text2: res?.message,
         visibilityTime: 3000,
         autoHide: true,
         onPress: () => Toast.hide(),
@@ -446,13 +449,13 @@ const UpdatePersonalDetails = () => {
   const handleUpdatePersonalDetails = async () => {
     setIsUpdating(true);
     const res = await updatePersonalDetails(userDetails);
-    if (res.error) {
+    if (res?.error) {
       Toast.show({
         type: 'error',
         position: 'top',
         topOffset: 50,
-        text1: res.title,
-        text2: res.data.message,
+        text1: res?.title,
+        text2: res?.data?.message,
         visibilityTime: 5000,
         autoHide: true,
         onPress: () => Toast.hide(),
@@ -462,8 +465,8 @@ const UpdatePersonalDetails = () => {
         type: 'success',
         position: 'top',
         topOffset: 50,
-        text1: res.title,
-        text2: res.message,
+        text1: res?.title,
+        text2: res?.message,
         visibilityTime: 3000,
         autoHide: true,
         onPress: () => Toast.hide(),
@@ -914,7 +917,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   TextHead: {
-    fontFamily: 'Montserat',
     fontWeight: '700',
     fontSize: 16,
     lineHeight: 20,
@@ -960,7 +962,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 24,
     color: '#14142B',
-    fontFamily: 'Montserat',
   },
   pick: {
     marginBottom: 10,
@@ -994,7 +995,7 @@ const styles = StyleSheet.create({
   },
   checkedText: {
     color: '#44AB3B',
-    fontFamily: 'Montserat',
+
     fontSize: 24,
     lineHeight: 36,
     textTransform: 'capitalize',
@@ -1005,7 +1006,6 @@ const styles = StyleSheet.create({
     marginTop: 30,
   },
   extra: {
-    fontFamily: 'Montserat',
     textAlign: 'center',
     fontSize: 16,
     lineHeight: 24,

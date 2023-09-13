@@ -204,7 +204,7 @@ const BusinessDetails = () => {
   const unSubBusinessDetails = async () => {
     setIsLoading(true);
     const res = await getLoanUserDetails();
-    if (res.error) {
+    if (res?.error) {
       // TODO: handle error
     } else {
       setOrgDetails(res?.data?.organizationDetails);
@@ -353,15 +353,15 @@ const BusinessDetails = () => {
   const handleCreateBusinessDetails = async () => {
     setIsUpdating(true);
     const res = await createBusinessDetails(businessDetails);
-    console.log('businessDetails', businessDetails);
-    console.log(res);
-    if (res.error) {
+    // console.log('businessDetails', businessDetails);
+    // console.log(res);
+    if (res?.error) {
       Toast.show({
         type: 'error',
         position: 'top',
         topOffset: 50,
-        text1: res.title,
-        text2: res.message,
+        text1: res?.title,
+        text2: res?.message,
         visibilityTime: 5000,
         autoHide: true,
         onPress: () => Toast.hide(),
@@ -371,8 +371,8 @@ const BusinessDetails = () => {
         type: 'success',
         position: 'top',
         topOffset: 50,
-        text1: res.title,
-        text2: res.message,
+        text1: res?.title,
+        text2: res?.message,
         visibilityTime: 3000,
         autoHide: true,
         onPress: () => Toast.hide(),
@@ -391,13 +391,13 @@ const BusinessDetails = () => {
   const handleUpdateBusinessDetails = async () => {
     setIsUpdating(true);
     const res = await updateBusinessDetails(businessDetails);
-    if (res.error) {
+    if (res?.error) {
       Toast.show({
         type: 'error',
         position: 'top',
         topOffset: 50,
-        text1: res.title,
-        text2: res.message,
+        text1: res?.title,
+        text2: res?.message,
         visibilityTime: 5000,
         autoHide: true,
         onPress: () => Toast.hide(),
@@ -407,8 +407,8 @@ const BusinessDetails = () => {
         type: 'success',
         position: 'top',
         topOffset: 50,
-        text1: res.title,
-        text2: res.message,
+        text1: res?.title,
+        text2: res?.message,
         visibilityTime: 3000,
         autoHide: true,
         onPress: () => Toast.hide(),
@@ -428,11 +428,11 @@ const BusinessDetails = () => {
     const fetchState = async () => {
       try {
         const res = await getState();
-        if (res.data !== undefined) {
-          setState(res.data);
+        if (res?.data !== undefined) {
+          setState(res?.data);
         }
       } catch (error) {
-        console.error(error);
+        // console.error(error);
       }
     };
 
@@ -466,11 +466,11 @@ const BusinessDetails = () => {
     const fetchCity = async () => {
       try {
         const res = await getCity(stateCity);
-        if (res.data !== undefined) {
-          setCity(res.data);
+        if (res?.data !== undefined) {
+          setCity(res?.data);
         }
       } catch (error) {
-        console.error(error);
+        // console.error(error);
       }
     };
 
@@ -1068,7 +1068,6 @@ const styles = StyleSheet.create({
     // backgroundColor: "red",
   },
   TextHead: {
-    fontFamily: 'Montserat',
     fontWeight: '700',
     fontSize: 16,
     lineHeight: 20,
@@ -1079,7 +1078,6 @@ const styles = StyleSheet.create({
     marginVertical: 16,
   },
   header: {
-    fontFamily: 'Montserat',
     fontSize: 12,
     fontWeight: '400',
     textAlign: 'center',
@@ -1116,7 +1114,7 @@ const styles = StyleSheet.create({
   },
   checkedText: {
     color: '#44AB3B',
-    fontFamily: 'Montserat',
+
     fontSize: 24,
     lineHeight: 36,
     textTransform: 'capitalize',
@@ -1127,7 +1125,6 @@ const styles = StyleSheet.create({
     marginTop: 30,
   },
   extra: {
-    fontFamily: 'Montserat',
     textAlign: 'center',
     fontSize: 16,
     lineHeight: 24,

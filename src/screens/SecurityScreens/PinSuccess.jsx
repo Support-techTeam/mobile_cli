@@ -49,7 +49,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   success: {
-    fontFamily: 'Montserat',
+    
     fontSize: 20,
     color: '#14142B',
     textAlign: 'center',

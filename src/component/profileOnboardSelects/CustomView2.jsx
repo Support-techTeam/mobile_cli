@@ -41,14 +41,14 @@ const styles = StyleSheet.create({
     borderWidth: 2,
   },
   pageText: {
-    fontFamily: 'Montserat',
+    
     fontSize: 14,
     fontWeight: '600',
     color: '#4E4B66',
     lineHeight: 24,
   },
   statusText: {
-    fontFamily: 'MontSBold',
+    fontFamily: 'serif',
     fontSize: 14,
     fontWeight: '400',
     color: '#06A77D',

@@ -31,7 +31,7 @@ const userProfileSlice = createSlice({
       return {...state, transactions: action.payload};
     },
     clearProfileReduxState: state => {
-      console.log('clearing profile');
+      // console.log('clearing profile');
       return {
         profile: null,
         wallet: null,

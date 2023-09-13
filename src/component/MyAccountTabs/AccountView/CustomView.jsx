@@ -42,18 +42,18 @@ const styles = StyleSheet.create({
     borderRadius: 39,
   },
   pageText: {
-    fontFamily: 'MontSBold',
+    fontFamily: 'serif',
     fontSize: 16,
     color: '#4E4B66',
     marginVertical: 5,
   },
   pagesubText: {
-    fontFamily: 'Montserat',
+    
     fontSize: 14,
     color: '#4E4B66',
   },
   statusText: {
-    fontFamily: 'Montserat',
+    
     fontSize: 12,
     fontWeight: '400',
     color: '#F4B740',

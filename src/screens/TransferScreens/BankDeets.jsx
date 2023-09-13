@@ -17,7 +17,6 @@ import CustomInput from '../../component/custominput/CustomInput';
 import Input from '../../component/inputField/input.component';
 import CustomDropdown from '../../component/dropDown/dropdown.component';
 import Buttons from '../../component/buttons/Buttons';
-// import {ScrollView} from 'react-native-gesture-handler';
 import {Dropdown} from 'react-native-element-dropdown';
 import {useSelector} from 'react-redux';
 import {
@@ -74,7 +73,7 @@ const BankDeets = ({route}) => {
             type: 'error',
             position: 'top',
             topOffset: 50,
-            text1: res.title,
+            text1: res?.title,
             text2: res?.data?.message,
             visibilityTime: 5000,
             autoHide: true,
@@ -87,9 +86,9 @@ const BankDeets = ({route}) => {
             amount: 0,
             narration: '',
             saveBeneficiary: false,
-            beneficiaryAccountName: res.data,
+            beneficiaryAccountName: res?.data,
           });
-          setHoldersName(res.data);
+          setHoldersName(res?.data);
         }
       };
 
@@ -109,12 +108,12 @@ const BankDeets = ({route}) => {
 
   const handleGetAllBanks = async () => {
     const res = await getAllBankDetails();
-    if (res.error) {
+    if (res?.error) {
       Toast.show({
         type: 'error',
         position: 'top',
         topOffset: 50,
-        text1: res.title,
+        text1: res?.title,
         text2: res?.data?.message,
         visibilityTime: 5000,
         autoHide: true,
@@ -139,12 +138,12 @@ const BankDeets = ({route}) => {
           bankDetails?.receiverAccountNumber,
           bankDetails?.receiverBankName,
         );
-        if (res.error) {
+        if (res?.error) {
           Toast.show({
             type: 'error',
             position: 'top',
             topOffset: 50,
-            text1: res.title,
+            text1: res?.title,
             text2: res?.message,
             visibilityTime: 5000,
             autoHide: true,
@@ -153,13 +152,13 @@ const BankDeets = ({route}) => {
           setHoldersName('');
         } else {
           setNumComplete(true);
-          const [firstPart, ...restParts] = res.data.split(/\s(.+)/);
+          const [firstPart, ...restParts] = res?.data?.split(/\s(.+)/);
           setBankDetails({
             ...bankDetails,
             receiverAccountFirstName:
-              res.data.length === undefined ? '' : [...restParts][0],
+              res?.data?.length === undefined ? '' : [...restParts][0],
             receiverAccountLastName:
-              res.data.length === undefined ? '' : firstPart,
+              res?.data?.length === undefined ? '' : firstPart,
           });
         }
       };
@@ -229,7 +228,7 @@ const BankDeets = ({route}) => {
           <Text
             style={{
               color: '#4E4B66',
-              fontFamily: 'Montserat',
+
               fontWeight: '500',
               marginBottom: 10,
             }}>
@@ -245,7 +244,7 @@ const BankDeets = ({route}) => {
                     toWalletIdAccountNumber: text,
                   })
                 }
-                iconName="numeric"
+                // iconName="numeric"
                 label="Wallet Number"
                 placeholder="Enter beneficiary wallet number"
                 keyboardType="numeric"
@@ -276,7 +275,7 @@ const BankDeets = ({route}) => {
                     alignItems: 'center',
                     marginBottom: 10,
                   }}>
-                  <Text style={{color: '#054B99', fontFamily: 'MontSBold'}}>
+                  <Text style={{color: '#054B99', fontFamily: 'serif'}}>
                     Save Beneficiary
                   </Text>
                   <ToggleSwitch
@@ -394,7 +393,7 @@ const BankDeets = ({route}) => {
                 onChangeText={text =>
                   setBankDetails({...bankDetails, receiverAccountNumber: text})
                 }
-                iconName="numeric"
+                // iconName="numeric"
                 label="Account Number"
                 placeholder="Enter beneficiary wallet number"
                 keyboardType="numeric"
@@ -421,7 +420,7 @@ const BankDeets = ({route}) => {
                       justifyContent: 'space-between',
                       alignItems: 'center',
                     }}>
-                    <Text style={{color: '#054B99', fontFamily: 'MontSBold'}}>
+                    <Text style={{color: '#054B99', fontFamily: 'serif'}}>
                       Save Beneficiary
                     </Text>
                     <ToggleSwitch
@@ -534,7 +533,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   TextHead: {
-    fontFamily: 'Montserat',
     fontWeight: '700',
     fontSize: 16,
     lineHeight: 20,

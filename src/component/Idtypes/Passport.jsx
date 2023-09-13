@@ -260,13 +260,13 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   Head: {
-    fontFamily: 'MontBold',
+    fontFamily: 'serif',
     fontSize: 14,
     color: '#054B99',
     letterSpacing: 0.5,
   },
   textHead: {
-    fontFamily: 'Montserat',
+    
     fontSize: 12,
     color: '#6E7191',
   },
@@ -308,7 +308,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   TextHead: {
-    fontFamily: 'MontBold',
+    fontFamily: 'serif',
     fontSize: 16,
     lineHeight: 20,
     letterSpacing: 0.5,
@@ -344,7 +344,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   removeText: {
-    fontFamily: 'Montserat',
+    
     fontSize: 18,
     color: '#ED2E7E',
   },
@@ -363,7 +363,7 @@ const styles = StyleSheet.create({
   },
   checkedText: {
     color: '#44AB3B',
-    fontFamily: 'Montserat',
+    
     fontSize: 24,
     lineHeight: 36,
     textTransform: 'capitalize',

@@ -25,13 +25,13 @@ const Morescreen = () => {
 
   const handleLogout = async () => {
     const res = await userLogOut();
-    if (res.error) {
+    if (res?.error) {
       Toast.show({
         type: 'error',
         position: 'top',
         topOffset: 50,
-        text1: res.title,
-        text2: res.message,
+        text1: res?.title,
+        text2: res?.message,
         visibilityTime: 3000,
         autoHide: true,
         onPress: () => Toast.hide(),
@@ -56,10 +56,7 @@ const Morescreen = () => {
         <View style={{alignItems: 'center'}}>
           <Image source={require('../../../assets/images/signoutIcon.png')} />
           <Text
-            style={[
-              styles.signOutText,
-              {fontSize: 24, fontFamily: 'MontBold'},
-            ]}>
+            style={[styles.signOutText, {fontSize: 24, fontFamily: 'serif'}]}>
             Sign Out
           </Text>
           <Text style={styles.question}>Are you sure you want to sign out</Text>
@@ -97,7 +94,6 @@ const Morescreen = () => {
             <View style={{flexDirection: 'row', alignItems: 'center'}}>
               <Text
                 style={{
-                  fontFamily: 'Montserat',
                   color: '#054B99',
                   marginRight: 10,
                   fontSize: 18,
@@ -107,7 +103,7 @@ const Morescreen = () => {
               <Text
                 selectable={true}
                 selectionColor={'#CED4DA'}
-                style={{fontFamily: 'Montserat', fontSize: 18}}>
+                style={{fontSize: 18}}>
                 {profile?.personalReferalCode}
               </Text>
             </View>
@@ -148,7 +144,10 @@ const Morescreen = () => {
           </TouchableOpacity>
 
           <View style={{alignItems: 'center'}}>
-            <Image source={require('../../../assets/images/HeadLogo.png')} />
+            <Image
+              source={require('../../../assets/images/HeadLogo.png')}
+              style={{width: 83, height: 32}}
+            />
           </View>
         </View>
       </ScrollView>
@@ -178,7 +177,6 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   ProfileText: {
-    fontFamily: 'Montserat',
     fontWeight: '600',
     fontSize: 24,
     lineHeight: 36,
@@ -190,11 +188,10 @@ const styles = StyleSheet.create({
   },
   signOutText: {
     color: '#ED2E7E',
-    fontFamily: 'MontSBold',
+    fontFamily: 'serif',
     fontSize: 16,
   },
   question: {
-    fontFamily: 'Montserat',
     textAlign: 'center',
     color: '#4E4B66',
   },
@@ -208,7 +205,6 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   confirmText: {
-    fontFamily: 'Montserat',
     color: '#fff',
     fontSize: 16,
   },

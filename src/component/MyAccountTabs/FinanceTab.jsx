@@ -26,7 +26,7 @@ const Finance = () => {
 
   const unSubBankDetails = async () => {
     const res = await getLoanUserDetails();
-    if (res.error) {
+    if (res?.error) {
       // TODO: handle error
     } else {
       setBankDeets(res?.data?.bankDetails);

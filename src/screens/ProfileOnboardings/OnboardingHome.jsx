@@ -221,7 +221,8 @@ const OnboardingHome = () => {
             </TouchableOpacity>
 
             <TouchableOpacity
-              onPress={() => navigation.navigate('ValidIdentity')}>
+              // onPress={() => navigation.navigate('ValidIdentity')}>
+              onPress={() => navigation.navigate('Home')}>
               <CustomView label="Add Documents" status="[0/7]Pending" />
             </TouchableOpacity>
 
@@ -251,7 +252,7 @@ const styles = StyleSheet.create({
   },
   ProfileText: {
     paddingTop: 0,
-    fontFamily: 'Montserat',
+
     fontWeight: '600',
     fontSize: 24,
     lineHeight: 36,
@@ -259,7 +260,7 @@ const styles = StyleSheet.create({
   },
   PDT: {
     textAlign: 'center',
-    fontFamily: 'Montserat',
+
     fontSize: 12,
     lineHeight: 18,
   },

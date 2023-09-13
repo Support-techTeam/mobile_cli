@@ -5,7 +5,10 @@ import App from './App';
 import {name as appName} from './app.json';
 import Toast, {BaseToast, ErrorToast} from 'react-native-toast-message';
 import {NativeBaseProvider, extendTheme} from 'native-base';
+import networkService from './src/util/NetworkService';
 
+// Initialize network service
+// const network = new networkService();
 const newColorTheme = {
   brand: {
     900: '#5B8DF6',

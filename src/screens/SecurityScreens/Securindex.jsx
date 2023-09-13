@@ -350,7 +350,7 @@ const styles = StyleSheet.create({
     // backgroundColor: "red",
   },
   TextHead: {
-    fontFamily: 'Montserat',
+    
     fontWeight: '700',
     fontSize: 16,
     lineHeight: 20,
@@ -371,12 +371,12 @@ const styles = StyleSheet.create({
   },
   desc: {
     color: '#4E4B66',
-    fontFamily: 'Montserat',
+    
     fontWeight: '500',
     fontSize: 14,
   },
   amount: {
-    fontFamily: 'MontSBold',
+    fontFamily: 'serif',
     fontSize: 16,
   },
 });

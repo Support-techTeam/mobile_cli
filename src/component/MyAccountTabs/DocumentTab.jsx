@@ -23,7 +23,7 @@ const Document = () => {
 
   const unSubBankDetails = async () => {
     const res = await getLoanUserDetails();
-    if (res.error) {
+    if (res?.error) {
       // TODO: handle error
     } else {
       setDocsDeets(res?.data?.loanDocumentDetails);
@@ -32,7 +32,8 @@ const Document = () => {
   return (
     <View style={styles.container}>
       <TouchableOpacity
-        onPress={() => navigation.navigate('ValidIndentity')}
+        // onPress={() => navigation.navigate('ValidIndentity')}
+        onPress={() => navigation.navigate('Home')}
         style={{marginBottom: 20}}>
         <Buttons label={'Update Documents'} />
       </TouchableOpacity>

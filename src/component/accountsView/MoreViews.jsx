@@ -70,7 +70,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   pageText: {
-    fontFamily: 'MontSBold',
+    fontFamily: 'serif',
     fontSize: 16,
     color: '#4E4B66',
     lineHeight: 24,

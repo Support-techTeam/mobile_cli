@@ -58,7 +58,7 @@ const style = StyleSheet.create({
     marginVertical: 5,
     fontSize: 14,
     color: COLORS.labelColor,
-    fontFamily: 'Montserat',
+    
   },
   inputContainer: {
     height: 55,

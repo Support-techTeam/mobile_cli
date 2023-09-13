@@ -44,6 +44,6 @@ export const resetStore = async () => {
     store.dispatch(clearLocationReduxState()); // Dispatch your reset action
     await persistor.flush();
   } catch (error) {
-    console.error('Error resetting store:', error);
+    // console.error('Error resetting store:', error);
   }
 };

@@ -79,7 +79,7 @@ const TransPin = () => {
             alignItems: 'center',
           }}>
           <Text
-            style={{color: '#14142B', fontFamily: 'Montserat', fontSize: 16}}>
+            style={{color: '#14142B',  fontSize: 16}}>
             Enter your transaction pin
           </Text>
         </View>
@@ -172,7 +172,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   TextHead: {
-    fontFamily: 'Montserat',
+    
     fontWeight: '700',
     fontSize: 16,
     lineHeight: 20,
@@ -209,7 +209,7 @@ const styles = StyleSheet.create({
     borderColor: '#054B99',
   },
   otpText: {
-    fontFamily: 'Montserat',
+    
     fontSize: 20,
     textAlign: 'center',
     height: 40,
@@ -233,12 +233,12 @@ const styles = StyleSheet.create({
   },
   desc: {
     color: '#4E4B66',
-    fontFamily: 'Montserat',
+    
     fontWeight: '500',
     fontSize: 14,
   },
   amount: {
-    fontFamily: 'MontSBold',
+    fontFamily: 'serif',
     fontSize: 16,
   },
 });

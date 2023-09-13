@@ -203,7 +203,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 26,
     color: '#14142B',
-    fontFamily: 'Montserat',
+    
     textAlign: 'left',
   },
   pinStyle: {
@@ -220,7 +220,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   TextHead: {
-    fontFamily: 'Montserat',
+    
     fontWeight: '700',
     fontSize: 16,
     lineHeight: 20,
@@ -241,12 +241,12 @@ const styles = StyleSheet.create({
   },
   desc: {
     color: '#4E4B66',
-    fontFamily: 'Montserat',
+    
     fontWeight: '500',
     fontSize: 14,
   },
   amount: {
-    fontFamily: 'MontSBold',
+    fontFamily: 'serif',
     fontSize: 16,
   },
   blur: {

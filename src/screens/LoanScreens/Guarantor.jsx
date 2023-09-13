@@ -14,6 +14,7 @@ import {useRoute} from '@react-navigation/native';
 import {getGuarantors} from '../../stores/GuarantorStore';
 import {getLoanUserDetails} from '../../stores/LoanStore';
 import AntDesign from 'react-native-vector-icons/AntDesign';
+import Toast from 'react-native-toast-message';
 
 const Guarantor = () => {
   const navigation = useNavigation();
@@ -36,13 +37,13 @@ const Guarantor = () => {
   const getGuarantorsData = async () => {
     setIsLoading(true);
     const res = await getGuarantors();
-    if (res.error) {
+    if (res?.error) {
       Toast.show({
         type: 'error',
         position: 'top',
         topOffset: 50,
-        text1: res.title,
-        text2: res.message,
+        text1: res?.title,
+        text2: res?.message,
         visibilityTime: 5000,
         autoHide: true,
         onPress: () => Toast.hide(),
@@ -56,13 +57,13 @@ const Guarantor = () => {
   const getLoanuserData = async () => {
     setIsLoading(true);
     const res = await getLoanUserDetails();
-    if (res.error) {
+    if (res?.error) {
       Toast.show({
         type: 'error',
         position: 'top',
         topOffset: 50,
-        text1: res.title,
-        text2: res.message,
+        text1: res?.title,
+        text2: res?.message,
         visibilityTime: 5000,
         autoHide: true,
         onPress: () => Toast.hide(),
@@ -345,7 +346,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
   },
   tabText: {
-    fontFamily: 'Montserat',
     fontSize: 12,
     fontWeight: '600',
     textAlign: 'center',
@@ -369,7 +369,7 @@ const styles = StyleSheet.create({
   getText: {
     textAlign: 'center',
     color: 'white',
-    fontFamily: 'Montserat',
+
     fontSize: 14,
     fontWeight: '500',
   },
@@ -392,13 +392,11 @@ const styles = StyleSheet.create({
     marginRight: 9,
   },
   addText: {
-    fontFamily: 'Montserat',
     fontSize: 14,
     fontWeight: '800',
     color: '#14142B',
   },
   addDets: {
-    fontFamily: 'Montserat',
     fontSize: 10,
     color: '#4E4B66',
   },
@@ -408,21 +406,18 @@ const styles = StyleSheet.create({
     paddingBottom: 500,
   },
   title: {
-    fontFamily: 'Montserat',
     fontSize: 14,
     fontWeight: '800',
     lineHeight: 21,
     color: '#14142B',
   },
   price: {
-    fontFamily: 'Montserat',
     fontSize: 12,
 
     lineHeight: 24,
     color: '#4E4B66',
   },
   noTrans: {
-    fontFamily: 'Montserat',
     fontWeight: '500',
     fontSize: 20,
     lineHeight: 28,
@@ -437,7 +432,6 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   myGuarantors: {
-    fontFamily: 'Montserat',
     color: '#054B99',
     fontSize: 16,
     fontWeight: '700',

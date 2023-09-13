@@ -44,7 +44,7 @@ const MyAccount = () => {
       permissionResult['android.permission.WRITE_EXTERNAL_STORAGE'] ===
         PermissionsAndroid.RESULTS.GRANTED
     ) {
-      console.log('Grantd');
+      // console.log('Grantd');
       await launchCamera(
         {
           mediaType: 'photo', // Specify 'photo' to capture images
@@ -54,9 +54,9 @@ const MyAccount = () => {
         },
         response => {
           if (response.didCancel) {
-            console.log('User cancelled the camera');
+            // console.log('User cancelled the camera');
           } else if (response.error) {
-            console.error('ImagePicker Error:', response.error);
+            // console.error('ImagePicker Error:', response.error);
           } else {
             handleImageSelection(response);
           }
@@ -186,7 +186,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   TextHead: {
-    fontFamily: 'Montserat',
+    
     fontWeight: '700',
     fontSize: 16,
     lineHeight: 20,
@@ -203,7 +203,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   ProfileText: {
-    fontFamily: 'Montserat',
+    
     fontWeight: '600',
     fontSize: 24,
     lineHeight: 36,
@@ -235,10 +235,10 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: 'bold',
     color: 'black',
-    fontFamily: 'Montserat',
+    
   },
   tabText2: {
-    fontFamily: 'MontSBold',
+    fontFamily: 'serif',
     fontSize: 12,
     textAlign: 'center',
   },

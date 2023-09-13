@@ -139,13 +139,13 @@ const SignaturePad = ({deets}) => {
   const s3UploadFunction = async () => {
     // setIsUpdating(true);
     const res = await createUploadDocument(fileUri, 'signature');
-    if (res.error) {
+    if (res?.error) {
       Toast.show({
         type: 'error',
         position: 'top',
         topOffset: 50,
-        text1: res.title,
-        text2: res.message,
+        text1: res?.title,
+        text2: res?.message,
         visibilityTime: 5000,
         autoHide: true,
         onPress: () => Toast.hide(),
@@ -155,14 +155,14 @@ const SignaturePad = ({deets}) => {
         type: 'success',
         position: 'top',
         topOffset: 50,
-        text1: res.title,
-        text2: res.message,
+        text1: res?.title,
+        text2: res?.message,
         visibilityTime: 3000,
         autoHide: true,
         onPress: () => Toast.hide(),
       });
 
-      console.log('res Add Signature', res);
+      // console.log('res Add Signature', res);
       // setUserDocs(deetss => {
       //   return {
       //     ...deetss,
@@ -358,7 +358,7 @@ const styles = StyleSheet.create({
   },
   textSign: {
     color: '#4E4B66',
-    fontFamily: 'MontSBold',
+    fontFamily: 'serif',
     textAlign: 'center',
     paddingVertical: 5,
   },
@@ -427,7 +427,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   TextHead: {
-    fontFamily: 'MontBold',
+    fontFamily: 'serif',
     fontSize: 16,
     lineHeight: 20,
     letterSpacing: 0.5,

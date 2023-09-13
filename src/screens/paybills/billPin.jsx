@@ -73,13 +73,13 @@ const BillPin = ({route}) => {
     if (airtimeDetails.service === 'airtime purchase') {
       setIsLoading(true);
       const res = await purchaseAirtime(details);
-      if (res.error || res?.data?.error) {
+      if (res?.error || res?.data?.error) {
         Toast.show({
           type: 'error',
           position: 'top',
           topOffset: 50,
-          text1: res.title,
-          text2: res?.data?.message ? res?.data?.message : res.message,
+          text1: res?.title,
+          text2: res?.data?.message ? res?.data?.message : res?.message,
           visibilityTime: 5000,
           autoHide: true,
           onPress: () => Toast.hide(),
@@ -92,8 +92,8 @@ const BillPin = ({route}) => {
           type: 'success',
           position: 'top',
           topOffset: 50,
-          text1: res.title,
-          text2: res.message,
+          text1: res?.title,
+          text2: res?.message,
           visibilityTime: 3000,
           autoHide: true,
           onPress: () => Toast.hide(),
@@ -108,13 +108,13 @@ const BillPin = ({route}) => {
     if (airtimeDetails.service === 'data purchase') {
       setIsLoading(true);
       const res = await purchaseDataPlan(dataDetails);
-      if (res.error || res?.data?.error) {
+      if (res?.error || res?.data?.error) {
         Toast.show({
           type: 'error',
           position: 'top',
           topOffset: 50,
-          text1: res.title,
-          text2: res?.data?.message ? res?.data?.message : res.message,
+          text1: res?.title,
+          text2: res?.data?.message ? res?.data?.message : res?.message,
           visibilityTime: 5000,
           autoHide: true,
           onPress: () => Toast.hide(),
@@ -127,8 +127,8 @@ const BillPin = ({route}) => {
           type: 'success',
           position: 'top',
           topOffset: 50,
-          text1: res.title,
-          text2: res.message,
+          text1: res?.title,
+          text2: res?.message,
           visibilityTime: 3000,
           autoHide: true,
           onPress: () => Toast.hide(),
@@ -143,13 +143,13 @@ const BillPin = ({route}) => {
     if (airtimeDetails.service === 'electricity purchase') {
       setIsLoading(true);
       const res = await purchaseElectricity(powerDetails);
-      if (res.error || res?.data?.error) {
+      if (res?.error || res?.data?.error) {
         Toast.show({
           type: 'error',
           position: 'top',
           topOffset: 50,
-          text1: res.title,
-          text2: res?.data?.message ? res?.data?.message : res.message,
+          text1: res?.title,
+          text2: res?.data?.message ? res?.data?.message : res?.message,
           visibilityTime: 5000,
           autoHide: true,
           onPress: () => Toast.hide(),
@@ -162,8 +162,8 @@ const BillPin = ({route}) => {
           type: 'success',
           position: 'top',
           topOffset: 50,
-          text1: res.title,
-          text2: res.message,
+          text1: res?.title,
+          text2: res?.message,
           visibilityTime: 3000,
           autoHide: true,
           onPress: () => Toast.hide(),
@@ -183,13 +183,13 @@ const BillPin = ({route}) => {
       } else {
         res = await renewSubscription(cableDetails);
       }
-      if (res.error || res?.data?.error) {
+      if (res?.error || res?.data?.error) {
         Toast.show({
           type: 'error',
           position: 'top',
           topOffset: 50,
-          text1: res.title,
-          text2: res?.data?.message ? res?.data?.message : res.message,
+          text1: res?.title,
+          text2: res?.data?.message ? res?.data?.message : res?.message,
           visibilityTime: 5000,
           autoHide: true,
           onPress: () => Toast.hide(),
@@ -202,8 +202,8 @@ const BillPin = ({route}) => {
           type: 'success',
           position: 'top',
           topOffset: 50,
-          text1: res.title,
-          text2: res.message,
+          text1: res?.title,
+          text2: res?.message,
           visibilityTime: 3000,
           autoHide: true,
           onPress: () => Toast.hide(),
@@ -275,8 +275,7 @@ const BillPin = ({route}) => {
             justifyContent: 'center',
             alignItems: 'center',
           }}>
-          <Text
-            style={{color: '#14142B', fontFamily: 'Montserat', fontSize: 16}}>
+          <Text style={{color: '#14142B', fontSize: 16}}>
             Enter your transaction pin
           </Text>
         </View>
@@ -367,7 +366,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   TextHead: {
-    fontFamily: 'Montserat',
     fontWeight: '700',
     fontSize: 16,
     lineHeight: 20,
@@ -405,7 +403,6 @@ const styles = StyleSheet.create({
     borderColor: '#054B99',
   },
   otpText: {
-    fontFamily: 'Montserat',
     fontSize: 20,
     textAlign: 'center',
     paddingHorizontal: 5,
@@ -429,12 +426,12 @@ const styles = StyleSheet.create({
   },
   desc: {
     color: '#4E4B66',
-    fontFamily: 'Montserat',
+
     fontWeight: '500',
     fontSize: 14,
   },
   amount: {
-    fontFamily: 'MontSBold',
+    fontFamily: 'serif',
     fontSize: 16,
   },
 });

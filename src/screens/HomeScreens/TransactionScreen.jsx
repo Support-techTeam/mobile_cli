@@ -7,6 +7,7 @@ import {
   Image,
   TouchableWithoutFeedback,
   ToastAndroid,
+  Platform,
 } from 'react-native';
 import React from 'react';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -16,6 +17,7 @@ import Share from 'react-native-share';
 import {useClipboard} from '@react-native-clipboard/clipboard';
 import ViewShot from 'react-native-view-shot';
 import SendIntentAndroid from 'react-native-send-intent';
+import email from 'react-native-email'
 
 const TransactionScreen = ({route}) => {
   const insets = useSafeAreaInsets();
@@ -26,12 +28,20 @@ const TransactionScreen = ({route}) => {
 
   const openSendSms = Id => {
     const text = `Hello, I would like to report a transaction, with Transaction ID: ${Id}`;
-
+    if (Platform.OS === 'android') {
     SendIntentAndroid.sendMail(
       'support@tradelenda.com',
       `Report Transaction`,
       `${text}`,
     );
+    }else{
+      email('support@tradelenda.com', {
+        subject: 'Report Transaction',
+        body: `${text}`,
+        checkCanOpen: false // Call Linking.canOpenURL prior to Linking.openURL
+    }).catch(console.error)
+
+    }
   };
 
   const shareToSocialMedia = async () => {
@@ -138,7 +148,7 @@ const TransactionScreen = ({route}) => {
               </View>
               <Text
                 style={{
-                  fontFamily: 'Montserat',
+                  
                   fontWeight: '400',
                   marginTop: 8,
                 }}>
@@ -277,7 +287,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   TextHead: {
-    fontFamily: 'Montserat',
+    
     fontWeight: '700',
     fontSize: 16,
     lineHeight: 20,
@@ -303,7 +313,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   title: {
-    fontFamily: 'Montserat',
+    
     fontWeight: '800',
     paddingLeft: 20,
     fontSize: 14,
@@ -312,12 +322,12 @@ const styles = StyleSheet.create({
     paddingTop: 10,
   },
   infotext: {
-    fontFamily: 'Montserat',
+    
     color: '#6E7191',
     marginBottom: 4,
   },
   values: {
-    fontFamily: 'Montserat',
+    
     fontSize: 16,
     lineHeight: 24,
     fontWeight: '800',
@@ -325,14 +335,14 @@ const styles = StyleSheet.create({
   report: {
     color: '#ED2E7E',
     fontSize: 14,
-    fontFamily: 'Montserat',
+    
     fontWeight: 'bold',
     lineHeight: 24,
     letterSpacing: 0.5,
   },
   reportdesc: {
     color: '#6E7191',
-    fontFamily: 'Montserat',
+    
     fontSize: 12,
     lineHeight: 18,
   },

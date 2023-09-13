@@ -31,10 +31,9 @@ import {
   DatadogProviderConfiguration,
   DatadogProvider,
 } from '@datadog/mobile-react-native';
-// import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 import AppNavigationContainer from './src/navigation';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
-import {Provider as PaperProvider, MD3LightTheme} from 'react-native-paper';
+import {Provider as PaperProvider} from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {Provider} from 'react-redux';
 import {PersistGate} from 'redux-persist/integration/react';
@@ -42,7 +41,7 @@ import {persistor, store} from './src/util/redux/store';
 import {LightTheme} from './src/constants/lightTheme';
 import EnterPin from './src/screens/SecurityScreens/EnterPinScreen';
 import {getAllPin} from './src/stores/SecurityStore';
-
+import NetworkStatus from './src/util/NetworkService';
 const inAppUpdates = new SpInAppUpdates(false);
 LogBox.ignoreAllLogs();
 
@@ -219,6 +218,7 @@ function App() {
             <View style={styles.container}>
               <Provider store={store}>
                 <PersistGate persistor={persistor} loading={null}>
+                  <NetworkStatus />
                   <AppNavigationContainer />
                 </PersistGate>
               </Provider>

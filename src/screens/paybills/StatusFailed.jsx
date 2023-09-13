@@ -65,7 +65,7 @@ const StatusFailed = () => {
           <Text
             style={{
               marginTop: 24,
-              fontFamily: 'Montserat',
+              
               fontSize: 20,
               color: '#14142B',
             }}>
@@ -74,7 +74,7 @@ const StatusFailed = () => {
           <Text
             style={{
               marginTop: 14,
-              fontFamily: 'Montserat',
+              
               fontSize: 14,
               color: '#4E4B66',
             }}>

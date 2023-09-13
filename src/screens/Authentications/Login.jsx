@@ -67,13 +67,13 @@ const Login = () => {
     setIsLoading(true);
     const {email, password} = userDetails;
     const res = await userLogin(email, password);
-    if (res.error) {
+    if (res?.error) {
       Toast.show({
         type: 'error',
         position: 'top',
         topOffset: 50,
-        text1: res.title,
-        text2: res.message,
+        text1: res?.title,
+        text2: res?.message,
         visibilityTime: 5000,
         autoHide: true,
         onPress: () => Toast.hide(),
@@ -83,13 +83,13 @@ const Login = () => {
         type: 'success',
         position: 'top',
         topOffset: 50,
-        text1: res.title,
-        text2: res.message,
+        text1: res?.title,
+        text2: res?.message,
         visibilityTime: 3000,
         autoHide: true,
         onPress: () => Toast.hide(),
       });
-      dispatch(signInUser(JSON.stringify(res.user)));
+      dispatch(signInUser(JSON.stringify(res?.user)));
       fetchProfileData();
     }
     setIsLoading(false);
@@ -99,7 +99,7 @@ const Login = () => {
     try {
       const res = await getProfileDetails();
       if (res?.data !== undefined) {
-        if (res.error) {
+        if (res?.error) {
         } else {
           dispatch(setProfile(res?.data));
         }
@@ -173,6 +173,7 @@ const Login = () => {
                   <View style={{alignItems: 'center'}}>
                     <Image
                       source={require('../../../assets/images/HeadLogo.png')}
+                      style={{width: 83, height: 32}}
                     />
                   </View>
                   <Text style={[styles.signupText, {marginBottom: 40}]}>
@@ -243,9 +244,8 @@ const Login = () => {
                         onPress={() => navigation.navigate('ForgotPassword')}>
                         <Text
                           style={{
-                            // color: '#0566C3',
                             color: COLORS.lendaBlue,
-                            fontFamily: 'Montserat',
+                            fontFamily: 'serif',
                             fontSize: 16,
                           }}>
                           Forgot password?
@@ -274,7 +274,7 @@ const Login = () => {
                     <Text
                       style={{
                         color: COLORS.lendaBlue,
-                        fontFamily: 'Montserat',
+                        fontFamily: 'serif',
                         fontSize: 16,
                       }}>
                       Sign up
@@ -304,7 +304,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     fontSize: 36,
     letterSpacing: 3.5,
-    fontFamily: 'Montserat',
+    fontFamily: 'serif',
     paddingTop: 22,
     lineHeight: 54,
   },
@@ -312,7 +312,7 @@ const styles = StyleSheet.create({
     fontWeight: '400',
     fontSize: 14,
     lineHeight: 21,
-    fontFamily: 'Montserat',
+    fontFamily: 'serif',
   },
   phonetextContainer: {
     borderRadius: 8,
@@ -347,7 +347,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 24,
     color: '#14142B',
-    fontFamily: 'Montserat',
+    fontFamily: 'serif',
   },
   signUp: {
     backgroundColor: '#054B99',
@@ -374,7 +374,7 @@ const styles = StyleSheet.create({
     fontWeight: '400',
     color: '#14142B',
     lineHeight: 21,
-    fontFamily: 'Montserat',
+    fontFamily: 'serif',
     marginLeft: 10,
   },
   signUpactivity: {

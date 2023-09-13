@@ -188,18 +188,18 @@ const styles = StyleSheet.create({
     backgroundColor: '#054B99',
   },
   tabText: {
-    fontFamily: 'Montserat',
+    
     fontSize: 12,
     fontWeight: '600',
     textAlign: 'center',
   },
   tabText2: {
-    fontFamily: 'MontSBold',
+    fontFamily: 'serif',
     fontSize: 12,
     textAlign: 'center',
   },
   TextHead: {
-    fontFamily: 'Montserat',
+    
     fontWeight: '700',
     fontSize: 16,
     lineHeight: 24,
@@ -214,7 +214,7 @@ const styles = StyleSheet.create({
     marginVertical: 16,
   },
   header: {
-    fontFamily: 'Montserat',
+    
     fontSize: 20,
     fontWeight: '700',
     letterSpacing: 1,
@@ -232,10 +232,10 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: 'bold',
     color: 'black',
-    fontFamily: 'Montserat',
+    
   },
   camHead: {
-    fontFamily: 'Montserat',
+    
     fontSize: 14,
     fontWeight: '400',
   },

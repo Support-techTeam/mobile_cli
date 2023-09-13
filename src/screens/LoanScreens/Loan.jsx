@@ -6,6 +6,8 @@ import {
   TouchableOpacity,
   ScrollView,
   FlatList,
+  Dimensions,
+  ImageBackground,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {TabView, SceneMap} from 'react-native-tab-view';
@@ -23,6 +25,8 @@ import {
   getLoanUserDetails,
 } from '../../stores/LoanStore';
 import {useRoute, useIsFocused} from '@react-navigation/native';
+
+const {width, height} = Dimensions.get('window');
 
 const Loanscreen = () => {
   const navigation = useNavigation();
@@ -74,13 +78,13 @@ const Loanscreen = () => {
   const getLoanuserData = async () => {
     setIsLoading(true);
     const res = await getLoanUserDetails();
-    if (res.error) {
+    if (res?.error) {
       // Toast.show({
       //   type: 'error',
       //   position: 'top',
       //   topOffset: 50,
-      //   text1: res.title,
-      //   text2: res.message,
+      //   text1: res?.title,
+      //   text2: res?.message,
       //   visibilityTime: 5000,
       //   autoHide: true,
       //   onPress: () => Toast.hide(),
@@ -93,13 +97,13 @@ const Loanscreen = () => {
   const getApprovedLoansData = async () => {
     setIsLoading(true);
     const res = await getApprovedLoans();
-    if (res.error) {
+    if (res?.error) {
       // Toast.show({
       //   type: 'error',
       //   position: 'top',
       //   topOffset: 50,
-      //   text1: res.title,
-      //   text2: res.message,
+      //   text1: res?.title,
+      //   text2: res?.message,
       //   visibilityTime: 5000,
       //   autoHide: true,
       //   onPress: () => Toast.hide(),
@@ -112,13 +116,13 @@ const Loanscreen = () => {
   const getPendingLoansData = async () => {
     setIsLoading(true);
     const res = await getPendingLoans();
-    if (res.error) {
+    if (res?.error) {
       // Toast.show({
       //   type: 'error',
       //   position: 'top',
       //   topOffset: 50,
-      //   text1: res.title,
-      //   text2: res.message,
+      //   text1: res?.title,
+      //   text2: res?.message,
       //   visibilityTime: 5000,
       //   autoHide: true,
       //   onPress: () => Toast.hide(),
@@ -131,13 +135,13 @@ const Loanscreen = () => {
   const getAllLoansData = async () => {
     setIsLoading(true);
     const res = await getAllLoans();
-    if (res.error) {
+    if (res?.error) {
       // Toast.show({
       //   type: 'error',
       //   position: 'top',
       //   topOffset: 50,
-      //   text1: res.title,
-      //   text2: res.message,
+      //   text1: res?.title,
+      //   text2: res?.message,
       //   visibilityTime: 5000,
       //   autoHide: true,
       //   onPress: () => Toast.hide(),
@@ -150,13 +154,13 @@ const Loanscreen = () => {
   const getPaidLoansData = async () => {
     setIsLoading(true);
     const res = await getPaidLoans();
-    if (res.error) {
+    if (res?.error) {
       // Toast.show({
       //   type: 'error',
       //   position: 'top',
       //   topOffset: 50,
-      //   text1: res.title,
-      //   text2: res.message,
+      //   text1: res?.title,
+      //   text2: res?.message,
       //   visibilityTime: 5000,
       //   autoHide: true,
       //   onPress: () => Toast.hide(),
@@ -175,10 +179,9 @@ const Loanscreen = () => {
         {isLoading ? (
           <View
             style={{
-              width: 120,
+              width: width - 32,
               height: 120,
               marginRight: 15,
-
               borderRadius: 20,
               borderColor: '#F7F7FC',
               borderWidth: 1,
@@ -189,68 +192,70 @@ const Loanscreen = () => {
             </View>
           </View>
         ) : (
-          <View
-            style={{
-              width: 150,
-              height: 170,
-              marginRight: 16,
-
-              borderRadius: 20,
-              borderColor: '#F7F7FC',
-              borderWidth: 1,
-              overflow: 'hidden',
-            }}>
-            <View style={{padding: 10}}>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                }}>
-                <View style={{width: '70%'}}>
-                  <Text style={styles.state}>{item.state}</Text>
+          <ImageBackground
+            source={require('../../../assets/icons/wallet_background.png')}>
+            <View
+              style={{
+                width: width - 32,
+                height: 170,
+                marginRight: 16,
+                borderRadius: 20,
+                borderColor: '#F7F7FC',
+                borderWidth: 1.5,
+                overflow: 'hidden',
+              }}>
+              <View style={{padding: 10}}>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                  }}>
+                  <View style={{width: '70%'}}>
+                    <Text style={styles.state}>{item.state}</Text>
+                  </View>
+                  <Image source={item.icon} />
                 </View>
-                <Image source={item.icon} />
+                <Text style={styles.amount}>{item.amount}</Text>
+                <View
+                  style={{
+                    width: 140,
+                    height: 170,
+                    borderRadius: 100,
+                    borderWidth: 12,
+                    bottom: -185,
+                    right: -20,
+                    position: 'absolute',
+                    borderColor:
+                      item.id === 1
+                        ? '#E6EDF5'
+                        : item.id === 2
+                        ? 'rgba(244, 183, 64, 0.2)'
+                        : '#DAEED8',
+                    opacity: 0.5,
+                  }}
+                />
+                <View
+                  style={{
+                    width: 100,
+                    height: 120,
+                    borderRadius: 100,
+                    borderWidth: 12,
+                    bottom: -155,
+                    right: item.id === 1 ? -15 : item.id === 2 ? 20 : -15,
+                    position: 'absolute',
+                    borderColor:
+                      item.id === 1
+                        ? 'linear-gradient(114.44deg, rgba(36, 52, 139, 0.5) 0%, rgba(99, 168, 235, 0.5) 100%)'
+                        : item.id === 2
+                        ? 'linear-gradient(114.44deg, rgba(235, 0, 85, 1) 100%, rgba(255, 250, 128, 1) 100%)'
+                        : 'linear-gradient(180deg, rgba(68, 171, 59, 1) 0%, #D8FF69 100%)',
+                    opacity: 0.3,
+                  }}
+                />
               </View>
-              <Text style={styles.amount}>{item.amount}</Text>
-              <View
-                style={{
-                  width: 140,
-                  height: 170,
-                  borderRadius: 100,
-                  borderWidth: 12,
-                  bottom: -185,
-                  right: -20,
-                  position: 'absolute',
-                  borderColor:
-                    item.id === 1
-                      ? '#E6EDF5'
-                      : item.id === 2
-                      ? 'rgba(244, 183, 64, 0.2)'
-                      : '#DAEED8',
-                  opacity: 0.5,
-                }}
-              />
-              <View
-                style={{
-                  width: 100,
-                  height: 120,
-                  borderRadius: 100,
-                  borderWidth: 12,
-                  bottom: -155,
-                  right: item.id === 1 ? -15 : item.id === 2 ? 20 : -15,
-                  position: 'absolute',
-                  borderColor:
-                    item.id === 1
-                      ? 'linear-gradient(114.44deg, rgba(36, 52, 139, 0.5) 0%, rgba(99, 168, 235, 0.5) 100%)'
-                      : item.id === 2
-                      ? 'linear-gradient(114.44deg, rgba(235, 0, 85, 1) 100%, rgba(255, 250, 128, 1) 100%)'
-                      : 'linear-gradient(180deg, rgba(68, 171, 59, 1) 0%, #D8FF69 100%)',
-                  opacity: 0.3,
-                }}
-              />
             </View>
-          </View>
+          </ImageBackground>
         )}
       </>
     );
@@ -970,7 +975,7 @@ const Loanscreen = () => {
           <TabView
             navigationState={{
               index,
-              routes: data.map(item => ({key: item.id, title: item.title})),
+              routes: data?.map(item => ({key: item.id, title: item.title})),
             }}
             renderScene={renderScene}
             onIndexChange={setIndex}
@@ -1000,7 +1005,10 @@ const Loanscreen = () => {
                 marginBottom: 20,
                 marginRight: 15,
               }}>
-              <Image source={require('../../../assets/images/HeadLogo.png')} />
+              <Image
+                source={require('../../../assets/images/HeadLogo.png')}
+                style={{width: 83, height: 32}}
+              />
               <TouchableOpacity
                 onPress={() => navigation.navigate('More')}
                 style={{
@@ -1060,7 +1068,7 @@ const Loanscreen = () => {
           <TabView
             navigationState={{
               index,
-              routes: data.map(item => ({key: item.id, title: item.title})),
+              routes: data?.map(item => ({key: item.id, title: item.title})),
             }}
             renderScene={renderScene}
             onIndexChange={setIndex}
@@ -1094,7 +1102,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
   },
   tabText: {
-    fontFamily: 'Montserat',
     fontSize: 12,
     fontWeight: '600',
     textAlign: 'center',
@@ -1118,7 +1125,7 @@ const styles = StyleSheet.create({
   getText: {
     textAlign: 'center',
     color: 'white',
-    fontFamily: 'Montserat',
+
     fontSize: 14,
     fontWeight: '500',
   },
@@ -1137,41 +1144,37 @@ const styles = StyleSheet.create({
     color: 'black',
   },
   title: {
-    fontFamily: 'Montserat',
     fontSize: 14,
     fontWeight: '800',
     lineHeight: 21,
     color: '#14142B',
   },
   price: {
-    fontFamily: 'Montserat',
     fontSize: 16,
     fontWeight: '800',
     lineHeight: 24,
     color: '#14142B',
   },
   desc: {
-    fontFamily: 'Montserat',
     fontSize: 12,
     fontWeight: '400',
     lineHeight: 18,
   },
   noTrans: {
-    fontFamily: 'MontSBold',
+    fontFamily: 'serif',
     // fontWeight: '300',
     fontSize: 20,
     lineHeight: 28,
     textAlign: 'center',
   },
   state: {
-    fontFamily: 'Montserat',
     fontSize: 12,
     fontWeight: '400',
     color: '#4E4B66',
   },
   amount: {
     marginTop: 40,
-    fontFamily: 'MontBold',
+    fontFamily: 'serif',
     fontSize: 20,
 
     marginBottom: -10,

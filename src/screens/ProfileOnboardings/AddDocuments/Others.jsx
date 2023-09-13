@@ -86,12 +86,12 @@ const Others = ({route}) => {
   const pickDocument = async () => {
     try {
       let result = await DocumentPicker.pick({});
-      console.log(
-        result.uri, // The URI of the selected document
-        result.type, // Mime type
-        result.name, // The name of the file
-        result.size, // File size (in bytes)
-      );
+      // console.log(
+      //   result.uri, // The URI of the selected document
+      //   result.type, // Mime type
+      //   result.name, // The name of the file
+      //   result.size, // File size (in bytes)
+      // );
       setSelectedDocument(result);
       setFile({name: result?.name, type: result?.mimeType, uri: result?.uri});
     } catch (err) {
@@ -112,13 +112,13 @@ const Others = ({route}) => {
   const s3UploadFunction = async () => {
     // setIsUpdating(true);
     const res = await createUploadDocument(fileUri, 'signature');
-    if (res.error) {
+    if (res?.error) {
       Toast.show({
         type: 'error',
         position: 'top',
         topOffset: 50,
-        text1: res.title,
-        text2: res.message,
+        text1: res?.title,
+        text2: res?.message,
         visibilityTime: 5000,
         autoHide: true,
         onPress: () => Toast.hide(),
@@ -128,14 +128,14 @@ const Others = ({route}) => {
         type: 'success',
         position: 'top',
         topOffset: 50,
-        text1: res.title,
-        text2: res.message,
+        text1: res?.title,
+        text2: res?.message,
         visibilityTime: 3000,
         autoHide: true,
         onPress: () => Toast.hide(),
       });
 
-      console.log('res', res);
+      // console.log('res', res);
       // setUserDocs(deetss => {
       //   return {
       //     ...deetss,
@@ -317,13 +317,12 @@ const styles = StyleSheet.create({
     marginHorizontal: 2,
   },
   tabText: {
-    fontFamily: 'Montserat',
     fontSize: 12,
     fontWeight: '600',
     textAlign: 'center',
   },
   tabText2: {
-    fontFamily: 'MontSBold',
+    fontFamily: 'serif',
     fontSize: 12,
     textAlign: 'center',
   },
@@ -334,7 +333,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#054B99',
   },
   TextHead: {
-    fontFamily: 'Montserat',
     fontWeight: '700',
     fontSize: 16,
     lineHeight: 24,
@@ -349,7 +347,6 @@ const styles = StyleSheet.create({
     marginVertical: 16,
   },
   header: {
-    fontFamily: 'Montserat',
     fontSize: 20,
     fontWeight: '700',
     letterSpacing: 1,
@@ -367,10 +364,8 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: 'bold',
     color: 'black',
-    fontFamily: 'Montserat',
   },
   camHead: {
-    fontFamily: 'Montserat',
     fontSize: 14,
     fontWeight: '400',
   },
