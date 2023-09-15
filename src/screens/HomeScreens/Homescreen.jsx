@@ -13,6 +13,7 @@ import {
   TouchableWithoutFeedback,
   ToastAndroid,
   NativeModules,
+  Platform,
 } from 'react-native';
 import React, {
   useContext,
@@ -21,21 +22,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import {
-  VStack,
-  Center,
-  HStack,
-  Box,
-  Container,
-  Flex,
-  Stack,
-  AspectRatio,
-  Heading,
-  Circle,
-  Badge,
-  Fab,
-  Actionsheet,
-} from 'native-base';
+import {Actionsheet} from 'native-base';
 import {Button} from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import OctaIcon from 'react-native-vector-icons/Octicons';
@@ -65,10 +52,11 @@ import Splashscreen from '../../navigation/Splashscreen';
 import {useRoute, useIsFocused} from '@react-navigation/native';
 import {getLoanUserDetails, getLoansAmount} from '../../stores/LoanStore';
 import {checkPin} from '../../stores/ProfileStore';
-// import RNRestart from 'react-native-restart';
+// import networkService from '../../util/NetworkService';
 
-const {width, height} = Dimensions.get('window');
+const {width} = Dimensions.get('window');
 const Homescreen = () => {
+  // const isConnected = networkService.isOnline();
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
@@ -95,8 +83,11 @@ const Homescreen = () => {
   const isFocused = useIsFocused();
   const [loanUserDetails, setLoanUserDetails] = useState(undefined);
   const [userPin, setUserPin] = useState(true);
+  // const networkState = useSelector(state => state.networkState.network);
 
   const dispatch = useDispatch();
+
+  // console.log('Network', isConnected);
 
   const toggleMakeTransfer = () => {
     setIsMakeTransferVisible(!isMakeTransferVisible);
@@ -111,13 +102,13 @@ const Homescreen = () => {
     setIsFetching(true);
     // if (isAllTransactionVisible) {
     const res = await getAccountTransactions(1, 10);
-    if (res.error) {
+    if (res?.error) {
       Toast.show({
         type: 'error',
         position: 'top',
         topOffset: 50,
-        text1: res.title,
-        text2: res.message,
+        text1: res?.title,
+        text2: res?.message,
         visibilityTime: 5000,
         autoHide: true,
         onPress: () => Toast.hide(),
@@ -126,7 +117,7 @@ const Homescreen = () => {
       setCurrentPage(1);
       if (
         res?.data?.transactions?.transaction !== undefined &&
-        res.data?.transactions?.transaction !== null
+        res?.data?.transactions?.transaction !== null
       ) {
         setAllUserTransactionsData(res?.data?.transactions?.transaction);
         setUserTransactionsPages(res?.data?.transactions?.maxPages);
@@ -150,7 +141,7 @@ const Homescreen = () => {
   const unsubGetWallet = async () => {
     setIsLoading(true);
     const res = await getAccountWallet();
-    if (res.error) {
+    if (res?.error) {
       // TODO: handle error
     } else {
       dispatch(setWallet(res?.data?.data?.wallet));
@@ -165,13 +156,13 @@ const Homescreen = () => {
   const unsubGetAllTransactions = async () => {
     setIsLoading(true);
     const res = await getAccountTransactions(1, 10);
-    if (res.error) {
+    if (res?.error) {
       // TODO:
     } else {
       setCurrentPage(1);
       if (
         res?.data?.transactions?.transaction !== undefined &&
-        res.data?.transactions?.transaction !== null
+        res?.data?.transactions?.transaction !== null
       ) {
         setUserTransactionsData(res?.data?.transactions?.transaction);
         setAllUserTransactionsData(res?.data?.transactions?.transaction);
@@ -189,7 +180,7 @@ const Homescreen = () => {
   const unsubGetTransactions = async () => {
     setIsLoading(true);
     const res = await getAccountTransactions(1, 10);
-    if (res.error) {
+    if (res?.error) {
       // TODO: handle error
     } else {
       setCurrentPage(1);
@@ -203,7 +194,7 @@ const Homescreen = () => {
   const unsubGetLoanAmount = async () => {
     setIsLoading(true);
     const res = await getLoansAmount();
-    if (res.error) {
+    if (res?.error) {
       // TODO: handle error
     } else {
       setUserLoanAmount(res?.data);
@@ -217,7 +208,7 @@ const Homescreen = () => {
 
   const unsubCheckPin = async () => {
     const res = await checkPin(1, 10);
-    if (res.error) {
+    if (res?.error) {
       // TODO: handle error
     } else {
       // console.log('PIN', res?.data);
@@ -244,7 +235,7 @@ const Homescreen = () => {
   useEffect(() => {
     const interval = setInterval(async () => {
       const res = await getAccountWallet();
-      if (res.error == false) {
+      if (res?.error == false) {
         dispatch(setWallet(res?.data?.data?.wallet));
         dispatch(setAccount(res?.data?.data?.accountDetails));
       }
@@ -258,10 +249,10 @@ const Homescreen = () => {
   useEffect(() => {
     const interval = setInterval(async () => {
       const res = await getAccountTransactions();
-      if (res.error == false) {
+      if (res?.error == false) {
         if (
           res?.data?.transactions?.transaction !== undefined &&
-          res.data?.transactions?.transaction !== null
+          res?.data?.transactions?.transaction !== null
         ) {
           setUserTransactionsData(res?.data?.transactions.transaction);
           setAllUserTransactionsData(res?.data?.transactions.transaction);
@@ -288,13 +279,13 @@ const Homescreen = () => {
       setPrevious(true);
       const prevPage = currentPage - 1;
       const res = await getAccountTransactions(prevPage, 10);
-      if (res.error) {
+      if (res?.error) {
         Toast.show({
           type: 'error',
           position: 'top',
           topOffset: 50,
-          text1: res.title,
-          text2: res.message,
+          text1: res?.title,
+          text2: res?.message,
           visibilityTime: 5000,
           autoHide: true,
           onPress: () => Toast.hide(),
@@ -314,13 +305,13 @@ const Homescreen = () => {
       setNext(true);
       const nextPage = currentPage + 1;
       const res = await getAccountTransactions(nextPage, 10);
-      if (res.error) {
+      if (res?.error) {
         Toast.show({
           type: 'error',
           position: 'top',
           topOffset: 50,
-          text1: res.title,
-          text2: res.message,
+          text1: res?.title,
+          text2: res?.message,
           visibilityTime: 5000,
           autoHide: true,
           onPress: () => Toast.hide(),
@@ -417,7 +408,6 @@ const Homescreen = () => {
             borderWidth: item.title === 'Wallet balance' ? 1 : 0,
             borderColor:
               item.title === 'Wallet balance' ? '#b7d8fd' : '#ffffff',
-            borderRadius: 20,
           },
         ]}>
         <ImageBackground
@@ -601,24 +591,6 @@ const Homescreen = () => {
     );
   };
 
-  const handleSignOut = async () => {
-    const res = await userLogOut();
-    if (res.error) {
-      Toast.show({
-        type: 'error',
-        position: 'top',
-        topOffset: 50,
-        text1: res.title,
-        text2: res.message,
-        visibilityTime: 3000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
-    } else {
-      await resetStore();
-    }
-  };
-
   useEffect(() => {
     if (userProfileData?.profileProgress == 31) {
       NativeModules.DevSettings.reload();
@@ -632,10 +604,14 @@ const Homescreen = () => {
   const getLoanUserData = async () => {
     setIsLoading(true);
     const res = await getLoanUserDetails();
-    if (res.error) {
+    if (res?.error) {
       // Todo : error handling
     } else {
-      if (res.data === undefined || res.data == null || res.data.length <= 0) {
+      if (
+        res?.data === undefined ||
+        res?.data == null ||
+        res?.data?.length <= 0
+      ) {
         setLoanUserDetails(undefined);
       } else {
         setLoanUserDetails(res?.data);
@@ -643,13 +619,7 @@ const Homescreen = () => {
     }
     setIsLoading(false);
   };
-  // useEffect(() => {
-  //   // Resetting default value for the input on restart
-  //   console.log('Resetting default value');
-  //   RNRestart.restart();
-  // }, [userProfileData?.profileProgress]);
 
-  // console.log('userProfileData', userProfileData?.profileProgress);
   return !timeOut ? (
     <Splashscreen text="Getting Profile Details..." />
   ) : timeOut &&
@@ -664,7 +634,7 @@ const Homescreen = () => {
         style={{
           flex: 1,
           backgroundColor: '#FCFCFC',
-          paddingHorizontal: 10,
+          // paddingHorizontal: 10,
           paddingTop: insets.top !== 0 ? insets.top / 2 : 'auto',
           paddingBottom: insets.bottom !== 0 ? insets.bottom / 2 : 'auto',
           paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
@@ -820,7 +790,7 @@ const Homescreen = () => {
                       style={
                         (styles.TextHead,
                         {
-                          fontSize: width * 0.05,
+                          fontSize: 14,
                           textAlign: 'right',
                           fontFamily: 'MontSBold',
                           lineHeight: 20,
@@ -946,8 +916,6 @@ const Homescreen = () => {
                   style={{
                     marginBottom: 5,
                     flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
                   }}
                   onPress={() => {
                     setIsMakeTransferVisible(false);
@@ -958,8 +926,6 @@ const Homescreen = () => {
                   <View
                     style={{
                       backgroundColor: '#CDDBEB',
-                      // width: 40,
-                      // height: 40,
                       borderRadius: 5,
                       justifyContent: 'center',
                       alignItems: 'center',
@@ -985,15 +951,20 @@ const Homescreen = () => {
                       Make transfer to other trade Lenda wallets
                     </Text>
                   </View>
-                  <Icon name="chevron-right" size={24} color="black" />
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      justifyContent: 'flex-end',
+                      flexGrow: 1,
+                    }}>
+                    <Icon name="chevron-right" size={24} color="black" />
+                  </View>
                 </TouchableOpacity>
                 <View style={[styles.demark, {width: width * 0.8}]} />
                 <TouchableOpacity
                   style={{
                     marginTop: 20,
                     flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
                   }}
                   onPress={() => {
                     setIsMakeTransferVisible(false);
@@ -1004,11 +975,10 @@ const Homescreen = () => {
                   <View
                     style={{
                       backgroundColor: '#CDDBEB',
-                      // width: 40,
-                      // height: 40,
                       borderRadius: 5,
                       justifyContent: 'center',
                       alignItems: 'center',
+                      marginRight: 20,
                     }}>
                     <EntypoIcon name="wallet" size={24} color="#054B99" />
                   </View>
@@ -1029,7 +999,15 @@ const Homescreen = () => {
                       Make transfer to other bank accounts{'         '}
                     </Text>
                   </View>
-                  <Icon name="chevron-right" size={24} color="black" />
+
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      justifyContent: 'flex-end',
+                      flexGrow: 1,
+                    }}>
+                    <Icon name="chevron-right" size={24} color="black" />
+                  </View>
                 </TouchableOpacity>
                 <View style={styles.demark} />
               </View>
@@ -1304,15 +1282,18 @@ const Homescreen = () => {
 
         {/* First Section */}
         <View
-          style={{
-            width: '100%',
-            height: '8%',
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            backgroundColor: '#FCFCFC',
-            marginVertical: 1,
-          }}>
+          style={[
+            styles.container,
+            {
+              width: '100%',
+              height: '8%',
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              backgroundColor: '#FCFCFC',
+              marginVertical: 1,
+            },
+          ]}>
           <View
             style={{
               flexDirection: 'row',
@@ -1327,11 +1308,32 @@ const Homescreen = () => {
               <Icon name="account-circle" size={36} color="#6E7191" />
             </TouchableOpacity>
             <Text style={styles.hello}>
-              {/* Hello {profile?.firstName === undefined ? '' : profile?.firstName}! */}
               Hello {userProfileData?.firstName}!
             </Text>
-            <View style={{flex: 1, alignItems: 'flex-end', marginRight: 10}}>
-              <Image source={require('../../../assets/images/HeadLogo.png')} />
+            {/* <View style={{flexDirection: 'column'}}>
+              <Text style={[styles.hello, {marginTop: 12}]}>
+                Hello {userProfileData?.firstName}!
+              </Text>
+              <Text style={styles.netInfo}>
+                {networkState.type && `${networkState.type.toUpperCase()}`}{' '}
+                {networkState.details.carrier &&
+                  ` | ${networkState.details.carrier.toUpperCase()}`}
+                {networkState.details.cellularGeneration &&
+                  ` | ${networkState.details.cellularGeneration}`}
+                {networkState.details.strength &&
+                  ` | ${networkState.details.strength} %`}
+              </Text>
+            </View> */}
+            <View
+              style={{
+                flex: 1,
+                alignItems: 'flex-end',
+                marginRight: 10,
+              }}>
+              <Image
+                source={require('../../../assets/images/HeadLogo.png')}
+                style={{width: 83, height: 32}}
+              />
             </View>
           </View>
         </View>
@@ -1351,14 +1353,17 @@ const Homescreen = () => {
         {/* Optional Section */}
         {!userPin ? (
           <TouchableOpacity
-            style={{
-              height: '9%',
-              backgroundColor: '#CDDBEB',
-              marginHorizontal: 15,
-              marginVertical: 5,
-              borderRadius: 8,
-              justifyContent: 'center',
-            }}
+            style={[
+              styles.container,
+              {
+                height: '9%',
+                backgroundColor: '#CDDBEB',
+                marginHorizontal: 15,
+                marginVertical: 5,
+                borderRadius: 8,
+                justifyContent: 'center',
+              },
+            ]}
             onPress={() => navigation.navigate('SetPin')}>
             <View
               style={{
@@ -1405,14 +1410,17 @@ const Homescreen = () => {
         {loanUserDetails == undefined ||
         loanUserDetails?.loanDocumentDetails === undefined ? (
           <TouchableOpacity
-            style={{
-              height: '9%',
-              backgroundColor: '#CDDBEB',
-              marginHorizontal: 15,
-              marginVertical: 5,
-              borderRadius: 8,
-              justifyContent: 'center',
-            }}
+            style={[
+              styles.container,
+              {
+                height: '9%',
+                backgroundColor: '#CDDBEB',
+                marginHorizontal: 15,
+                marginVertical: 5,
+                borderRadius: 8,
+                justifyContent: 'center',
+              },
+            ]}
             onPress={() => navigation.navigate('OnboardingHome')}>
             <View
               style={{
@@ -1453,7 +1461,7 @@ const Homescreen = () => {
           </TouchableOpacity>
         ) : null}
         {/* Third Section */}
-        <View style={styles.transView}>
+        <View style={[styles.container, styles.transView]}>
           <Pressable
             onPress={toggleFundWallet}
             style={({pressed}) => [
@@ -1540,7 +1548,7 @@ const Homescreen = () => {
         </View>
 
         {/* Forth Section */}
-        <View style={styles.transHistory}>
+        <View style={[styles.container, styles.transHistory]}>
           <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
             <Text style={styles.history}>Recent Transactions</Text>
             <TouchableOpacity
@@ -1567,7 +1575,7 @@ const Homescreen = () => {
               </Text>
             </TouchableOpacity>
           </View>
-          <View style={styles.demark} />
+          <View style={[styles.demark, {marginLeft: 10}]} />
         </View>
 
         {/* Fifth Section */}
@@ -1576,7 +1584,7 @@ const Homescreen = () => {
           showsHorizontalScrollIndicator={false}
           showsVerticalScrollIndicator={false}
           centerContent={true}
-          style={[styles.scrollView, {paddingHorizontal: 16}]}
+          style={[styles.scrollView, {paddingRight: 30}]}
           contentContainerStyle={styles.contentContainer}
           alwaysBounceVertical={false}>
           {(userTransactionsData && userTransactionsData.length === 0) ||
@@ -1709,6 +1717,9 @@ export default Homescreen;
 
 const styles = StyleSheet.create({
   container: {
+    paddingHorizontal: 10,
+    // marginHorizontal: 16,
+
     // flex: 1,
     // paddingHorizontal: 16,
     // backgroundColor: '#fff',
@@ -1807,6 +1818,13 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     color: '#14142B',
   },
+  netInfo: {
+    fontFamily: 'Montserat',
+    fontWeight: '800',
+    fontSize: 14,
+    lineHeight: 24,
+    color: COLORS.Success,
+  },
   toptabs: {
     borderWidth: 1,
     paddingVertical: 4,
@@ -1826,12 +1844,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   gradient: {
-    marginLeft: 5,
-    marginRight: 15,
+    marginHorizontal: 16,
     borderRadius: 15,
     marginTop: 20,
-    width: width * 0.9,
-    height: '85%',
+    width: width - 32,
+    height: 'auto',
   },
   wallet: {
     color: '#054B99',

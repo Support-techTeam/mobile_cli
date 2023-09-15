@@ -310,13 +310,13 @@ const PersonalDetails = () => {
   const handleCreateUser = async () => {
     setIsLoading(true);
     const res = await createUserProfile(userDetails);
-    if (res.data.error) {
+    if (res?.data?.error) {
       Toast.show({
         type: 'error',
         position: 'top',
         topOffset: 50,
-        text1: res.data.title,
-        text2: res.data.message,
+        text1: res?.data?.title,
+        text2: res?.data?.message,
         visibilityTime: 5000,
         autoHide: true,
         onPress: () => Toast.hide(),
@@ -326,13 +326,13 @@ const PersonalDetails = () => {
         type: 'success',
         position: 'top',
         topOffset: 50,
-        text1: res.data.title,
-        text2: res.data.message,
+        text1: res?.data?.title,
+        text2: res?.data?.message,
         visibilityTime: 3000,
         autoHide: true,
         onPress: () => Toast.hide(),
       });
-      dispatch(setProfile(res.data));
+      dispatch(setProfile(res?.data));
     }
     setIsLoading(false);
   };
@@ -351,12 +351,12 @@ const PersonalDetails = () => {
     const fetchState = async () => {
       try {
         const res = await getState();
-        if (res.data !== undefined) {
-          setState(res.data);
+        if (res?.data !== undefined) {
+          setState(res?.data);
         }
-        dispatch(setReduxState(res.data));
+        dispatch(setReduxState(res?.data));
       } catch (error) {
-        console.error(error);
+        // console.error(error);
       }
     };
 
@@ -390,11 +390,11 @@ const PersonalDetails = () => {
     const fetchCity = async () => {
       try {
         const res = await getCity(stateCity);
-        if (res.data !== undefined) {
-          setCity(res.data);
+        if (res?.data !== undefined) {
+          setCity(res?.data);
         }
       } catch (error) {
-        console.error(error);
+        // console.error(error);
       }
     };
 
@@ -928,13 +928,11 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     fontSize: 36,
     letterSpacing: 1,
-    fontFamily: 'Montserat',
   },
   extraText: {
     fontWeight: '400',
     fontSize: 14,
     lineHeight: 21,
-    fontFamily: 'Montserat',
   },
   phonetextContainer: {
     borderRadius: 8,
@@ -969,7 +967,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 24,
     color: '#14142B',
-    fontFamily: 'Montserat',
   },
   pick: {
     marginBottom: 10,
@@ -1003,7 +1000,7 @@ const styles = StyleSheet.create({
   },
   checkedText: {
     color: '#44AB3B',
-    fontFamily: 'Montserat',
+
     fontSize: 24,
     lineHeight: 36,
     textTransform: 'capitalize',
@@ -1014,7 +1011,6 @@ const styles = StyleSheet.create({
     marginTop: 30,
   },
   extra: {
-    fontFamily: 'Montserat',
     textAlign: 'center',
     fontSize: 16,
     lineHeight: 24,
@@ -1034,7 +1030,7 @@ const styles = StyleSheet.create({
     // marginVertical: 5,
     // fontSize: 14,
     // color: COLORS.labelColor,
-    // fontFamily: 'Montserat',
+    //
   },
   dropdown: {
     // height: 55,

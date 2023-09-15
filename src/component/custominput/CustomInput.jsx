@@ -87,7 +87,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 26,
     color: '#14142B',
-    fontFamily: 'Montserat',
+    
   },
   textFeild: {
     backgroundColor: '#fffff',

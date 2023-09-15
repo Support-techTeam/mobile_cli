@@ -28,13 +28,13 @@ const GuarantorDetails = ({route}) => {
   const getGuarantorData = async () => {
     setIsLoading(true);
     const res = await getGuarantor(guarantorId);
-    if (res.error) {
+    if (res?.error) {
       Toast.show({
         type: 'error',
         position: 'top',
         topOffset: 50,
-        text1: res.title,
-        text2: res.message,
+        text1: res?.title,
+        text2: res?.message,
         visibilityTime: 5000,
         autoHide: true,
         onPress: () => Toast.hide(),
@@ -116,17 +116,12 @@ const GuarantorDetails = ({route}) => {
             <Text style={styles.title}>Details</Text>
           </View>
           <View style={{flexDirection: 'row', marginTop: 8}}>
-            <Text style={{fontFamily: 'Montserat', fontWeight: '400'}}>
-              Added{' '}
-            </Text>
+            <Text style={{fontWeight: '400'}}>Added </Text>
             <Text style={{fontWeight: '600'}}>
               {' '}
               {guarantor?.createdAt?.substr(0, 10)}
             </Text>
-            <Text style={{fontFamily: 'Montserat', fontWeight: '400'}}>
-              {' '}
-              at
-            </Text>
+            <Text style={{fontWeight: '400'}}> at</Text>
             <Text style={{fontWeight: '600'}}>
               {' '}
               {guarantor?.createdAt?.substr(11, 5)}
@@ -357,7 +352,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   TextHead: {
-    fontFamily: 'Montserat',
     fontWeight: '700',
     fontSize: 16,
     lineHeight: 20,
@@ -380,19 +374,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   title: {
-    fontFamily: 'Montserat',
     fontWeight: '800',
     fontSize: 14,
     lineHeight: 21,
     color: '#14142B',
   },
   infotext: {
-    fontFamily: 'Montserat',
     color: '#6E7191',
     marginBottom: 4,
   },
   values: {
-    fontFamily: 'Montserat',
     fontSize: 16,
     lineHeight: 24,
     fontWeight: '800',
@@ -400,14 +391,14 @@ const styles = StyleSheet.create({
   report: {
     color: '#ED2E7E',
     fontSize: 14,
-    fontFamily: 'Montserat',
+
     fontWeight: 'bold',
     lineHeight: 24,
     letterSpacing: 0.5,
   },
   reportdesc: {
     color: '#6E7191',
-    fontFamily: 'Montserat',
+
     fontSize: 12,
     lineHeight: 18,
   },

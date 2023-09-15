@@ -99,12 +99,12 @@ const Pin = ({route}) => {
     if (internalTransferDetails.toWalletIdAccountNumber !== '') {
       setIsLoading(true);
       const res = await createInternalTransfer(internalTransferDetails);
-      if (res.error) {
+      if (res?.error) {
         Toast.show({
           type: 'error',
           position: 'top',
           topOffset: 50,
-          text1: res.title,
+          text1: res?.title,
           text2: res?.message,
           visibilityTime: 3000,
           autoHide: true,
@@ -115,7 +115,7 @@ const Pin = ({route}) => {
           type: 'success',
           position: 'top',
           topOffset: 50,
-          text1: res.title,
+          text1: res?.title,
           text2: res?.message,
           visibilityTime: 3000,
           autoHide: true,
@@ -127,12 +127,12 @@ const Pin = ({route}) => {
     } else {
       setIsLoading(true);
       const res = await createNIPTransfer(transferDetails);
-      if (res.error) {
+      if (res?.error) {
         Toast.show({
           type: 'error',
           position: 'top',
           topOffset: 50,
-          text1: res.title,
+          text1: res?.title,
           text2: res?.message,
           visibilityTime: 3000,
           autoHide: true,
@@ -143,7 +143,7 @@ const Pin = ({route}) => {
           type: 'success',
           position: 'top',
           topOffset: 50,
-          text1: res.title,
+          text1: res?.title,
           text2: res?.message,
           visibilityTime: 3000,
           autoHide: true,
@@ -302,7 +302,6 @@ const styles = StyleSheet.create({
     // backgroundColor: "red",
   },
   TextHead: {
-    fontFamily: 'Montserat',
     fontWeight: '700',
     fontSize: 16,
     lineHeight: 20,
@@ -330,7 +329,6 @@ const styles = StyleSheet.create({
     borderColor: '#054B99',
   },
   otpText: {
-    fontFamily: 'Montserat',
     fontSize: 20,
     textAlign: 'center',
     paddingHorizontal: 5,

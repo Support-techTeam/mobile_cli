@@ -30,7 +30,7 @@ const Personal = () => {
 
   const unSubProfileDetails = async () => {
     const res = await getProfileDetails();
-    if (res.error) {
+    if (res?.error) {
       // TODO: handle error
     } else {
       setProfile(res?.data);

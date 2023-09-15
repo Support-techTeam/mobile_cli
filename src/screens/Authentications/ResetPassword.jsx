@@ -1,7 +1,14 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
-import React, { useState } from 'react';
-import { useNavigation } from '@react-navigation/native';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  Image,
+} from 'react-native';
+import React, {useState} from 'react';
+import {useNavigation} from '@react-navigation/native';
+import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 
 import CustomInput from '../../component/custominput/CustomInput';
 import KeyboardAvoidingWrapper from '../../component/KeyBoardAvoiding/keyBoardAvoiding';
@@ -21,18 +28,19 @@ const ResetPassword = () => {
         paddingBottom: insets.bottom !== 0 ? insets.bottom : 'auto',
         paddingLeft: insets.left !== 0 ? insets.left : 'auto',
         paddingRight: insets.right !== 0 ? insets.right : 'auto',
-      }}
-    >
+      }}>
       <ScrollView
         bounces={false}
         showsHorizontalScrollIndicator={false}
-        showsVerticalScrollIndicator={false}
-      >
+        showsVerticalScrollIndicator={false}>
         <KeyboardAvoidingWrapper>
-          <View style={{ marginBottom: 40 }}>
-            <View style={{ alignItems: 'center' }}>
-              <View style={{ paddingLeft: 3 }}>
-                <Image source={require('../../../assets/images/HeadLogo.png')} />
+          <View style={{marginBottom: 40}}>
+            <View style={{alignItems: 'center'}}>
+              <View style={{paddingLeft: 3}}>
+                <Image
+                  source={require('../../../assets/images/HeadLogo.png')}
+                  style={{width: 83, height: 32}}
+                />
               </View>
             </View>
             <View style={styles.signupView}>
@@ -60,16 +68,17 @@ const ResetPassword = () => {
                 secureTextEntry={hidePassword}
               />
 
-              <TouchableOpacity style={styles.signUp} onPress={() => navigation.navigate('Login')}>
+              <TouchableOpacity
+                style={styles.signUp}
+                onPress={() => navigation.navigate('Login')}>
                 <Text
                   style={{
                     fontWeight: '500',
                     color: '#fff',
-                    fontFamily: 'Montserat',
+
                     fontSize: 18,
                     lineHeight: 24,
-                  }}
-                >
+                  }}>
                   Save Changes
                 </Text>
               </TouchableOpacity>
@@ -105,7 +114,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     fontSize: 32,
     // letterSpacing: 3.5,
-    fontFamily: 'Montserat',
+
     paddingTop: 16,
     lineHeight: 48,
     color: '#14142B',
@@ -113,7 +122,7 @@ const styles = StyleSheet.create({
   },
   extraText: {
     textAlign: 'center',
-    fontFamily: 'Montserat',
+
     size: 14,
     lineHeight: 21,
     color: '#000000',

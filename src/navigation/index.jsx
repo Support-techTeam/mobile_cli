@@ -9,10 +9,11 @@ import {useColorScheme} from 'react-native';
 import AppStack from './AppStack';
 import AuthStack from './AuthStack';
 import {auth} from '../util/firebase/firebaseConfig';
-import Spinner from 'react-native-loading-spinner-overlay';
 import SplashScreen from 'react-native-splash-screen';
 import Splashscreen from './Splashscreen';
-import {UserProvider} from '../context/userContext';
+import NetworkScreen from './NetworkError';
+import {useSelector} from 'react-redux';
+import {networkState} from '../util/redux/networkState/network.slice';
 
 const AppNavigationContainer = () => {
   const navigationRef = useNavigationContainerRef();
@@ -20,6 +21,7 @@ const AppNavigationContainer = () => {
   const scheme = useColorScheme();
   const [user, setUser] = useState();
   const [isLoading, setIsLoading] = useState(true);
+  const networkState = useSelector(state => state.networkState.network);
 
   useLayoutEffect(() => {
     if (
@@ -33,7 +35,6 @@ const AppNavigationContainer = () => {
 
   useLayoutEffect(() => {
     const subscriber = auth.onAuthStateChanged(user => {
-      // console.log('user', JSON.stringify(user));
       setUser(user);
       setIsLoading(false);
     });
@@ -52,13 +53,17 @@ const AppNavigationContainer = () => {
         const currentRouteName = navigationRef.getCurrentRoute();
         console.log(currentRouteName);
       }}>
-      {!user && isLoading ? (
+      {isLoading ? (
         <Splashscreen text="Checking Authentication..." />
       ) : user ? (
-        // <UserProvider>
-        <AppStack />
+        networkState &&
+        networkState?.isConnected &&
+        networkState?.isInternetReachable ? (
+          <AppStack />
+        ) : (
+          <NetworkScreen />
+        )
       ) : (
-        // </UserProvider>
         <AuthStack />
       )}
     </NavigationContainer>

@@ -37,6 +37,7 @@ const InputPhone = ({
           }}
           onBlur={() => setIsFocused(false)}
           isNeeded={true}
+          placeholderTextColor={COLORS.Secondary}
           {...props}
         />
       </View>
@@ -54,7 +55,6 @@ const style = StyleSheet.create({
     marginVertical: 5,
     fontSize: 14,
     color: COLORS.labelColor,
-    fontFamily: 'Montserat',
   },
   inputContainer: {
     height: 53,

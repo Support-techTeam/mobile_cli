@@ -1087,13 +1087,13 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   Head: {
-    fontFamily: 'MontBold',
+    fontFamily: 'serif',
     fontSize: 14,
     color: '#054B99',
     letterSpacing: 0.5,
   },
   textHead: {
-    fontFamily: 'Montserat',
+    
     fontSize: 12,
     color: '#6E7191',
   },
@@ -1135,7 +1135,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   TextHead: {
-    fontFamily: 'MontBold',
+    fontFamily: 'serif',
     fontSize: 16,
     lineHeight: 20,
     letterSpacing: 0.5,
@@ -1170,7 +1170,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   removeText: {
-    fontFamily: 'Montserat',
+    
     fontSize: 18,
     color: '#ED2E7E',
   },
@@ -1189,19 +1189,19 @@ const styles = StyleSheet.create({
   },
   checkedText: {
     color: '#44AB3B',
-    fontFamily: 'Montserat',
+    
     fontSize: 24,
     lineHeight: 36,
     textTransform: 'capitalize',
     fontWeight: '600',
   },
   takeText: {
-    fontFamily: 'MontSBold',
+    fontFamily: 'serif',
     marginTop: 10,
     fontSize: 16,
   },
   takeText2: {
-    fontFamily: 'Montserat',
+    
     marginTop: 10,
     fontSize: 10,
   },

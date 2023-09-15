@@ -68,7 +68,7 @@ const BankDetails = () => {
   const unSubBankDetails = async () => {
     setIsLoading(true);
     const res = await getLoanUserDetails();
-    if (res.error) {
+    if (res?.error) {
       // TODO: handle error
     } else {
       setBankDeets(res?.data?.bankDetails);
@@ -154,13 +154,13 @@ const BankDetails = () => {
   const handleCreateBankDetails = async () => {
     setIsUpdating(true);
     const res = await createBankDetails(bankDetails);
-    if (res.error) {
+    if (res?.error) {
       Toast.show({
         type: 'error',
         position: 'top',
         topOffset: 50,
-        text1: res.title,
-        text2: res.message,
+        text1: res?.title,
+        text2: res?.message,
         visibilityTime: 5000,
         autoHide: true,
         onPress: () => Toast.hide(),
@@ -170,8 +170,8 @@ const BankDetails = () => {
         type: 'success',
         position: 'top',
         topOffset: 50,
-        text1: res.title,
-        text2: res.message,
+        text1: res?.title,
+        text2: res?.message,
         visibilityTime: 3000,
         autoHide: true,
         onPress: () => Toast.hide(),
@@ -190,13 +190,13 @@ const BankDetails = () => {
   const handleUpdateBankDetails = async () => {
     setIsUpdating(true);
     const res = await updateBankDetails(bankDetails);
-    if (res.error) {
+    if (res?.error) {
       Toast.show({
         type: 'error',
         position: 'top',
         topOffset: 50,
-        text1: res.title,
-        text2: res.message,
+        text1: res?.title,
+        text2: res?.message,
         visibilityTime: 5000,
         autoHide: true,
         onPress: () => Toast.hide(),
@@ -206,15 +206,16 @@ const BankDetails = () => {
         type: 'success',
         position: 'top',
         topOffset: 50,
-        text1: res.title,
-        text2: res.message,
+        text1: res?.title,
+        text2: res?.message,
         visibilityTime: 3000,
         autoHide: true,
         onPress: () => Toast.hide(),
       });
       setTimeout(() => {
         if (previousRoute !== 'MyAccount') {
-          navigation.navigate('ValidIndentity');
+          // navigation.navigate('ValidIndentity');
+          navigation.navigate('Home');
         } else {
           navigation.navigate('MyAccount');
         }
@@ -230,12 +231,12 @@ const BankDetails = () => {
 
   const handleGetAllBanks = async () => {
     const res = await getAllBankDetails();
-    if (res.error) {
+    if (res?.error) {
       Toast.show({
         type: 'error',
         position: 'top',
         topOffset: 50,
-        text1: res.title,
+        text1: res?.title,
         text2: res?.data?.message,
         visibilityTime: 5000,
         autoHide: true,
@@ -504,7 +505,6 @@ const styles = StyleSheet.create({
     marginVertical: 16,
   },
   header: {
-    fontFamily: 'Montserat',
     fontSize: 12,
     fontWeight: '400',
     textAlign: 'center',
@@ -515,7 +515,6 @@ const styles = StyleSheet.create({
     // backgroundColor: "red",
   },
   TextHead: {
-    fontFamily: 'Montserat',
     fontWeight: '700',
     fontSize: 16,
     lineHeight: 20,
@@ -553,7 +552,7 @@ const styles = StyleSheet.create({
   },
   checkedText: {
     color: '#44AB3B',
-    fontFamily: 'Montserat',
+
     fontSize: 24,
     lineHeight: 36,
     textTransform: 'capitalize',
@@ -564,7 +563,6 @@ const styles = StyleSheet.create({
     marginTop: 30,
   },
   extra: {
-    fontFamily: 'Montserat',
     textAlign: 'center',
     fontSize: 16,
     lineHeight: 24,
@@ -614,6 +612,5 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 24,
     color: '#14142B',
-    fontFamily: 'Montserat',
   },
 });

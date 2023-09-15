@@ -1,48 +1,49 @@
-import React, { useState, useRef } from 'react';
-import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { AntDesign } from '@expo/vector-icons';
+import React, {useState, useRef} from 'react';
+import {FlatList, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {AntDesign} from '@expo/vector-icons';
 
 const data = [
-  { id: 'camera', title: 'CAMERA' },
-  { id: 'upload', title: 'UPLOAD' },
+  {id: 'camera', title: 'CAMERA'},
+  {id: 'upload', title: 'UPLOAD'},
 ];
 
-const CustomTabBar2 = ({ navigationState, onIndexChange }) => {
+const CustomTabBar2 = ({navigationState, onIndexChange}) => {
   const [activeTab, setActiveTab] = useState(navigationState.index);
   const flatListRef = useRef();
 
-  const handleTabPress = (index) => {
+  const handleTabPress = index => {
     setActiveTab(index);
     onIndexChange(index);
-    flatListRef.current.scrollToIndex({ index, animated: true });
+    flatListRef.current.scrollToIndex({index, animated: true});
   };
 
   const handleNextPress = () => {
-    const nextIndex = (activeTab + 1) % data.length;
+    const nextIndex = (activeTab + 1) % data?.length;
     setActiveTab(nextIndex);
     onIndexChange(nextIndex);
-    flatListRef.current.scrollToIndex({ index: nextIndex, animated: true });
+    flatListRef.current.scrollToIndex({index: nextIndex, animated: true});
   };
 
   const handlePrevPress = () => {
-    const prevIndex = (activeTab - 1) % data.length;
+    const prevIndex = (activeTab - 1) % data?.length;
     if (activeTab === 0) {
       return;
     }
     setActiveTab(prevIndex);
     onIndexChange(prevIndex);
-    flatListRef.current.scrollToIndex({ index: prevIndex, animated: true });
+    flatListRef.current.scrollToIndex({index: prevIndex, animated: true});
   };
 
-  const renderItem = ({ item, index }) => {
+  const renderItem = ({item, index}) => {
     const isActive = index === activeTab;
 
     return (
       <TouchableOpacity
         style={[styles.tab, isActive && styles.activeTab]}
-        onPress={() => handleTabPress(index)}
-      >
-        <Text style={[styles.tabTitle, isActive && styles.activeTabTitle]}>{item.title}</Text>
+        onPress={() => handleTabPress(index)}>
+        <Text style={[styles.tabTitle, isActive && styles.activeTabTitle]}>
+          {item.title}
+        </Text>
       </TouchableOpacity>
     );
   };
@@ -50,7 +51,12 @@ const CustomTabBar2 = ({ navigationState, onIndexChange }) => {
   return (
     <View style={styles.tabBar}>
       <TouchableOpacity style={styles.nextButton} onPress={handlePrevPress}>
-        <AntDesign name="stepbackward" size={24} color="black" style={styles.nextButtonText} />
+        <AntDesign
+          name="stepbackward"
+          size={24}
+          color="black"
+          style={styles.nextButtonText}
+        />
       </TouchableOpacity>
       <FlatList
         ref={flatListRef}
@@ -62,7 +68,12 @@ const CustomTabBar2 = ({ navigationState, onIndexChange }) => {
       />
 
       <TouchableOpacity style={styles.nextButton} onPress={handleNextPress}>
-        <AntDesign name="stepforward" size={24} color="black" style={styles.nextButtonText} />
+        <AntDesign
+          name="stepforward"
+          size={24}
+          color="black"
+          style={styles.nextButtonText}
+        />
       </TouchableOpacity>
     </View>
   );
@@ -96,7 +107,7 @@ const styles = StyleSheet.create({
   },
   tabTitle: {
     fontSize: 16,
-    fontFamily: 'MontSBold',
+    fontFamily: 'serif',
     textAlign: 'center',
   },
   nextButton: {

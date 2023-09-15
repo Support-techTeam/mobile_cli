@@ -111,7 +111,7 @@ const Summary = ({route}) => {
 
           <View style={styles.detailsView}>
             <Text style={styles.desc}>Note</Text>
-            <Text style={[styles.amount, {fontFamily: 'Montserat'}]}>
+            <Text style={[styles.amount, {fontFamily: 'serif'}]}>
               {bankDetails?.narration}
             </Text>
           </View>
@@ -156,7 +156,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   TextHead: {
-    fontFamily: 'Montserat',
+    
     fontWeight: '700',
     fontSize: 16,
     lineHeight: 20,
@@ -177,17 +177,17 @@ const styles = StyleSheet.create({
   },
   desc: {
     color: '#4E4B66',
-    fontFamily: 'Montserat',
+    
     fontWeight: '500',
     fontSize: 14,
   },
   amount: {
-    fontFamily: 'MontSBold',
+    fontFamily: 'serif',
     fontSize: 16,
   },
   nameComponent: {
     textAlign: 'right',
-    fontFamily: 'MontSBold',
+    fontFamily: 'serif',
     fontSize: 16,
     flexShrink: 1,
   },

@@ -8,7 +8,6 @@ import {
 import React, {useState} from 'react';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {getStatusBarHeight} from 'react-native-status-bar-height';
-import {ScrollView} from 'react-native-gesture-handler';
 import {useNavigation} from '@react-navigation/native';
 import Pdf from 'react-native-pdf';
 import Buttons from '../../component/buttons/Buttons';
@@ -107,7 +106,7 @@ const styles = StyleSheet.create({
     paddingTop: 30,
   },
   TextHead: {
-    fontFamily: 'Montserat',
+    
     fontWeight: '700',
     fontSize: 16,
     lineHeight: 24,
@@ -137,7 +136,7 @@ const styles = StyleSheet.create({
   getText: {
     textAlign: 'center',
     color: 'white',
-    fontFamily: 'MontSBold',
+    fontFamily: 'serif',
     fontSize: 16,
   },
 });

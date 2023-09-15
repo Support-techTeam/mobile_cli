@@ -78,13 +78,13 @@ const FinalSubmit = ({route}) => {
   const handleCreateDocs = async () => {
     setIsUpdating(true);
     const res = await createDocumentsDetails(formDetails);
-    if (res.error) {
+    if (res?.error) {
       Toast.show({
         type: 'error',
         position: 'top',
         topOffset: 50,
-        text1: res.title,
-        text2: res.message,
+        text1: res?.title,
+        text2: res?.message,
         visibilityTime: 5000,
         autoHide: true,
         onPress: () => Toast.hide(),
@@ -94,8 +94,8 @@ const FinalSubmit = ({route}) => {
         type: 'success',
         position: 'top',
         topOffset: 50,
-        text1: res.title,
-        text2: res.message,
+        text1: res?.title,
+        text2: res?.message,
         visibilityTime: 3000,
         autoHide: true,
         onPress: () => Toast.hide(),
@@ -110,13 +110,13 @@ const FinalSubmit = ({route}) => {
   const handleUpdateDocs = async () => {
     setIsUpdating(true);
     const res = await updateDocumentsDetails(formDetails);
-    if (res.error) {
+    if (res?.error) {
       Toast.show({
         type: 'error',
         position: 'top',
         topOffset: 50,
-        text1: res.title,
-        text2: res.message,
+        text1: res?.title,
+        text2: res?.message,
         visibilityTime: 5000,
         autoHide: true,
         onPress: () => Toast.hide(),
@@ -126,8 +126,8 @@ const FinalSubmit = ({route}) => {
         type: 'success',
         position: 'top',
         topOffset: 50,
-        text1: res.title,
-        text2: res.message,
+        text1: res?.title,
+        text2: res?.message,
         visibilityTime: 3000,
         autoHide: true,
         onPress: () => Toast.hide(),
@@ -252,23 +252,20 @@ const styles = StyleSheet.create({
     marginHorizontal: 2,
   },
   tabText: {
-    fontFamily: 'Montserat',
     fontSize: 12,
     fontWeight: '600',
     textAlign: 'center',
   },
   tabText2: {
-    fontFamily: 'MontSBold',
+    fontFamily: 'serif',
     fontSize: 12,
     textAlign: 'center',
   },
   textHead: {
-    fontFamily: 'Montserat',
     fontSize: 12,
     color: '#6E7191',
   },
   TextHead: {
-    fontFamily: 'Montserat',
     fontWeight: '700',
     fontSize: 16,
     lineHeight: 24,
@@ -283,7 +280,6 @@ const styles = StyleSheet.create({
     marginVertical: 16,
   },
   header: {
-    fontFamily: 'Montserat',
     fontSize: 20,
     fontWeight: '700',
     letterSpacing: 1,
@@ -301,10 +297,8 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: 'bold',
     color: 'black',
-    fontFamily: 'Montserat',
   },
   camHead: {
-    fontFamily: 'Montserat',
     fontSize: 14,
     fontWeight: '400',
   },

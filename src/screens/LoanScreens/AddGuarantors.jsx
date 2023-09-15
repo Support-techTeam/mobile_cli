@@ -50,13 +50,13 @@ const AddGuarantors = () => {
     setIsLoading(true);
     const res = await createGuarantor(guarantorsDetails);
     console.log('createGuarantor', res);
-    if (res.data.error) {
+    if (res?.data?.error) {
       Toast.show({
         type: 'error',
         position: 'top',
         topOffset: 50,
-        text1: res.data.title,
-        text2: res.data.message,
+        text1: res?.data?.title,
+        text2: res?.data?.message,
         visibilityTime: 5000,
         autoHide: true,
         onPress: () => Toast.hide(),
@@ -66,8 +66,8 @@ const AddGuarantors = () => {
         type: 'success',
         position: 'top',
         topOffset: 50,
-        text1: res.title,
-        text2: res.message,
+        text1: res?.title,
+        text2: res?.message,
         visibilityTime: 3000,
         autoHide: true,
         onPress: () => Toast.hide(),
@@ -133,7 +133,7 @@ const AddGuarantors = () => {
           bounces={false}
           showsHorizontalScrollIndicator={false}
           showsVerticalScrollIndicator={false}
-          style={[styles.innercontainer]}>
+          style={[styles.innercontainer, {marginVertical: 30}]}>
           <View style={styles.form}>
             <Text style={styles.header}>
               Fill the form below to add a new guarantor
@@ -277,7 +277,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   TextHead: {
-    fontFamily: 'Montserat',
     fontWeight: '700',
     fontSize: 16,
     lineHeight: 24,
@@ -296,7 +295,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 24,
     color: '#14142B',
-    fontFamily: 'Montserat',
   },
   textFeild: {
     backgroundColor: '#fffff',
@@ -311,12 +309,10 @@ const styles = StyleSheet.create({
     height: 85,
   },
   header: {
-    fontFamily: 'Montserat',
     fontSize: 12,
     fontWeight: '400',
   },
   headerRed: {
-    fontFamily: 'Montserat',
     fontSize: 12,
     fontWeight: '400',
     color: 'red',

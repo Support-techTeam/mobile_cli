@@ -124,7 +124,7 @@ const OnboardingScreen = () => {
           <Pressable
             onPress={async () => {
               const res = await userLogOut();
-              if (res.error) {
+              if (res?.error) {
               } else {
                 await resetStore();
               }
@@ -190,7 +190,7 @@ const styles = StyleSheet.create({
     // fontSize: 28,
     fontSize: width * 0.072,
     color: '#054B99',
-    fontFamily: 'MontSBold',
+    fontFamily: 'serif',
     letterSpacing: 0.4,
   },
   image: {
@@ -213,7 +213,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     paddingLeft: 5,
     color: '#054B99',
-    fontFamily: 'MontSBold',
+    fontFamily: 'serif',
     letterSpacing: 0.4,
   },
 });

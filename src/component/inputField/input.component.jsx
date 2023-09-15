@@ -57,6 +57,7 @@ const Input = ({
           secureTextEntry={hidePassword}
           style={{color: COLORS.black, flex: 1}}
           {...props}
+          placeholderTextColor={COLORS.Secondary}
         />
         {password && (
           <Icon
@@ -80,7 +81,6 @@ const style = StyleSheet.create({
     marginVertical: 5,
     fontSize: 14,
     color: COLORS.labelColor,
-    fontFamily: 'Montserat',
   },
   inputContainer: {
     height: 55,

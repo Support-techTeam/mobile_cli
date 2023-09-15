@@ -26,7 +26,7 @@ const NextOfKin = () => {
 
   const unSubNOKDetails = async () => {
     const res = await getLoanUserDetails();
-    if (res.error) {
+    if (res?.error) {
       // TODO: handle error
     } else {
       setNokDeets(res?.data?.nextOfKinDetails);

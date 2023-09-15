@@ -62,7 +62,7 @@ const NextOfKin = () => {
   const unSubNOKDetails = async () => {
     setIsLoading(true);
     const res = await getLoanUserDetails();
-    if (res.error) {
+    if (res?.error) {
       // TODO: handle error
     } else {
       setNokDetails(res?.data?.nextOfKinDetails);
@@ -123,13 +123,13 @@ const NextOfKin = () => {
   const handleCreateNokDetails = async () => {
     setIsUpdating(true);
     const res = await createNextOfKin(kinDetails);
-    if (res.error) {
+    if (res?.error) {
       Toast.show({
         type: 'error',
         position: 'top',
         topOffset: 50,
-        text1: res.title,
-        text2: res.message,
+        text1: res?.title,
+        text2: res?.message,
         visibilityTime: 5000,
         autoHide: true,
         onPress: () => Toast.hide(),
@@ -139,8 +139,8 @@ const NextOfKin = () => {
         type: 'success',
         position: 'top',
         topOffset: 50,
-        text1: res.title,
-        text2: res.message,
+        text1: res?.title,
+        text2: res?.message,
         visibilityTime: 3000,
         autoHide: true,
         onPress: () => Toast.hide(),
@@ -159,13 +159,13 @@ const NextOfKin = () => {
   const handleUpdateNokDetails = async () => {
     setIsUpdating(true);
     const res = await updateNokDetails(kinDetails);
-    if (res.error) {
+    if (res?.error) {
       Toast.show({
         type: 'error',
         position: 'top',
         topOffset: 50,
-        text1: res.title,
-        text2: res.message,
+        text1: res?.title,
+        text2: res?.message,
         visibilityTime: 5000,
         autoHide: true,
         onPress: () => Toast.hide(),
@@ -175,8 +175,8 @@ const NextOfKin = () => {
         type: 'success',
         position: 'top',
         topOffset: 50,
-        text1: res.title,
-        text2: res.message,
+        text1: res?.title,
+        text2: res?.message,
         visibilityTime: 3000,
         autoHide: true,
         onPress: () => Toast.hide(),
@@ -400,7 +400,6 @@ const styles = StyleSheet.create({
     marginVertical: 16,
   },
   header: {
-    fontFamily: 'Montserat',
     fontSize: 12,
     fontWeight: '400',
   },
@@ -418,7 +417,6 @@ const styles = StyleSheet.create({
     // backgroundColor: "red",
   },
   TextHead: {
-    fontFamily: 'Montserat',
     fontWeight: '700',
     fontSize: 16,
     lineHeight: 20,
@@ -456,7 +454,7 @@ const styles = StyleSheet.create({
   },
   checkedText: {
     color: '#44AB3B',
-    fontFamily: 'Montserat',
+
     fontSize: 24,
     lineHeight: 36,
     textTransform: 'capitalize',
@@ -467,7 +465,6 @@ const styles = StyleSheet.create({
     marginTop: 30,
   },
   extra: {
-    fontFamily: 'Montserat',
     textAlign: 'center',
     fontSize: 16,
     lineHeight: 24,
@@ -516,6 +513,5 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 24,
     color: '#14142B',
-    fontFamily: 'Montserat',
   },
 });

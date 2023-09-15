@@ -64,13 +64,13 @@ const SignUp = () => {
   const handleSignUp = async () => {
     setIsLoading(true);
     const res = await userSignUp(inputs);
-    if (res.error) {
+    if (res?.error) {
       Toast.show({
         type: 'error',
         position: 'top',
         topOffset: 50,
-        text1: res.title,
-        text2: res.message,
+        text1: res?.title,
+        text2: res?.message,
         visibilityTime: 3000,
         autoHide: true,
         onPress: () => Toast.hide(),
@@ -80,13 +80,13 @@ const SignUp = () => {
         type: 'success',
         position: 'top',
         topOffset: 50,
-        text1: res.title,
-        text2: res.message,
+        text1: res?.title,
+        text2: res?.message,
         visibilityTime: 3000,
         autoHide: true,
         onPress: () => Toast.hide(),
       });
-      dispatch(signUpUser(JSON.stringify(res.user)));
+      dispatch(signUpUser(JSON.stringify(res?.user)));
     }
     setIsLoading(false);
   };
@@ -240,44 +240,51 @@ const SignUp = () => {
           bounces={false}
           showsHorizontalScrollIndicator={false}
           showsVerticalScrollIndicator={false}
-          style={{paddingHorizontal: 20, marginBottom: 40}}>
+          style={{paddingHorizontal: 20, marginBottom: screenHeight * 0.15}}>
           <KeyboardAvoidingWrapper>
             {/* Work In Progress with goBack() */}
-            <View style={{marginBottom: 40}}>
-              <View
-                style={{
-                  flex: 1,
-                  flexDirection: 'row',
-                  justifyContent: 'flex-start',
-                }}>
-                <View
-                  style={{alignItems: 'center', marginRight: screenWidth / 8}}>
-                  <TouchableOpacity onPress={() => navigation.goBack()}>
-                    <View
-                      style={{
-                        borderWidth: 0.5,
-                        borderColor: '#D9DBE9',
-                        borderRadius: 5,
-                      }}>
-                      <Icon name="chevron-left" size={36} color="black" />
+            <View>
+              <View>
+                <View style={{paddingHorizontal: 12}}>
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      justifyContent: 'center',
+                      marginTop: 15,
+                    }}>
+                    <View>
+                      <TouchableOpacity
+                        style={{
+                          alignSelf: 'flex-start',
+                          borderWidth: 0.5,
+                          borderColor: '#D9DBE9',
+                          borderRadius: 5,
+                        }}
+                        onPress={() => navigation.goBack()}>
+                        <View>
+                          <Icon name="chevron-left" size={30} color="black" />
+                        </View>
+                      </TouchableOpacity>
                     </View>
-                  </TouchableOpacity>
-                </View>
-                <View style={{alignItems: 'center'}}>
-                  <View style={styles.signupView}>
-                    <Image
-                      source={require('../../../assets/images/HeadLogo.png')}
-                      style={{marginBottom: 24}}
-                    />
-                    <Text style={styles.signupText}>Sign Up</Text>
-                  </View>
-                  <View style={styles.signupDetails}>
-                    <Text style={[styles.DetailsText, {marginBottom: 40}]}>
-                      Create an account to get started
-                    </Text>
+                    <View style={styles.signupView}>
+                      <Image
+                        source={require('../../../assets/images/HeadLogo.png')}
+                        style={{width: 83, height: 32, marginBottom: 24}}
+                      />
+                      <Image
+                        source={require('../../../assets/images/locked.png')}
+                      />
+                      <Text style={styles.signupText}>Sign Up</Text>
+                      <View style={styles.signupDetails}>
+                        <Text style={[styles.DetailsText, {marginBottom: 40}]}>
+                          Create an account to get started
+                        </Text>
+                      </View>
+                    </View>
                   </View>
                 </View>
               </View>
+
               <View
                 style={{
                   paddingTop: 25,
@@ -583,7 +590,6 @@ const SignUp = () => {
                               }
                               style={{
                                 color: '#0566C3',
-                                fontFamily: 'Montserat',
                               }}>
                               Terms and Conditions{' '}
                             </Text>
@@ -613,7 +619,7 @@ const SignUp = () => {
                           <Text
                             style={{
                               color: '#054B99',
-                              fontFamily: 'Montserat',
+
                               textDecorationLine: 'underline',
                               textDecorationColor: '#054B99',
                             }}>
@@ -636,26 +642,20 @@ const SignUp = () => {
 export default SignUp;
 
 const styles = StyleSheet.create({
-  container: {
-    // flex: 1,
-    // paddingHorizontal: 20,
-    // backgroundColor: '#fff',
-    // paddingTop: Platform.OS === 'android' ? StatusBarManager.HEIGHT : 0,
-  },
+  container: {},
   signupView: {
     alignItems: 'center',
+    width: '93%',
   },
   signupText: {
     fontWeight: '700',
     fontSize: 36,
     letterSpacing: 1,
-    fontFamily: 'Montserat',
   },
   DetailsText: {
     fontWeight: '400',
     fontSize: 14,
     lineHeight: 21,
-    fontFamily: 'Montserat',
   },
   phonetextContainer: {
     borderRadius: 8,
@@ -691,7 +691,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 24,
     color: '#14142B',
-    fontFamily: 'Montserat',
   },
   demark: {
     height: 2,
@@ -728,7 +727,7 @@ const styles = StyleSheet.create({
   },
   checkedText: {
     color: '#44AB3B',
-    fontFamily: 'Montserat',
+
     fontSize: 24,
     lineHeight: 36,
     textTransform: 'capitalize',
@@ -747,7 +746,6 @@ const styles = StyleSheet.create({
     fontWeight: '400',
     color: '#14142B',
     lineHeight: 21,
-    fontFamily: 'Montserat',
   },
   passLog: {
     flexDirection: 'row',
@@ -758,7 +756,7 @@ const styles = StyleSheet.create({
   },
   passReq: {
     color: '#ED2E7E',
-    fontFamily: 'Montserat',
+
     fontWeight: '600',
     fontSize: 15,
     lineHeight: 21,
@@ -770,7 +768,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
 
     //  lineHeight:28
-    // fontFamily:'Montserat'
+    // fontFamily:'serif'
   },
   signUpactivity: {
     backgroundColor: '#054B99',

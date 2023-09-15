@@ -86,7 +86,7 @@ const AppStack = () => {
         try {
           const res = await getProfileDetails();
           if (res?.data !== undefined) {
-            if (res.error) {
+            if (res?.error) {
               // console.error(error);
             } else {
               dispatch(setProfile(res?.data));

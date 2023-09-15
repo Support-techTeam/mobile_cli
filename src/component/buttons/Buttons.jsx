@@ -9,7 +9,7 @@ const Buttons = ({ label, disabled }) => {
           style={{
             fontWeight: '700',
             color: '#fff',
-            fontFamily: 'Montserat',
+            
             fontSize: 18,
             lineHeight: 24,
           }}

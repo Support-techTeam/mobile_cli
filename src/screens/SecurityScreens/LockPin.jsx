@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
     // backgroundColor: "red",
   },
   TextHead: {
-    fontFamily: 'Montserat',
+    
     fontWeight: '700',
     fontSize: 16,
     lineHeight: 20,
@@ -148,7 +148,7 @@ const styles = StyleSheet.create({
     borderColor: '#054B99',
   },
   otpText: {
-    fontFamily: 'Montserat',
+    
     fontSize: 20,
     textAlign: 'center',
     paddingHorizontal: 5,
@@ -172,16 +172,16 @@ const styles = StyleSheet.create({
   },
   desc: {
     color: '#4E4B66',
-    fontFamily: 'Montserat',
+    
     fontWeight: '500',
     fontSize: 14,
   },
   amount: {
-    fontFamily: 'MontSBold',
+    fontFamily: 'serif',
     fontSize: 16,
   },
   text: {
-    fontFamily: 'Montserat',
+    
     marginVertical: 20,
     fontSize: 16,
   },
@@ -204,11 +204,11 @@ const styles = StyleSheet.create({
   },
   signOutText: {
     color: '#054B99',
-    fontFamily: 'MontSBold',
+    fontFamily: 'serif',
     fontSize: 16,
   },
   question: {
-    fontFamily: 'Montserat',
+    
     textAlign: 'center',
     color: '#4E4B66',
   },
@@ -222,7 +222,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   confirmText: {
-    fontFamily: 'Montserat',
+    
     color: '#fff',
     fontSize: 16,
   },

@@ -20,14 +20,14 @@ const CustomTabBar = ({navigationState, onIndexChange}) => {
   };
 
   const handleNextPress = () => {
-    const nextIndex = (activeTab + 1) % data.length;
+    const nextIndex = (activeTab + 1) % data?.length;
     setActiveTab(nextIndex);
     onIndexChange(nextIndex);
     flatListRef.current.scrollToIndex({index: nextIndex, animated: true});
   };
 
   const handlePrevPress = () => {
-    const prevIndex = (activeTab - 1) % data.length;
+    const prevIndex = (activeTab - 1) % data?.length;
     if (activeTab === 0) {
       return;
     }
@@ -115,7 +115,7 @@ const styles = StyleSheet.create({
   },
   tabTitle: {
     fontSize: 16,
-    fontFamily: 'MontSBold',
+    fontFamily: 'serif',
     textAlign: 'center',
   },
   nextButton: {

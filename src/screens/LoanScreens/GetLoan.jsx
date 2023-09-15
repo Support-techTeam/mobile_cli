@@ -99,13 +99,13 @@ const GetLoan = () => {
   const getLoanDuration = async () => {
     setIsLoading(true);
     const res = await getDuration();
-    if (res.error) {
+    if (res?.error) {
       Toast.show({
         type: 'error',
         position: 'top',
         topOffset: 50,
-        text1: res.title,
-        text2: res.message,
+        text1: res?.title,
+        text2: res?.message,
         visibilityTime: 5000,
         autoHide: true,
         onPress: () => Toast.hide(),
@@ -119,13 +119,13 @@ const GetLoan = () => {
   const getGuarantor = async () => {
     setIsLoading(true);
     const res = await getGuarantors();
-    if (res.error) {
+    if (res?.error) {
       Toast.show({
         type: 'error',
         position: 'top',
         topOffset: 50,
-        text1: res.title,
-        text2: res.message,
+        text1: res?.title,
+        text2: res?.message,
         visibilityTime: 5000,
         autoHide: true,
         onPress: () => Toast.hide(),
@@ -145,20 +145,20 @@ const GetLoan = () => {
   const getLoanDetail = async (amount, loanTenor) => {
     setIsLoading(true);
     const res = await getLoanDetails(amount, loanTenor);
-    if (res.error) {
+    if (res?.error) {
       Toast.show({
         type: 'error',
         position: 'top',
         topOffset: 50,
-        text1: res.title,
-        text2: res.message,
+        text1: res?.title,
+        text2: res?.message,
         visibilityTime: 5000,
         autoHide: true,
         onPress: () => Toast.hide(),
       });
     } else {
       setDetails(res?.data);
-      // setLoanDetails({...loanDetails, interest: res?.data.InterestRate});
+      // setLoanDetails({...loanDetails, interest: res?.data?.InterestRate});
     }
     setIsLoading(false);
   };
@@ -203,13 +203,13 @@ const GetLoan = () => {
     if (guarantors.length !== 0) {
       setIsLoading(true);
       const res = await createLoan(loanDetails);
-      if (res.error) {
+      if (res?.error) {
         Toast.show({
           type: 'error',
           position: 'top',
           topOffset: 50,
-          text1: res.title,
-          text2: res.message,
+          text1: res?.title,
+          text2: res?.message,
           visibilityTime: 5000,
           autoHide: true,
           onPress: () => Toast.hide(),
@@ -219,8 +219,8 @@ const GetLoan = () => {
           type: 'success',
           position: 'top',
           topOffset: 50,
-          text1: res.title,
-          text2: res.message,
+          text1: res?.title,
+          text2: res?.message,
           visibilityTime: 3000,
           autoHide: true,
           onPress: () => Toast.hide(),
@@ -482,7 +482,7 @@ const GetLoan = () => {
                             style={{
                               color: '#054B99',
                               fontSize: 16,
-                              fontFamily: 'MontBold',
+                              fontFamily: 'serif',
                               // fontWeight: '700',
                               letterSpacing: 0.4,
                               lineHeight: 20,
@@ -491,7 +491,6 @@ const GetLoan = () => {
                           </Text>
                           <Text
                             style={{
-                              fontFamily: 'Montserat',
                               fontWeight: '400',
                               fontSize: 13,
                             }}>
@@ -505,7 +504,7 @@ const GetLoan = () => {
                                 onPress={() => setShowPdf(true)}
                                 style={{
                                   color: '#054B99',
-                                  fontFamily: 'MontSBold',
+                                  fontFamily: 'serif',
                                   fontSize: 16,
                                 }}>
                                 Click here to read our loan policy agreement{' '}
@@ -515,7 +514,7 @@ const GetLoan = () => {
                                 onPress={() => setPdfTerm(true)}
                                 style={{
                                   color: '#054B99',
-                                  fontFamily: 'MontSBold',
+                                  fontFamily: 'serif',
                                   fontSize: 16,
                                 }}>
                                 Click here to read our term agreement
@@ -543,7 +542,7 @@ const GetLoan = () => {
                           label="How much do you need?"
                           placeholder="Enter amount"
                           keyboardType="numeric"
-                          value={details?.Amount}
+                          // value={details?.Amount}
                           onChangeText={text =>
                             setLoanDetails({
                               ...loanDetails,
@@ -610,7 +609,6 @@ const GetLoan = () => {
                                     fontSize: 16,
                                     lineHeight: 24,
                                     color: '#14142B',
-                                    fontFamily: 'Montserat',
                                   }}>
                                   Interest Rate (Monthly)
                                 </Text>
@@ -655,7 +653,6 @@ const GetLoan = () => {
                                     fontSize: 16,
                                     lineHeight: 24,
                                     color: '#14142B',
-                                    fontFamily: 'Montserat',
                                   }}>
                                   Payback Amount
                                 </Text>
@@ -689,7 +686,6 @@ const GetLoan = () => {
                                     fontSize: 16,
                                     lineHeight: 24,
                                     color: '#14142B',
-                                    fontFamily: 'Montserat',
                                   }}>
                                   Payback plan
                                 </Text>
@@ -700,7 +696,6 @@ const GetLoan = () => {
                                   ]}>
                                   <Text
                                     style={{
-                                      fontFamily: 'Montserat',
                                       fontSize: 16,
                                     }}>
                                     Amount to be paid monthly: ₦{' '}
@@ -720,7 +715,6 @@ const GetLoan = () => {
                                     {'\n'}
                                     <Text
                                       style={{
-                                        fontFamily: 'Montserat',
                                         fontSize: 16,
                                       }}>
                                       Total interest rate:{' '}
@@ -729,7 +723,6 @@ const GetLoan = () => {
                                     {'\n'}
                                     <Text
                                       style={{
-                                        fontFamily: 'Montserat',
                                         fontSize: 16,
                                       }}>
                                       APR: {details?.APR}%{' '}
@@ -765,7 +758,7 @@ const GetLoan = () => {
                                 onPress={() => setShowPdf(true)}
                                 style={{
                                   color: '#054B99',
-                                  fontFamily: 'MontSBold',
+                                  fontFamily: 'serif',
                                   fontSize: 16,
                                   marginTop: 30,
                                 }}>
@@ -776,7 +769,7 @@ const GetLoan = () => {
                                 onPress={() => setPdfTerm(true)}
                                 style={{
                                   color: '#054B99',
-                                  fontFamily: 'MontSBold',
+                                  fontFamily: 'serif',
                                   fontSize: 16,
                                   marginVertical: 30,
                                 }}>
@@ -838,7 +831,6 @@ const styles = StyleSheet.create({
     // opacity:bs.current.snapTo(1)?0.1:1
   },
   TextHead: {
-    fontFamily: 'Montserat',
     fontWeight: '700',
     fontSize: 16,
     lineHeight: 24,
@@ -857,7 +849,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 24,
     color: '#14142B',
-    fontFamily: 'Montserat',
   },
   textFeild: {
     backgroundColor: '#fffff',
@@ -882,7 +873,7 @@ const styles = StyleSheet.create({
   getText: {
     textAlign: 'center',
     color: 'white',
-    fontFamily: 'MontSBold',
+    fontFamily: 'serif',
     fontSize: 16,
   },
 });

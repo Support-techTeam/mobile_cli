@@ -57,14 +57,14 @@ const styles = StyleSheet.create({
     borderRadius: 39,
   },
   pageText: {
-    fontFamily: 'MontSBold',
+    fontFamily: 'serif',
     fontSize: 16,
     marginLeft: 10,
     color: '#4E4B66',
     lineHeight: 24,
   },
   statusText: {
-    fontFamily: 'Montserat',
+    
     fontSize: 12,
     fontWeight: '400',
     color: '#F4B740',

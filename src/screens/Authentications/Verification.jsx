@@ -49,13 +49,13 @@ const Verification = () => {
 
   const handleSignOut = async () => {
     const res = await userLogOut();
-    if (res.error) {
+    if (res?.error) {
       Toast.show({
         type: 'error',
         position: 'top',
         topOffset: 50,
-        text1: res.title,
-        text2: res.message,
+        text1: res?.title,
+        text2: res?.message,
         visibilityTime: 3000,
         autoHide: true,
         onPress: () => Toast.hide(),
@@ -68,13 +68,13 @@ const Verification = () => {
   const handleResendVerificationEmail = async () => {
     setIsLoading(true);
     const res = await resendVerificationEmail();
-    if (res.error) {
+    if (res?.error) {
       Toast.show({
         type: 'error',
         position: 'top',
         topOffset: 50,
-        text1: res.title,
-        text2: res.message,
+        text1: res?.title,
+        text2: res?.message,
         visibilityTime: 3000,
         autoHide: true,
         onPress: () => Toast.hide(),
@@ -84,8 +84,8 @@ const Verification = () => {
         type: 'success',
         position: 'top',
         topOffset: 50,
-        text1: res.title,
-        text2: res.message,
+        text1: res?.title,
+        text2: res?.message,
         visibilityTime: 3000,
         autoHide: true,
         onPress: () => Toast.hide(),
@@ -120,7 +120,10 @@ const Verification = () => {
         showsVerticalScrollIndicator={false}>
         <View style={{alignItems: 'center'}}>
           <View style={{marginTop: 40, alignItems: 'center'}}>
-            <Image source={require('../../../assets/images/HeadLogo.png')} />
+            <Image
+              source={require('../../../assets/images/HeadLogo.png')}
+              style={{width: 83, height: 32}}
+            />
           </View>
           <View style={{marginTop: 40}}>
             <Image source={require('../../../assets/images/veriEnv.png')} />
@@ -152,7 +155,6 @@ const Verification = () => {
                 style={{
                   fontWeight: '500',
                   color: '#fff',
-                  fontFamily: 'Montserat',
                 }}>
                 Resend verification code
               </Text>
@@ -168,7 +170,6 @@ const Verification = () => {
                 style={{
                   fontWeight: '500',
                   color: COLORS.white,
-                  fontFamily: 'Montserat',
                 }}>
                 SignOut
               </Text>
@@ -201,7 +202,7 @@ const styles = StyleSheet.create({
   },
   verify: {
     color: '#14142B',
-    fontFamily: 'Montserat',
+
     fontSize: 28,
     lineHeight: 42,
     fontWeight: '400',
@@ -216,7 +217,6 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   messageText: {
-    fontFamily: 'Montserat',
     fontSize: 16,
     lineHeight: 24,
     color: '#595959',
@@ -245,7 +245,6 @@ const styles = StyleSheet.create({
     borderColor: '#054B99',
   },
   otpText: {
-    fontFamily: 'Montserat',
     fontSize: 20,
     textAlign: 'center',
     paddingHorizontal: 5,
@@ -280,7 +279,6 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
   },
   resendText: {
-    fontFamily: 'Montserat',
     color: '#054B99',
     fontWeight: '600',
     fontSize: 14,
@@ -301,7 +299,7 @@ const styles = StyleSheet.create({
   },
   checkedText: {
     color: '#44AB3B',
-    fontFamily: 'Montserat',
+
     fontSize: 24,
     lineHeight: 36,
     textTransform: 'capitalize',
@@ -309,7 +307,7 @@ const styles = StyleSheet.create({
   },
   checkedText2: {
     color: '#ED2E7E',
-    fontFamily: 'Montserat',
+
     fontSize: 24,
     lineHeight: 36,
     textTransform: 'capitalize',
@@ -322,7 +320,6 @@ const styles = StyleSheet.create({
     marginTop: 30,
   },
   extra: {
-    fontFamily: 'Montserat',
     textAlign: 'center',
     fontSize: 16,
     lineHeight: 24,

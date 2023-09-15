@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   Image,
   ScrollView,
+  Platform,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import Spinner from 'react-native-loading-spinner-overlay';
@@ -18,6 +19,7 @@ import ViewShot from 'react-native-view-shot';
 import SendIntentAndroid from 'react-native-send-intent';
 import Share from 'react-native-share';
 import Toast from 'react-native-toast-message';
+import email from 'react-native-email';
 
 const LoanTransactions = ({route}) => {
   const navigation = useNavigation();
@@ -34,13 +36,13 @@ const LoanTransactions = ({route}) => {
   const getLoan = async () => {
     setIsLoading(true);
     const res = await getLoanById(loanIdd);
-    if (res.error) {
+    if (res?.error) {
       Toast.show({
         type: 'error',
         position: 'top',
         topOffset: 50,
-        text1: res.title,
-        text2: res.message,
+        text1: res?.title,
+        text2: res?.message,
         visibilityTime: 5000,
         autoHide: true,
         onPress: () => Toast.hide(),
@@ -53,12 +55,19 @@ const LoanTransactions = ({route}) => {
 
   const openSendEmail = Id => {
     const text = `Hello, I would like to report a loan transaction, with Transaction ID: ${Id}`;
-
-    SendIntentAndroid.sendMail(
-      'support@tradelenda.com',
-      `Report Loan Transaction`,
-      `${text}`,
-    );
+    if (Platform.OS === 'android') {
+      SendIntentAndroid.sendMail(
+        'support@tradelenda.com',
+        `Report Loan Transaction`,
+        `${text}`,
+      );
+    } else {
+      email('support@tradelenda.com', {
+        subject: 'Report Transaction',
+        body: `${text}`,
+        checkCanOpen: false, // Call Linking.canOpenURL prior to Linking.openURL
+      }).catch(console.error);
+    }
   };
 
   const shareToSocialMedia = async () => {
@@ -166,17 +175,12 @@ const LoanTransactions = ({route}) => {
                 <Text style={styles.title}>Loan Application</Text>
               </View>
               <View style={{flexDirection: 'row', marginTop: 8}}>
-                <Text style={{fontFamily: 'Montserat', fontWeight: '400'}}>
-                  On
-                </Text>
+                <Text style={{fontWeight: '400'}}>On</Text>
                 <Text style={{fontWeight: '600'}}>
                   {' '}
                   {loanDetails?.createdAt?.substr(0, 10)}
                 </Text>
-                <Text style={{fontFamily: 'Montserat', fontWeight: '400'}}>
-                  {' '}
-                  at
-                </Text>
+                <Text style={{fontWeight: '400'}}> at</Text>
                 <Text style={{fontWeight: '600'}}>
                   {' '}
                   {loanDetails?.createdAt?.substr(11, 5)}
@@ -276,12 +280,12 @@ const LoanTransactions = ({route}) => {
                     justifyContent: 'space-between',
                     alignItems: 'center',
                   }}>
-                  <Text style={{fontFamily: 'Montserat', fontSize: 16}}>
+                  <Text style={{fontSize: 16}}>
                     {loanDetails?.dateOfApproval === undefined
                       ? '00-00-000'
                       : loanDetails?.dateOfApproval?.substr(0, 10)}
                   </Text>
-                  <Text style={{fontFamily: 'Montserat', fontSize: 16}}>
+                  <Text style={{fontSize: 16}}>
                     {loanDetails?.numberOfRepayments === undefined
                       ? '0'
                       : loanDetails?.numberOfRepayments}
@@ -425,7 +429,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   TextHead: {
-    fontFamily: 'Montserat',
     fontWeight: '700',
     fontSize: 16,
     lineHeight: 20,
@@ -448,19 +451,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   title: {
-    fontFamily: 'Montserat',
     fontWeight: '800',
     fontSize: 14,
     lineHeight: 21,
     color: '#14142B',
   },
   infotext: {
-    fontFamily: 'Montserat',
     color: '#6E7191',
     marginBottom: 4,
   },
   values: {
-    fontFamily: 'Montserat',
     fontSize: 16,
     lineHeight: 24,
     fontWeight: '800',
@@ -468,14 +468,14 @@ const styles = StyleSheet.create({
   report: {
     color: '#ED2E7E',
     fontSize: 14,
-    fontFamily: 'Montserat',
+
     fontWeight: 'bold',
     lineHeight: 24,
     letterSpacing: 0.5,
   },
   reportdesc: {
     color: '#6E7191',
-    fontFamily: 'Montserat',
+
     fontSize: 12,
     lineHeight: 18,
   },
