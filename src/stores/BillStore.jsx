@@ -1,15 +1,11 @@
 import React from 'react';
 import axios from 'axios';
 import {BASE_API_URL} from '../../app.json';
-import {useSelector, useDispatch} from 'react-redux';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import {auth} from '../util/firebase/firebaseConfig';
 import {store} from '../util/redux/store';
 
 //get login token
 const reduxStore = store.getState().userAuth;
-
-console.log(store.getState().networkState);
 
 let headers;
 if (reduxStore !== null || reduxStore !== undefined) {

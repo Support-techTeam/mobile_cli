@@ -1,0 +1,17 @@
+{
+  "name": "Tradelenda",
+  "displayName": "Tradelenda",
+  "version": "3.0.2",
+  "orientation": "portrait",
+  "BASE_URL": "https://tradelenda.com",
+  "BASE_API_URL": "https://prime.tradelenda.com/api/v1",
+  "firebase_config": {
+    "apiKey": "AIzaSyA-FQQY9cImFEd3BFkoqbNquoOEO8hnvhg",
+    "authDomain": "tradelenda-app.firebaseapp.com",
+    "projectId": "tradelenda-app",
+    "storageBucket": "tradelenda-app.appspot.com",
+    "messagingSenderId": "24130547176",
+    "appId": "1:24130547176:web:9c25693f5c2da2bc1cc85d",
+    "measurementId": "G-4SS0SHYK0S"
+  }
+}

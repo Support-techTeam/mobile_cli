@@ -14,6 +14,7 @@ import {
   ToastAndroid,
   NativeModules,
   Platform,
+  RefreshControl,
 } from 'react-native';
 import React, {
   useContext,
@@ -63,7 +64,8 @@ const Homescreen = () => {
   const [isMakeTransferVisible, setIsMakeTransferVisible] = useState(false);
   const [isFundWalletVisible, setIsFundWalletVisible] = useState(false);
   const [isAllTransactionVisible, setIsAllTransactionVisible] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoadingPullDown] = useState(false);
+  const [isLoadingPullDown, setIsLoading] = useState(false);
   const [isPrevious, setPrevious] = useState(false);
   const [isNext, setNext] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
@@ -149,6 +151,7 @@ const Homescreen = () => {
     }
     setIsLoading(false);
   };
+
   useEffect(() => {
     unsubGetAllTransactions();
   }, []);
@@ -189,6 +192,20 @@ const Homescreen = () => {
       setUserTransactionsTotal(res?.data?.transactions?.count);
     }
     setIsLoading(false);
+  };
+
+  const unsubGetTransactionsonPullDown = async () => {
+    // setIsLoadingPullDown(true);
+    const res = await getAccountTransactions(1, 10);
+    if (res?.error) {
+      // TODO: handle error
+    } else {
+      setCurrentPage(1);
+      setUserTransactionsData(res?.data?.transactions?.transaction);
+      setUserTransactionsPages(res?.data?.transactions?.maxPages);
+      setUserTransactionsTotal(res?.data?.transactions?.count);
+    }
+    // setIsLoadingPullDown(false);
   };
 
   const unsubGetLoanAmount = async () => {
@@ -1581,6 +1598,12 @@ const Homescreen = () => {
         {/* Fifth Section */}
         <ScrollView
           bounces={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={isLoadingPullDown}
+              onRefresh={unsubGetTransactionsonPullDown}
+            />
+          }
           showsHorizontalScrollIndicator={false}
           showsVerticalScrollIndicator={false}
           centerContent={true}
@@ -1683,9 +1706,13 @@ const Homescreen = () => {
                               {trans.transactionType}
                             </Text>
                             {trans.credit === null ? (
-                              <Text style={styles.price}>₦{trans.debit}</Text>
+                              <Text style={styles.price}>
+                                D: ₦{trans.debit} | ₦{trans.credit}
+                              </Text>
                             ) : (
-                              <Text style={styles.price}>₦{trans.credit}</Text>
+                              <Text style={styles.price}>
+                                C: ₦{trans.credit} | ₦{trans.debit}{' '}
+                              </Text>
                             )}
                           </View>
                           <View

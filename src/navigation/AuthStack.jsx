@@ -24,11 +24,13 @@ const AuthStack = () => {
   useEffect(() => {
     const getUserStore = async () => {
       const appData = await AsyncStorage.getItem('isAppFirstLaunched');
-      if (appData == null) {
+      console.log('First time', appData);
+      if (appData == null || appData == undefined) {
         setIsAppFirstLaunched(true);
-        AsyncStorage.setItem('isAppFirstLaunched', 'false');
+        AsyncStorage.setItem('isAppFirstLaunched', 'true');
       } else {
         setIsAppFirstLaunched(false);
+        AsyncStorage.setItem('isAppFirstLaunched', 'false');
       }
     };
     getUserStore();
@@ -37,7 +39,7 @@ const AuthStack = () => {
       getUserStore();
     };
   }, []);
-
+  console.log(isAppFirstLaunched);
   return (
     isAppFirstLaunched != null && (
       <Stack.Navigator screenOptions={{headerShown: false}}>

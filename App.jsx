@@ -1,12 +1,9 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, {useEffect, useState, useRef} from 'react';
 import {
-  Button,
   Platform,
-  ScrollView,
   StatusBar,
   StyleSheet,
-  Text,
   View,
   AppState,
   LogBox,
@@ -15,6 +12,7 @@ import {
 import SplashScreen from 'react-native-splash-screen';
 import SpInAppUpdates, {
   IncomingStatusUpdateEvent,
+  InstallationResult,
   NeedsUpdateResponse,
   IAUUpdateKind,
   StartUpdateOptions,
@@ -33,7 +31,7 @@ import {
 } from '@datadog/mobile-react-native';
 import AppNavigationContainer from './src/navigation';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
-import {Provider as PaperProvider} from 'react-native-paper';
+import {Provider as PaperProvider, FAB, Portal} from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {Provider} from 'react-redux';
 import {PersistGate} from 'redux-persist/integration/react';
@@ -42,6 +40,8 @@ import {LightTheme} from './src/constants/lightTheme';
 import EnterPin from './src/screens/SecurityScreens/EnterPinScreen';
 import {getAllPin} from './src/stores/SecurityStore';
 import NetworkStatus from './src/util/NetworkService';
+import RNRestart from 'react-native-restart';
+
 const inAppUpdates = new SpInAppUpdates(false);
 LogBox.ignoreAllLogs();
 
@@ -65,14 +65,11 @@ datadogConfiguration.nativeCrashReportEnabled = true;
 datadogConfiguration.sampleRate = 80;
 
 function App() {
-  // const insets = useSafeAreaInsets();
-
   const appMainState = useRef(AppState.currentState);
   const [appState, setAppState] = useState(appMainState.current);
   const [isLocked, setIsLocked] = useState('');
   const [hasPin, setHasPin] = useState(false);
   const {getItem, setItem} = useAsyncStorage('@lockState');
-
   const readItemFromStorage = async () => {
     const item = await getItem();
     setIsLocked(item);
@@ -147,6 +144,12 @@ function App() {
     });
     if (totalBytesToDownload === bytesDownloaded) {
       Toast.hide();
+      if (Platform.OS === 'android') {
+        inAppUpdates.installUpdate();
+        if (status.status == '5') {
+          RNRestart.restart();
+        }
+      }
     }
   };
 
@@ -210,21 +213,23 @@ function App() {
   return (
     <SafeAreaProvider style={styles.rootContainer}>
       <PaperProvider theme={theme}>
-        <DatadogProvider configuration={datadogConfiguration}>
-          <StatusBar translucent={true} />
-          {isLocked && isLocked === 'true' && hasPin ? (
-            <EnterPin toggleVisibility={() => toggleVisibility()} />
-          ) : (
-            <View style={styles.container}>
-              <Provider store={store}>
-                <PersistGate persistor={persistor} loading={null}>
-                  <NetworkStatus />
-                  <AppNavigationContainer />
-                </PersistGate>
-              </Provider>
-            </View>
-          )}
-        </DatadogProvider>
+        <Portal>
+          <DatadogProvider configuration={datadogConfiguration}>
+            <StatusBar translucent={true} />
+            {isLocked && isLocked === 'true' && hasPin ? (
+              <EnterPin toggleVisibility={() => toggleVisibility()} />
+            ) : (
+              <View style={styles.container}>
+                <Provider store={store}>
+                  <PersistGate persistor={persistor} loading={null}>
+                    <NetworkStatus />
+                    <AppNavigationContainer />
+                  </PersistGate>
+                </Provider>
+              </View>
+            )}
+          </DatadogProvider>
+        </Portal>
       </PaperProvider>
     </SafeAreaProvider>
   );
@@ -236,6 +241,13 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
+  },
+  fab: {
+    position: 'absolute',
+    // margin: 16,
+    opacity: 0.9,
+    right: 0,
+    bottom: 0,
   },
 });
 

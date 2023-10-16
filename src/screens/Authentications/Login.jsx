@@ -141,7 +141,7 @@ const Login = () => {
     <SafeAreaView
       style={{
         flex: 1,
-        backgroundColor: '#f4f4f4',
+        backgroundColor: '#fff',
         paddingTop: insets.top !== 0 ? insets.top : 'auto',
         paddingBottom: insets.bottom !== 0 ? insets.bottom : 'auto',
         paddingLeft: insets.left !== 0 ? insets.left : 'auto',

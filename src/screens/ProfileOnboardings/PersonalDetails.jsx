@@ -264,10 +264,10 @@ const PersonalDetails = () => {
       isValid = false;
     }
 
-    if (!userDetails.NoOfDependents) {
-      handleError('Please input No of dependents', 'NoOfDependents');
-      isValid = false;
-    }
+    // if (!userDetails.NoOfDependents) {
+    //   handleError('Please input No of dependents', 'NoOfDependents');
+    //   isValid = false;
+    // }
     if (!userDetails.referredByOption) {
       handleError('Please input referred by option', 'referredByOption');
       isValid = false;
