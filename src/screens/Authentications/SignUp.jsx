@@ -23,9 +23,11 @@ import Toast from 'react-native-toast-message';
 import {useDispatch, useSelector} from 'react-redux';
 import {signUpUser} from '../../util/redux/userAuth/user.auth.slice';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from 'react-native-responsive-screen';
 
-const screenHeight = Dimensions.get('window').height;
-const screenWidth = Dimensions.get('window').width;
 const SignUp = () => {
   const insets = useSafeAreaInsets();
   const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -216,14 +218,15 @@ const SignUp = () => {
 
   return (
     <SafeAreaView
-      style={{
-        flex: 1,
-        backgroundColor: '#fff',
-        paddingTop: insets.top !== 0 ? insets.top : 'auto',
-        paddingBottom: insets.bottom !== 0 ? insets.bottom : 'auto',
-        paddingLeft: insets.left !== 0 ? insets.left : 'auto',
-        paddingRight: insets.right !== 0 ? insets.right : 'auto',
-      }}>
+      style={[
+        styles.container,
+        {
+          paddingTop: insets.top !== 0 ? insets.top : 'auto',
+          paddingBottom: insets.bottom !== 0 ? insets.bottom : 'auto',
+          paddingLeft: insets.left !== 0 ? insets.left : 'auto',
+          paddingRight: insets.right !== 0 ? insets.right : 'auto',
+        },
+      ]}>
       {isLoading && (
         <Spinner
           textContent={'Signing Up...'}
@@ -232,17 +235,19 @@ const SignUp = () => {
           overlayColor="rgba(78, 75, 102, 0.7)"
         />
       )}
-      <ImageBackground
-        source={require('../../../assets/signup.png')}
-        resizeMode="stretch"
-        style={styles.image}>
-        <ScrollView
-          bounces={false}
-          showsHorizontalScrollIndicator={false}
-          showsVerticalScrollIndicator={false}
-          style={{paddingHorizontal: 20, marginBottom: screenHeight * 0.15}}>
-          <KeyboardAvoidingWrapper>
-            {/* Work In Progress with goBack() */}
+      <KeyboardAvoidingWrapper>
+        <ImageBackground
+          source={require('../../../assets/signup.png')}
+          resizeMode="stretch"
+          style={styles.image}>
+          <ScrollView
+            bounces={false}
+            showsHorizontalScrollIndicator={false}
+            showsVerticalScrollIndicator={false}
+            style={{
+              paddingHorizontal: 16,
+              marginBottom: hp('2%'),
+            }}>
             <View>
               <View>
                 <View style={{paddingHorizontal: 12}}>
@@ -632,9 +637,9 @@ const SignUp = () => {
                 </Formik>
               </View>
             </View>
-          </KeyboardAvoidingWrapper>
-        </ScrollView>
-      </ImageBackground>
+          </ScrollView>
+        </ImageBackground>
+      </KeyboardAvoidingWrapper>
     </SafeAreaView>
   );
 };
@@ -642,7 +647,11 @@ const SignUp = () => {
 export default SignUp;
 
 const styles = StyleSheet.create({
-  container: {},
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    height: hp('100%'),
+  },
   signupView: {
     alignItems: 'center',
     width: '93%',
@@ -717,7 +726,6 @@ const styles = StyleSheet.create({
     paddingVertical: 39,
     marginTops: 30,
     borderRadius: 50,
-    // borderWidth:.5,
     shadowColor: 'black',
     shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.8,
@@ -736,8 +744,6 @@ const styles = StyleSheet.create({
   },
   termsRow: {
     flexDirection: 'row',
-    // alignItems: 'flex-start',
-    // justifyContent: 'center',
     marginBottom: 22,
     marginTop: 10,
   },
@@ -766,9 +772,6 @@ const styles = StyleSheet.create({
     marginLeft: 8,
     color: '#4E4B66',
     fontSize: 12,
-
-    //  lineHeight:28
-    // fontFamily:'serif'
   },
   signUpactivity: {
     backgroundColor: '#054B99',
@@ -778,8 +781,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   image: {
-    height: screenHeight,
-    width: screenWidth,
+    // height: hp('100'),
+    width: wp('100%'),
     justifyContent: 'center',
   },
 });

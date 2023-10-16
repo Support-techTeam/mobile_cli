@@ -25,9 +25,11 @@ import {signInUser} from '../../util/redux/userAuth/user.auth.slice';
 import Toast from 'react-native-toast-message';
 import {getProfileDetails} from '../../stores/ProfileStore';
 import {setProfile} from '../../util/redux/userProfile/user.profile.slice';
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from 'react-native-responsive-screen';
 
-const screenHeight = Dimensions.get('window').height;
-const screenWidth = Dimensions.get('window').width;
 const Login = () => {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
@@ -139,14 +141,15 @@ const Login = () => {
 
   return (
     <SafeAreaView
-      style={{
-        flex: 1,
-        backgroundColor: '#fff',
-        paddingTop: insets.top !== 0 ? insets.top : 'auto',
-        paddingBottom: insets.bottom !== 0 ? insets.bottom : 'auto',
-        paddingLeft: insets.left !== 0 ? insets.left : 'auto',
-        paddingRight: insets.right !== 0 ? insets.right : 'auto',
-      }}>
+      style={[
+        styles.container,
+        {
+          paddingTop: insets.top !== 0 ? insets.top : 'auto',
+          paddingBottom: insets.bottom !== 0 ? insets.bottom : 'auto',
+          paddingLeft: insets.left !== 0 ? insets.left : 'auto',
+          paddingRight: insets.right !== 0 ? insets.right : 'auto',
+        },
+      ]}>
       <Loader visible={false} />
       {isLoading && (
         <Spinner
@@ -157,16 +160,16 @@ const Login = () => {
           animation="slide"
         />
       )}
-      <ImageBackground
-        source={require('../../../assets/login.png')}
-        resizeMode="stretch"
-        style={styles.image}>
-        <ScrollView
-          bounces={false}
-          showsHorizontalScrollIndicator={false}
-          showsVerticalScrollIndicator={false}
-          style={{paddingHorizontal: 20}}>
-          <KeyboardAvoidingWrapper>
+      <KeyboardAvoidingWrapper>
+        <ImageBackground
+          source={require('../../../assets/login.png')}
+          resizeMode="stretch"
+          style={styles.image}>
+          <ScrollView
+            bounces={false}
+            showsHorizontalScrollIndicator={false}
+            showsVerticalScrollIndicator={false}
+            style={{paddingHorizontal: 16}}>
             <View style={{marginBottom: 40}}>
               <View style={{alignItems: 'center'}}>
                 <View>
@@ -283,9 +286,9 @@ const Login = () => {
                 </TouchableOpacity>
               </View>
             </View>
-          </KeyboardAvoidingWrapper>
-        </ScrollView>
-      </ImageBackground>
+          </ScrollView>
+        </ImageBackground>
+      </KeyboardAvoidingWrapper>
     </SafeAreaView>
   );
 };
@@ -294,10 +297,8 @@ export default Login;
 
 const styles = StyleSheet.create({
   container: {
-    // flex: 1,
-    // paddingHorizontal: 20,
-    // backgroundColor: '#f4f4f4',
-    // paddingTop: Platform.OS === 'android' ? StatusBarManager.HEIGHT : 0,
+    flex: 1,
+    backgroundColor: '#fff',
   },
 
   signupText: {
@@ -385,8 +386,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   image: {
-    height: screenHeight,
-    width: screenWidth,
+    height: hp('100%'),
+    width: wp('100%'),
     justifyContent: 'center',
   },
 });

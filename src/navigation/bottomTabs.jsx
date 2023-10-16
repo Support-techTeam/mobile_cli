@@ -94,7 +94,6 @@ export default function BottomTabs() {
         screenOptions={{
           tabBarActiveTintColor: COLORS.lendaBlue,
           tabBarInactiveTintColor: COLORS.Secondary,
-          tabBarActiveBackgroundColor: COLORS.Light,
           headerShown: false,
           tabBarShowLabel: true,
           tabBarStyle: styles.tabBar,

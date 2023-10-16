@@ -5,6 +5,7 @@ import {
   ScrollView,
   TouchableOpacity,
   Image,
+  ImageBackground,
 } from 'react-native';
 import React, {useState} from 'react';
 import {useNavigation} from '@react-navigation/native';
@@ -12,6 +13,10 @@ import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 
 import CustomInput from '../../component/custominput/CustomInput';
 import KeyboardAvoidingWrapper from '../../component/KeyBoardAvoiding/keyBoardAvoiding';
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from 'react-native-responsive-screen';
 
 const ResetPassword = () => {
   const insets = useSafeAreaInsets();
@@ -29,63 +34,70 @@ const ResetPassword = () => {
         paddingLeft: insets.left !== 0 ? insets.left : 'auto',
         paddingRight: insets.right !== 0 ? insets.right : 'auto',
       }}>
-      <ScrollView
-        bounces={false}
-        showsHorizontalScrollIndicator={false}
-        showsVerticalScrollIndicator={false}>
-        <KeyboardAvoidingWrapper>
-          <View style={{marginBottom: 40}}>
-            <View style={{alignItems: 'center'}}>
-              <View style={{paddingLeft: 3}}>
+      <KeyboardAvoidingWrapper>
+        <ImageBackground
+          source={require('../../../assets/forgotPass.png')}
+          resizeMode="stretch"
+          style={styles.image}>
+          <ScrollView
+            bounces={false}
+            showsHorizontalScrollIndicator={false}
+            showsVerticalScrollIndicator={false}>
+            <View style={{marginBottom: 40}}>
+              <View style={{alignItems: 'center'}}>
+                <View style={{paddingLeft: 3}}>
+                  <Image
+                    source={require('../../../assets/images/HeadLogo.png')}
+                    style={{width: 83, height: 32}}
+                  />
+                </View>
+              </View>
+              <View style={styles.signupView}>
                 <Image
-                  source={require('../../../assets/images/HeadLogo.png')}
-                  style={{width: 83, height: 32}}
+                  source={require('../../../assets/images/unlocked.png')}
                 />
+                <Text style={styles.signupText}>Reset Password</Text>
+                <View>
+                  <Text style={styles.extraText}>Setup your new password</Text>
+                </View>
               </View>
-            </View>
-            <View style={styles.signupView}>
-              <Image source={require('../../../assets/images/unlocked.png')} />
-              <Text style={styles.signupText}>Reset Password</Text>
+              <View style={styles.demark} />
               <View>
-                <Text style={styles.extraText}>Setup your new password</Text>
+                <CustomInput
+                  label="Password"
+                  isPassword={true}
+                  hidePassword={hidePassword}
+                  setHidePassword={setHidePassword}
+                  secureTextEntry={hidePassword}
+                />
+
+                <CustomInput
+                  label="Confirm Password"
+                  isPassword={true}
+                  hidePassword={hidePassword}
+                  setHidePassword={setHidePassword}
+                  secureTextEntry={hidePassword}
+                />
+
+                <TouchableOpacity
+                  style={styles.signUp}
+                  onPress={() => navigation.navigate('Login')}>
+                  <Text
+                    style={{
+                      fontWeight: '500',
+                      color: '#fff',
+
+                      fontSize: 18,
+                      lineHeight: 24,
+                    }}>
+                    Save Changes
+                  </Text>
+                </TouchableOpacity>
               </View>
             </View>
-            <View style={styles.demark} />
-            <View>
-              <CustomInput
-                label="Password"
-                isPassword={true}
-                hidePassword={hidePassword}
-                setHidePassword={setHidePassword}
-                secureTextEntry={hidePassword}
-              />
-
-              <CustomInput
-                label="Confirm Password"
-                isPassword={true}
-                hidePassword={hidePassword}
-                setHidePassword={setHidePassword}
-                secureTextEntry={hidePassword}
-              />
-
-              <TouchableOpacity
-                style={styles.signUp}
-                onPress={() => navigation.navigate('Login')}>
-                <Text
-                  style={{
-                    fontWeight: '500',
-                    color: '#fff',
-
-                    fontSize: 18,
-                    lineHeight: 24,
-                  }}>
-                  Save Changes
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </KeyboardAvoidingWrapper>
-      </ScrollView>
+          </ScrollView>
+        </ImageBackground>
+      </KeyboardAvoidingWrapper>
     </SafeAreaView>
   );
 };
@@ -136,5 +148,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 28,
+  },
+  image: {
+    height: hp('100%'),
+    width: wp('100%'),
+    justifyContent: 'center',
   },
 });

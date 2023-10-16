@@ -8,17 +8,7 @@ import {
   AppState,
   LogBox,
 } from 'react-native';
-
-import SplashScreen from 'react-native-splash-screen';
-import SpInAppUpdates, {
-  IncomingStatusUpdateEvent,
-  InstallationResult,
-  NeedsUpdateResponse,
-  IAUUpdateKind,
-  StartUpdateOptions,
-  StatusUpdateEvent,
-  IAUInstallStatus,
-} from 'sp-react-native-in-app-updates';
+import SpInAppUpdates, {IAUUpdateKind} from 'sp-react-native-in-app-updates';
 import {version} from './app.json';
 import Toast from 'react-native-toast-message';
 import {useAsyncStorage} from '@react-native-async-storage/async-storage';
@@ -31,7 +21,7 @@ import {
 } from '@datadog/mobile-react-native';
 import AppNavigationContainer from './src/navigation';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
-import {Provider as PaperProvider, FAB, Portal} from 'react-native-paper';
+import {Provider as PaperProvider, Portal} from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {Provider} from 'react-redux';
 import {PersistGate} from 'redux-persist/integration/react';
@@ -195,21 +185,6 @@ function App() {
     ...LightTheme,
   };
 
-  useEffect(() => {
-    const getUserStore = async () => {
-      const appData = await AsyncStorage.getItem('isAppFirstLaunched');
-      if (appData == null) {
-        AsyncStorage.setItem('isAppFirstLaunched', 'false');
-      } else {
-      }
-    };
-    getUserStore();
-
-    return () => {
-      getUserStore();
-    };
-  }, []);
-
   return (
     <SafeAreaProvider style={styles.rootContainer}>
       <PaperProvider theme={theme}>
@@ -241,13 +216,6 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-  },
-  fab: {
-    position: 'absolute',
-    // margin: 16,
-    opacity: 0.9,
-    right: 0,
-    bottom: 0,
   },
 });
 

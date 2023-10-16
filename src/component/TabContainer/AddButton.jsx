@@ -178,7 +178,7 @@ const AddButton = ({opened, toggleOpened}) => {
             />
           </Animated.View>
         </TouchableWithoutFeedback>
-        <View style={styles.center} />
+        {/* <View style={styles.center} /> */}
         <View style={styles.center2} />
         <View
           style={
@@ -271,15 +271,15 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
   },
-  center: {
-    alignSelf: 'center',
-    backgroundColor: '#fff',
-    position: 'absolute',
-    width: 100,
-    height: 400,
-    top: 10,
-    borderRadius: 40,
-  },
+  // center: {
+  //   alignSelf: 'center',
+  //   backgroundColor: '#fff',
+  //   position: 'absolute',
+  //   width: 100,
+  //   height: 400,
+  //   top: 10,
+  //   borderRadius: 40,
+  // },
   center2: {
     alignSelf: 'center',
     backgroundColor: '#F4F4F4',
