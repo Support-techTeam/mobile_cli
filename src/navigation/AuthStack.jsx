@@ -19,31 +19,32 @@ const config = {
   },
 };
 const AuthStack = () => {
-  const [isAppFirstLaunched, setIsAppFirstLaunched] = useState(null);
+  const [onboardingCompleted, setOnboardingCompleted] = useState(null);
 
   useEffect(() => {
-    const getUserStore = async () => {
-      const appData = await AsyncStorage.getItem('isAppFirstLaunched');
-      console.log('First time', appData);
-      if (appData == null || appData == undefined) {
-        setIsAppFirstLaunched(true);
-        AsyncStorage.setItem('isAppFirstLaunched', 'true');
-      } else {
-        setIsAppFirstLaunched(false);
-        AsyncStorage.setItem('isAppFirstLaunched', 'false');
+    async function checkOnboardingState() {
+      try {
+        const value = await AsyncStorage.getItem('onboardingCompleted');
+        if (value !== null) {
+          setOnboardingCompleted(JSON.parse(value));
+        } else {
+          await AsyncStorage.setItem(
+            'onboardingCompleted',
+            JSON.stringify(false),
+          );
+          setOnboardingCompleted(false);
+        }
+      } catch (error) {
+        setOnboardingCompleted(false);
       }
-    };
-    getUserStore();
-
-    return () => {
-      getUserStore();
-    };
+    }
+    checkOnboardingState();
   }, []);
-  console.log(isAppFirstLaunched);
+
   return (
-    isAppFirstLaunched != null && (
+    onboardingCompleted != null && (
       <Stack.Navigator screenOptions={{headerShown: false}}>
-        {isAppFirstLaunched ? (
+        {!onboardingCompleted ? (
           <>
             <Stack.Screen
               name="OnboardingScreen"

@@ -17,7 +17,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 const {width, height} = Dimensions.get('window');
 const midth = Dimensions.get('window').width;
 const hidth = Dimensions.get('window').height;
@@ -52,7 +52,7 @@ const Slide = ({item}) => {
           position: 'absolute',
           top: hidth * 0.59,
           marginBottom: 0,
-          width: '100%',
+          width: wp('100%'),
           paddingLeft: 24,
         }}>
         <Text style={styles.watermark}>{item.title}</Text>
@@ -65,6 +65,14 @@ const OnboardingScreen = () => {
   const [currentslide, setCurrentSlide] = useState(0);
   const insets = useSafeAreaInsets();
   const Footer = () => {
+    const handleCompleteOnboarding = async () => {
+      // Set the onboarding state as completed
+      try {
+        await AsyncStorage.setItem('onboardingCompleted', JSON.stringify(true));
+      } catch (error) {
+        // console.error('Error setting onboarding state in AsyncStorage', error);
+      }
+    };
     return (
       <View
         style={{
@@ -94,7 +102,11 @@ const OnboardingScreen = () => {
         </View>
 
         <View style={{marginBottom: 50}}>
-          <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
+          <TouchableOpacity
+            onPress={() => {
+              handleCompleteOnboarding();
+              navigation.navigate('SignUp');
+            }}>
             <View
               style={{
                 marginBottom: 2,
@@ -113,7 +125,11 @@ const OnboardingScreen = () => {
             </View>
           </TouchableOpacity>
 
-          <Pressable onPress={() => navigation.navigate('Login')}>
+          <Pressable
+            onPress={() => {
+              handleCompleteOnboarding();
+              navigation.navigate('Login');
+            }}>
             <View
               style={{
                 marginTop: 16,
