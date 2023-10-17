@@ -258,7 +258,6 @@ function SettingsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -283,7 +282,7 @@ const styles = StyleSheet.create({
   tabBar: {
     // position: 'absolute',
     padding: 0,
-    marginHorizontal: 2,
+    // marginHorizontal: 2,
     left: 0,
     right: 0,
     bottom: 1,

@@ -73,7 +73,8 @@ const getAccountTransactions = async (page, limit) => {
       };
       try {
         const response = await axiosInstance.get(
-          `/loan-wallet/paginated-transactions?page=${page}&limit=${limit}`,
+          // `/loan-wallet/paginated-transactions?page=${page}&limit=${limit}`,
+          `/loan-wallet/paginated-all-transactions?page=${page}&limit=${limit}`,
           {headers},
         );
         // console.log('response=>', response)

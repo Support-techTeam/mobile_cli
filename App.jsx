@@ -7,6 +7,8 @@ import {
   View,
   AppState,
   LogBox,
+  Text,
+  Button,
 } from 'react-native';
 import SpInAppUpdates, {IAUUpdateKind} from 'sp-react-native-in-app-updates';
 import {version} from './app.json';
@@ -31,6 +33,7 @@ import EnterPin from './src/screens/SecurityScreens/EnterPinScreen';
 import {getAllPin} from './src/stores/SecurityStore';
 import NetworkStatus from './src/util/NetworkService';
 import RNRestart from 'react-native-restart';
+import COLORS from './src/constants/colors';
 
 const inAppUpdates = new SpInAppUpdates(false);
 LogBox.ignoreAllLogs();
@@ -54,6 +57,9 @@ datadogConfiguration.nativeCrashReportEnabled = true;
 // Optional: sample RUM sessions (here, 80% of session will be sent to Datadog. Default = 100%)
 datadogConfiguration.sampleRate = 80;
 
+const STYLES = ['default', 'dark-content', 'light-content'];
+const TRANSITIONS = ['fade', 'slide', 'none'];
+
 function App() {
   const appMainState = useRef(AppState.currentState);
   const [appState, setAppState] = useState(appMainState.current);
@@ -64,6 +70,32 @@ function App() {
     const item = await getItem();
     setIsLocked(item);
   };
+
+  const [hidden, setHidden] = useState(false);
+  const [statusBarStyle, setStatusBarStyle] = useState(STYLES[0]);
+  const [statusBarTransition, setStatusBarTransition] = useState(
+    TRANSITIONS[0],
+  );
+
+  // const changeStatusBarVisibility = () => setHidden(!hidden);
+
+  // const changeStatusBarStyle = () => {
+  //   const styleId = STYLES.indexOf(statusBarStyle) + 1;
+  //   if (styleId === STYLES.length) {
+  //     setStatusBarStyle(STYLES[0]);
+  //   } else {
+  //     setStatusBarStyle(STYLES[styleId]);
+  //   }
+  // };
+
+  // const changeStatusBarTransition = () => {
+  //   const transition = TRANSITIONS.indexOf(statusBarTransition) + 1;
+  //   if (transition === TRANSITIONS.length) {
+  //     setStatusBarTransition(TRANSITIONS[0]);
+  //   } else {
+  //     setStatusBarTransition(TRANSITIONS[transition]);
+  //   }
+  // };
 
   const writeItemToStorage = async newValue => {
     await setItem(newValue);
@@ -190,7 +222,14 @@ function App() {
       <PaperProvider theme={theme}>
         <Portal>
           <DatadogProvider configuration={datadogConfiguration}>
-            <StatusBar translucent={true} />
+            {/* <StatusBar translucent={true} /> */}
+            <StatusBar
+              animated={true}
+              backgroundColor={COLORS.lendaBlue}
+              barStyle={'default'}
+              showHideTransition={statusBarTransition}
+              hidden={hidden}
+            />
             {isLocked && isLocked === 'true' && hasPin ? (
               <EnterPin toggleVisibility={() => toggleVisibility()} />
             ) : (
