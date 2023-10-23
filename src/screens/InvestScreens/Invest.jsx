@@ -6,72 +6,51 @@ import {
   TouchableOpacity,
   ScrollView,
   FlatList,
-  Dimensions,
-  ImageBackground,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {TabView, SceneMap} from 'react-native-tab-view';
 import {useNavigation} from '@react-navigation/native';
 import {Skeleton} from '@rneui/base';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import CustomTabBar from '../../component/CustomTabs/CustomTabBar';
+import CustomTabBar from '../../component/CustomTabs/CustomTabBar3';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
+import {getLoanUserDetails} from '../../stores/LoanStore';
+import {useRoute} from '@react-navigation/native';
 import {
-  getApprovedLoans,
-  getPendingLoans,
-  getAllLoans,
-  getPaidLoans,
-  getLoanUserDetails,
-} from '../../stores/LoanStore';
-import {useRoute, useIsFocused} from '@react-navigation/native';
-import {getGuarantors} from '../../stores/GuarantorStore';
-
-const {width, height} = Dimensions.get('window');
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from 'react-native-responsive-screen';
+import COLORS from '../../constants/colors';
 
 const Investscreen = () => {
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const [index, setIndex] = useState(0);
-  const [pendingLoansData, setPendingLoansData] = useState([]);
-  const [paidLoansData, setPaidLoansData] = useState([]);
-  const [approvedLoansData, setApprovedLoansData] = useState([]);
-  const [allLoansData, setAllLoansData] = useState([]);
-  const [loanUserDetails, setLoanUserDetails] = useState(undefined);
+  const [allInvestmentData, setAllInvestmentData] = useState([]);
+  const [allArmData, setAllArmData] = useState([]);
+  const [allILendaData, setAllLendaData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [guarantor, setGuarantor] = useState([]);
   const route = useRoute();
-  //total approvedLoans
-  let totalApprovedLoanAmount = 0;
 
-  for (const loan of approvedLoansData) {
-    totalApprovedLoanAmount += loan.amount;
+  //total ARM Investment
+  let totalArmAmount = 0;
+
+  for (const invest of allArmData) {
+    totalArmAmount += invest.amount;
   }
 
-  //total Pending
-  let totalPendingLoanAmount = 0;
+  //total Lenda Investment
+  let totalLendaAmount = 0;
 
-  for (const loan of pendingLoansData) {
-    totalPendingLoanAmount += loan.amount;
-  }
-
-  //total Paid
-  let totalPaidLoanAmount = 0;
-
-  for (const loan of paidLoansData) {
-    totalPaidLoanAmount += loan.amount;
+  for (const invest of allILendaData) {
+    totalLendaAmount += invest.amount;
   }
 
   useEffect(() => {
-    if (route.name === 'LoanHome') {
+    if (route.name === 'Invest') {
       const unsubscribe = navigation.addListener('focus', async () => {
-        // console.log('Loan focused..');
         getLoanuserData();
-        getApprovedLoansData();
-        getPendingLoansData();
-        getAllLoansData();
-        getPaidLoansData();
-        getGuarantorData();
       });
       return unsubscribe;
     }
@@ -79,108 +58,54 @@ const Investscreen = () => {
 
   const getLoanuserData = async () => {
     setIsLoading(true);
-    const res = await getLoanUserDetails();
-    if (res?.error) {
-      // Toast.show({
-      //   type: 'error',
-      //   position: 'top',
-      //   topOffset: 50,
-      //   text1: res?.title,
-      //   text2: res?.message,
-      //   visibilityTime: 5000,
-      //   autoHide: true,
-      //   onPress: () => Toast.hide(),
-      // });
-    } else {
-      setLoanUserDetails(res?.data);
-    }
+    // const res = await getLoanUserDetails();
+    // if (res?.error) {
+    // } else {
+    //   setLoanUserDetails(res?.data);
+    // }
     setIsLoading(false);
-  };
-  const getApprovedLoansData = async () => {
-    setIsLoading(true);
-    const res = await getApprovedLoans();
-    if (res?.error) {
-      // Toast.show({
-      //   type: 'error',
-      //   position: 'top',
-      //   topOffset: 50,
-      //   text1: res?.title,
-      //   text2: res?.message,
-      //   visibilityTime: 5000,
-      //   autoHide: true,
-      //   onPress: () => Toast.hide(),
-      // });
-    } else {
-      setApprovedLoansData(res?.data);
-    }
-    setIsLoading(false);
-  };
-  const getPendingLoansData = async () => {
-    setIsLoading(true);
-    const res = await getPendingLoans();
-    if (res?.error) {
-      // Toast.show({
-      //   type: 'error',
-      //   position: 'top',
-      //   topOffset: 50,
-      //   text1: res?.title,
-      //   text2: res?.message,
-      //   visibilityTime: 5000,
-      //   autoHide: true,
-      //   onPress: () => Toast.hide(),
-      // });
-    } else {
-      setPendingLoansData(res?.data);
-    }
-    setIsLoading(false);
-  };
-  const getAllLoansData = async () => {
-    setIsLoading(true);
-    const res = await getAllLoans();
-    if (res?.error) {
-      // Toast.show({
-      //   type: 'error',
-      //   position: 'top',
-      //   topOffset: 50,
-      //   text1: res?.title,
-      //   text2: res?.message,
-      //   visibilityTime: 5000,
-      //   autoHide: true,
-      //   onPress: () => Toast.hide(),
-      // });
-    } else {
-      setAllLoansData(res?.data);
-    }
-    setIsLoading(false);
-  };
-  const getPaidLoansData = async () => {
-    setIsLoading(true);
-    const res = await getPaidLoans();
-    if (res?.error) {
-      // Toast.show({
-      //   type: 'error',
-      //   position: 'top',
-      //   topOffset: 50,
-      //   text1: res?.title,
-      //   text2: res?.message,
-      //   visibilityTime: 5000,
-      //   autoHide: true,
-      //   onPress: () => Toast.hide(),
-      // });
-    } else {
-      setPaidLoansData(res?.data);
-    }
-    setIsLoading(false);
-  };
-  const getGuarantorData = async () => {
-    const res = await getGuarantors();
-    if (res?.error) {
-    } else {
-      setGuarantor(res?.data);
-    }
   };
 
-  const loadingList = ['string', 'string', 'string', 'string'];
+  const loadingList = ['string', 'string', 'string'];
+
+  const status = [
+    {
+      id: 1,
+      state: 'Lend with Trade Lenda',
+      amount: `₦${
+        totalLendaAmount === undefined
+          ? '0.00'
+          : `${
+              totalLendaAmount === 0
+                ? '0.00'
+                : totalLendaAmount
+                    ?.toString()
+                    ?.replace(/\B(?=(\d{3})+\b)/g, ',')
+            }`
+      }`,
+      icon: require('../../../assets/images/lenda.png'),
+      bottomIcon: require('../../../assets/images/tradeLendaCoin.png'),
+      buttonText: 'Lend Now',
+      buttonRoute: 'InvestmentOption',
+    },
+    {
+      id: 2,
+      state: 'Save with ARM',
+      amount: `₦${
+        totalArmAmount === undefined
+          ? '0.00'
+          : `${
+              totalArmAmount === 0
+                ? '0.00'
+                : totalArmAmount?.toString()?.replace(/\B(?=(\d{3})+\b)/g, ',')
+            }`
+      }`,
+      icon: require('../../../assets/images/arm.png'),
+      bottomIcon: require('../../../assets/images/armCoin.png'),
+      buttonText: 'Save Now',
+      buttonRoute: 'InvestmentOption',
+    },
+  ];
 
   const Slide = ({item}) => {
     return (
@@ -188,83 +113,87 @@ const Investscreen = () => {
         {isLoading ? (
           <View
             style={{
-              width: width - 32,
-              height: 120,
-              marginRight: 15,
+              width: wp('43.5%'),
+              height: hp('25%'),
+              marginHorizontal: 2,
               borderRadius: 20,
               borderColor: '#F7F7FC',
               borderWidth: 1,
               overflow: 'hidden',
             }}>
             <View>
-              <Skeleton animation="wave" width={120} height={120} />
+              <Skeleton
+                animation="wave"
+                width={wp('43.5%')}
+                height={hp('25%')}
+              />
             </View>
           </View>
         ) : (
-          <ImageBackground
-            source={require('../../../assets/icons/wallet_background.png')}>
-            <View
-              style={{
-                width: width - 32,
-                height: 170,
-                marginRight: 16,
-                borderRadius: 20,
-                borderColor: '#F7F7FC',
-                borderWidth: 1.5,
-                overflow: 'hidden',
-              }}>
-              <View style={{padding: 10}}>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                  }}>
-                  <View style={{width: '70%'}}>
-                    <Text style={styles.state}>{item.state}</Text>
-                  </View>
-                  <Image source={item.icon} />
+          <View
+            style={{
+              width: wp('43.5%'),
+              height: hp('25%'),
+              marginHorizontal: 2,
+              borderRadius: 20,
+              borderColor: '#F7F7FC',
+              borderWidth: 2,
+              overflow: 'hidden',
+              shadowOffset: 4,
+              shadowColor: '#F7F7FC',
+              shadowOpacity: 1,
+            }}>
+            <View style={{paddingHorizontal: 10}}>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                }}>
+                <View style={{width: '70%'}}>
+                  <Text style={styles.state}>{item.state}</Text>
                 </View>
-                <Text style={styles.amount}>{item.amount}</Text>
-                <View
-                  style={{
-                    width: 140,
-                    height: 170,
-                    borderRadius: 100,
-                    borderWidth: 12,
-                    bottom: -185,
-                    right: -20,
-                    position: 'absolute',
-                    borderColor:
-                      item.id === 1
-                        ? '#E6EDF5'
-                        : item.id === 2
-                        ? 'rgba(244, 183, 64, 0.2)'
-                        : '#DAEED8',
-                    opacity: 0.5,
-                  }}
+                <Image
+                  source={item.icon}
+                  style={{width: wp('10%')}}
+                  resizeMode="contain"
                 />
-                <View
-                  style={{
-                    width: 100,
-                    height: 120,
-                    borderRadius: 100,
-                    borderWidth: 12,
-                    bottom: -155,
-                    right: item.id === 1 ? -15 : item.id === 2 ? 20 : -15,
-                    position: 'absolute',
-                    borderColor:
-                      item.id === 1
-                        ? 'linear-gradient(114.44deg, rgba(36, 52, 139, 0.5) 0%, rgba(99, 168, 235, 0.5) 100%)'
-                        : item.id === 2
-                        ? 'linear-gradient(114.44deg, rgba(235, 0, 85, 1) 100%, rgba(255, 250, 128, 1) 100%)'
-                        : 'linear-gradient(180deg, rgba(68, 171, 59, 1) 0%, #D8FF69 100%)',
-                    opacity: 0.3,
-                  }}
+              </View>
+              <View>
+                <Text style={styles.amount}>{item.amount}</Text>
+                <TouchableOpacity
+                  onPress={() => {
+                    navigation.navigate('InvestmentOption');
+                    // Toast.show({
+                    //   type: 'info',
+                    //   position: 'top',
+                    //   topOffset: 50,
+                    //   text1: 'Investment',
+                    //   text2: 'Invest',
+                    //   visibilityTime: 2000,
+                    //   autoHide: true,
+                    //   onPress: () => Toast.hide(),
+                    // });
+                  }}>
+                  <View style={styles.buttonAction}>
+                    <Text style={styles.getText}>{item.buttonText}</Text>
+                  </View>
+                </TouchableOpacity>
+              </View>
+              <View
+                style={{
+                  bottom: -hp(8),
+                  right: -wp(20),
+                  position: 'absolute',
+                }}>
+                <Image
+                  source={item.bottomIcon}
+                  style={{width: wp('50%'), height: hp('10%')}}
+                  resizeMode="contain"
                 />
               </View>
             </View>
-          </ImageBackground>
+          </View>
         )}
       </>
     );
@@ -278,7 +207,7 @@ const Investscreen = () => {
             showsHorizontalScrollIndicator={false}
             showsVerticalScrollIndicator={false}>
             {loadingList.map((loan, i) => (
-              <View key={i} style={{paddingHorizontal: 10}}>
+              <View key={i} style={{paddingHorizontal: 20}}>
                 <View style={{marginTop: 10}}>
                   <TouchableOpacity>
                     <View
@@ -332,176 +261,19 @@ const Investscreen = () => {
         </View>
       ) : (
         <View style={{flex: 1}}>
-          {allLoansData.length > 0 ? (
+          {allInvestmentData.length > 0 ? (
             <ScrollView
               showsHorizontalScrollIndicator={false}
               showsVerticalScrollIndicator={false}>
-              {allLoansData.map((loan, i) => (
+              {allInvestmentData.map((loan, i) => (
                 <View key={i} style={{paddingHorizontal: 10}}>
                   <View style={{marginTop: 10}}>
                     <TouchableOpacity
                       onPress={() =>
-                        navigation.navigate('LoanTransaction', {
-                          paramKey: loan.id,
-                        })
-                      }>
-                      <View
-                        style={{
-                          flexDirection: 'row',
-                          justifyContent: 'space-between',
-                          alignItems: 'center',
-                          marginTop: 10,
-                        }}>
-                        <View
-                          style={{
-                            backgroundColor: '#CDDBEB',
-                            width: 40,
-                            height: 40,
-                            borderRadius: 5,
-                            marginRight: 16,
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                          }}>
-                          <Image
-                            source={
-                              loan?.approvalStatus === 'approved'
-                                ? require('../../../assets/images/approvedbox.png')
-                                : loan.approvalStatus === 'paid'
-                                ? require('../../../assets/images/unapprovedBox.png')
-                                : loan.approvalStatus === 'pending' &&
-                                  require('../../../assets/images/unapprovedBox.png')
-                            }
-                          />
-                        </View>
-                        <View style={{flex: 1}}>
-                          <View
-                            style={{
-                              flexDirection: 'row',
-                              justifyContent: 'space-between',
-                            }}>
-                            <Text style={styles.title}>{loan?.loanType}</Text>
-                            <Text style={styles.price}>
-                              ₦
-                              {loan?.amount
-                                ?.toString()
-                                ?.replace(/\B(?=(\d{3})+\b)/g, ',')}
-                            </Text>
-                          </View>
-                          <View
-                            style={{
-                              flexDirection: 'row',
-                              justifyContent: 'space-between',
-                            }}>
-                            <Text style={styles.desc}>{loan?.reason}</Text>
-                            <View style={{flexDirection: 'row'}}>
-                              <Text style={[styles.desc]}>
-                                {loan?.createdAt?.substr(11, 5)}
-                                {'  '}
-                              </Text>
-                              <Text style={styles.desc}>
-                                {loan?.createdAt?.substr(0, 10)}
-                              </Text>
-                            </View>
-                          </View>
-                        </View>
-                      </View>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              ))}
-            </ScrollView>
-          ) : (
-            <View
-              style={{
-                alignItems: 'center',
-                flex: 1,
-                justifyContent: 'center',
-                marginHorizontal: 30,
-              }}>
-              <Image source={require('../../../assets/images/Group.png')} />
-              <Text style={styles.noTrans}>
-                Get a loan to boost your business
-              </Text>
-            </View>
-          )}
-        </View>
-      )}
-    </>
-  );
-  const SecondRoute = () => (
-    <>
-      {isLoading ? (
-        <View style={{flex: 1}}>
-          <ScrollView
-            showsHorizontalScrollIndicator={false}
-            showsVerticalScrollIndicator={false}>
-            {loadingList.map((loan, i) => (
-              <View key={i} style={{paddingHorizontal: 10}}>
-                <View style={{marginTop: 10}}>
-                  <TouchableOpacity>
-                    <View
-                      style={{
-                        flexDirection: 'row',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        marginTop: 10,
-                      }}>
-                      <View
-                        style={{
-                          backgroundColor: '#CDDBEB',
-                          width: 30,
-                          height: 30,
-                          borderRadius: 5,
-                          marginRight: 16,
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                        }}>
-                        <Skeleton animation="wave" width={20} height={20} />
-                      </View>
-                      <View style={{flex: 1}}>
-                        <View
-                          style={{
-                            flexDirection: 'row',
-                            justifyContent: 'space-between',
-                          }}>
-                          <Skeleton animation="wave" width={70} height={20} />
-                          <Skeleton animation="wave" width={50} height={20} />
-                        </View>
-
-                        <View
-                          style={{
-                            flexDirection: 'row',
-                            justifyContent: 'space-between',
-                          }}>
-                          <Text style={{marginTop: 10}}>
-                            <Skeleton animation="wave" width={90} height={20} />
-                          </Text>
-                          <Text style={{marginTop: 10}}>
-                            <Skeleton animation="wave" width={70} height={20} />
-                          </Text>
-                        </View>
-                      </View>
-                    </View>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            ))}
-          </ScrollView>
-        </View>
-      ) : (
-        <View style={{flex: 1}}>
-          {approvedLoansData.length > 0 ? (
-            <ScrollView
-              showsHorizontalScrollIndicator={false}
-              showsVerticalScrollIndicator={false}>
-              {approvedLoansData.map((loan, i) => (
-                <View key={i} style={{paddingHorizontal: 10}}>
-                  <View style={{marginTop: 10}}>
-                    <TouchableOpacity
-                      onPress={() =>
-                        navigation.navigate('LoanTransaction', {
-                          paramKey: loan._id,
-                        })
+                        // navigation.navigate('LoanTransaction', {
+                        //   paramKey: loan.id,
+                        // })
+                        console.log('Open Investment')
                       }>
                       <View
                         style={{
@@ -566,312 +338,12 @@ const Investscreen = () => {
               style={{
                 alignItems: 'center',
                 flex: 1,
-                justifyContent: 'center',
-                marginHorizontal: 30,
+                // justifyContent: 'center',
+                marginHorizontal: 20,
               }}>
               <Image source={require('../../../assets/images/Group.png')} />
               <Text style={styles.noTrans}>
-                You do not have an approved loan!
-              </Text>
-            </View>
-          )}
-        </View>
-      )}
-    </>
-  );
-  const ThirdRoute = () => (
-    <>
-      {isLoading ? (
-        <View style={{flex: 1}}>
-          <ScrollView
-            showsHorizontalScrollIndicator={false}
-            showsVerticalScrollIndicator={false}>
-            {loadingList.map((loan, i) => (
-              <View key={i} style={{paddingHorizontal: 10}}>
-                <View style={{marginTop: 10}}>
-                  <TouchableOpacity>
-                    <View
-                      style={{
-                        flexDirection: 'row',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        marginTop: 10,
-                      }}>
-                      <View
-                        style={{
-                          backgroundColor: '#CDDBEB',
-                          width: 30,
-                          height: 30,
-                          borderRadius: 5,
-                          marginRight: 16,
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                        }}>
-                        <Skeleton animation="wave" width={20} height={20} />
-                      </View>
-                      <View style={{flex: 1}}>
-                        <View
-                          style={{
-                            flexDirection: 'row',
-                            justifyContent: 'space-between',
-                          }}>
-                          <Skeleton animation="wave" width={70} height={20} />
-                          <Skeleton animation="wave" width={50} height={20} />
-                        </View>
-
-                        <View
-                          style={{
-                            flexDirection: 'row',
-                            justifyContent: 'space-between',
-                          }}>
-                          <Text style={{marginTop: 10}}>
-                            <Skeleton animation="wave" width={90} height={20} />
-                          </Text>
-                          <Text style={{marginTop: 10}}>
-                            <Skeleton animation="wave" width={70} height={20} />
-                          </Text>
-                        </View>
-                      </View>
-                    </View>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            ))}
-          </ScrollView>
-        </View>
-      ) : (
-        <View style={{flex: 1}}>
-          {paidLoansData.length > 0 ? (
-            <ScrollView
-              showsHorizontalScrollIndicator={false}
-              showsVerticalScrollIndicator={false}>
-              {paidLoansData.map((loan, i) => (
-                <View key={i} style={{paddingHorizontal: 10}}>
-                  <View style={{marginTop: 10}}>
-                    <TouchableOpacity
-                      onPress={() =>
-                        navigation.navigate('LoanTransaction', {
-                          paramKey: loan._id,
-                        })
-                      }>
-                      <View
-                        style={{
-                          flexDirection: 'row',
-                          justifyContent: 'space-between',
-                          alignItems: 'center',
-                          marginTop: 10,
-                        }}>
-                        <View
-                          style={{
-                            backgroundColor: '#CDDBEB',
-                            width: 40,
-                            height: 40,
-                            borderRadius: 5,
-                            marginRight: 16,
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                          }}>
-                          <Image
-                            source={require('../../../assets/images/pendingBox.png')}
-                          />
-                        </View>
-                        <View style={{flex: 1}}>
-                          <View
-                            style={{
-                              flexDirection: 'row',
-                              justifyContent: 'space-between',
-                            }}>
-                            <Text style={styles.title}>{loan?.loanType}</Text>
-                            <Text style={styles.price}>
-                              ₦
-                              {loan?.amount
-                                ?.toString()
-                                ?.replace(/\B(?=(\d{3})+\b)/g, ',')}
-                            </Text>
-                          </View>
-                          <View
-                            style={{
-                              flexDirection: 'row',
-                              justifyContent: 'space-between',
-                            }}>
-                            <Text style={styles.desc}>{loan?.reason}</Text>
-                            <View style={{flexDirection: 'row'}}>
-                              <Text style={[styles.desc]}>
-                                {loan?.createdAt?.substr(11, 5)}
-                                {'  '}
-                              </Text>
-                              <Text style={styles.desc}>
-                                {loan?.createdAt?.substr(0, 10)}
-                              </Text>
-                            </View>
-                          </View>
-                        </View>
-                      </View>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              ))}
-            </ScrollView>
-          ) : (
-            <View
-              style={{
-                alignItems: 'center',
-                flex: 1,
-                justifyContent: 'center',
-                marginHorizontal: 30,
-              }}>
-              <Image source={require('../../../assets/images/Group.png')} />
-              <Text style={styles.noTrans}>You do not have a paid loan!</Text>
-            </View>
-          )}
-        </View>
-      )}
-    </>
-  );
-  const fourthRoute = () => (
-    <>
-      {isLoading ? (
-        <View style={{flex: 1}}>
-          <ScrollView
-            showsHorizontalScrollIndicator={false}
-            showsVerticalScrollIndicator={false}>
-            {loadingList.map((loan, i) => (
-              <View key={i} style={{paddingHorizontal: 10}}>
-                <View style={{marginTop: 10}}>
-                  <TouchableOpacity>
-                    <View
-                      style={{
-                        flexDirection: 'row',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        marginTop: 10,
-                      }}>
-                      <View
-                        style={{
-                          backgroundColor: '#CDDBEB',
-                          width: 30,
-                          height: 30,
-                          borderRadius: 5,
-                          marginRight: 16,
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                        }}>
-                        <Skeleton animation="wave" width={20} height={20} />
-                      </View>
-                      <View style={{flex: 1}}>
-                        <View
-                          style={{
-                            flexDirection: 'row',
-                            justifyContent: 'space-between',
-                          }}>
-                          <Skeleton animation="wave" width={70} height={20} />
-                          <Skeleton animation="wave" width={50} height={20} />
-                        </View>
-
-                        <View
-                          style={{
-                            flexDirection: 'row',
-                            justifyContent: 'space-between',
-                          }}>
-                          <Text style={{marginTop: 10}}>
-                            <Skeleton animation="wave" width={90} height={20} />
-                          </Text>
-                          <Text style={{marginTop: 10}}>
-                            <Skeleton animation="wave" width={70} height={20} />
-                          </Text>
-                        </View>
-                      </View>
-                    </View>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            ))}
-          </ScrollView>
-        </View>
-      ) : (
-        <View style={{flex: 1}}>
-          {pendingLoansData.length > 0 ? (
-            <ScrollView
-              showsHorizontalScrollIndicator={false}
-              showsVerticalScrollIndicator={false}>
-              {pendingLoansData.map((loan, i) => (
-                <View key={i} style={{paddingHorizontal: 10}}>
-                  <View style={{marginTop: 10}}>
-                    <TouchableOpacity
-                      onPress={() =>
-                        navigation.navigate('LoanTransaction', {
-                          paramKey: loan._id,
-                        })
-                      }>
-                      <View
-                        style={{
-                          flexDirection: 'row',
-                          justifyContent: 'space-between',
-                          alignItems: 'center',
-                          marginTop: 10,
-                        }}>
-                        <View
-                          style={{
-                            backgroundColor: '#CDDBEB',
-                            width: 40,
-                            height: 40,
-                            borderRadius: 5,
-                            marginRight: 16,
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                          }}>
-                          <Image
-                            source={require('../../../assets/images/unapprovedBox.png')}
-                          />
-                        </View>
-                        <View style={{flex: 1}}>
-                          <View
-                            style={{
-                              flexDirection: 'row',
-                              justifyContent: 'space-between',
-                            }}>
-                            <Text style={styles.title}>{loan?.loanType}</Text>
-                            <Text style={styles.price}>
-                              ₦
-                              {loan?.amount
-                                ?.toString()
-                                ?.replace(/\B(?=(\d{3})+\b)/g, ',')}
-                            </Text>
-                          </View>
-                          <View
-                            style={{
-                              flexDirection: 'row',
-                              justifyContent: 'space-between',
-                            }}>
-                            <Text style={styles.desc}>{loan?.reason}</Text>
-                            <View style={{flexDirection: 'row'}}>
-                              <Text style={[styles.desc]}>
-                                {loan?.createdAt?.substr(11, 5)}
-                                {'  '}
-                              </Text>
-                              <Text style={styles.desc}>
-                                {loan?.createdAt?.substr(0, 10)}
-                              </Text>
-                            </View>
-                          </View>
-                        </View>
-                      </View>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              ))}
-            </ScrollView>
-          ) : (
-            <View
-              style={{
-                alignItems: 'center',
-                flex: 1,
-                justifyContent: 'center',
-                marginHorizontal: 30,
-              }}>
-              <Image source={require('../../../assets/images/Group.png')} />
-              <Text style={styles.noTrans}>
-                You do not have a pending loan!
+                Lend to the supply chain and earn more
               </Text>
             </View>
           )}
@@ -880,71 +352,11 @@ const Investscreen = () => {
     </>
   );
 
-  const data = [
-    {id: 'pending', title: 'Pending Loans'},
-    {id: 'approved', title: 'Approved Loans'},
-    {id: 'paid', title: 'Paid Loans'},
-    {id: 'all', title: 'All Loans'},
-  ];
+  const data = [{id: 'myInvesments', title: 'My Investment'}];
 
   const renderScene = SceneMap({
-    pending: fourthRoute,
-    approved: SecondRoute,
-    paid: ThirdRoute,
-    all: FirstRoute,
+    myInvesments: FirstRoute,
   });
-
-  const status = [
-    {
-      id: 1,
-      state: 'Pending Loan',
-      amount: `₦${
-        totalPendingLoanAmount === undefined
-          ? '0.00'
-          : `${
-              totalPendingLoanAmount === 0
-                ? '0.00'
-                : totalPendingLoanAmount
-                    ?.toString()
-                    ?.replace(/\B(?=(\d{3})+\b)/g, ',')
-            }`
-      }`,
-      icon: require('../../../assets/images/unapprovedBox.png'),
-    },
-    {
-      id: 2,
-      state: 'Approved Loan',
-      amount: `₦${
-        totalApprovedLoanAmount === undefined
-          ? '0.00'
-          : `${
-              totalApprovedLoanAmount === 0
-                ? '0.00'
-                : totalApprovedLoanAmount
-                    ?.toString()
-                    ?.replace(/\B(?=(\d{3})+\b)/g, ',')
-            }`
-      }`,
-      icon: require('../../../assets/images/approvedbox.png'),
-    },
-    {
-      id: 3,
-      state: 'Paid Loan',
-      amount: `₦${
-        totalPaidLoanAmount === undefined
-          ? '0.00'
-          : `${
-              totalPaidLoanAmount === 0
-                ? '0.00'
-                : totalPaidLoanAmount
-                    ?.toString()
-                    ?.replace(/\B(?=(\d{3})+\b)/g, ',')
-            }`
-      }`,
-      icon: require('../../../assets/images/pendingBox.png'),
-      //   bottomIcon:require('')
-    },
-  ];
 
   return (
     <>
@@ -969,12 +381,13 @@ const Investscreen = () => {
               </View>
             </View>
 
-            <View style={styles.getLoanLoader}>
+            <View style={styles.getInvestmentLoader}>
               <Skeleton animation="wave" width={80} height={25} />
             </View>
 
             <FlatList
               data={status}
+              numColumns={1}
               showsHorizontalScrollIndicator={false}
               showsVerticalScrollIndicator={false}
               horizontal
@@ -1031,55 +444,6 @@ const Investscreen = () => {
               </TouchableOpacity>
             </View>
 
-            <View style={{flexDirection: 'row', width: '45%'}}>
-              <View style={{flexDirection: 'row'}}>
-                <TouchableOpacity onPress={() => navigation.navigate('Loan')}>
-                  <View style={[styles.tobTab, {marginRight: 16}]}>
-                    <Text style={[styles.tabText, {color: '#054B99'}]}>
-                      Loans
-                    </Text>
-                  </View>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  onPress={() => navigation.navigate('Guarantor')}>
-                  <View style={styles.tobTab}>
-                    <Text style={styles.tabText}>Guarantor</Text>
-                  </View>
-                </TouchableOpacity>
-              </View>
-            </View>
-
-            <TouchableOpacity
-              onPress={() => {
-                if (guarantor && guarantor.length <= 0) {
-                  Toast.show({
-                    type: 'warning',
-                    position: 'top',
-                    topOffset: 50,
-                    text1: 'Guarantor Data',
-                    text2: 'Guarantor Data is not available',
-                    visibilityTime: 2000,
-                    autoHide: true,
-                    onPress: () => Toast.hide(),
-                  });
-                }
-                navigation.navigate(
-                  `${
-                    loanUserDetails === undefined ||
-                    loanUserDetails?.loanDocumentDetails
-                      ?.validIdentification === undefined
-                      ? 'OnboardingHome'
-                      : guarantor && guarantor.length > 0
-                      ? 'GetLoan'
-                      : 'AddGuarantors'
-                  }`,
-                );
-              }}>
-              <View style={styles.getLoan}>
-                <Text style={styles.getText}>Get Loan</Text>
-              </View>
-            </TouchableOpacity>
             <FlatList
               data={status}
               showsHorizontalScrollIndicator={false}
@@ -1115,7 +479,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   innerContainer: {
-    marginHorizontal: 20,
+    marginHorizontal: 16,
   },
   tobTab: {
     borderWidth: 1,
@@ -1129,17 +493,14 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     textAlign: 'center',
   },
-  getLoan: {
-    backgroundColor: '#054B99',
+  buttonAction: {
+    backgroundColor: COLORS.lendaBlue,
     borderRadius: 12,
-    width: '30%',
-    left: '68%',
-    bottom: 32,
+    width: wp(22),
     height: 35,
     justifyContent: 'center',
-    //  paddingHorizontal:12,
   },
-  getLoanLoader: {
+  getInvestmentLoader: {
     left: '78%',
     bottom: 28,
     height: 35,
@@ -1185,7 +546,6 @@ const styles = StyleSheet.create({
   },
   noTrans: {
     fontFamily: 'serif',
-    // fontWeight: '300',
     fontSize: 20,
     lineHeight: 28,
     textAlign: 'center',
@@ -1196,11 +556,9 @@ const styles = StyleSheet.create({
     color: '#4E4B66',
   },
   amount: {
-    marginTop: 40,
+    marginTop: hp(0.5),
     fontFamily: 'serif',
-    fontSize: 20,
-
-    marginBottom: -10,
-    // fontWeight: 'bold',
+    fontSize: hp(3),
+    marginVertical: hp(2.2),
   },
 });

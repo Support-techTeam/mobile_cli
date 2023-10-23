@@ -241,6 +241,7 @@ const Homescreen = () => {
         unsubGetTransactions();
         unsubGetLoanAmount();
         getLoanUserData();
+        getGuarantorData();
       });
       return unsubscribe;
     }
@@ -1124,10 +1125,13 @@ const Homescreen = () => {
                               alignItems: 'center',
                               justifyContent: 'center',
                               marginHorizontal: 20,
-                              marginVertical: '20%',
+                              marginVertical: hp('15%'),
                             }}>
+                            <Image
+                              source={require('../../../assets/images/Group.png')}
+                            />
                             <Text style={styles.noTrans}>
-                              You do not have recent transactions
+                              No transaction data available!
                             </Text>
                           </View>
                         </View>

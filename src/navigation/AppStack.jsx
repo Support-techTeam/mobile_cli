@@ -51,6 +51,7 @@ import StatusPage from '../screens/paybills/StausPage';
 import GetData from '../screens/paybills/GetData';
 import Electric from '../screens/paybills/ElectricityBills';
 import Cable from '../screens/paybills/Cable';
+import {InvestmentOption} from '../screens/InvestScreens';
 //Pending
 
 // import BeneficiaryList from '../screens/TransferScreens/BeneficiaryList';
@@ -207,6 +208,9 @@ const AppStack = () => {
           <Stack.Screen name="BillPin" component={BillPin} />
           <Stack.Screen name="StatusFailed" component={StatusFailed} />
           <Stack.Screen name="StatusSuc" component={StatusPage} />
+
+          {/* Investment */}
+          <Stack.Screen name="InvestmentOption" component={InvestmentOption} />
         </>
       )}
     </Stack.Navigator>
