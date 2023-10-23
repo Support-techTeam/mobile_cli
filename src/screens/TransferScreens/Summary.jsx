@@ -24,7 +24,7 @@ const Summary = ({route}) => {
         flex: 1,
         paddingHorizontal: 16,
         backgroundColor: '#fff',
-        paddingTop: insets.top !== 0 ? insets.top : 'auto',
+        paddingTop: insets.top !== 0 ? insets.top : 18,
         paddingBottom: insets.bottom !== 0 ? insets.bottom : 'auto',
         paddingLeft: insets.left !== 0 ? insets.left : 'auto',
         paddingRight: insets.right !== 0 ? insets.right : 'auto',
@@ -156,7 +156,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   TextHead: {
-    
     fontWeight: '700',
     fontSize: 16,
     lineHeight: 20,
@@ -177,7 +176,7 @@ const styles = StyleSheet.create({
   },
   desc: {
     color: '#4E4B66',
-    
+
     fontWeight: '500',
     fontSize: 14,
   },

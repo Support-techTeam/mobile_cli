@@ -34,7 +34,7 @@ const OnboardingHome = () => {
         flex: 1,
         paddingHorizontal: 20,
         backgroundColor: '#fff',
-        paddingTop: insets.top !== 0 ? insets.top / 2 : 'auto',
+        paddingTop: insets.top !== 0 ? insets.top : 18,
         paddingBottom: insets.bottom !== 0 ? insets.bottom / 2 : 'auto',
         paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
         paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
@@ -221,8 +221,7 @@ const OnboardingHome = () => {
             </TouchableOpacity>
 
             <TouchableOpacity
-              // onPress={() => navigation.navigate('ValidIdentity')}>
-              onPress={() => navigation.navigate('Home')}>
+              onPress={() => navigation.navigate('ValidIdentity')}>
               <CustomView label="Add Documents" status="[0/7]Pending" />
             </TouchableOpacity>
 

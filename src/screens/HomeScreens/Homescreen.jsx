@@ -47,6 +47,7 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import Carousel from 'react-native-snap-carousel';
+import {getGuarantors} from '../../stores/GuarantorStore';
 // import * as All from '../../../assets/images/';
 
 const {width} = Dimensions.get('window');
@@ -77,6 +78,7 @@ const Homescreen = () => {
   const [loanUserDetails, setLoanUserDetails] = useState(undefined);
   const [userPin, setUserPin] = useState(true);
   const [isScrolling, setIsScrolling] = useState(false);
+  const [guarantor, setGuarantor] = useState([]);
   const dispatch = useDispatch();
 
   const toggleMakeTransfer = () => {
@@ -126,6 +128,7 @@ const Homescreen = () => {
 
   useEffect(() => {
     unsubGetWallet();
+    getGuarantorData();
   }, []);
 
   const unsubGetWallet = async () => {
@@ -276,6 +279,14 @@ const Homescreen = () => {
       clearInterval(interval);
     };
   }, []);
+
+  const getGuarantorData = async () => {
+    const res = await getGuarantors();
+    if (res?.error) {
+    } else {
+      setGuarantor(res?.data);
+    }
+  };
 
   const handleLongPress = async evt => {
     try {
@@ -485,16 +496,31 @@ const Homescreen = () => {
               }}>
               {item.button === 'Get loan' && (
                 <TouchableOpacity
-                  onPress={() =>
+                  onPress={() => {
+                    if (guarantor && guarantor.length <= 0) {
+                      Toast.show({
+                        type: 'warning',
+                        position: 'top',
+                        topOffset: 50,
+                        text1: 'Guarantor Data',
+                        text2: 'Guarantor Data is not available',
+                        visibilityTime: 2000,
+                        autoHide: true,
+                        onPress: () => Toast.hide(),
+                      });
+                    }
                     navigation.navigate(
                       `${
+                        loanUserDetails === undefined ||
                         loanUserDetails?.loanDocumentDetails
                           ?.validIdentification === undefined
                           ? 'OnboardingHome'
-                          : 'GetLoan'
+                          : guarantor && guarantor.length > 0
+                          ? 'GetLoan'
+                          : 'AddGuarantors'
                       }`,
-                    )
-                  }
+                    );
+                  }}
                   style={styles.fundView}>
                   <Text style={styles.FundButton}>{item.button}</Text>
                 </TouchableOpacity>
@@ -503,7 +529,7 @@ const Homescreen = () => {
               {item.button === 'View investment' && (
                 <TouchableOpacity
                   onPress={() => {
-                    // console.log('get investment')
+                    navigation.navigate('Invest');
                   }}
                   style={styles.fundView}>
                   <Text style={styles.FundButton}>{item.button}</Text>
@@ -615,7 +641,7 @@ const Homescreen = () => {
           height: hp('100%'),
           width: wp('100%'),
           backgroundColor: '#FCFCFC',
-          paddingTop: insets.top !== 0 ? insets.top / 2 : 'auto',
+          paddingTop: insets.top !== 0 ? insets.top : 18,
           paddingBottom: insets.bottom !== 0 ? insets.bottom / 2 : 'auto',
           paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
           paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
@@ -1549,7 +1575,7 @@ const Homescreen = () => {
           ) : null}
 
           {/* Optional Section */}
-          {loanUserDetails == undefined ||
+          {loanUserDetails === undefined ||
           loanUserDetails?.loanDocumentDetails === undefined ? (
             <TouchableOpacity
               style={[
@@ -1722,7 +1748,7 @@ const Homescreen = () => {
           <View
             style={[styles.container, styles.transView, {height: hp('10%')}]}>
             <Pressable
-              onPress={toggleFundWallet}
+              onPress={() => navigation.navigate('Invest')}
               style={({pressed}) => [
                 {
                   // backgroundColor: pressed ? '#D9DBE9' : '#FFFFFF',
@@ -1765,7 +1791,7 @@ const Homescreen = () => {
             </Pressable>
 
             <Pressable
-              onPress={toggleMakeTransfer}
+              onPress={() => navigation.navigate('Invest')}
               style={({pressed}) => [
                 {
                   backgroundColor: pressed ? '#D9DBE9' : COLORS.white,
@@ -1807,7 +1833,31 @@ const Homescreen = () => {
             </Pressable>
 
             <Pressable
-              onPress={() => navigation.navigate('Paybills')}
+              onPress={() => {
+                if (guarantor && guarantor.length <= 0) {
+                  Toast.show({
+                    type: 'warning',
+                    position: 'top',
+                    topOffset: 50,
+                    text1: 'Guarantor Data',
+                    text2: 'Guarantor Data is not available',
+                    visibilityTime: 2000,
+                    autoHide: true,
+                    onPress: () => Toast.hide(),
+                  });
+                }
+                navigation.navigate(
+                  `${
+                    loanUserDetails === undefined ||
+                    loanUserDetails?.loanDocumentDetails
+                      ?.validIdentification === undefined
+                      ? 'OnboardingHome'
+                      : guarantor && guarantor.length > 0
+                      ? 'GetLoan'
+                      : 'AddGuarantors'
+                  }`,
+                );
+              }}
               style={({pressed}) => [
                 {
                   backgroundColor: pressed ? '#D9DBE9' : COLORS.white,

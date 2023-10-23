@@ -22,30 +22,10 @@ const TobTabs = [
   {name: 'Submit All', key: 'SubmitDocs'},
 ];
 
-const CAC = ({route}) => {
-  const docsDetails = route?.params?.paramKey;
-
-  const userDocs = {
-    validIdentificationType:
-      docsDetails?.validIdentificationType === undefined
-        ? ''
-        : docsDetails?.validIdentificationType,
-    validIdentification:
-      docsDetails?.validIdentification === undefined
-        ? ''
-        : docsDetails?.validIdentification,
-    utilityBill:
-      docsDetails?.utilityBill === undefined ? '' : docsDetails?.utilityBill,
-    bankStatement:
-      docsDetails?.bankStatement === undefined
-        ? ''
-        : docsDetails?.bankStatement,
-    passport: docsDetails?.passport === undefined ? '' : docsDetails?.passport,
-    signature:
-      docsDetails?.signature === undefined ? '' : docsDetails?.signature,
-    seal: docsDetails?.seal === undefined ? '' : docsDetails?.seal,
-    cac: docsDetails?.cac === undefined ? '' : docsDetails?.cac,
-  };
+const CAC = () => {
+  const route = useRoute();
+  const {params} = route;
+  const {paramKey} = params;
 
   const [index, setIndex] = useState(0);
   const navigation = useNavigation();
@@ -107,7 +87,7 @@ const CAC = ({route}) => {
       style={{
         flex: 1,
         backgroundColor: '#fff',
-        paddingTop: insets.top !== 0 ? insets.top / 2 : 'auto',
+        paddingTop: insets.top !== 0 ? insets.top : 18,
         paddingBottom: insets.bottom !== 0 ? insets.bottom / 2 : 'auto',
         paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
         paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
@@ -170,7 +150,6 @@ const CAC = ({route}) => {
         renderTabBar={props => (
           <TabBar
             {...props}
-            // tabStyle={styles.tabBar}
             labelStyle={styles.label}
             indicatorStyle={styles.indicator}
             style={styles.tabBar}
@@ -179,7 +158,6 @@ const CAC = ({route}) => {
                 {route.title}
               </Text>
             )}
-            // contentContainerStyle={styles.tabBar}
           />
         )}
       />
@@ -197,7 +175,9 @@ const CAC = ({route}) => {
         </TouchableOpacity>
 
         <TouchableOpacity
-          onPress={() => navigation.navigate('Others', {paramKey: userDocs})}>
+          onPress={() =>
+            navigation.navigate('Others', {paramKey: {...paramKey}})
+          }>
           <View style={[styles.tobTab, {backgroundColor: '#054B99'}]}>
             <Text style={[styles.tabText, {color: 'white'}]}>Skip</Text>
           </View>
@@ -222,7 +202,6 @@ const styles = StyleSheet.create({
     marginHorizontal: 2,
   },
   tabText: {
-    
     fontSize: 12,
     fontWeight: '600',
     textAlign: 'center',
@@ -233,7 +212,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   TextHead: {
-    
     fontWeight: '700',
     fontSize: 16,
     lineHeight: 24,
@@ -248,7 +226,6 @@ const styles = StyleSheet.create({
     marginVertical: 16,
   },
   header: {
-    
     fontSize: 20,
     fontWeight: '700',
     letterSpacing: 1,
@@ -266,10 +243,8 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: 'bold',
     color: 'black',
-    
   },
   camHead: {
-    
     fontSize: 14,
     fontWeight: '400',
   },

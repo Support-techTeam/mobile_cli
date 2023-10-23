@@ -9,7 +9,6 @@ const COLORS = {
   lendaBlue: '#054a99',
   lendaLightBlue: '#05a67d',
   lendaOrange: '#f9ad26',
-  // lendaOrange: '#054B99',
   lendaLightOrange: '#d5c67a',
   lendaGreen: '#05a67d',
   labelColor: '#14142B',

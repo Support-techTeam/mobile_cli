@@ -144,7 +144,7 @@ const Login = () => {
       style={[
         styles.container,
         {
-          paddingTop: insets.top !== 0 ? insets.top : 'auto',
+          paddingTop: insets.top !== 0 ? insets.top : 18,
           paddingBottom: insets.bottom !== 0 ? insets.bottom : 'auto',
           paddingLeft: insets.left !== 0 ? insets.left : 'auto',
           paddingRight: insets.right !== 0 ? insets.right : 'auto',

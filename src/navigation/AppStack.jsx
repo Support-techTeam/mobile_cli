@@ -24,14 +24,14 @@ import {
 import UpdatePersonalDetails from '../screens/ProfileOnboardings/UpdatePersonalDetails';
 import MyAccount from '../screens/MyAccountsScreens/MyAccount';
 import {
-  // BankStatement,
-  // CAC,
-  // CompanySeals,
-  // Others,
-  // Passport,
-  // Signature,
-  // ProofOfAddress,
+  BankStatement,
+  CAC,
+  CompanySeals,
+  Others,
+  Passport,
+  Signature,
   ValidIdentity,
+  ProofOfAddress,
 } from '../screens/ProfileOnboardings/AddDocuments';
 import FinalSubmit from '../screens/ProfileOnboardings/AddDocuments/FinalSubmit';
 import Securindex from '../screens/SecurityScreens/Securindex';
@@ -188,14 +188,14 @@ const AppStack = () => {
           <Stack.Screen name="ChangeLockPin" component={ChangeLockPin} />
           {/* Documents */}
           <Stack.Screen name="ValidIdentity" component={ValidIdentity} />
-          {/* <Stack.Screen name="ProofOfAddress" component={ProofOfAddress} /> */}
-          {/* <Stack.Screen name="CompanySeals" component={CompanySeals} />
-          <Stack.Screen name="CAC" component={CAC} />
+          <Stack.Screen name="ProofOfAddress" component={ProofOfAddress} />
           <Stack.Screen name="BankStatement" component={BankStatement} />
+          <Stack.Screen name="CompanySeals" component={CompanySeals} />
+          <Stack.Screen name="CAC" component={CAC} />
           <Stack.Screen name="Passport" component={Passport} />
           <Stack.Screen name="Signature" component={Signature} />
           <Stack.Screen name="SubmitDocs" component={FinalSubmit} />
-          <Stack.Screen name="Others" component={Others} /> */}
+          <Stack.Screen name="Others" component={Others} />
 
           {/* Bill payment */}
           <Stack.Screen name="Paybills" component={Paybills} />

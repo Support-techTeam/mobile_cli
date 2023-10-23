@@ -20,6 +20,7 @@ import RNFS from 'react-native-fs';
 import Buttons from '../buttons/Buttons';
 import {useNavigation} from '@react-navigation/native';
 import {createUploadDocument, uploadProgress} from '../../stores/LoanStore';
+// import CameraRoll from 'react-native-camera-roll';
 
 const statusBarHeight = getStatusBarHeight();
 
@@ -28,7 +29,7 @@ const SignaturePad = ({deets}) => {
   const [signature, setSign] = useState(null);
   const [image, setImage] = useState(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
-
+  const [isUpdating, setIsUpdating] = useState(false);
   // const { loansStore } = useContext(StoreContext);
   // const { success, sucsMsg, uploadProgress, fileString } = loansStore;
   const navigation = useNavigation();
@@ -66,7 +67,8 @@ const SignaturePad = ({deets}) => {
 
   const handleSave = async sign => {
     try {
-      const dirs = FileSystem.documentDirectory;
+      // const dirs = FileSystem.documentDirectory;
+      const dirs = RNFS.DocumentDirectoryPath;
       var image_data = sign?.split('data:image/png;base64,');
       const fileName = 'signature' + new Date().getMilliseconds() + '.png';
       const filePath = dirs + fileName;
@@ -77,16 +79,42 @@ const SignaturePad = ({deets}) => {
         type: 'image/png',
       });
 
-      await FileSystem.writeAsStringAsync(filePath, image_data[1], {
-        encoding: FileSystem.EncodingType.Base64,
-      });
+      try {
+        //create a file at filePath. Write the content data to it
+        await RNFS.writeFile(filePath, image_data[1], 'base64');
+        console.log('written to filePath', filePath);
+        console.log('written to image_data[1]', image_data[1]);
+        console.log('written to file');
+      } catch (error) {
+        //if the function throws an error, log it out.
+        console.log(error);
+      }
 
-      const asset = await MediaLibrary.createAssetAsync(filePath);
-      await MediaLibrary.createAlbumAsync(
-        'TradeLenda Signatures Captures',
-        asset,
-        false,
-      );
+      // await CameraRoll.save(tag, {type, album});
+
+      // try {
+      //   const result = await CameraRoll.save(
+      //     `${filePath}/${image_data[1]}`,
+      //     'photo',
+      //   );
+      //   console.log('Image saved:', result);
+      // } catch (error) {
+      //   console.error('Error saving image:', error);
+      // }
+
+      // await FileSystem.writeAsStringAsync(filePath, image_data[1], {
+      //   encoding: FileSystem.EncodingType.Base64,
+      // });
+
+      // console.log('written to file', file);
+      // console.log('written to filePath', filePath);
+
+      // const asset = await MediaLibrary.createAssetAsync(filePath);
+      // await MediaLibrary.createAlbumAsync(
+      //   'TradeLenda Signatures Captures',
+      //   asset,
+      //   false,
+      // );
     } catch (error) {}
   };
 
@@ -133,11 +161,8 @@ const SignaturePad = ({deets}) => {
     others: docsDetails?.others === undefined ? '' : docsDetails?.others,
   });
 
-  // const s3UploadFunction = () => {
-  //   loansStore.createUploadDocument(fileUri, 'signature');
-  // };
   const s3UploadFunction = async () => {
-    // setIsUpdating(true);
+    setIsUpdating(true);
     const res = await createUploadDocument(fileUri, 'signature');
     if (res?.error) {
       Toast.show({
@@ -162,35 +187,25 @@ const SignaturePad = ({deets}) => {
         onPress: () => Toast.hide(),
       });
 
-      // console.log('res Add Signature', res);
-      // setUserDocs(deetss => {
-      //   return {
-      //     ...deetss,
-      //     others: `${fileString}`,
-      //   };
-      // });
+      setUserDocs(deetss => {
+        return {
+          ...deetss,
+          signature: `${res?.data?.data?.url}`,
+        };
+      });
+      setTimeout(() => {
+        setDocumentName('');
+      }, 200);
+
+      setTimeout(() => {
+        navigation.navigate('CompanySeals', {paramKey: userDocs});
+      }, 1000);
+      setTimeout(() => {
+        setNextRoute('');
+      }, 200);
     }
-    // setIsUpdating(false);
+    setIsUpdating(false);
   };
-
-  // useEffect(() => {
-  //   if (success === 'upload successful') {
-  //     setUserDocs((deetss) => {
-  //       return {
-  //         ...deetss,
-  //         signature: `${fileString}`,
-  //       };
-  //     });
-  //   }
-  // }, [fileString, success]);
-
-  // useEffect(() => {
-  //   if (sucsMsg === 'success') {
-  //     setTimeout(() => {
-  //       navigation.navigate('CompanySeals', { paramKey: userDocs });
-  //     }, 1000);
-  //   }
-  // }, [navigation, sucsMsg, userDocs]);
 
   return (
     <View style={styles.container}>

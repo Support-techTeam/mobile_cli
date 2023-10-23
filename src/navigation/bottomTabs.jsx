@@ -18,6 +18,7 @@ import COLORS from '../constants/colors';
 import {Homescreen} from '../screens/HomeScreens';
 import {Morescreens} from '../screens/MoreScreens';
 import LoanStack from './LoanStack';
+import {Investscreen} from '../screens/InvestScreens';
 import AddButton from '../component/TabContainer/AddButton';
 import {useTabMenu} from '../context/TabContext';
 
@@ -182,7 +183,7 @@ export default function BottomTabs() {
         />
         <Tab.Screen
           name="Invest"
-          component={SettingsScreen}
+          component={Investscreen}
           options={{
             tabBarButton: disabledIt,
             tabBarLabel: ({focused, position}) => (
@@ -243,14 +244,6 @@ export default function BottomTabs() {
           }}
         />
       </Tab.Navigator>
-    </View>
-  );
-}
-
-function SettingsScreen() {
-  return (
-    <View style={styles.container}>
-      <Text>Invest Screen</Text>
     </View>
   );
 }

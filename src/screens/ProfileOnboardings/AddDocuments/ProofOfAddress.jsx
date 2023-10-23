@@ -20,40 +20,16 @@ const TobTabs = [
   {name: 'Submit All', key: 'SubmitDocs'},
 ];
 
-const ProofOfAddress = ({route}) => {
-  const docsDetails = route?.params?.paramKey;
-
-  // console.log('route', route);
-
-  const userDocs = {
-    validIdentificationType:
-      docsDetails?.validIdentificationType === undefined
-        ? ''
-        : docsDetails?.validIdentificationType,
-    validIdentification:
-      docsDetails?.validIdentification === undefined
-        ? ''
-        : docsDetails?.validIdentification,
-    utilityBill:
-      docsDetails?.utilityBill === undefined ? '' : docsDetails?.utilityBill,
-    bankStatement:
-      docsDetails?.bankStatement === undefined
-        ? ''
-        : docsDetails?.bankStatement,
-    passport: docsDetails?.passport === undefined ? '' : docsDetails?.passport,
-    signature:
-      docsDetails?.signature === undefined ? '' : docsDetails?.signature,
-    seal: docsDetails?.seal === undefined ? '' : docsDetails?.seal,
-    cac: docsDetails?.cac === undefined ? '' : docsDetails?.cac,
-  };
+const ProofOfAddress = () => {
+  // const docsDetails = route?.params?.paramKey;
+  const route = useRoute();
+  const {params} = route;
+  const {paramKey} = params;
 
   const activeTab = 'ProofOfAddress';
   const [index, setIndex] = useState(0);
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
-  // const route = useRoute();
-  // const curentRoute = route.name;
-  // const previousRoute = navigation.getState()?.routes.slice(-2)[0]?.name;
 
   const renderItem = ({item}) => {
     const isActive = item.key === activeTab;
@@ -112,7 +88,7 @@ const ProofOfAddress = ({route}) => {
       style={{
         flex: 1,
         backgroundColor: '#fff',
-        paddingTop: insets.top !== 0 ? insets.top / 2 : 'auto',
+        paddingTop: insets.top !== 0 ? insets.top : 18,
         paddingBottom: insets.bottom !== 0 ? insets.bottom / 2 : 'auto',
         paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
         paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
@@ -138,9 +114,6 @@ const ProofOfAddress = ({route}) => {
           <View style={styles.TopView}>
             <Text style={styles.TextHead}>UPLOAD DOCUMENT</Text>
           </View>
-        </View>
-        <View>
-          <Text> </Text>
         </View>
       </View>
 
@@ -206,7 +179,11 @@ const ProofOfAddress = ({route}) => {
 
         <TouchableOpacity
           onPress={() =>
-            navigation.navigate('BankStatement', {paramKey: userDocs})
+            // console.log('Press')
+            // navigation.navigate('BankStatement', {paramKey: userDocs})
+            navigation.navigate('BankStatement', {
+              paramKey: {...paramKey},
+            })
           }>
           <View style={[styles.tobTab, {backgroundColor: '#054B99'}]}>
             <Text style={[styles.tabText, {color: 'white'}]}>Skip</Text>
@@ -232,7 +209,6 @@ const styles = StyleSheet.create({
     marginHorizontal: 2,
   },
   tabText: {
-    
     fontSize: 12,
     fontWeight: '600',
     textAlign: 'center',
@@ -250,7 +226,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   TextHead: {
-    
     fontWeight: '700',
     fontSize: 16,
     lineHeight: 24,
@@ -265,7 +240,6 @@ const styles = StyleSheet.create({
     marginVertical: 16,
   },
   header: {
-    
     fontSize: 20,
     fontWeight: '700',
     letterSpacing: 1,
@@ -283,10 +257,8 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: 'bold',
     color: 'black',
-    
   },
   camHead: {
-    
     fontSize: 14,
     fontWeight: '400',
   },

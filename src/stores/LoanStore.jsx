@@ -726,6 +726,11 @@ const updatePersonalDetails = async details => {
         const response = await axiosInstance.put(`/users/update`, details, {
           headers,
         });
+        const onBoardingState = (await AsyncStorage.getItem('hasStarted')) ?? 0;
+        if (Number(onBoardingState) < 1) {
+          await AsyncStorage.setItem('hasStarted', '1');
+        }
+
         return {
           title: 'Update Profile ',
           error: false,
@@ -769,6 +774,10 @@ const updateBusinessDetails = async details => {
             headers,
           },
         );
+        const onBoardingState = await AsyncStorage.getItem('hasStarted');
+        if (Number(onBoardingState) < 2) {
+          await AsyncStorage.setItem('hasStarted', '2');
+        }
         return {
           title: 'Update Business Details ',
           error: false,
@@ -813,6 +822,10 @@ const updateNokDetails = async details => {
             headers,
           },
         );
+        const onBoardingState = await AsyncStorage.getItem('hasStarted');
+        if (Number(onBoardingState) < 3) {
+          await AsyncStorage.setItem('hasStarted', '3');
+        }
         return {
           title: 'Update Next Of Kin ',
           error: false,
@@ -857,6 +870,10 @@ const updateBankDetails = async details => {
             headers,
           },
         );
+        const onBoardingState = await AsyncStorage.getItem('hasStarted');
+        if (Number(onBoardingState) < 4) {
+          await AsyncStorage.setItem('hasStarted', '4');
+        }
         return {
           title: 'Update Bank Details ',
           error: false,

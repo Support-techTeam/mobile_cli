@@ -1,0 +1,212 @@
+{
+  "title": ["Mr", "Mrs", "Miss"],
+  "genders": ["Male", "Female"],
+  "relationshipTypes": [
+    {"value": "Guardian", "label": "Guardian"},
+    {"value": "Aunt", "label": "Aunt"},
+    {"value": "Brother", "label": "Brother"},
+    {"value": "Daughter", "label": "Daughter"},
+    {"value": "Father", "label": "Father"},
+    {"value": "Husband", "label": "Husband"},
+    {"value": "Mother", "label": "Mother"},
+    {"value": "Sister", "label": "Sister"},
+    {"value": "Son", "label": "Son"},
+    {"value": "Wife", "label": "Wife"},
+    {"value": "Uncle", "label": "Uncle"}
+  ],
+  "idTypes": [
+    "Birth Certificate",
+    "International Passport",
+    "Drivers License",
+    "Voters Card",
+    "NIN"
+  ],
+  "utilityBillTypes": [
+    "Electricity",
+    "Telephone",
+    "Waste management",
+    "Water corporation",
+    "Estate management",
+    "Bank statement",
+    "Tenancy Agreement",
+    "Valid Driver's License"
+  ],
+  "employmentStatuses": [
+    "Permanent",
+    "Contract",
+    "Self Employed",
+    "Unemployed",
+    "Retired"
+  ],
+  "incomeRanges": ["Below - 1M", "1M - 2M", "2M - 5M", "5M - 10M", "Above 10M"],
+  "redemptionReasons": [
+    "Business",
+    "Rent",
+    "Property purchase",
+    "Entertainment",
+    "Return on investment not enough",
+    "Other investments(ARM)",
+    "Other investment(outside ARM)",
+    "Poor service"
+  ],
+  "kycLevel": [
+    {
+      "level": "Tier-1",
+      "maximumSingleInvestmentAmount": "₦20,000",
+      "maximumSingleRedemptionAmount": "₦30,000",
+      "maximumCumulativeInvestmentAmount": "₦200,000",
+      "onboardingRequirement": [
+        "Basic Infomation",
+        "Bank Account Details",
+        "BVN Details",
+        "Passport Photograph"
+      ]
+    }
+  ],
+  "politicallyExposedPersonsCategory": [
+    "Head Of State",
+    "State Governors",
+    "Local Government Chairmen",
+    "Senior Politicians",
+    "Senior Government Officials",
+    "Judicial or Military Officials",
+    "Senior Executives of state owned companies",
+    "Important Political party officials",
+    "Family members or close associates of PEPs",
+    "Members of royal families",
+    "Diplomats",
+    "Directors and Board Members of Corporate Organizations"
+  ],
+  "banks": [
+    {
+      "bankName": "ACCESS BANK PLC",
+      "bankCode": "ABNGNGLA",
+      "branchCode": ""
+    },
+    {
+      "bankName": "ACCESS",
+      "bankCode": "ABNGNGLA",
+      "branchCode": "ACCESS"
+    },
+    {
+      "bankName": "LAGOS",
+      "bankCode": "AFRNNGLA",
+      "branchCode": "LAGOS"
+    },
+    {
+      "bankName": "LAGOS",
+      "bankCode": "CITINGLA",
+      "branchCode": "LAGOS"
+    },
+    {
+      "bankName": "DIAMOND",
+      "bankCode": "DBLNNGLA",
+      "branchCode": "DIAMOND"
+    },
+    {
+      "bankName": "ECOBANK",
+      "bankCode": "ECOCNGLA",
+      "branchCode": "ECOBANK"
+    },
+    {
+      "bankName": "FIRST BANK",
+      "bankCode": "FBNINGLA",
+      "branchCode": "FIRST BANK"
+    },
+    {
+      "bankName": "FCMB",
+      "bankCode": "FCMBNGLA",
+      "branchCode": "FCMB"
+    },
+    {
+      "bankName": "FIDELITY",
+      "bankCode": "FIDTNGLA",
+      "branchCode": "FIDELITY"
+    },
+    {
+      "bankName": "RAND MERCHANT BANK",
+      "bankCode": "FIRNNGLA",
+      "branchCode": "LAGOS"
+    },
+    {
+      "bankName": "GTBANK",
+      "bankCode": "GTBINGLA",
+      "branchCode": "GTBANK"
+    },
+    {
+      "bankName": "HERITAGE",
+      "bankCode": "HBCLNGLA",
+      "branchCode": "HERITAGE"
+    },
+    {
+      "bankName": "UNITY",
+      "bankCode": "ICITNGLA",
+      "branchCode": "UNITY"
+    },
+    {
+      "bankName": "JAIZ",
+      "bankCode": "JAIZNGLA",
+      "branchCode": "JAIZ"
+    },
+    {
+      "bankName": "STERLING",
+      "bankCode": "NAMENGLA",
+      "branchCode": "STERLING"
+    },
+    {
+      "bankName": "LAGOS",
+      "bankCode": "PLNINGLA",
+      "branchCode": "LAGOS"
+    },
+    {
+      "bankName": "SKYE",
+      "bankCode": "PRDTNGLA",
+      "branchCode": "SKYE"
+    },
+    {
+      "bankName": "STANBIC IBTC",
+      "bankCode": "SBICNGLA",
+      "branchCode": "STANBIC IBTC"
+    },
+    {
+      "bankName": "LAGOS",
+      "bankCode": "SCBLNGLA",
+      "branchCode": "LAGOS"
+    },
+    {
+      "bankName": "LAGOS",
+      "bankCode": "SPRGNGLA",
+      "branchCode": "LAGOS"
+    },
+    {
+      "bankName": "LAGOS",
+      "bankCode": "SUTGNGLA",
+      "branchCode": "LAGOS"
+    },
+    {
+      "bankName": "UNION",
+      "bankCode": "UBNINGLA",
+      "branchCode": "UNION"
+    },
+    {
+      "bankName": "PROVIDUS BANK",
+      "bankCode": "UMPLNGLA",
+      "branchCode": "PROVIDUS"
+    },
+    {
+      "bankName": "LAGOS",
+      "bankCode": "UNAFNGLA",
+      "branchCode": "LAGOS"
+    },
+    {
+      "bankName": "WEMA",
+      "bankCode": "WEMANGLA",
+      "branchCode": "WEMA"
+    },
+    {
+      "bankName": "ZENITH",
+      "bankCode": "ZEIBNGLA",
+      "branchCode": "ZENITH"
+    }
+  ]
+}

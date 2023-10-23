@@ -39,7 +39,7 @@ const LockPin = () => {
         flex: 1,
         backgroundColor: '#fff',
         paddingHorizontal: 16,
-        paddingTop: insets.top !== 0 ? insets.top / 2 : 'auto',
+        paddingTop: insets.top !== 0 ? insets.top : 18,
         paddingBottom: insets.bottom !== 0 ? insets.bottom / 2 : 'auto',
         paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
         paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
@@ -110,7 +110,6 @@ const styles = StyleSheet.create({
     // backgroundColor: "red",
   },
   TextHead: {
-    
     fontWeight: '700',
     fontSize: 16,
     lineHeight: 20,
@@ -148,7 +147,6 @@ const styles = StyleSheet.create({
     borderColor: '#054B99',
   },
   otpText: {
-    
     fontSize: 20,
     textAlign: 'center',
     paddingHorizontal: 5,
@@ -172,7 +170,7 @@ const styles = StyleSheet.create({
   },
   desc: {
     color: '#4E4B66',
-    
+
     fontWeight: '500',
     fontSize: 14,
   },
@@ -181,7 +179,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   text: {
-    
     marginVertical: 20,
     fontSize: 16,
   },
@@ -208,7 +205,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   question: {
-    
     textAlign: 'center',
     color: '#4E4B66',
   },
@@ -222,7 +218,6 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   confirmText: {
-    
     color: '#fff',
     fontSize: 16,
   },

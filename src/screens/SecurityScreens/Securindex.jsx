@@ -20,7 +20,7 @@ const Securindex = () => {
         flex: 1,
         backgroundColor: '#fff',
         paddingHorizontal: 16,
-        paddingTop: insets.top !== 0 ? insets.top / 2 : 'auto',
+        paddingTop: insets.top !== 0 ? insets.top : 18,
         paddingBottom: insets.bottom !== 0 ? insets.bottom / 2 : 'auto',
         paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
         paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
@@ -350,7 +350,6 @@ const styles = StyleSheet.create({
     // backgroundColor: "red",
   },
   TextHead: {
-    
     fontWeight: '700',
     fontSize: 16,
     lineHeight: 20,
@@ -371,7 +370,7 @@ const styles = StyleSheet.create({
   },
   desc: {
     color: '#4E4B66',
-    
+
     fontWeight: '500',
     fontSize: 14,
   },

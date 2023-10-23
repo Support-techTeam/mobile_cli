@@ -29,7 +29,7 @@ import {getGuarantors} from '../../stores/GuarantorStore';
 
 const {width, height} = Dimensions.get('window');
 
-const Loanscreen = () => {
+const Investscreen = () => {
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const [index, setIndex] = useState(0);
@@ -1107,7 +1107,7 @@ const Loanscreen = () => {
   );
 };
 
-export default Loanscreen;
+export default Investscreen;
 
 const styles = StyleSheet.create({
   container: {

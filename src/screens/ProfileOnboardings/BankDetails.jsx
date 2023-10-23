@@ -214,15 +214,13 @@ const BankDetails = () => {
       });
       setTimeout(() => {
         if (previousRoute !== 'MyAccount') {
-          // navigation.navigate('ValidIndentity');
-          navigation.navigate('Home');
+          navigation.navigate('ValidIdentity');
         } else {
           navigation.navigate('MyAccount');
         }
       }, 1000);
     }
     setIsUpdating(false);
-    // loansStore.updateBankDetails(bankDetails);
   };
 
   useEffect(() => {
@@ -258,7 +256,7 @@ const BankDetails = () => {
       style={{
         flex: 1,
         backgroundColor: '#fff',
-        paddingTop: insets.top !== 0 ? insets.top / 2 : 'auto',
+        paddingTop: insets.top !== 0 ? insets.top : 18,
         paddingBottom: insets.bottom !== 0 ? insets.bottom / 2 : 'auto',
         paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
         paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
@@ -319,7 +317,7 @@ const BankDetails = () => {
       </View>
       <ImageBackground
         source={require('../../../assets/signup.png')}
-        resizeMode="stretch"
+        resizeMode="cover"
         style={styles.image}>
         <ScrollView
           bounces={false}

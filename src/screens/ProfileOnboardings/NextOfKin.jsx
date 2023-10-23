@@ -25,6 +25,8 @@ import {
   getLoanUserDetails,
   updateNokDetails,
 } from '../../stores/LoanStore';
+import KeyboardAvoidingWrapper from '../../component/KeyBoardAvoiding/keyBoardAvoiding';
+import data from '../../constants/data.json';
 
 const genderData = [
   {value: '', label: 'Select Gender'},
@@ -197,7 +199,7 @@ const NextOfKin = () => {
       style={{
         flex: 1,
         backgroundColor: '#fff',
-        paddingTop: insets.top !== 0 ? insets.top / 2 : 'auto',
+        paddingTop: insets.top !== 0 ? insets.top : 18,
         paddingBottom: insets.bottom !== 0 ? insets.bottom / 2 : 'auto',
         paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
         paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
@@ -252,126 +254,138 @@ const NextOfKin = () => {
           Trade Lenda requires this information of your next of kin
         </Text>
       </View>
-      <ImageBackground
-        source={require('../../../assets/signup.png')}
-        resizeMode="stretch"
-        style={styles.image}>
-        <ScrollView
-          bounces={false}
-          showsHorizontalScrollIndicator={false}
-          showsVerticalScrollIndicator={false}
-          style={{
-            paddingHorizontal: 10,
-            marginTop: 10,
-            marginBottom: insets.top + 60,
-          }}>
-          <View
+      <KeyboardAvoidingWrapper>
+        <ImageBackground
+          source={require('../../../assets/signup.png')}
+          resizeMode="cover"
+          style={styles.image}>
+          <ScrollView
+            bounces={false}
+            showsHorizontalScrollIndicator={false}
+            showsVerticalScrollIndicator={false}
             style={{
-              paddingTop: 25,
-              backgroundColor: '#FFFFFF',
-              borderRadius: 15,
-              paddingHorizontal: 15,
-              paddingVertical: 15,
-              opacity: 0.86,
-              borderColor: '#D9DBE9',
-              borderWidth: 2,
+              paddingHorizontal: 10,
+              marginTop: 10,
+              marginBottom: insets.top + 60,
             }}>
-            <Input
-              iconName="account-outline"
-              label="First Name"
-              placeholder="Enter kin's first name"
-              isNeeded={true}
-              defaultValue={kinDetails?.firstName}
-              onChangeText={text =>
-                setKinDetails({...kinDetails, firstName: text})
-              }
-              Needed={true}
-            />
-
-            <Input
-              iconName="account-outline"
-              label="Last Name"
-              placeholder="Enter kin's last name"
-              defaultValue={kinDetails?.lastName}
-              onChangeText={text =>
-                setKinDetails({...kinDetails, lastName: text})
-              }
-              isNeeded={true}
-            />
-            <View style={{marginVertical: 10}}>
-              <CustomDropdown
-                label="Gender"
+            <View
+              style={{
+                paddingTop: 25,
+                backgroundColor: '#FFFFFF',
+                borderRadius: 15,
+                paddingHorizontal: 15,
+                paddingVertical: 15,
+                opacity: 0.86,
+                borderColor: '#D9DBE9',
+                borderWidth: 2,
+              }}>
+              <Input
+                iconName="account-outline"
+                label="First Name"
+                placeholder="Enter kin's first name"
                 isNeeded={true}
-                iconName="gender-male-female"
-                placeholder="Select Gender"
-                placeholderStyle={styles.placeholderStyle}
-                selectedTextStyle={styles.selectedTextStyle}
-                data={genderData}
-                maxHeight={300}
-                labelField="label"
-                valueField="value"
-                value={kinDetails.gender}
-                onChange={option => {
-                  setKinDetails({...kinDetails, gender: option.value});
-                }}
+                defaultValue={kinDetails?.firstName}
+                onChangeText={text =>
+                  setKinDetails({...kinDetails, firstName: text})
+                }
+                Needed={true}
               />
-            </View>
-            <Input
-              label="Next of kin's Relationship"
-              placeholder="Enter kin's Relationship"
-              defaultValue={kinDetails?.relationship}
-              onChangeText={text =>
-                setKinDetails({...kinDetails, relationship: text})
-              }
-              isNeeded={true}
-            />
 
-            <Input
-              iconName="email-outline"
-              label="Email"
-              placeholder="Enter kin's email"
-              keyboardType="email-address"
-              defaultValue={kinDetails?.email}
-              onChangeText={text =>
-                setKinDetails({...kinDetails, email: text.trim()})
-              }
-              isNeeded={true}
-            />
-
-            <InputPhone
-              label="Phone number"
-              layout="first"
-              isNeeded={true}
-              defaultCode="NG"
-              codeTextStyle={{color: '#6E7191'}}
-              defaultValue={kinDetails?.phoneNumber}
-              onChangeFormattedText={text =>
-                setKinDetails({...kinDetails, phoneNumber: text})
-              }
-            />
-            <Input
-              label="Address"
-              defaultValue={kinDetails?.Address}
-              onChangeText={text =>
-                setKinDetails({...kinDetails, Address: text})
-              }
-              iconName="map-marker-outline"
-              placeholder="Enter address"
-            />
-            <TouchableOpacity
-              onPress={
-                nokDetails?.firstName === undefined
-                  ? handleCreateNokDetails
-                  : handleUpdateNokDetails
-              }
-              disabled={disableit}>
-              <View style={{marginBottom: 40, marginTop: 20}}>
-                <Buttons label="Save & Continue" disabled={disableit} />
+              <Input
+                iconName="account-outline"
+                label="Last Name"
+                placeholder="Enter kin's last name"
+                defaultValue={kinDetails?.lastName}
+                onChangeText={text =>
+                  setKinDetails({...kinDetails, lastName: text})
+                }
+                isNeeded={true}
+              />
+              <View style={{marginVertical: 10}}>
+                <CustomDropdown
+                  label="Gender"
+                  isNeeded={true}
+                  iconName="gender-male-female"
+                  placeholder="Select Gender"
+                  placeholderStyle={styles.placeholderStyle}
+                  selectedTextStyle={styles.selectedTextStyle}
+                  data={genderData}
+                  maxHeight={300}
+                  labelField="label"
+                  valueField="value"
+                  value={kinDetails.gender}
+                  onChange={option => {
+                    setKinDetails({...kinDetails, gender: option.value});
+                  }}
+                />
               </View>
-            </TouchableOpacity>
-          </View>
-        </ScrollView>
-      </ImageBackground>
+              <View style={{marginVertical: 10}}>
+                <CustomDropdown
+                  label="Next of kin's Relationship"
+                  isNeeded={true}
+                  placeholder="Select kin's Relationship"
+                  placeholderStyle={styles.placeholderStyle}
+                  selectedTextStyle={styles.selectedTextStyle}
+                  data={data?.relationshipTypes}
+                  maxHeight={300}
+                  labelField="label"
+                  valueField="value"
+                  value={kinDetails?.relationship}
+                  onChange={option => {
+                    setKinDetails({...kinDetails, relationship: option.value});
+                  }}
+                />
+              </View>
+
+              <Input
+                iconName="email-outline"
+                label="Email"
+                autoCapitalize="none"
+                placeholder="Enter kin's email"
+                keyboardType="email-address"
+                defaultValue={kinDetails?.email}
+                onChangeText={text =>
+                  setKinDetails({...kinDetails, email: text.trim()})
+                }
+                isNeeded={true}
+              />
+
+              <InputPhone
+                label="Phone number"
+                layout="first"
+                isNeeded={true}
+                defaultCode="NG"
+                codeTextStyle={{color: '#6E7191'}}
+                defaultValue={kinDetails?.phoneNumber}
+                onChangeFormattedText={text =>
+                  setKinDetails({...kinDetails, phoneNumber: text})
+                }
+              />
+
+              <Input
+                label="Address"
+                defaultValue={kinDetails?.Address}
+                onChangeText={text =>
+                  setKinDetails({...kinDetails, Address: text})
+                }
+                iconName="map-marker-outline"
+                placeholder="Enter address"
+              />
+              <TouchableOpacity
+                onPress={
+                  nokDetails?.firstName === undefined
+                    ? handleCreateNokDetails
+                    : handleUpdateNokDetails
+                }
+                disabled={disableit}>
+                <View style={{marginBottom: 40, marginTop: 20}}>
+                  <Buttons label="Save & Continue" disabled={disableit} />
+                </View>
+              </TouchableOpacity>
+            </View>
+          </ScrollView>
+        </ImageBackground>
+      </KeyboardAvoidingWrapper>
     </SafeAreaView>
   );
 };
@@ -384,7 +398,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   image: {
-    height: screenHeight,
+    // height: screenHeight,
     width: screenWidth,
     justifyContent: 'center',
   },
