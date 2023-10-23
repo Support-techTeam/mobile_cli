@@ -1902,7 +1902,11 @@ const Homescreen = () => {
               flex: 1,
               marginHorizontal: wp('5%'),
               width: wp('90%'),
-              height: hp('25%'),
+              height: hp(
+                userTransactionsData && userTransactionsData.length > 0
+                  ? '25%'
+                  : '40%',
+              ),
               borderRadius: 5,
             }}>
             <View
@@ -1973,10 +1977,13 @@ const Homescreen = () => {
                       alignItems: 'center',
                       justifyContent: 'center',
                       marginHorizontal: 20,
-                      marginVertical: hp('6%'),
+                      marginVertical: hp('1%'),
                     }}>
+                    <Image
+                      source={require('../../../assets/images/Group.png')}
+                    />
                     <Text style={styles.noTrans}>
-                      You do not have recent transactions
+                      No transaction data available!
                     </Text>
                   </View>
                 </View>
