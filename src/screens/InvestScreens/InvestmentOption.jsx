@@ -5,27 +5,89 @@ import {
   TouchableOpacity,
   ScrollView,
   Image,
-  TouchableWithoutFeedback,
-  ToastAndroid,
-  Platform,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useRoute} from '@react-navigation/native';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
-import Share from 'react-native-share';
-import {useClipboard} from '@react-native-clipboard/clipboard';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import COLORS from '../../constants/colors';
+import {
+  getAllArmProduct,
+  getAllLendaProduct,
+  getArmProductYield,
+} from '../../stores/InvestStore';
+import Spinner from 'react-native-loading-spinner-overlay';
 
-const InvestmentOptionScreen = ({route}) => {
+const InvestmentOptionScreen = () => {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
-  const [data, setData] = useState([{name: 'MMF'}, {name: 'EB'}]);
+  const [data, setData] = useState([]);
+  const [yieldData, setYieldData] = useState();
   const [isScrolling, setIsScrolling] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const route = useRoute();
+  const {name, header} = route.params;
+
+  useEffect(() => {
+    if (route.name === 'InvestmentOption') {
+      const unsubscribe = navigation.addListener('focus', async () => {
+        if (name === 'Lenda') {
+          getLendaProducts();
+        }
+        if (name === 'Arm') {
+          getArmProducts();
+          getSingleArmProductYield();
+        }
+      });
+      return unsubscribe;
+    }
+  }, [navigation]);
+
+  useEffect(() => {
+    if (name === 'Lenda') {
+      getLendaProducts();
+    }
+    if (name === 'Arm') {
+      getArmProducts();
+      getSingleArmProductYield();
+    }
+  }, []);
+
+  const getLendaProducts = async () => {
+    setIsLoading(true);
+    const res = await getAllLendaProduct();
+    if (res?.error) {
+    } else {
+      setData(res?.data);
+      // console.log(res?.data);
+    }
+    setIsLoading(false);
+  };
+
+  const getArmProducts = async data => {
+    setIsLoading(true);
+    const res = await getAllArmProduct(data);
+    if (res?.error) {
+    } else {
+      setData(res?.data);
+      // console.log(res?.data);
+    }
+    setIsLoading(false);
+  };
+
+  const getSingleArmProductYield = async () => {
+    setIsLoading(true);
+    const res = await getArmProductYield('ARMMMF');
+    if (res?.error) {
+    } else {
+      setYieldData(res?.data);
+    }
+    setIsLoading(false);
+  };
 
   return (
     <SafeAreaView
@@ -38,6 +100,15 @@ const InvestmentOptionScreen = ({route}) => {
         paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
         paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
       }}>
+      {isLoading && (
+        <Spinner
+          textContent={'Getting Investment Plans...'}
+          textStyle={{color: 'white'}}
+          visible={true}
+          overlayColor="rgba(78, 75, 102, 0.7)"
+          animation="slide"
+        />
+      )}
       <View
         style={{
           width: wp(90),
@@ -57,7 +128,7 @@ const InvestmentOptionScreen = ({route}) => {
         </TouchableOpacity>
         <View style={styles.HeadView}>
           <View style={styles.TopView}>
-            <Text style={styles.TextHead}>SAVE WITH ARM</Text>
+            <Text style={styles.TextHead}>{header}</Text>
           </View>
         </View>
       </View>
@@ -79,7 +150,9 @@ const InvestmentOptionScreen = ({route}) => {
           ]}>
           <View style={{alignItems: 'center', marginTop: 24}}>
             <View style={styles.titleView}>
-              <Text style={styles.title}>Recommended products</Text>
+              <Text style={styles.title}>
+                {name === 'Arm' ? 'Recommended Products' : 'Lenda’s Plans'}
+              </Text>
             </View>
           </View>
           <ScrollView
@@ -122,10 +195,10 @@ const InvestmentOptionScreen = ({route}) => {
                       isScrolling
                         ? null
                         : () =>
-                            navigation.navigate('Transaction', {
-                              transaction: item,
-                              time: time,
-                              day: date,
+                            navigation.navigate('InvestmentSummary', {
+                              yieldValue: yieldData?.yield ?? 0.0,
+                              name: name,
+                              investment: item,
                             })
                     }>
                     <View style={styles.PanelItemContainer}>
@@ -136,10 +209,17 @@ const InvestmentOptionScreen = ({route}) => {
                         }}>
                         <View style={{marginRight: 10}}>
                           <>
-                            <Image
-                              style={styles.PanelImage}
-                              source={require('../../../assets/images/investGraph.png')}
-                            />
+                            {name === 'Arm' ? (
+                              <Image
+                                style={styles.PanelImage}
+                                source={require('../../../assets/images/investGraph.png')}
+                              />
+                            ) : (
+                              <Image
+                                style={styles.PanelImage}
+                                source={require('../../../assets/images/InvestIcon.png')}
+                              />
+                            )}
                           </>
                         </View>
                         <View>
@@ -148,8 +228,9 @@ const InvestmentOptionScreen = ({route}) => {
                               fontSize: hp('2%'),
                               color: COLORS.dark,
                             }}>
-                            {/* {item?.transactionType} */}
-                            Money Market Funds
+                            {name === 'Arm'
+                              ? item.productCode
+                              : item.investmentName}
                           </Text>
                           <Text
                             style={[
@@ -164,29 +245,59 @@ const InvestmentOptionScreen = ({route}) => {
                               style={styles.InternalImage}
                               source={require('../../../assets/images/ArrowUp.png')}
                             />
-                            17 % Annual
+                            {name === 'Arm'
+                              ? `${
+                                  yieldData
+                                    ? Number(yieldData?.yield).toFixed(2)
+                                    : '0.00'
+                                }% Yield`
+                              : `${Number(item.interestRate).toFixed(
+                                  1,
+                                )}% Interest`}
                           </Text>
                         </View>
                       </View>
-                      <View
-                        style={{
-                          flexDirection: 'row',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                        }}>
+                      <View>
                         <Text
                           style={{
                             fontSize: hp('2.2%'),
                             color: COLORS.dark,
                             alignSelf: 'flex-end',
                           }}>
-                          <>
-                            ₦ 10,000.00
-                            {/* {item.debit
-                                .toString()
-                                .replace(/\B(?=(\d{3})+(?!\d))/g, ',')} */}
-                          </>
+                          ₦
+                          {name === 'Arm' ? (
+                            `${
+                              item?.minimumInvestmentAmount
+                                ? item?.minimumInvestmentAmount
+                                    .toString()
+                                    .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+                                : '0.00'
+                            }`
+                          ) : (
+                            <>
+                              {item?.amountRange?.minAmount
+                                ? item?.amountRange?.minAmount
+                                    .toString()
+                                    .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+                                : '0.00'}
+                            </>
+                          )}
                         </Text>
+                        {name === 'Lenda' && (
+                          <Text
+                            style={{
+                              fontSize: hp('2.2%'),
+                              color: COLORS.dark,
+                              alignSelf: 'flex-end',
+                            }}>
+                            ₦
+                            {item?.amountRange?.maxAmount
+                              ? item?.amountRange?.maxAmount
+                                  .toString()
+                                  .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+                              : '0.00'}
+                          </Text>
+                        )}
                       </View>
                     </View>
                   </TouchableOpacity>

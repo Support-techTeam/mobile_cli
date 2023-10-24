@@ -34,20 +34,20 @@ const getAllLendaProduct = async () => {
       };
       try {
         const response = await axiosInstance.get(
-          `/loans/all-types/loans/mobile`,
+          `/lenda-investment/lenda-investment-plans`,
           {
             headers,
           },
         );
         return {
-          title: 'Get All Loans',
+          title: 'Lenda Investment Plans',
           error: false,
-          data: response.data,
+          data: response?.data,
           message: 'success',
         };
       } catch (error) {
         return {
-          title: 'Get All Loans',
+          title: 'Lenda Investment Plans',
           error: true,
           data: null,
           message: error,
@@ -76,21 +76,61 @@ const getAllArmProduct = async () => {
         'Content-Type': 'application/json',
       };
       try {
+        const response = await axiosInstance.get(`/investment/arm-products`, {
+          headers,
+        });
+        return {
+          title: 'ARM Investment',
+          error: false,
+          data: response?.data?.data,
+          message: 'success',
+        };
+      } catch (error) {
+        return {
+          title: 'ARM Investment',
+          error: true,
+          data: null,
+          message: error,
+        };
+      }
+    }
+  } else {
+    return {
+      error: true,
+      data: null,
+      message: 'No Internet Connection',
+    };
+  }
+};
+
+const getArmProductYield = async productCode => {
+  if (
+    store.getState().networkState &&
+    store.getState().networkState.network.isConnected &&
+    store.getState().networkState.network.isInternetReachable
+  ) {
+    if (auth?.currentUser?.stsTokenManager?.accessToken) {
+      headers = {
+        accept: 'application/json',
+        Authorization: `Bearer ${auth.currentUser?.stsTokenManager?.accessToken}`,
+        'Content-Type': 'application/json',
+      };
+      try {
         const response = await axiosInstance.get(
-          `/loans/all-types/loans/mobile`,
+          `/investment/arm-product-yield?productCode=${productCode}`,
           {
             headers,
           },
         );
         return {
-          title: 'Get All Loans',
+          title: 'ARM Investment Yield',
           error: false,
-          data: response.data,
+          data: response?.data?.data,
           message: 'success',
         };
       } catch (error) {
         return {
-          title: 'Get All Loans',
+          title: 'ARM Investment',
           error: true,
           data: null,
           message: error,
@@ -128,7 +168,7 @@ const getAllLendaInvestment = async () => {
         return {
           title: 'Get All Loans',
           error: false,
-          data: response.data,
+          data: response?.data,
           message: 'success',
         };
       } catch (error) {
@@ -167,7 +207,7 @@ const getAllArmInvestment = async () => {
         return {
           title: 'Get Approved Loans',
           error: false,
-          data: response.data,
+          data: response?.data,
           message: 'success',
         };
       } catch (error) {
@@ -207,7 +247,7 @@ const getLendaInvestmentById = async id => {
         return {
           title: 'Get Single Loan ',
           error: false,
-          data: response.data,
+          data: response?.data,
           message: 'success',
         };
       } catch (error) {
@@ -247,7 +287,7 @@ const getArmInvestmentById = async id => {
         return {
           title: 'Get Single Loan ',
           error: false,
-          data: response.data,
+          data: response?.data,
           message: 'success',
         };
       } catch (error) {
@@ -291,7 +331,7 @@ const createLendaInvestment = async details => {
         return {
           title: 'Create Loan ',
           error: false,
-          data: response.data,
+          data: response?.data,
           message: "Loan request successful. You'll be redirected shortly!,",
         };
       } catch (error) {
@@ -335,7 +375,7 @@ const createArmInvestment = async details => {
         return {
           title: 'Create Loan ',
           error: false,
-          data: response.data,
+          data: response?.data,
           message: "Loan request successful. You'll be redirected shortly!,",
         };
       } catch (error) {
@@ -359,6 +399,7 @@ const createArmInvestment = async details => {
 export {
   getAllLendaProduct,
   getAllArmProduct,
+  getArmProductYield,
   getAllLendaInvestment,
   getAllArmInvestment,
   getLendaInvestmentById,

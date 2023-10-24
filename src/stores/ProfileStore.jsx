@@ -26,7 +26,7 @@ const getState = async () => {
       const response = await axiosInstance.get('/address/get-state');
       return {
         error: false,
-        data: response.data,
+        data: response?.data,
         message: 'success',
       };
     } catch (error) {
@@ -57,7 +57,7 @@ const getCity = async cityByState => {
       );
       return {
         error: false,
-        data: response.data,
+        data: response?.data,
         message: 'success',
       };
     } catch (error) {
@@ -95,7 +95,7 @@ const getProfileDetails = async () => {
         await AsyncStorage.setItem('hasProfile', 'true');
         return {
           error: false,
-          data: response.data,
+          data: response?.data,
           message: 'success',
         };
       } catch (error) {
@@ -137,7 +137,7 @@ const createUserProfile = async details => {
         return {
           title: 'Create Profile',
           error: false,
-          data: response.data,
+          data: response?.data,
           message: 'Profile created successfully',
         };
       } catch (error) {
@@ -177,7 +177,7 @@ const checkPin = async () => {
         return {
           title: 'Check Pin ',
           error: false,
-          data: response.data,
+          data: response?.data,
           message: 'success',
         };
       } catch (error) {
@@ -185,7 +185,7 @@ const checkPin = async () => {
           title: 'Check Pin ',
           error: true,
           data: null,
-          message: `Failed | ${error.response.data?.message}`,
+          message: `Failed | ${error?.response?.data?.message}`,
         };
       }
     }
@@ -238,7 +238,7 @@ const createTransactionPin = async details => {
           title: 'Create Transaction Pin',
           error: true,
           data: null,
-          message: `Failed | ${error.response.data?.message}`,
+          message: `Failed | ${error?.response?.data?.message}`,
         };
       }
     }
@@ -282,7 +282,7 @@ const changePin = async details => {
         return {
           title: 'Change Transaction Pin',
           error: false,
-          data: response.data,
+          data: response?.data,
           message: 'success',
         };
       } catch (error) {
@@ -290,7 +290,7 @@ const changePin = async details => {
           title: 'Change Transaction Pin',
           error: true,
           data: null,
-          message: `Failed | ${error.response.data?.message}`,
+          message: `Failed | ${error?.response?.data?.message}`,
         };
       }
     }

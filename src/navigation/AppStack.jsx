@@ -51,7 +51,12 @@ import StatusPage from '../screens/paybills/StausPage';
 import GetData from '../screens/paybills/GetData';
 import Electric from '../screens/paybills/ElectricityBills';
 import Cable from '../screens/paybills/Cable';
-import {InvestmentOption} from '../screens/InvestScreens';
+import {
+  InvestmentOption,
+  InvestmentSummary,
+  InvestmentTransaction,
+  TransactionSummary,
+} from '../screens/InvestScreens';
 //Pending
 
 // import BeneficiaryList from '../screens/TransferScreens/BeneficiaryList';
@@ -197,7 +202,6 @@ const AppStack = () => {
           <Stack.Screen name="Signature" component={Signature} />
           <Stack.Screen name="SubmitDocs" component={FinalSubmit} />
           <Stack.Screen name="Others" component={Others} />
-
           {/* Bill payment */}
           <Stack.Screen name="Paybills" component={Paybills} />
           <Stack.Screen name="airtime" component={Airtime} />
@@ -208,9 +212,20 @@ const AppStack = () => {
           <Stack.Screen name="BillPin" component={BillPin} />
           <Stack.Screen name="StatusFailed" component={StatusFailed} />
           <Stack.Screen name="StatusSuc" component={StatusPage} />
-
           {/* Investment */}
           <Stack.Screen name="InvestmentOption" component={InvestmentOption} />
+          <Stack.Screen
+            name="InvestmentSummary"
+            component={InvestmentSummary}
+          />
+          <Stack.Screen
+            name="InvestmentTransaction"
+            component={InvestmentTransaction}
+          />
+          <Stack.Screen
+            name="TransactionSummary"
+            component={TransactionSummary}
+          />
         </>
       )}
     </Stack.Navigator>

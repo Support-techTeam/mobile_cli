@@ -42,7 +42,7 @@ const getAllLoans = async () => {
         return {
           title: 'Get All Loans',
           error: false,
-          data: response.data,
+          data: response?.data,
           message: 'success',
         };
       } catch (error) {
@@ -81,7 +81,7 @@ const getApprovedLoans = async () => {
         return {
           title: 'Get Approved Loans',
           error: false,
-          data: response.data,
+          data: response?.data,
           message: 'success',
         };
       } catch (error) {
@@ -120,7 +120,7 @@ const getPaidLoans = async () => {
         return {
           title: 'Get Paid Loans',
           error: false,
-          data: response.data,
+          data: response?.data,
           message: 'success',
         };
       } catch (error) {
@@ -159,7 +159,7 @@ const getPendingLoans = async () => {
         return {
           title: 'Get Pending Loans',
           error: false,
-          data: response.data,
+          data: response?.data,
           message: 'success',
         };
       } catch (error) {
@@ -202,7 +202,7 @@ const getLoansAmount = async () => {
         return {
           title: 'Get Loans Amount',
           error: false,
-          data: response.data,
+          data: response?.data,
           message: 'success',
         };
       } catch (error) {
@@ -242,7 +242,7 @@ const getDuration = async () => {
         return {
           title: 'Get Loans Duration ',
           error: false,
-          data: response.data,
+          data: response?.data,
           message: 'success',
         };
       } catch (error) {
@@ -282,7 +282,7 @@ const getLoanUserDetails = async () => {
         return {
           title: 'Get User Loan Details ',
           error: false,
-          data: response.data,
+          data: response?.data,
           message: 'success',
         };
       } catch (error) {
@@ -322,7 +322,7 @@ const getLoanById = async id => {
         return {
           title: 'Get Single Loan ',
           error: false,
-          data: response.data,
+          data: response?.data,
           message: 'success',
         };
       } catch (error) {
@@ -365,7 +365,7 @@ const getLoanDetails = async (amount, tenor) => {
         return {
           title: 'Get Loan Details ',
           error: false,
-          data: response.data,
+          data: response?.data,
           message: 'success',
         };
       } catch (error) {
@@ -409,7 +409,7 @@ const createLoan = async details => {
         return {
           title: 'Create Loan ',
           error: false,
-          data: response.data,
+          data: response?.data,
           message: "Loan request successful. You'll be redirected shortly!,",
         };
       } catch (error) {
@@ -454,7 +454,7 @@ const createUserProfile = async details => {
         return {
           title: 'Create Profile ',
           error: false,
-          data: response.data,
+          data: response?.data,
           message: 'Profile data stored successfully',
         };
       } catch (error) {
@@ -498,7 +498,7 @@ const createBusinessDetails = async details => {
         return {
           title: 'Create Business Details ',
           error: false,
-          data: response.data,
+          data: response?.data,
           message: 'Business details stored successfully',
         };
       } catch (error) {
@@ -506,7 +506,7 @@ const createBusinessDetails = async details => {
           title: 'Create Business Details ',
           error: true,
           data: null,
-          message: `Failed | ${error.response.data?.message}`,
+          message: `Failed | ${error?.response?.data?.message}`,
         };
       }
     }
@@ -543,7 +543,7 @@ const createNextOfKin = async details => {
         return {
           title: 'Create Next Of Kin ',
           error: false,
-          data: response.data,
+          data: response?.data,
           message: 'Next Of Kin data stored successfully',
         };
       } catch (error) {
@@ -551,7 +551,7 @@ const createNextOfKin = async details => {
           title: 'Create Next Of Kin ',
           error: true,
           data: null,
-          message: `Failed | ${error.response.data?.message}`,
+          message: `Failed | ${error?.response?.data?.message}`,
         };
       }
     }
@@ -588,7 +588,7 @@ const createBankDetails = async details => {
         return {
           title: 'Create Bank Details ',
           error: false,
-          data: response.data,
+          data: response?.data,
           message: 'Bank details stored successfully',
         };
       } catch (error) {
@@ -596,7 +596,7 @@ const createBankDetails = async details => {
           title: 'Create Bank Details ',
           error: true,
           data: null,
-          message: `Failed | ${error.response.data?.message}`,
+          message: `Failed | ${error?.response?.data?.message}`,
         };
       }
     }
@@ -632,7 +632,7 @@ const createDocumentsDetails = async details => {
         return {
           title: 'Create Document Details ',
           error: false,
-          data: response.data,
+          data: response?.data,
           message: 'Document details created successfully',
         };
       } catch (error) {
@@ -640,7 +640,7 @@ const createDocumentsDetails = async details => {
           title: 'Create Document Details ',
           error: true,
           data: null,
-          message: `Failed | ${error.response.data?.message}`,
+          message: `Failed | ${error?.response?.data?.message}`,
         };
       }
     }
@@ -688,7 +688,7 @@ const createUploadDocument = async (details, documentName) => {
         return {
           title: 'Document Upload ',
           error: false,
-          data: response.data,
+          data: response?.data,
           message: 'Upload successful',
         };
       } catch (error) {
@@ -697,7 +697,7 @@ const createUploadDocument = async (details, documentName) => {
           title: 'Document Upload ',
           error: true,
           data: null,
-          message: `Failed | ${error.response.data?.message}`,
+          message: `Failed | ${error?.response?.data?.message}`,
         };
       }
     }
@@ -734,7 +734,7 @@ const updatePersonalDetails = async details => {
         return {
           title: 'Update Profile ',
           error: false,
-          data: response.data,
+          data: response?.data,
           message: 'Profile data stored successfully',
         };
       } catch (error) {
@@ -742,7 +742,7 @@ const updatePersonalDetails = async details => {
           title: 'Update Profile ',
           error: true,
           data: null,
-          message: `Failed | ${error.response.data?.message}`,
+          message: `Failed | ${error?.response?.data?.message}`,
         };
       }
     }
@@ -781,7 +781,7 @@ const updateBusinessDetails = async details => {
         return {
           title: 'Update Business Details ',
           error: false,
-          data: response.data,
+          data: response?.data,
           message: 'Business details stored successfully',
         };
       } catch (error) {
@@ -789,7 +789,7 @@ const updateBusinessDetails = async details => {
           title: 'Update Business Details ',
           error: true,
           data: null,
-          message: `Failed | ${error.response.data?.message}`,
+          message: `Failed | ${error?.response?.data?.message}`,
         };
       }
     }
@@ -829,7 +829,7 @@ const updateNokDetails = async details => {
         return {
           title: 'Update Next Of Kin ',
           error: false,
-          data: response.data,
+          data: response?.data,
           message: 'Next Of Kin data stored successfully',
         };
       } catch (error) {
@@ -837,7 +837,7 @@ const updateNokDetails = async details => {
           title: 'Update Next Of Kin ',
           error: true,
           data: null,
-          message: `Failed | ${error.response.data?.message}`,
+          message: `Failed | ${error?.response?.data?.message}`,
         };
       }
     }
@@ -877,7 +877,7 @@ const updateBankDetails = async details => {
         return {
           title: 'Update Bank Details ',
           error: false,
-          data: response.data,
+          data: response?.data,
           message: 'Bank details stored successfully',
         };
       } catch (error) {
@@ -885,7 +885,7 @@ const updateBankDetails = async details => {
           title: 'Update Bank Details ',
           error: true,
           data: null,
-          message: `Failed | ${error.response.data?.message}`,
+          message: `Failed | ${error?.response?.data?.message}`,
         };
       }
     }
@@ -921,7 +921,7 @@ const updateDocumentsDetails = async details => {
         return {
           title: 'Update Document Details ',
           error: false,
-          data: response.data,
+          data: response?.data,
           message: 'Document details updated successfully',
         };
       } catch (error) {
@@ -929,7 +929,7 @@ const updateDocumentsDetails = async details => {
           title: 'Update Document Details ',
           error: true,
           data: null,
-          message: `Failed | ${error.response.data?.message}`,
+          message: `Failed | ${error?.response?.data?.message}`,
         };
       }
     }

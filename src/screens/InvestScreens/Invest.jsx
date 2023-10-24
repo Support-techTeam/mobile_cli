@@ -163,17 +163,17 @@ const Investscreen = () => {
                 <Text style={styles.amount}>{item.amount}</Text>
                 <TouchableOpacity
                   onPress={() => {
-                    navigation.navigate('InvestmentOption');
-                    // Toast.show({
-                    //   type: 'info',
-                    //   position: 'top',
-                    //   topOffset: 50,
-                    //   text1: 'Investment',
-                    //   text2: 'Invest',
-                    //   visibilityTime: 2000,
-                    //   autoHide: true,
-                    //   onPress: () => Toast.hide(),
-                    // });
+                    if (item.id == 1) {
+                      navigation.navigate('InvestmentOption', {
+                        name: 'Lenda',
+                        header: 'LEND WITH TRADELENDA',
+                      });
+                    } else if (item.id == 2) {
+                      navigation.navigate('InvestmentOption', {
+                        name: 'Arm',
+                        header: 'SAVE WITH ARM',
+                      });
+                    }
                   }}>
                   <View style={styles.buttonAction}>
                     <Text style={styles.getText}>{item.buttonText}</Text>

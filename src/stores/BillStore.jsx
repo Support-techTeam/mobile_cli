@@ -39,7 +39,7 @@ const getNetworkProvider = async () => {
         return {
           title: 'Get Network Provider',
           error: false,
-          data: response.data,
+          data: response?.data,
           message: 'success',
         };
       } catch (error) {
@@ -83,7 +83,7 @@ const purchaseAirtime = async data => {
         return {
           title: 'Purchase Airtime',
           error: false,
-          data: response.data,
+          data: response?.data,
           message: 'Bill Purchase successful!',
         };
       } catch (error) {
@@ -126,7 +126,7 @@ const getDataProvider = async () => {
         return {
           title: 'Get Network Provider',
           error: false,
-          data: response.data,
+          data: response?.data,
           message: 'success',
         };
       } catch (error) {
@@ -169,7 +169,7 @@ const getDataPlanByProvider = async provider => {
         return {
           title: 'Get Data Plan',
           error: false,
-          data: response.data,
+          data: response?.data,
           message: 'success',
         };
       } catch (error) {
@@ -213,7 +213,7 @@ const purchaseDataPlan = async data => {
         return {
           title: 'Purchase Data',
           error: false,
-          data: response.data,
+          data: response?.data,
           message: 'Bill Purchase successful!',
         };
       } catch (error) {
@@ -256,7 +256,7 @@ const getElectricityProviders = async () => {
         return {
           title: 'Get Electricity Provider',
           error: false,
-          data: response.data,
+          data: response?.data,
           message: 'success',
         };
       } catch (error) {
@@ -300,7 +300,7 @@ const verifyMeter = async data => {
         return {
           title: 'Verify Meter',
           error: false,
-          data: response.data,
+          data: response?.data,
           message: 'successful!',
         };
       } catch (error) {
@@ -344,7 +344,7 @@ const purchaseElectricity = async data => {
         return {
           title: 'Purchase Power',
           error: false,
-          data: response.data,
+          data: response?.data,
           message: 'Bill Purchase successful!',
         };
       } catch (error) {
@@ -387,7 +387,7 @@ const getCableTvProvider = async provider => {
         return {
           title: 'Get CableTv Provider',
           error: false,
-          data: response.data,
+          data: response?.data,
           message: 'success',
         };
       } catch (error) {
@@ -431,7 +431,7 @@ const verifyIUC = async data => {
         return {
           title: 'Verify IUC',
           error: false,
-          data: response.data,
+          data: response?.data,
           message: 'successful!',
         };
       } catch (error) {
@@ -475,7 +475,7 @@ const renewSubscription = async data => {
         return {
           title: 'Renew Subscription',
           error: false,
-          data: response.data,
+          data: response?.data,
           message: 'Bill Purchase successful!',
         };
       } catch (error) {
@@ -519,7 +519,7 @@ const updateSubscription = async data => {
         return {
           title: 'Update Subscription',
           error: false,
-          data: response.data,
+          data: response?.data,
           message: 'Bill Purchase successful!',
         };
       } catch (error) {
@@ -562,7 +562,7 @@ const getAllTransaction = async () => {
         return {
           title: 'Get All Transaction',
           error: false,
-          data: response.data,
+          data: response?.data,
           message: 'success',
         };
       } catch (error) {
