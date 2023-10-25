@@ -22,6 +22,10 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import COLORS from '../../constants/colors';
+import {
+  getAllArmInvestment,
+  getAllLendaInvestment,
+} from '../../stores/InvestStore';
 
 const Investscreen = () => {
   const navigation = useNavigation();
@@ -30,41 +34,132 @@ const Investscreen = () => {
   const [allInvestmentData, setAllInvestmentData] = useState([]);
   const [allArmData, setAllArmData] = useState([]);
   const [allILendaData, setAllLendaData] = useState([]);
+  const [loanUserDetails, setLoanUserDetails] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const route = useRoute();
 
   //total ARM Investment
-  let totalArmAmount = 0;
-
-  for (const invest of allArmData) {
-    totalArmAmount += invest.amount;
-  }
+  let totalArmAmount =
+    allArmData &&
+    allArmData?.reduce(
+      (accumulator, currentValue) =>
+        accumulator +
+        (currentValue.investmentAmount - currentValue?.redemptionAmount),
+      0,
+    );
 
   //total Lenda Investment
-  let totalLendaAmount = 0;
-
-  for (const invest of allILendaData) {
-    totalLendaAmount += invest.amount;
-  }
+  let totalLendaAmount =
+    allILendaData &&
+    allILendaData?.reduce(
+      (accumulator, currentValue) => accumulator + currentValue.totalReturn,
+      0,
+    );
 
   useEffect(() => {
     if (route.name === 'Invest') {
       const unsubscribe = navigation.addListener('focus', async () => {
         getLoanuserData();
+        getAllLendaInvestments();
+        getAllArmInvestments();
       });
       return unsubscribe;
     }
   }, [navigation]);
 
+  useEffect(() => {
+    getAllLendaInvestments();
+    getAllArmInvestments();
+  }, []);
+
+  useEffect(() => {
+    const mergedData = [...allArmData, ...allILendaData];
+    // const mergedData = Array.from(allArmData).concat(allILendaData);
+    setAllInvestmentData(mergedData);
+  }, [allArmData, allILendaData]);
+
   const getLoanuserData = async () => {
     setIsLoading(true);
-    // const res = await getLoanUserDetails();
-    // if (res?.error) {
-    // } else {
-    //   setLoanUserDetails(res?.data);
-    // }
+    const res = await getLoanUserDetails();
+    if (res?.error) {
+    } else {
+      setLoanUserDetails(res?.data);
+    }
     setIsLoading(false);
   };
+
+  const getAllLendaInvestments = async () => {
+    setIsLoading(true);
+    const res = await getAllLendaInvestment();
+    if (res?.error) {
+    } else {
+      setAllLendaData(res?.data);
+    }
+    setIsLoading(false);
+  };
+
+  const getAllArmInvestments = async () => {
+    setIsLoading(true);
+    const res = await getAllArmInvestment();
+    if (res?.error) {
+    } else {
+      setAllArmData(res?.data?.data);
+    }
+    setIsLoading(false);
+  };
+
+  const isReadyToInvest =
+    loanUserDetails?.armUserBankDetails &&
+    loanUserDetails?.nextOfKinDetails &&
+    loanUserDetails?.loanDocumentDetails &&
+    loanUserDetails?.armUserBankDetails != null &&
+    loanUserDetails?.loanDocumentDetails != null &&
+    loanUserDetails?.nextOfKinDetails != null &&
+    loanUserDetails?.armUserBankDetails?.annualExpectedAnnualIncomeRange !=
+      undefined &&
+    loanUserDetails?.armUserBankDetails?.annualExpectedAnnualIncomeRange !=
+      '' &&
+    loanUserDetails?.armUserBankDetails?.bankAccountName != undefined &&
+    loanUserDetails?.armUserBankDetails?.bankAccountName != '' &&
+    loanUserDetails?.armUserBankDetails?.bankAccountNumber != undefined &&
+    loanUserDetails?.armUserBankDetails?.bankAccountNumber != '' &&
+    loanUserDetails?.armUserBankDetails?.bankCode != undefined &&
+    loanUserDetails?.armUserBankDetails?.bankCode != '' &&
+    loanUserDetails?.armUserBankDetails?.bankName != undefined &&
+    loanUserDetails?.armUserBankDetails?.bankName != '' &&
+    loanUserDetails?.armUserBankDetails?.branchCode != undefined &&
+    loanUserDetails?.armUserBankDetails?.branchCode != '' &&
+    loanUserDetails?.armUserBankDetails?.employmentStatus != undefined &&
+    loanUserDetails?.armUserBankDetails?.employmentStatus != '' &&
+    loanUserDetails?.armUserBankDetails?.expiryDateOfId != undefined &&
+    loanUserDetails?.armUserBankDetails?.expiryDateOfId != '' &&
+    loanUserDetails?.armUserBankDetails?.idType != undefined &&
+    loanUserDetails?.armUserBankDetails?.idType != '' &&
+    loanUserDetails?.armUserBankDetails?.kycLevel != undefined &&
+    loanUserDetails?.armUserBankDetails?.kycLevel != '' &&
+    loanUserDetails?.armUserBankDetails?.maximumSingleInvestmentAmount !=
+      undefined &&
+    loanUserDetails?.armUserBankDetails?.maximumSingleInvestmentAmount != '' &&
+    loanUserDetails?.armUserBankDetails?.maximumSingleRedemptionAmount !=
+      undefined &&
+    loanUserDetails?.armUserBankDetails?.maximumSingleRedemptionAmount != '' &&
+    loanUserDetails?.armUserBankDetails?.politicallyExposedPersons !=
+      undefined &&
+    loanUserDetails?.armUserBankDetails?.politicallyExposedPersons != '' &&
+    loanUserDetails?.armUserBankDetails?.reInvestDividends != undefined &&
+    loanUserDetails?.armUserBankDetails?.reInvestDividends != '' &&
+    loanUserDetails?.armUserBankDetails?.utilityBillIdType != undefined &&
+    loanUserDetails?.armUserBankDetails?.utilityBillIdType != null &&
+    loanUserDetails?.armUserBankDetails?.utilityBillIdType != '' &&
+    loanUserDetails?.loanDocumentDetails?.identityCard != undefined &&
+    loanUserDetails?.loanDocumentDetails?.identityCard != null &&
+    loanUserDetails?.loanDocumentDetails?.identityCard != '' &&
+    loanUserDetails?.loanDocumentDetails?.utilityBill != undefined &&
+    loanUserDetails?.loanDocumentDetails?.utilityBill != null &&
+    loanUserDetails?.loanDocumentDetails?.utilityBill != '' &&
+    loanUserDetails?.loanDocumentDetails?.personalPhoto != undefined &&
+    loanUserDetails?.loanDocumentDetails?.personalPhoto != null &&
+    loanUserDetails?.loanDocumentDetails?.personalPhoto != '';
 
   const loadingList = ['string', 'string', 'string'];
 
@@ -169,10 +264,14 @@ const Investscreen = () => {
                         header: 'LEND WITH TRADELENDA',
                       });
                     } else if (item.id == 2) {
-                      navigation.navigate('InvestmentOption', {
-                        name: 'Arm',
-                        header: 'SAVE WITH ARM',
-                      });
+                      if (isReadyToInvest) {
+                        navigation.navigate('InvestmentOption', {
+                          name: 'Arm',
+                          header: 'SAVE WITH ARM',
+                        });
+                      } else {
+                        navigation.navigate('OnboardingHome');
+                      }
                     }
                   }}>
                   <View style={styles.buttonAction}>
@@ -206,7 +305,7 @@ const Investscreen = () => {
           <ScrollView
             showsHorizontalScrollIndicator={false}
             showsVerticalScrollIndicator={false}>
-            {loadingList.map((loan, i) => (
+            {loadingList.map((investment, i) => (
               <View key={i} style={{paddingHorizontal: 20}}>
                 <View style={{marginTop: 10}}>
                   <TouchableOpacity>
@@ -265,13 +364,13 @@ const Investscreen = () => {
             <ScrollView
               showsHorizontalScrollIndicator={false}
               showsVerticalScrollIndicator={false}>
-              {allInvestmentData.map((loan, i) => (
+              {allInvestmentData.map((investment, i) => (
                 <View key={i} style={{paddingHorizontal: 10}}>
                   <View style={{marginTop: 10}}>
                     <TouchableOpacity
                       onPress={() =>
                         // navigation.navigate('LoanTransaction', {
-                        //   paramKey: loan.id,
+                        //   paramKey: investment,
                         // })
                         console.log('Open Investment')
                       }>
@@ -280,7 +379,6 @@ const Investscreen = () => {
                           flexDirection: 'row',
                           justifyContent: 'space-between',
                           alignItems: 'center',
-                          marginTop: 10,
                         }}>
                         <View
                           style={{
@@ -292,9 +390,18 @@ const Investscreen = () => {
                             justifyContent: 'center',
                             alignItems: 'center',
                           }}>
-                          <Image
-                            source={require('../../../assets/images/approvedbox.png')}
-                          />
+                          {investment?.investmentType && (
+                            <Image
+                              style={{width: 30, height: 30, borderRadius: 40}}
+                              source={require('../../../assets/images/lendaCube.png')}
+                            />
+                          )}
+                          {investment?.productCode && (
+                            <Image
+                              style={{width: 30, height: 30, borderRadius: 40}}
+                              source={require('../../../assets/images/armCube.png')}
+                            />
+                          )}
                         </View>
                         <View style={{flex: 1}}>
                           <View
@@ -302,12 +409,15 @@ const Investscreen = () => {
                               flexDirection: 'row',
                               justifyContent: 'space-between',
                             }}>
-                            <Text style={styles.title}>{loan?.loanType}</Text>
+                            <Text style={styles.title}>
+                              {investment?.investmentType ??
+                                investment?.productCode}
+                            </Text>
                             <Text style={styles.price}>
                               ₦
-                              {loan?.amount
+                              {investment?.investmentAmount
                                 ?.toString()
-                                ?.replace(/\B(?=(\d{3})+\b)/g, ',')}
+                                ?.replace(/\B(?=(\d{3})+\b)/g, ',') ?? '0.00'}
                             </Text>
                           </View>
                           <View
@@ -315,14 +425,19 @@ const Investscreen = () => {
                               flexDirection: 'row',
                               justifyContent: 'space-between',
                             }}>
-                            <Text style={styles.desc}>{loan?.reason}</Text>
+                            <Text style={styles.desc}>
+                              {investment?.investmentType && 'Trade Lenda'}
+                              {investment?.productCode && 'ARM'}
+                            </Text>
                             <View style={{flexDirection: 'row'}}>
                               <Text style={[styles.desc]}>
-                                {loan?.createdAt?.substr(11, 5)}
+                                {investment?.createdAt?.substr(11, 5) ??
+                                  investment?.created_at?.substr(11, 5)}
                                 {'  '}
                               </Text>
                               <Text style={styles.desc}>
-                                {loan?.createdAt?.substr(0, 10)}
+                                {investment?.createdAt?.substr(0, 10) ??
+                                  investment?.created_at?.substr(0, 10)}
                               </Text>
                             </View>
                           </View>
@@ -338,7 +453,6 @@ const Investscreen = () => {
               style={{
                 alignItems: 'center',
                 flex: 1,
-                // justifyContent: 'center',
                 marginHorizontal: 20,
               }}>
               <Image source={require('../../../assets/images/Group.png')} />

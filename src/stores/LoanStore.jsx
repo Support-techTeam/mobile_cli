@@ -912,7 +912,7 @@ const updateDocumentsDetails = async details => {
       };
       try {
         const response = await axiosInstance.put(
-          `/loan-details/update-documents`,
+          `/loan-details/update/arm-documents`,
           details,
           {
             headers,
@@ -927,6 +927,51 @@ const updateDocumentsDetails = async details => {
       } catch (error) {
         return {
           title: 'Update Document Details ',
+          error: true,
+          data: null,
+          message: `Failed | ${error?.response?.data?.message}`,
+        };
+      }
+    }
+  } else {
+    return {
+      error: true,
+      data: null,
+      message: 'No Internet Connection',
+    };
+  }
+};
+
+const createArmDetails = async details => {
+  if (
+    store.getState().networkState &&
+    store.getState().networkState.network.isConnected &&
+    store.getState().networkState.network.isInternetReachable
+  ) {
+    if (auth?.currentUser?.stsTokenManager?.accessToken) {
+      headers = {
+        accept: 'application/json',
+        Authorization: `Bearer ${auth.currentUser?.stsTokenManager?.accessToken}`,
+        'Content-Type': 'application/json',
+      };
+      try {
+        const response = await axiosInstance.put(
+          `/loan-details/update/arm-details`,
+          details,
+          {
+            headers,
+          },
+        );
+        await AsyncStorage.setItem('hasStarted', '5');
+        return {
+          title: 'Create ARM Details ',
+          error: false,
+          data: response?.data,
+          message: 'ARM details stored successfully',
+        };
+      } catch (error) {
+        return {
+          title: 'Create ARM Details ',
           error: true,
           data: null,
           message: `Failed | ${error?.response?.data?.message}`,
@@ -965,4 +1010,5 @@ export {
   updateNokDetails,
   updateBankDetails,
   updateDocumentsDetails,
+  createArmDetails,
 };

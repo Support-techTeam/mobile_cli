@@ -15,6 +15,10 @@ import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 import CustomView from '../../component/profileOnboardSelects/CustomView';
 import CustomView2 from '../../component/profileOnboardSelects/CustomView2';
 import Buttons from '../../component/buttons/Buttons';
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from 'react-native-responsive-screen';
 
 const OnboardingHome = () => {
   const [hasStarted, setHasStarted] = useState(null);
@@ -32,7 +36,9 @@ const OnboardingHome = () => {
     <SafeAreaView
       style={{
         flex: 1,
+        height: hp(100),
         paddingHorizontal: 20,
+        paddingVertical: 20,
         backgroundColor: '#fff',
         paddingTop: insets.top !== 0 ? insets.top : 18,
         paddingBottom: insets.bottom !== 0 ? insets.bottom / 2 : 'auto',
@@ -99,6 +105,12 @@ const OnboardingHome = () => {
 
             <TouchableOpacity
               disabled={true}
+              onPress={() => navigation.navigate('ArmDetails')}>
+              <CustomView label="ARM Details" status="Pending" />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              disabled={true}
               onPress={() => navigation.navigate('ValidIdentity')}>
               <CustomView label="Add Documents" status="Pending" />
             </TouchableOpacity>
@@ -127,6 +139,12 @@ const OnboardingHome = () => {
 
             <TouchableOpacity disabled={true}>
               <CustomView label="Bank Details" status="Pending" />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              disabled={true}
+              onPress={() => navigation.navigate('ArmDetails')}>
+              <CustomView label="ARM Details" status="Pending" />
             </TouchableOpacity>
 
             <TouchableOpacity disabled={true}>
@@ -159,6 +177,12 @@ const OnboardingHome = () => {
               <CustomView label="Bank Details" status="Pending" />
             </TouchableOpacity>
 
+            <TouchableOpacity
+              disabled={true}
+              onPress={() => navigation.navigate('ArmDetails')}>
+              <CustomView label="ARM Details" status="Pending" />
+            </TouchableOpacity>
+
             <TouchableOpacity disabled={true}>
               <CustomView label="Add Documents" status="[0/7]Pending" />
             </TouchableOpacity>
@@ -187,6 +211,12 @@ const OnboardingHome = () => {
             <TouchableOpacity
               onPress={() => navigation.navigate('BankDetails')}>
               <CustomView label="Bank Details" status="Pending" />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              disabled={true}
+              onPress={() => navigation.navigate('ArmDetails')}>
+              <CustomView label="ARM Details" status="Pending" />
             </TouchableOpacity>
 
             <TouchableOpacity disabled={true}>
@@ -218,6 +248,46 @@ const OnboardingHome = () => {
             <TouchableOpacity
               onPress={() => navigation.navigate('BankDetails')}>
               <CustomView2 label="Bank Details" status="Filled" />
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={() => navigation.navigate('ArmDetails')}>
+              <CustomView label="ARM Details" status="Pending" />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              disabled={true}
+              onPress={() => navigation.navigate('ValidIdentity')}>
+              <CustomView label="Add Documents" status="[0/7]Pending" />
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={() => navigation.navigate('ArmDetails')}>
+              <Buttons label={'Complete Profile'} />
+            </TouchableOpacity>
+          </View>
+        )}
+        {hasStarted === '5' && (
+          <View style={styles.selectView}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('UpdatePersonalDetails')}>
+              <CustomView2 label="Personal Details" status="Filled" />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => navigation.navigate('BusinessDetails')}>
+              <CustomView2 label="Business Details" status="Filled" />
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={() => navigation.navigate('NextOfKin')}>
+              <CustomView2 label="Next Of Kin Details" status="Filled" />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => navigation.navigate('BankDetails')}>
+              <CustomView2 label="Bank Details" status="Filled" />
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={() => navigation.navigate('ArmDetails')}>
+              <CustomView2 label="ARM Details" status="Filled" />
             </TouchableOpacity>
 
             <TouchableOpacity

@@ -10,8 +10,10 @@ import ProofofAdd from '../../../component/Idtypes/ProofOfAddress';
 
 const ITEM_HEIGHT = 100;
 const TobTabs = [
-  {name: 'Valid Identity', key: 'ValidIndentity'},
+  {name: 'Valid Identity', key: 'ValidIdentity'},
   {name: 'Proof of Address', key: 'ProofOfAddress'},
+  {name: 'Personal Photo', key: 'PersonalPhoto'},
+  {name: 'Identity Card (ARM)', key: 'IdentityCard'},
   {name: 'Bank Statement', key: 'BankStatement'},
   {name: 'Passport', key: 'Passport'},
   {name: 'Signature', key: 'Signature'},

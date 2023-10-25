@@ -25,8 +25,10 @@ import Spinner from 'react-native-loading-spinner-overlay';
 const ITEM_HEIGHT = 100;
 
 const TobTabs = [
-  {name: 'Valid Identity', key: 'ValidIndentity'},
+  {name: 'Valid Identity', key: 'ValidIdentity'},
   {name: 'Proof of Address', key: 'ProofOfAddress'},
+  {name: 'Personal Photo', key: 'PersonalPhoto'},
+  {name: 'Identity Card (ARM)', key: 'IdentityCard'},
   {name: 'Bank Statement', key: 'BankStatement'},
   {name: 'Passport', key: 'Passport'},
   {name: 'Signature', key: 'Signature'},
@@ -50,8 +52,10 @@ const Others = () => {
     signature: '',
     seal: '',
     cacCertificate: '',
-    othersName: '',
     others: '',
+    othersName: '',
+    identityCard: '',
+    personalPhoto: '',
   });
 
   useEffect(() => {
@@ -76,6 +80,10 @@ const Others = () => {
       othersName:
         paramKey?.othersName === undefined ? '' : paramKey?.othersName,
       others: paramKey?.others === undefined ? '' : paramKey?.others,
+      identityCard:
+        paramKey?.identityCard === undefined ? '' : paramKey?.identityCard,
+      personalPhoto:
+        paramKey?.personalPhoto === undefined ? '' : paramKey?.personalPhoto,
     });
   }, [paramKey]);
 
@@ -99,7 +107,7 @@ const Others = () => {
         ? PERMISSIONS.IOS.PHOTO_LIBRARY
         : PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE,
     );
-    // console.log(status);
+
     if (status === 'granted') {
       return true;
     }

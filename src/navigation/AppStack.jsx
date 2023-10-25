@@ -20,6 +20,7 @@ import {
   BusinessDetails,
   NextOfKin,
   OnboardingHome,
+  ArmDetails,
 } from '../screens/ProfileOnboardings';
 import UpdatePersonalDetails from '../screens/ProfileOnboardings/UpdatePersonalDetails';
 import MyAccount from '../screens/MyAccountsScreens/MyAccount';
@@ -32,6 +33,8 @@ import {
   Signature,
   ValidIdentity,
   ProofOfAddress,
+  IdentityCard,
+  PersonalPhoto,
 } from '../screens/ProfileOnboardings/AddDocuments';
 import FinalSubmit from '../screens/ProfileOnboardings/AddDocuments/FinalSubmit';
 import Securindex from '../screens/SecurityScreens/Securindex';
@@ -178,6 +181,7 @@ const AppStack = () => {
           <Stack.Screen name="BusinessDetails" component={BusinessDetails} />
           <Stack.Screen name="NextOfKin" component={NextOfKin} />
           <Stack.Screen name="BankDetails" component={BankDetails} />
+          <Stack.Screen name="ArmDetails" component={ArmDetails} />
           {/* Settings */}
           <Stack.Screen name="MyAccount" component={MyAccount} />
           {/* Security */}
@@ -200,6 +204,8 @@ const AppStack = () => {
           <Stack.Screen name="CAC" component={CAC} />
           <Stack.Screen name="Passport" component={Passport} />
           <Stack.Screen name="Signature" component={Signature} />
+          <Stack.Screen name="PersonalPhoto" component={PersonalPhoto} />
+          <Stack.Screen name="IdentityCard" component={IdentityCard} />
           <Stack.Screen name="SubmitDocs" component={FinalSubmit} />
           <Stack.Screen name="Others" component={Others} />
           {/* Bill payment */}

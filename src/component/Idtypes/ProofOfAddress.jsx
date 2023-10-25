@@ -39,6 +39,8 @@ const ProofofAdd = ({
   isBank,
   isPass,
   isSign,
+  isPer,
+  isId,
   deets,
 }) => {
   const [image, setImage] = useState(null);
@@ -60,6 +62,8 @@ const ProofofAdd = ({
     seal,
     cacCertificate,
     others,
+    identityCard,
+    personalPhoto,
   } = paramKey;
 
   const [userDocs, setUserDocs] = useState(
@@ -103,6 +107,18 @@ const ProofofAdd = ({
           : cacCertificate,
       others:
         others === undefined || others === null || others === '' ? '' : others,
+      identityCard:
+        identityCard === undefined ||
+        identityCard === null ||
+        identityCard === ''
+          ? ''
+          : identityCard,
+      personalPhoto:
+        personalPhoto === undefined ||
+        personalPhoto === null ||
+        personalPhoto === ''
+          ? ''
+          : personalPhoto,
     },
     [navigation],
   );
@@ -114,6 +130,8 @@ const ProofofAdd = ({
     signature: '',
     seal: '',
     cacCertificate: '',
+    identityCard: '',
+    personalPhoto: '',
   });
 
   const [nextRoute, setNextRoute] = useState('');
@@ -204,7 +222,7 @@ const ProofofAdd = ({
               type: result?.assets[0]?.type,
             });
             setDocumentName('utilityBill');
-            setNextRoute('BankStatement');
+            setNextRoute('PersonalPhoto');
           }
         },
       );
@@ -357,6 +375,76 @@ const ProofofAdd = ({
     }
   };
 
+  const launchCameraAsync6 = async () => {
+    const permissopnResult = await requestCameraPermission();
+    if (permissopnResult) {
+      await launchCamera(
+        {
+          mediaType: 'photo', // Specify 'photo' to capture images
+          maxWidth: 800, // Maximum width for the captured image
+          maxHeight: 600, // Maximum height for the captured image
+          quality: 1,
+        },
+        result => {
+          if (result.didCancel) {
+          } else if (result.error) {
+          } else {
+            handleImageSelection(result);
+            setUserDocs({...userDocs, personalPhoto: result});
+            setFile({
+              uri: result?.assets[0]?.uri,
+              name: result?.assets[0]?.fileName,
+              type: result?.assets[0]?.type,
+            });
+            setDocumentName('personalPhoto');
+            setNextRoute('IdentityCard');
+          }
+        },
+      );
+    } else {
+      Alert.alert(
+        'Permission Required',
+        'Permission to access camera is required.',
+      );
+      return;
+    }
+  };
+
+  const launchCameraAsync7 = async () => {
+    const permissopnResult = await requestCameraPermission();
+    if (permissopnResult) {
+      await launchCamera(
+        {
+          mediaType: 'photo', // Specify 'photo' to capture images
+          maxWidth: 800, // Maximum width for the captured image
+          maxHeight: 600, // Maximum height for the captured image
+          quality: 1,
+        },
+        result => {
+          if (result.didCancel) {
+          } else if (result.error) {
+          } else {
+            handleImageSelection(result);
+            setUserDocs({...userDocs, identityCard: result});
+            setFile({
+              uri: result?.assets[0]?.uri,
+              name: result?.assets[0]?.fileName,
+              type: result?.assets[0]?.type,
+            });
+            setDocumentName('identityCard');
+            setNextRoute('BankStatement');
+          }
+        },
+      );
+    } else {
+      Alert.alert(
+        'Permission Required',
+        'Permission to access camera is required.',
+      );
+      return;
+    }
+  };
+
   const pickDocument1 = useCallback(async () => {
     const permissopnResult = await requestStoragePermission();
     if (permissopnResult) {
@@ -372,7 +460,7 @@ const ProofofAdd = ({
           type: result?.assets[0]?.type,
         });
         setDocumentName('utilityBill');
-        setNextRoute('BankStatement');
+        setNextRoute('PersonalPhoto');
       } catch (err) {
         // console.warn(err);
       }
@@ -542,6 +630,62 @@ const ProofofAdd = ({
         });
         setDocumentName('cacCertificate');
         setNextRoute('Others');
+      } catch (err) {
+        // console.warn(err);
+      }
+    } else {
+      Alert.alert(
+        'Permission Required',
+        'Permission to access storage is required.',
+      );
+      return;
+    }
+  }, []);
+
+  const pickDocument7 = useCallback(async () => {
+    const permissopnResult = await requestStoragePermission();
+    if (permissopnResult) {
+      try {
+        const result = await launchImageLibrary({
+          presentationStyle: 'fullScreen',
+        });
+        setImage(result.assets[0].uri);
+        setDocsName({...docsName, personalPhoto: result});
+        setFile({
+          name: result?.assets[0]?.fileName,
+          type: result?.assets[0]?.type,
+          uri: result?.assets[0]?.uri,
+        });
+        setDocumentName('personalPhoto');
+        setNextRoute('IdentityCard');
+      } catch (err) {
+        // console.warn(err);
+      }
+    } else {
+      Alert.alert(
+        'Permission Required',
+        'Permission to access storage is required.',
+      );
+      return;
+    }
+  }, []);
+
+  const pickDocument8 = useCallback(async () => {
+    const permissopnResult = await requestStoragePermission();
+    if (permissopnResult) {
+      try {
+        const result = await launchImageLibrary({
+          presentationStyle: 'fullScreen',
+        });
+        setImage(result.assets[0].uri);
+        setDocsName({...docsName, identityCard: result});
+        setFile({
+          name: result?.assets[0]?.fileName,
+          type: result?.assets[0]?.type,
+          uri: result?.assets[0]?.uri,
+        });
+        setDocumentName('identityCard');
+        setNextRoute('BankStatement');
       } catch (err) {
         // console.warn(err);
       }
@@ -1433,6 +1577,264 @@ const ProofofAdd = ({
               ) : null}
             </>
           ) : null}
+          {isPer && !isCam && (
+            <>
+              <Text style={styles.textHead}>
+                Take a clear picture or upload your Personal Photo{' '}
+              </Text>
+              <Text style={[styles.textHead, {color: '#054B99'}]}>
+                See samples
+              </Text>
+              <Text style={styles.textHead}>
+                Personal Photo size not more than 3MB
+              </Text>
+              <View style={styles.reqField}>
+                {docsName.personalPhoto ? (
+                  <>
+                    <View>
+                      <Text>{docsName.personalPhoto.name}</Text>
+                    </View>
+                    {image !== null && (
+                      <Image
+                        source={{uri: image}}
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          resizeMode: 'contain',
+                        }}
+                      />
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <TouchableOpacity
+                      style={{
+                        backgroundColor: '#24348B',
+                        padding: 10,
+                        borderRadius: 5,
+                      }}
+                      onPress={pickDocument7}>
+                      <Entypo
+                        name="upload-to-cloud"
+                        size={30}
+                        color="#FCFCFC"
+                      />
+                    </TouchableOpacity>
+                    <Text style={styles.takeText}>Browse Files</Text>
+                    <Text style={styles.takeText2}>
+                      File format: JPG, JPEG, PNG,PDF | Max File Size 3mb
+                    </Text>
+                  </>
+                )}
+              </View>
+
+              <TouchableOpacity
+                disabled={docsName.personalPhoto === ''}
+                style={{marginTop: 10}}
+                onPress={s3UploadFunction}>
+                <Buttons
+                  label="Upload"
+                  disabled={docsName.personalPhoto === ''}
+                />
+              </TouchableOpacity>
+              <TouchableOpacity
+                disabled={docsName.personalPhoto === ''}
+                style={{marginTop: 10}}
+                onPress={pickDocument1}>
+                <Buttons
+                  label="Change Selection"
+                  disabled={docsName.personalPhoto === ''}
+                />
+              </TouchableOpacity>
+              {uploadProgress && uploadProgress > 0 ? (
+                <View
+                  style={{
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginTop: 20,
+                  }}>
+                  <Text>{uploadProgress && uploadProgress}% complete</Text>
+                </View>
+              ) : null}
+            </>
+          )}
+          {isPer && isCam && (
+            <>
+              <Text style={styles.textHead}>
+                Take a clear picture or upload a Personal Photo
+              </Text>
+              <View style={styles.reqField}>
+                {image ? (
+                  <Image
+                    source={{uri: image}}
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      resizeMode: 'contain',
+                    }}
+                  />
+                ) : (
+                  <>
+                    <TouchableOpacity
+                      style={{
+                        backgroundColor: '#24348B',
+                        padding: 10,
+                        borderRadius: 5,
+                      }}
+                      onPress={launchCameraAsync6}>
+                      <FontAwesome name="camera" size={30} color="#FCFCFC" />
+                    </TouchableOpacity>
+                    <Text style={styles.takeText}>Tap to take a photo</Text>
+                  </>
+                )}
+              </View>
+              <TouchableOpacity
+                style={{opacity: 1, marginTop: 10}}
+                onPress={s3UploadFunction}>
+                <Buttons label="Upload" />
+              </TouchableOpacity>
+              {uploadProgress && uploadProgress > 0 ? (
+                <View
+                  style={{
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginTop: 20,
+                  }}>
+                  <Text>{uploadProgress && uploadProgress}% complete</Text>
+                </View>
+              ) : null}
+            </>
+          )}
+
+          {isId && !isCam && (
+            <>
+              <Text style={styles.textHead}>
+                Take a clear picture or upload your Id Card{' '}
+              </Text>
+              <Text style={[styles.textHead, {color: '#054B99'}]}>
+                See samples
+              </Text>
+              <Text style={styles.textHead}>
+                Id Card size not more than 3MB
+              </Text>
+              <View style={styles.reqField}>
+                {docsName.identityCard ? (
+                  <>
+                    <View>
+                      <Text>{docsName.identityCard.name}</Text>
+                    </View>
+                    {image !== null && (
+                      <Image
+                        source={{uri: image}}
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          resizeMode: 'contain',
+                        }}
+                      />
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <TouchableOpacity
+                      style={{
+                        backgroundColor: '#24348B',
+                        padding: 10,
+                        borderRadius: 5,
+                      }}
+                      onPress={pickDocument8}>
+                      <Entypo
+                        name="upload-to-cloud"
+                        size={30}
+                        color="#FCFCFC"
+                      />
+                    </TouchableOpacity>
+                    <Text style={styles.takeText}>Browse Files</Text>
+                    <Text style={styles.takeText2}>
+                      File format: JPG, JPEG, PNG,PDF | Max File Size 3mb
+                    </Text>
+                  </>
+                )}
+              </View>
+
+              <TouchableOpacity
+                disabled={docsName.identityCard === ''}
+                style={{marginTop: 10}}
+                onPress={s3UploadFunction}>
+                <Buttons
+                  label="Upload"
+                  disabled={docsName.identityCard === ''}
+                />
+              </TouchableOpacity>
+              <TouchableOpacity
+                disabled={docsName.identityCard === ''}
+                style={{marginTop: 10}}
+                onPress={pickDocument1}>
+                <Buttons
+                  label="Change Selection"
+                  disabled={docsName.identityCard === ''}
+                />
+              </TouchableOpacity>
+              {uploadProgress && uploadProgress > 0 ? (
+                <View
+                  style={{
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginTop: 20,
+                  }}>
+                  <Text>{uploadProgress && uploadProgress}% complete</Text>
+                </View>
+              ) : null}
+            </>
+          )}
+
+          {isId && isCam && (
+            <>
+              <Text style={styles.textHead}>
+                Take a clear picture or upload an Id Card
+              </Text>
+              <View style={styles.reqField}>
+                {image ? (
+                  <Image
+                    source={{uri: image}}
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      resizeMode: 'contain',
+                    }}
+                  />
+                ) : (
+                  <>
+                    <TouchableOpacity
+                      style={{
+                        backgroundColor: '#24348B',
+                        padding: 10,
+                        borderRadius: 5,
+                      }}
+                      onPress={launchCameraAsync7}>
+                      <FontAwesome name="camera" size={30} color="#FCFCFC" />
+                    </TouchableOpacity>
+                    <Text style={styles.takeText}>Tap to take a photo</Text>
+                  </>
+                )}
+              </View>
+              <TouchableOpacity
+                style={{opacity: 1, marginTop: 10}}
+                onPress={s3UploadFunction}>
+                <Buttons label="Upload" />
+              </TouchableOpacity>
+              {uploadProgress && uploadProgress > 0 ? (
+                <View
+                  style={{
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginTop: 20,
+                  }}>
+                  <Text>{uploadProgress && uploadProgress}% complete</Text>
+                </View>
+              ) : null}
+            </>
+          )}
         </View>
       </View>
 

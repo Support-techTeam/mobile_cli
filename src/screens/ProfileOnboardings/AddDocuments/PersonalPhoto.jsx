@@ -12,7 +12,7 @@ import ProofofAdd from '../../../component/Idtypes/ProofOfAddress';
 
 const ITEM_HEIGHT = 100;
 const TobTabs = [
-  {name: 'Valid Identity', key: 'ValidIdentity'},
+  {name: 'Valid Identity', key: 'ValidIndentity'},
   {name: 'Proof of Address', key: 'ProofOfAddress'},
   {name: 'Personal Photo', key: 'PersonalPhoto'},
   {name: 'Identity Card (ARM)', key: 'IdentityCard'},
@@ -25,14 +25,14 @@ const TobTabs = [
   {name: 'Submit All', key: 'SubmitDocs'},
 ];
 
-const BankStatement = () => {
+const PersonalPhoto = () => {
   // const docsDetails = route?.params?.paramKey;
 
   const route = useRoute();
   const {params} = route;
   const {paramKey} = params;
 
-  const activeTab = 'BankStatement';
+  const activeTab = 'PersonalPhoto';
   const [index, setIndex] = useState(0);
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
@@ -59,7 +59,7 @@ const BankStatement = () => {
           marginHorizontal: 19,
         }}>
         <View style={{marginHorizontal: 10, marginVertical: 20}}>
-          <ProofofAdd isCam={true} isBank={true} deets={route} />
+          <ProofofAdd isCam={true} isPer={true} deets={route} />
         </View>
       </View>
     );
@@ -73,7 +73,7 @@ const BankStatement = () => {
           marginHorizontal: 19,
         }}>
         <View style={{marginHorizontal: 10, marginVertical: 20}}>
-          <ProofofAdd isBank={true} deets={route} />
+          <ProofofAdd isPer={true} deets={route} />
         </View>
       </View>
     );
@@ -127,7 +127,7 @@ const BankStatement = () => {
       </View>
 
       <View style={styles.form}>
-        <Text style={styles.header}>Upload Bank Statement</Text>
+        <Text style={styles.header}>Upload Personal Photo</Text>
       </View>
       <View style={styles.innercontainer}>
         <FlatList
@@ -186,7 +186,7 @@ const BankStatement = () => {
 
         <TouchableOpacity
           onPress={() =>
-            navigation.navigate('Passport', {paramKey: {...paramKey}})
+            navigation.navigate('IdentityCard', {paramKey: {...paramKey}})
           }>
           <View style={[styles.tobTab, {backgroundColor: '#054B99'}]}>
             <Text style={[styles.tabText, {color: 'white'}]}>Skip</Text>
@@ -197,7 +197,7 @@ const BankStatement = () => {
   );
 };
 
-export default BankStatement;
+export default PersonalPhoto;
 const styles = StyleSheet.create({
   innercontainer: {
     marginTop: 16,

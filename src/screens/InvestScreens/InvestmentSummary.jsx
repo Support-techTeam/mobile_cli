@@ -17,11 +17,6 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import COLORS from '../../constants/colors';
-import {
-  getAllArmProduct,
-  getAllLendaProduct,
-  getArmProductYield,
-} from '../../stores/InvestStore';
 import Spinner from 'react-native-loading-spinner-overlay';
 
 const listData = [
@@ -215,7 +210,7 @@ const InvestmentSummaryScreen = () => {
                   });
                 }}>
                 <View style={styles.buttonAction}>
-                  <Text style={styles.getText}>Lend</Text>
+                  <Text style={styles.getText}>Save</Text>
                 </View>
               </TouchableOpacity>
             </View>

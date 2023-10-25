@@ -5,16 +5,23 @@ import {
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
-import React from 'react';
+import React, {useState} from 'react';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useNavigation, useRoute} from '@react-navigation/native';
 
 import Buttons from '../../component/buttons/Buttons';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
+import {
+  createArmInvestment,
+  createLendaInvestment,
+} from '../../stores/InvestStore';
+import Spinner from 'react-native-loading-spinner-overlay';
+import Toast from 'react-native-toast-message';
 
 const TransactionSummary = () => {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
+  const [isLoading, setIsLoading] = useState(false);
   const route = useRoute();
   const {
     investmentType,
@@ -26,24 +33,78 @@ const TransactionSummary = () => {
     description,
   } = route.params;
 
-  const handleCreateARMInvestment = () => {
+  const handleCreateARMInvestment = async () => {
     const payload = {
       productCode: productCode,
       investmentAmount: Number(investmentAmount),
     };
-
-    console.log(payload);
+    setIsLoading(true);
+    const res = await createArmInvestment(payload);
+    if (res?.error) {
+      Toast.show({
+        type: 'error',
+        position: 'top',
+        topOffset: 50,
+        text1: res?.title,
+        text2: res?.message,
+        visibilityTime: 5000,
+        autoHide: true,
+        onPress: () => Toast.hide(),
+      });
+    } else {
+      Toast.show({
+        type: 'success',
+        position: 'top',
+        topOffset: 50,
+        text1: res?.title,
+        text2: res?.message,
+        visibilityTime: 3000,
+        autoHide: true,
+        onPress: () => Toast.hide(),
+      });
+      setTimeout(() => {
+        navigation.navigate('Invest');
+      }, 1000);
+    }
+    setIsLoading(false);
   };
 
-  const handleCreateLendaInvestment = () => {
+  const handleCreateLendaInvestment = async () => {
     const payload = {
       investmentType: investmentType,
       investmentTenor: investmentTenor,
-      investmentAmount: Number(investmentAmount),
+      investmentAmount: investmentAmount.toString(),
       transactionPin: transactionPin,
     };
-
-    console.log(payload);
+    setIsLoading(true);
+    const res = await createLendaInvestment(payload);
+    if (res?.error) {
+      Toast.show({
+        type: 'error',
+        position: 'top',
+        topOffset: 50,
+        text1: res?.title,
+        text2: res?.message,
+        visibilityTime: 5000,
+        autoHide: true,
+        onPress: () => Toast.hide(),
+      });
+    } else {
+      Toast.show({
+        type: 'success',
+        position: 'top',
+        topOffset: 50,
+        text1: res?.title,
+        text2: res?.message,
+        visibilityTime: 3000,
+        autoHide: true,
+        onPress: () => Toast.hide(),
+      });
+      setTimeout(() => {
+        navigation.navigate('Invest');
+      }, 1000);
+    }
+    setIsLoading(false);
   };
 
   return (
@@ -57,6 +118,15 @@ const TransactionSummary = () => {
         paddingLeft: insets.left !== 0 ? insets.left : 'auto',
         paddingRight: insets.right !== 0 ? insets.right : 'auto',
       }}>
+      {isLoading && (
+        <Spinner
+          textContent={'Creating Investment...'}
+          textStyle={{color: 'white'}}
+          visible={true}
+          overlayColor="rgba(78, 75, 102, 0.7)"
+          animation="slide"
+        />
+      )}
       <View
         style={{
           flexDirection: 'row',

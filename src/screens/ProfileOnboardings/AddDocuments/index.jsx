@@ -5,4 +5,6 @@ export {default as CompanySeals} from './CompanySeals';
 export {default as CAC} from './CAC';
 export {default as Passport} from './Passport';
 export {default as Signature} from './Signature';
+export {default as PersonalPhoto} from './PersonalPhoto';
+export {default as IdentityCard} from './IdentityCard';
 export {default as Others} from './Others';

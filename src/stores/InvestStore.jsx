@@ -160,20 +160,20 @@ const getAllLendaInvestment = async () => {
       };
       try {
         const response = await axiosInstance.get(
-          `/loans/all-types/loans/mobile`,
+          `/lenda-investment/All-lenda-investments`,
           {
             headers,
           },
         );
         return {
-          title: 'Get All Loans',
+          title: 'Get All Investment',
           error: false,
           data: response?.data,
           message: 'success',
         };
       } catch (error) {
         return {
-          title: 'Get All Loans',
+          title: 'Get All Investment',
           error: true,
           data: null,
           message: error,
@@ -188,6 +188,7 @@ const getAllLendaInvestment = async () => {
     };
   }
 };
+
 const getAllArmInvestment = async () => {
   if (
     store.getState().networkState &&
@@ -201,18 +202,21 @@ const getAllArmInvestment = async () => {
         'Content-Type': 'application/json',
       };
       try {
-        const response = await axiosInstance.get(`/loans/approved-loans/list`, {
-          headers,
-        });
+        const response = await axiosInstance.get(
+          `/investment/active-investments`,
+          {
+            headers,
+          },
+        );
         return {
-          title: 'Get Approved Loans',
+          title: 'Get All Investment',
           error: false,
           data: response?.data,
           message: 'success',
         };
       } catch (error) {
         return {
-          title: 'Get Approved Loans',
+          title: 'Get All Investment',
           error: true,
           data: null,
           message: error,
@@ -322,24 +326,32 @@ const createLendaInvestment = async details => {
       };
       try {
         const response = await axiosInstance.post(
-          `/loans/create-loan`,
+          `/lenda-investment/create-user-lenda-investment`,
           details,
           {
             headers,
           },
         );
+        if (response?.data?.error) {
+          return {
+            title: 'Create Lenda Investment ',
+            error: true,
+            data: null,
+            message: response?.data?.message,
+          };
+        }
         return {
-          title: 'Create Loan ',
+          title: 'Create Lenda Investment',
           error: false,
           data: response?.data,
-          message: "Loan request successful. You'll be redirected shortly!,",
+          message: 'Investment Created successfully',
         };
       } catch (error) {
         return {
-          title: 'Create Loan ',
+          title: 'Create Lenda Investment',
           error: true,
           data: null,
-          message: 'Loan request failed',
+          message: 'Investment Creation Failed',
         };
       }
     }
@@ -366,24 +378,33 @@ const createArmInvestment = async details => {
       };
       try {
         const response = await axiosInstance.post(
-          `/loans/create-loan`,
+          `/investment/create-arm-investment`,
           details,
           {
             headers,
           },
         );
+        if (response?.data?.data?.error) {
+          return {
+            title: 'Create ARM Investment ',
+            error: true,
+            data: null,
+            message: response?.data?.data?.message,
+          };
+        }
         return {
-          title: 'Create Loan ',
+          title: 'Create ARM Investment ',
           error: false,
-          data: response?.data,
-          message: "Loan request successful. You'll be redirected shortly!,",
+          data: response?.data?.data,
+          message:
+            'Investment successful, you will be notified once it is active.',
         };
       } catch (error) {
         return {
-          title: 'Create Loan ',
+          title: 'Create ARM Investment ',
           error: true,
           data: null,
-          message: 'Loan request failed',
+          message: 'Investment creation failed',
         };
       }
     }

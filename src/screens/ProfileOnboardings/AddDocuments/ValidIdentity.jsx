@@ -20,8 +20,10 @@ const idTypeData = [
 
 const ITEM_HEIGHT = 100;
 const TobTabs = [
-  {name: 'Valid Identity', key: 'ValidIndentity'},
+  {name: 'Valid Identity', key: 'ValidIdentity'},
   {name: 'Proof of Address', key: 'ProofOfAddress'},
+  {name: 'Personal Photo', key: 'PersonalPhoto'},
+  {name: 'Identity Card (ARM)', key: 'IdentityCard'},
   {name: 'Bank Statement', key: 'BankStatement'},
   {name: 'Passport', key: 'Passport'},
   {name: 'Signature', key: 'Signature'},
@@ -43,6 +45,8 @@ const ValidIdentity = () => {
     cacCertificate: '',
     othersName: '',
     others: '',
+    identityCard: '',
+    personalPhoto: '',
   });
 
   const [orgDetails, setOrgDetails] = useState([]);
@@ -113,6 +117,14 @@ const ValidIdentity = () => {
         orgDetails && orgDetails?.others === undefined
           ? ''
           : orgDetails?.others,
+      identityCard:
+        orgDetails && orgDetails?.identityCard === undefined
+          ? ''
+          : orgDetails?.identityCard,
+      personalPhoto:
+        orgDetails && orgDetails?.personalPhoto === undefined
+          ? ''
+          : orgDetails?.personalPhoto,
     });
   }, [orgDetails, navigation]);
 
@@ -122,6 +134,8 @@ const ValidIdentity = () => {
   const activeTab = 'ValidIndentity';
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
+
+  console.log('formDetails VI', formDetails);
 
   const renderItem = ({item}) => {
     const isActive = item.key === activeTab;

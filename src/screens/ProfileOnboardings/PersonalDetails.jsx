@@ -30,9 +30,6 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 
-const screenHeight = Dimensions.get('window').height;
-const screenWidth = Dimensions.get('window').width;
-
 const titleData = [
   {value: '', label: 'Select Title'},
   {value: 'Mr', label: 'Mr'},

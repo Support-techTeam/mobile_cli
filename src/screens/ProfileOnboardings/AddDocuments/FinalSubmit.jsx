@@ -14,8 +14,10 @@ import {
 const ITEM_HEIGHT = 100;
 
 const TobTabs = [
-  {name: 'Valid Identity', key: 'ValidIndentity'},
+  {name: 'Valid Identity', key: 'ValidIdentity'},
   {name: 'Proof of Address', key: 'ProofOfAddress'},
+  {name: 'Personal Photo', key: 'PersonalPhoto'},
+  {name: 'Identity Card (ARM)', key: 'IdentityCard'},
   {name: 'Bank Statement', key: 'BankStatement'},
   {name: 'Passport', key: 'Passport'},
   {name: 'Signature', key: 'Signature'},
@@ -71,6 +73,12 @@ const FinalSubmit = ({route}) => {
     othersName:
       docsDetails?.othersName === undefined ? '' : docsDetails?.othersName,
     others: docsDetails?.others === undefined ? '' : docsDetails?.others,
+    identityCard:
+      docsDetails?.identityCard === undefined ? '' : docsDetails?.identityCard,
+    personalPhoto:
+      docsDetails?.personalPhoto === undefined
+        ? ''
+        : docsDetails?.personalPhoto,
     cac7: '',
     cac2: '',
     lpoFile: '',

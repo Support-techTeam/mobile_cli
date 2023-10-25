@@ -106,7 +106,7 @@ const MyAccount = () => {
           alignItems: 'center',
           marginHorizontal: 15,
         }}>
-        <TouchableOpacity onPress={() => navigation.navigate('More')}>
+        <TouchableOpacity onPress={() => navigation.navigate('Home')}>
           <View
             style={{
               borderWidth: 0.5,
