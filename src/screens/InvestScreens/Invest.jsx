@@ -369,10 +369,12 @@ const Investscreen = () => {
                   <View style={{marginTop: 10}}>
                     <TouchableOpacity
                       onPress={() =>
-                        // navigation.navigate('LoanTransaction', {
-                        //   paramKey: investment,
-                        // })
-                        console.log('Open Investment')
+                        navigation.navigate('InvestmentDetails', {
+                          paramKey: {
+                            investment: investment,
+                            name: investment?.investmentType ? 'Lenda' : 'Arm',
+                          },
+                        })
                       }>
                       <View
                         style={{
@@ -415,9 +417,14 @@ const Investscreen = () => {
                             </Text>
                             <Text style={styles.price}>
                               ₦
-                              {investment?.investmentAmount
-                                ?.toString()
-                                ?.replace(/\B(?=(\d{3})+\b)/g, ',') ?? '0.00'}
+                              {new Intl.NumberFormat('en-US', {
+                                style: 'decimal',
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              }).format(
+                                Number(investment?.investmentAmount) +
+                                  Number(investment?.topUpAmount),
+                              ) ?? '0.00'}
                             </Text>
                           </View>
                           <View

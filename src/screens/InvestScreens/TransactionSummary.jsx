@@ -14,6 +14,8 @@ import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 import {
   createArmInvestment,
   createLendaInvestment,
+  topUpArmInvestment,
+  topUpLendaInvestment,
 } from '../../stores/InvestStore';
 import Spinner from 'react-native-loading-spinner-overlay';
 import Toast from 'react-native-toast-message';
@@ -29,8 +31,13 @@ const TransactionSummary = () => {
     investmentAmount,
     transactionPin,
     productCode,
+    id,
     name,
     description,
+    membershipId,
+    leadId,
+    potentialClientId,
+    action,
   } = route.params;
 
   const handleCreateARMInvestment = async () => {
@@ -40,6 +47,45 @@ const TransactionSummary = () => {
     };
     setIsLoading(true);
     const res = await createArmInvestment(payload);
+    if (res?.error) {
+      Toast.show({
+        type: 'error',
+        position: 'top',
+        topOffset: 50,
+        text1: res?.title,
+        text2: res?.message,
+        visibilityTime: 5000,
+        autoHide: true,
+        onPress: () => Toast.hide(),
+      });
+    } else {
+      Toast.show({
+        type: 'success',
+        position: 'top',
+        topOffset: 50,
+        text1: res?.title,
+        text2: res?.message,
+        visibilityTime: 3000,
+        autoHide: true,
+        onPress: () => Toast.hide(),
+      });
+      setTimeout(() => {
+        navigation.navigate('Invest');
+      }, 1000);
+    }
+    setIsLoading(false);
+  };
+
+  const handleTopupARMInvestment = async () => {
+    const payload = {
+      membershipId: membershipId,
+      productCode: productCode,
+      investmentAmount: Number(investmentAmount),
+      leadId: leadId,
+      potentialClientId: potentialClientId,
+    };
+    setIsLoading(true);
+    const res = await topUpArmInvestment(payload);
     if (res?.error) {
       Toast.show({
         type: 'error',
@@ -107,6 +153,43 @@ const TransactionSummary = () => {
     setIsLoading(false);
   };
 
+  const handleTopupLendaInvestment = async () => {
+    const payload = {
+      id: id,
+      topUpAmount: investmentAmount.toString(),
+      transactionPin: transactionPin,
+    };
+    setIsLoading(true);
+    const res = await topUpLendaInvestment(payload);
+    if (res?.error) {
+      Toast.show({
+        type: 'error',
+        position: 'top',
+        topOffset: 50,
+        text1: res?.title,
+        text2: res?.message,
+        visibilityTime: 5000,
+        autoHide: true,
+        onPress: () => Toast.hide(),
+      });
+    } else {
+      Toast.show({
+        type: 'success',
+        position: 'top',
+        topOffset: 50,
+        text1: res?.title,
+        text2: res?.message,
+        visibilityTime: 3000,
+        autoHide: true,
+        onPress: () => Toast.hide(),
+      });
+      setTimeout(() => {
+        navigation.navigate('Invest');
+      }, 1000);
+    }
+    setIsLoading(false);
+  };
+
   return (
     <SafeAreaView
       style={{
@@ -120,7 +203,11 @@ const TransactionSummary = () => {
       }}>
       {isLoading && (
         <Spinner
-          textContent={'Creating Investment...'}
+          textContent={
+            action === 'TOP-UP'
+              ? 'Investment Top-Up...'
+              : 'Creating Investment...'
+          }
           textStyle={{color: 'white'}}
           visible={true}
           overlayColor="rgba(78, 75, 102, 0.7)"
@@ -173,6 +260,20 @@ const TransactionSummary = () => {
             </View>
           )}
 
+          {name === 'Lenda' && action === 'TOP-UP' && (
+            <View style={styles.detailsView}>
+              <Text style={styles.desc}>Description</Text>
+              <Text style={styles.amount}>{description}</Text>
+            </View>
+          )}
+
+          {name === 'Arm' && membershipId && (
+            <View style={styles.detailsView}>
+              <Text style={styles.desc}>Membership ID</Text>
+              <Text style={styles.amount}>{membershipId}</Text>
+            </View>
+          )}
+
           <View style={styles.detailsView}>
             <Text style={styles.desc}>Investment Amount</Text>
             <Text style={styles.amount}>
@@ -205,11 +306,19 @@ const TransactionSummary = () => {
           <TouchableOpacity
             style={{marginTop: 140}}
             onPress={() => {
-              if (name === 'Arm') {
+              if (name === 'Arm' && action === 'TOP-UP') {
+                handleTopupARMInvestment();
+              }
+
+              if (name === 'Arm' && action == undefined) {
                 handleCreateARMInvestment();
               }
-              if (name === 'Lenda') {
+
+              if (name === 'Lenda' && action == undefined) {
                 handleCreateLendaInvestment();
+              }
+              if (name === 'Lenda' && action === 'TOP-UP') {
+                handleTopupLendaInvestment();
               }
             }}>
             <Buttons label={'Confirm'} />

@@ -232,7 +232,7 @@ const getAllArmInvestment = async () => {
   }
 };
 
-const getLendaInvestmentById = async id => {
+const getSingleArmInvestment = async (membershipId, productCode) => {
   if (
     store.getState().networkState &&
     store.getState().networkState.network.isConnected &&
@@ -245,61 +245,24 @@ const getLendaInvestmentById = async id => {
         'Content-Type': 'application/json',
       };
       try {
-        const response = await axiosInstance.get(`/loans/get-loan/${id}`, {
-          headers,
-        });
+        const response = await axiosInstance.get(
+          `/investment/single-investment/?membershipId=${membershipId}&productCode=${productCode}`,
+          {
+            headers,
+          },
+        );
         return {
-          title: 'Get Single Loan ',
+          title: 'Get Single Investment ',
           error: false,
-          data: response?.data,
+          data: response?.data?.data,
           message: 'success',
         };
       } catch (error) {
         return {
-          title: 'Get Single Loan ',
+          title: 'Get Single Investment ',
           error: true,
           data: null,
-          message: 'Failed to retrieve loan data!',
-        };
-      }
-    }
-  } else {
-    return {
-      error: true,
-      data: null,
-      message: 'No Internet Connection',
-    };
-  }
-};
-
-const getArmInvestmentById = async id => {
-  if (
-    store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
-  ) {
-    if (auth?.currentUser?.stsTokenManager?.accessToken) {
-      headers = {
-        accept: 'application/json',
-        Authorization: `Bearer ${auth.currentUser?.stsTokenManager?.accessToken}`,
-        'Content-Type': 'application/json',
-      };
-      try {
-        const response = await axiosInstance.get(`/loans/get-loan/${id}`, {
-          headers,
-        });
-        return {
-          title: 'Get Single Loan ',
-          error: false,
-          data: response?.data,
-          message: 'success',
-        };
-      } catch (error) {
-        return {
-          title: 'Get Single Loan ',
-          error: true,
-          data: null,
-          message: 'Failed to retrieve loan data!',
+          message: 'Failed to retrieve investment data!',
         };
       }
     }
@@ -417,14 +380,119 @@ const createArmInvestment = async details => {
   }
 };
 
+const topUpArmInvestment = async details => {
+  if (
+    store.getState().networkState &&
+    store.getState().networkState.network.isConnected &&
+    store.getState().networkState.network.isInternetReachable
+  ) {
+    if (auth?.currentUser?.stsTokenManager?.accessToken) {
+      headers = {
+        accept: 'application/json',
+        Authorization: `Bearer ${auth.currentUser?.stsTokenManager?.accessToken}`,
+        'Content-Type': 'application/json',
+      };
+      try {
+        const response = await axiosInstance.post(
+          `/investment/topup-arm-investment`,
+          details,
+          {
+            headers,
+          },
+        );
+        if (response?.data?.data?.error) {
+          return {
+            title: 'Top-Up Investment',
+            error: true,
+            data: null,
+            message: response?.data?.data?.message,
+          };
+        }
+        return {
+          title: 'Top-Up Investment',
+          error: false,
+          data: response?.data,
+          message: 'Investment Top-Up successful',
+        };
+      } catch (error) {
+        return {
+          title: 'Top-Up Investment',
+          error: true,
+          data: null,
+          message: 'Investment Top-Up Failed',
+        };
+      }
+    }
+  } else {
+    return {
+      error: true,
+      data: null,
+      message: 'No Internet Connection',
+    };
+  }
+};
+
+const topUpLendaInvestment = async details => {
+  if (
+    store.getState().networkState &&
+    store.getState().networkState.network.isConnected &&
+    store.getState().networkState.network.isInternetReachable
+  ) {
+    if (auth?.currentUser?.stsTokenManager?.accessToken) {
+      headers = {
+        accept: 'application/json',
+        Authorization: `Bearer ${auth.currentUser?.stsTokenManager?.accessToken}`,
+        'Content-Type': 'application/json',
+      };
+      try {
+        const response = await axiosInstance.post(
+          `/lenda-investment/topUp-lenda-investment`,
+          details,
+          {
+            headers,
+          },
+        );
+        if (response?.data?.error) {
+          return {
+            title: 'Top-Up Investment',
+            error: true,
+            data: null,
+            message: response?.data?.message,
+          };
+        }
+        return {
+          title: 'Top-Up Investment',
+          error: false,
+          data: response?.data,
+          message: 'Investment Top-Up successful',
+        };
+      } catch (error) {
+        return {
+          title: 'Top-Up Investment',
+          error: true,
+          data: null,
+          message: 'Investment Top-Up Failed',
+        };
+      }
+    }
+  } else {
+    return {
+      error: true,
+      data: null,
+      message: 'No Internet Connection',
+    };
+  }
+};
+
 export {
   getAllLendaProduct,
   getAllArmProduct,
   getArmProductYield,
   getAllLendaInvestment,
   getAllArmInvestment,
-  getLendaInvestmentById,
-  getArmInvestmentById,
+  getSingleArmInvestment,
   createLendaInvestment,
   createArmInvestment,
+  topUpLendaInvestment,
+  topUpArmInvestment,
 };

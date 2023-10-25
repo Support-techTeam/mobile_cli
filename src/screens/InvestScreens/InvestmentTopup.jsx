@@ -15,7 +15,6 @@ import Input from '../../component/inputField/input.component';
 import CustomDropdown from '../../component/dropDown/dropdown.component';
 import Buttons from '../../component/buttons/Buttons';
 import {useSelector} from 'react-redux';
-
 import Toast from 'react-native-toast-message';
 import COLORS from '../../constants/colors';
 
@@ -26,7 +25,7 @@ const durationData = [
   {value: '12 Months', label: '12 Months'},
 ];
 
-const InvestmentTransaction = () => {
+const InvestmentTopup = () => {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
   const userWalletData = useSelector(state => state.userProfile.wallet);
@@ -40,15 +39,18 @@ const InvestmentTransaction = () => {
   const {name, investment} = route.params;
 
   const [investmentDetails, setInvestmentDetails] = useState({
-    investmentType: investment?.investmentName,
-    investmentTenor: '',
+    investmentType: investment?.investmentType,
+    investmentTenor: investment?.investmentTenor,
     investmentAmount: 0,
     transactionPin: '',
   });
 
   const [armDetails, setArmDetails] = useState({
-    productCode: investment.productCode,
+    productCode: investment?.productCode,
     investmentAmount: 0,
+    membershipId: investment?.membershipId,
+    leadId: investment?.leadId,
+    potentialClientId: investment?.potentialClientId,
   });
 
   const disableit =
@@ -56,8 +58,6 @@ const InvestmentTransaction = () => {
     !otp[2] ||
     !otp[3] ||
     !otp[4] ||
-    !investmentDetails.investmentType ||
-    !investmentDetails.investmentTenor ||
     investmentDetails.investmentAmount == 0;
 
   const disableitarm =
@@ -206,9 +206,10 @@ const InvestmentTransaction = () => {
                     return;
                   } else {
                     navigation.navigate('TransactionSummary', {
-                      description: investment?.description,
+                      description: `${investment?.productCode} Top-Up`,
                       name: name,
                       ...armDetails,
+                      action: 'TOP-UP',
                     });
                   }
                 }}>
@@ -218,23 +219,6 @@ const InvestmentTransaction = () => {
           </View>
         ) : (
           <View style={styles.innerContainer}>
-            <CustomDropdown
-              label="Investment Tenor"
-              isNeeded={true}
-              placeholder="Select Option"
-              data={durationData}
-              maxHeight={300}
-              labelField="label"
-              valueField="value"
-              value={investmentDetails.investmentTenor}
-              onChange={option => {
-                setInvestmentDetails({
-                  ...investmentDetails,
-                  investmentTenor: option.value,
-                });
-              }}
-            />
-
             <View style={{marginTop: 10}}>
               <Input
                 onChangeText={text =>
@@ -256,7 +240,7 @@ const InvestmentTransaction = () => {
                     ?.replace(/\B(?=(\d{3})+\b)/g, ',')
                 }
               />
-              {investment?.amountRange?.minAmount && (
+              {investment?.amountRange && (
                 <Text
                   style={{
                     color: COLORS.lendaBlue,
@@ -414,9 +398,12 @@ const InvestmentTransaction = () => {
                     });
 
                     navigation.navigate('TransactionSummary', {
+                      description: `${investment?.investmentType} Top-Up`,
+                      id: investment?._id,
                       name: name,
                       ...investmentDetails,
                       transactionPin: `${otp[1] + otp[2] + otp[3] + otp[4]}`,
+                      action: 'TOP-UP',
                     });
                   }
                 }}>
@@ -430,7 +417,7 @@ const InvestmentTransaction = () => {
   );
 };
 
-export default InvestmentTransaction;
+export default InvestmentTopup;
 
 const styles = StyleSheet.create({
   pick: {

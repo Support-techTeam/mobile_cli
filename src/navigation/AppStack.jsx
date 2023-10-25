@@ -59,6 +59,8 @@ import {
   InvestmentSummary,
   InvestmentTransaction,
   TransactionSummary,
+  InvestmentDetails,
+  InvestmentTopup,
 } from '../screens/InvestScreens';
 //Pending
 
@@ -232,6 +234,11 @@ const AppStack = () => {
             name="TransactionSummary"
             component={TransactionSummary}
           />
+          <Stack.Screen
+            name="InvestmentDetails"
+            component={InvestmentDetails}
+          />
+          <Stack.Screen name="InvestmentTopup" component={InvestmentTopup} />
         </>
       )}
     </Stack.Navigator>
