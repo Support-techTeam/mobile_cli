@@ -82,12 +82,12 @@ const SignaturePad = ({deets}) => {
       try {
         //create a file at filePath. Write the content data to it
         await RNFS.writeFile(filePath, image_data[1], 'base64');
-        console.log('written to filePath', filePath);
-        console.log('written to image_data[1]', image_data[1]);
-        console.log('written to file');
+        // console.log('written to filePath', filePath);
+        // console.log('written to image_data[1]', image_data[1]);
+        // console.log('written to file');
       } catch (error) {
         //if the function throws an error, log it out.
-        console.log(error);
+        // console.log(error);
       }
 
       // await CameraRoll.save(tag, {type, album});

@@ -61,6 +61,7 @@ import {
   TransactionSummary,
   InvestmentDetails,
   InvestmentTopup,
+  InvestmentRedemption,
 } from '../screens/InvestScreens';
 //Pending
 
@@ -92,20 +93,16 @@ const AppStack = () => {
   useEffect(() => {
     // fetch profile
     if (auth.currentUser !== null) {
-      // console.log('Fetching profile');
       const fetchState = async () => {
         try {
           const res = await getProfileDetails();
           if (res?.data !== undefined) {
             if (res?.error) {
-              // console.error(error);
             } else {
               dispatch(setProfile(res?.data));
             }
           }
-        } catch (error) {
-          // console.error(error);
-        }
+        } catch (error) {}
       };
 
       fetchState();
@@ -239,6 +236,10 @@ const AppStack = () => {
             component={InvestmentDetails}
           />
           <Stack.Screen name="InvestmentTopup" component={InvestmentTopup} />
+          <Stack.Screen
+            name="InvestmentRedemption"
+            component={InvestmentRedemption}
+          />
         </>
       )}
     </Stack.Navigator>

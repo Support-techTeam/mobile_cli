@@ -11,13 +11,8 @@ import {useNavigation, useRoute} from '@react-navigation/native';
 
 import Buttons from '../../component/buttons/Buttons';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
-import {
-  createArmInvestment,
-  createLendaInvestment,
-  getSingleArmInvestment,
-} from '../../stores/InvestStore';
+import {getSingleArmInvestment} from '../../stores/InvestStore';
 import Spinner from 'react-native-loading-spinner-overlay';
-import Toast from 'react-native-toast-message';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -34,9 +29,6 @@ const InvestmentDetails = () => {
   useEffect(() => {
     if (route.name === 'InvestmentDetails') {
       const unsubscribe = navigation.addListener('focus', async () => {
-        // if (name === 'Lenda') {
-        //   getLendaProducts();
-        // }
         if (name === 'Arm') {
           getArmInvestment();
         }
@@ -46,9 +38,6 @@ const InvestmentDetails = () => {
   }, [navigation]);
 
   useEffect(() => {
-    // if (name === 'Lenda') {
-    //   getLendaProducts();
-    // }
     if (name === 'Arm') {
       getArmInvestment();
     }
@@ -67,81 +56,6 @@ const InvestmentDetails = () => {
     }
     setIsLoading(false);
   };
-
-  const handleCreateARMInvestment = async () => {
-    const payload = {
-      productCode: productCode,
-      investmentAmount: Number(investmentAmount),
-    };
-    setIsLoading(true);
-    const res = await createArmInvestment(payload);
-    if (res?.error) {
-      Toast.show({
-        type: 'error',
-        position: 'top',
-        topOffset: 50,
-        text1: res?.title,
-        text2: res?.message,
-        visibilityTime: 5000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
-    } else {
-      Toast.show({
-        type: 'success',
-        position: 'top',
-        topOffset: 50,
-        text1: res?.title,
-        text2: res?.message,
-        visibilityTime: 3000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
-      setTimeout(() => {
-        navigation.navigate('Invest');
-      }, 1000);
-    }
-    setIsLoading(false);
-  };
-
-  const handleCreateLendaInvestment = async () => {
-    const payload = {
-      investmentType: investmentType,
-      investmentTenor: investmentTenor,
-      investmentAmount: investmentAmount.toString(),
-      transactionPin: transactionPin,
-    };
-    setIsLoading(true);
-    const res = await createLendaInvestment(payload);
-    if (res?.error) {
-      Toast.show({
-        type: 'error',
-        position: 'top',
-        topOffset: 50,
-        text1: res?.title,
-        text2: res?.message,
-        visibilityTime: 5000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
-    } else {
-      Toast.show({
-        type: 'success',
-        position: 'top',
-        topOffset: 50,
-        text1: res?.title,
-        text2: res?.message,
-        visibilityTime: 3000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
-      setTimeout(() => {
-        navigation.navigate('Invest');
-      }, 1000);
-    }
-    setIsLoading(false);
-  };
-
   return (
     <SafeAreaView
       style={{
@@ -222,6 +136,15 @@ const InvestmentDetails = () => {
               <Text style={styles.desc}>Investment Commencement Date</Text>
               <Text style={styles.amount}>
                 {investment?.createdAt?.substr(0, 10)}
+              </Text>
+            </View>
+          )}
+
+          {name === 'Lenda' && (
+            <View style={styles.detailsView}>
+              <Text style={styles.desc}>investment Status</Text>
+              <Text style={[styles.amount, {fontFamily: 'serif'}]}>
+                {investment?.investmentStatus}
               </Text>
             </View>
           )}
@@ -485,6 +408,11 @@ const InvestmentDetails = () => {
                 fontSize: hp(5),
                 marginHorizontal: 5,
               }}
+              disabled={
+                name === 'Lenda' && investment?.investmentStatus === 'CLOSED'
+                  ? investment?.investmentStatus === 'CLOSED'
+                  : false
+              }
               onPress={() => {
                 if (name === 'Arm') {
                   navigation.navigate('InvestmentTopup', {
@@ -499,7 +427,14 @@ const InvestmentDetails = () => {
                   });
                 }
               }}>
-              <Buttons label={'Top Up'} />
+              <Buttons
+                label={'Top Up'}
+                disabled={
+                  name === 'Lenda' && investment?.investmentStatus === 'CLOSED'
+                    ? investment?.investmentStatus === 'CLOSED'
+                    : false
+                }
+              />
             </TouchableOpacity>
             <TouchableOpacity
               style={{
@@ -508,15 +443,34 @@ const InvestmentDetails = () => {
                 fontSize: hp(5),
                 marginHorizontal: 5,
               }}
+              disabled={
+                name === 'Lenda' && investment?.investmentStatus === 'CLOSED'
+                  ? investment?.investmentStatus === 'CLOSED'
+                  : false
+              }
               onPress={() => {
                 if (name === 'Arm') {
-                  handleCreateARMInvestment();
+                  navigation.navigate('InvestmentRedemption', {
+                    name: 'Arm',
+                    investment: investmentDetail,
+                    portfolio: portfolioDetail,
+                  });
                 }
                 if (name === 'Lenda') {
-                  handleCreateLendaInvestment();
+                  navigation.navigate('InvestmentRedemption', {
+                    name: 'Lenda',
+                    investment: investment,
+                  });
                 }
               }}>
-              <Buttons label={'Redeem'} />
+              <Buttons
+                label={'Redeem'}
+                disabled={
+                  name === 'Lenda' && investment?.investmentStatus === 'CLOSED'
+                    ? investment?.investmentStatus === 'CLOSED'
+                    : false
+                }
+              />
             </TouchableOpacity>
           </View>
         </View>

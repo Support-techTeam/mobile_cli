@@ -36,7 +36,6 @@ const PinCon = ({route}) => {
   const handleCreatePin = async () => {
     setIsLoading(true);
     const res = await createTransactionPin(pinValue);
-    // console.log(res);
     if (res?.error) {
       Toast.show({
         type: 'error',

@@ -68,7 +68,6 @@ const GetData = () => {
     if (res?.error) {
       // TODO: handle error
     } else {
-      // console.log(res?.data?.data?.data);
       setNetworkProviders(res?.data?.data?.data);
     }
     setIsLoading(false);
@@ -99,8 +98,6 @@ const GetData = () => {
     if (res?.error) {
       // TODO: handle error
     } else {
-      // console.log(res);
-      // console.log(res?.data?.data?.data);
       setProviderPlan(res?.data?.data?.data);
     }
     setIsLoading(false);

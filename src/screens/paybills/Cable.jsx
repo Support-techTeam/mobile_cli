@@ -81,10 +81,9 @@ const Cable = () => {
       provider: airtimeDetails.network,
       cardNumber: airtimeDetails.cardNumber.toString(),
     };
-    // console.log(data);
+
     const res = await verifyIUC(data);
-    // console.log(data);
-    // console.log(res);
+
     if (res?.error) {
       Toast.show({
         type: 'error',

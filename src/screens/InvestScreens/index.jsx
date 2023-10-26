@@ -5,3 +5,4 @@ export {default as InvestmentTransaction} from './InvestmentTransaction';
 export {default as TransactionSummary} from './TransactionSummary';
 export {default as InvestmentDetails} from './InvestmentDetails';
 export {default as InvestmentTopup} from './InvestmentTopup';
+export {default as InvestmentRedemption} from './InvestmentRedemption';

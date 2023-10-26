@@ -175,7 +175,6 @@ const ProofofAdd = ({
         ? PERMISSIONS.IOS.PHOTO_LIBRARY
         : PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE,
     );
-    // console.log(status);
     if (status === 'granted') {
       return true;
     }

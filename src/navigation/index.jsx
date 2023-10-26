@@ -53,7 +53,6 @@ const AppNavigationContainer = () => {
         onStateChange={async () => {
           const previousRouteName = routeNameRef.current;
           const currentRouteName = navigationRef.getCurrentRoute();
-          // console.log(currentRouteName);
         }}>
         {isLoading ? (
           <Splashscreen text="Checking Authentication..." />

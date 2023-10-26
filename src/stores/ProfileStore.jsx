@@ -218,7 +218,7 @@ const createTransactionPin = async details => {
             headers,
           },
         );
-        // console.log(response?.data?.error);
+
         if (response?.data?.error) {
           return {
             title: 'Create Transaction Pin',

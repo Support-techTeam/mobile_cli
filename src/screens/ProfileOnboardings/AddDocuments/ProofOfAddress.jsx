@@ -33,8 +33,6 @@ const ProofOfAddress = () => {
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
 
-  console.log('paramKey POF', paramKey);
-
   const renderItem = ({item}) => {
     const isActive = item.key === activeTab;
 

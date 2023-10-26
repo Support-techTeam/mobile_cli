@@ -11,6 +11,7 @@ const Input = ({
   isDate,
   isAirtime,
   isBalance,
+  isInvestment,
   isNeeded,
   onFocus = () => {},
   ...props
@@ -30,6 +31,7 @@ const Input = ({
           {isNeeded && <Text style={{color: 'red', marginRight: 10}}>*</Text>}
         </View>
         {isAirtime && <Text>Wallet Balance: ₦{isBalance}</Text>}
+        {isInvestment && <Text>Available Balance: ₦{isBalance}</Text>}
       </View>
       <View
         style={[

@@ -77,7 +77,7 @@ const getAccountTransactions = async (page, limit) => {
           `/loan-wallet/paginated-all-transactions?page=${page}&limit=${limit}`,
           {headers},
         );
-        // console.log('response=>', response)
+
         return {
           title: 'Get Wallet Transactions',
           error: false,

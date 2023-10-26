@@ -48,6 +48,10 @@ import {
 } from 'react-native-responsive-screen';
 import Carousel from 'react-native-snap-carousel';
 import {getGuarantors} from '../../stores/GuarantorStore';
+import {
+  getAllArmInvestment,
+  getAllLendaInvestment,
+} from '../../stores/InvestStore';
 // import * as All from '../../../assets/images/';
 
 const {width} = Dimensions.get('window');
@@ -80,6 +84,8 @@ const Homescreen = () => {
   const [isScrolling, setIsScrolling] = useState(false);
   const [guarantor, setGuarantor] = useState([]);
   const dispatch = useDispatch();
+  const [allArmData, setAllArmData] = useState([]);
+  const [allILendaData, setAllLendaData] = useState([]);
 
   const toggleMakeTransfer = () => {
     setIsMakeTransferVisible(!isMakeTransferVisible);
@@ -120,6 +126,26 @@ const Homescreen = () => {
     setIsFetching(false);
   };
 
+  //total ARM Investment
+  let totalArmAmount =
+    allArmData &&
+    allArmData?.reduce(
+      (accumulator, currentValue) =>
+        accumulator +
+        (currentValue.investmentAmount - currentValue?.redemptionAmount),
+      0,
+    );
+
+  //total Lenda Investment
+  let totalLendaAmount =
+    allILendaData &&
+    allILendaData
+      ?.filter(item => item?.investmentStatus === 'ACTIVE')
+      .reduce(
+        (accumulator, currentValue) => accumulator + currentValue.totalReturn,
+        0,
+      );
+
   useEffect(() => {
     setTimeout(() => {
       setTimeOut(true);
@@ -129,6 +155,10 @@ const Homescreen = () => {
   useEffect(() => {
     unsubGetWallet();
     getGuarantorData();
+    getAllLendaInvestments();
+    getAllArmInvestments();
+    unsubGetAllTransactions();
+    unsubGetTransactions();
   }, []);
 
   const unsubGetWallet = async () => {
@@ -142,10 +172,6 @@ const Homescreen = () => {
     }
     setIsLoading(false);
   };
-
-  useEffect(() => {
-    unsubGetAllTransactions();
-  }, []);
 
   const unsubGetAllTransactions = async () => {
     setIsLoading(true);
@@ -166,10 +192,6 @@ const Homescreen = () => {
     }
     setIsLoading(false);
   };
-
-  useEffect(() => {
-    unsubGetTransactions();
-  }, []);
 
   const unsubGetTransactions = async () => {
     setIsLoading(true);
@@ -227,9 +249,28 @@ const Homescreen = () => {
     if (res?.error) {
       // TODO: handle error
     } else {
-      // console.log('PIN', res?.data);
       setUserPin(res?.data?.data?.hasPin);
     }
+  };
+
+  const getAllLendaInvestments = async () => {
+    setIsLoading(true);
+    const res = await getAllLendaInvestment();
+    if (res?.error) {
+    } else {
+      setAllLendaData(res?.data);
+    }
+    setIsLoading(false);
+  };
+
+  const getAllArmInvestments = async () => {
+    setIsLoading(true);
+    const res = await getAllArmInvestment();
+    if (res?.error) {
+    } else {
+      setAllArmData(res?.data?.data);
+    }
+    setIsLoading(false);
   };
 
   //Navigation useEffect Hook
@@ -242,6 +283,8 @@ const Homescreen = () => {
         unsubGetLoanAmount();
         getLoanUserData();
         getGuarantorData();
+        getAllLendaInvestments();
+        getAllArmInvestments();
       });
       return unsubscribe;
     }
@@ -356,7 +399,12 @@ const Homescreen = () => {
     {
       id: '3',
       title: 'My investment',
-      balance: '0.00',
+      balance:
+        new Intl.NumberFormat('en-US', {
+          style: 'decimal',
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        }).format(totalArmAmount + totalLendaAmount) ?? '0.00',
       button: 'View investment',
       extra: '',
       image: require('../../../assets/icons/wallet_background.png'),

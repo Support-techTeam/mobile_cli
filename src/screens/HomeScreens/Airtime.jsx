@@ -52,7 +52,6 @@ const Airtime = () => {
     if (res?.error) {
       // TODO: handle error
     } else {
-      // console.log(res?.data?.data?.data?.providers);
       setNetworkProviders(res?.data?.data?.data?.providers);
     }
     setIsLoading(false);
@@ -117,7 +116,7 @@ const Airtime = () => {
           </TouchableOpacity>
           <View style={styles.HeadView}>
             <View style={styles.TopView}>
-              <Text style={styles.TextHead}>AIRTIME</Text>
+              <Text style={styles.TextHead}>AIRTIME TOP-UP</Text>
             </View>
           </View>
           <View>
@@ -125,12 +124,12 @@ const Airtime = () => {
           </View>
         </View>
         <View style={styles.demark} />
-        <KeyboardAvoidingWrapper>
-          <ScrollView
-            bounces={false}
-            showsHorizontalScrollIndicator={false}
-            showsVerticalScrollIndicator={false}
-            style={[styles.innercontainer]}>
+        <ScrollView
+          bounces={false}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+          style={[styles.innercontainer]}>
+          <KeyboardAvoidingWrapper>
             <View style={{marginTop: 24}}>
               <View style={{marginTop: 10}}>
                 <InputPhone
@@ -228,8 +227,8 @@ const Airtime = () => {
                 <Buttons label={'Next'} disabled={disableit} />
               </TouchableOpacity>
             </View>
-          </ScrollView>
-        </KeyboardAvoidingWrapper>
+          </KeyboardAvoidingWrapper>
+        </ScrollView>
       </View>
     </SafeAreaView>
   );

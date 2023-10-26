@@ -63,7 +63,6 @@ const InvestmentOptionScreen = () => {
     if (res?.error) {
     } else {
       setData(res?.data);
-      // console.log(res?.data);
     }
     setIsLoading(false);
   };
@@ -74,7 +73,6 @@ const InvestmentOptionScreen = () => {
     if (res?.error) {
     } else {
       setData(res?.data);
-      // console.log(res?.data);
     }
     setIsLoading(false);
   };

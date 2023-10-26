@@ -8,9 +8,9 @@ const NetworkStatus = () => {
   const dispatch = useDispatch();
 
   const updateMessage = state => {
-    if (state.isConnected && state.isInternetReachable) {
+    if (state?.isConnected && state?.isInternetReachable) {
       // console.log
-    } else if (state.isConnected && !state.isInternetReachable) {
+    } else if (state?.isConnected && !state?.isInternetReachable) {
       Toast.show({
         type: 'warning',
         position: 'top',

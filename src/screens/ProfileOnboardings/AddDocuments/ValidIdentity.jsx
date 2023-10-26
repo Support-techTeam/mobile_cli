@@ -135,8 +135,6 @@ const ValidIdentity = () => {
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
 
-  console.log('formDetails VI', formDetails);
-
   const renderItem = ({item}) => {
     const isActive = item.key === activeTab;
 

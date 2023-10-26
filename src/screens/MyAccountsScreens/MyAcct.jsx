@@ -45,7 +45,6 @@ const MyAccount = () => {
       permissionResult['android.permission.WRITE_EXTERNAL_STORAGE'] ===
         PermissionsAndroid.RESULTS.GRANTED
     ) {
-      // console.log('Grantd');
       await launchCamera(
         {
           mediaType: 'photo', // Specify 'photo' to capture images
@@ -55,9 +54,7 @@ const MyAccount = () => {
         },
         response => {
           if (response.didCancel) {
-            // console.log('User cancelled the camera');
           } else if (response.error) {
-            // console.error('ImagePicker Error:', response.error);
           } else {
             handleImageSelection(response);
           }

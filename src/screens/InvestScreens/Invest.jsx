@@ -51,10 +51,12 @@ const Investscreen = () => {
   //total Lenda Investment
   let totalLendaAmount =
     allILendaData &&
-    allILendaData?.reduce(
-      (accumulator, currentValue) => accumulator + currentValue.totalReturn,
-      0,
-    );
+    allILendaData
+      ?.filter(item => item?.investmentStatus === 'ACTIVE')
+      .reduce(
+        (accumulator, currentValue) => accumulator + currentValue.totalReturn,
+        0,
+      );
 
   useEffect(() => {
     if (route.name === 'Invest') {
@@ -365,8 +367,17 @@ const Investscreen = () => {
               showsHorizontalScrollIndicator={false}
               showsVerticalScrollIndicator={false}>
               {allInvestmentData.map((investment, i) => (
-                <View key={i} style={{paddingHorizontal: 10}}>
-                  <View style={{marginTop: 10}}>
+                <View
+                  key={i}
+                  style={{
+                    paddingHorizontal: 10,
+                    paddingVertical: 10,
+                    backgroundColor:
+                      investment?.investmentStatus === 'CLOSED'
+                        ? COLORS.lendaOrange
+                        : COLORS.white,
+                  }}>
+                  <View style={{marginTop: 0}}>
                     <TouchableOpacity
                       onPress={() =>
                         navigation.navigate('InvestmentDetails', {

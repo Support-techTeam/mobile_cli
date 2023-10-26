@@ -1,8 +1,6 @@
 import React from 'react';
 import axios from 'axios';
 import {BASE_API_URL} from '../../app.json';
-import {useSelector, useDispatch} from 'react-redux';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import {auth} from '../util/firebase/firebaseConfig';
 import {store} from '../util/redux/store';
 
@@ -484,6 +482,205 @@ const topUpLendaInvestment = async details => {
   }
 };
 
+const redeemArmInvestment = async details => {
+  if (
+    store.getState().networkState &&
+    store.getState().networkState.network.isConnected &&
+    store.getState().networkState.network.isInternetReachable
+  ) {
+    if (auth?.currentUser?.stsTokenManager?.accessToken) {
+      headers = {
+        accept: 'application/json',
+        Authorization: `Bearer ${auth.currentUser?.stsTokenManager?.accessToken}`,
+        'Content-Type': 'application/json',
+      };
+      try {
+        const response = await axiosInstance.post(
+          `/investment/redeem-arm-investment`,
+          details,
+          {
+            headers,
+          },
+        );
+        if (response?.data?.error) {
+          return {
+            title: 'Redeem Investment',
+            error: true,
+            data: null,
+            message: response?.data?.message,
+          };
+        }
+        return {
+          title: 'Redeem Investment',
+          error: false,
+          data: response?.data,
+          message: 'Investment redeemption successful.',
+        };
+      } catch (error) {
+        return {
+          title: 'Redeem Investment',
+          error: true,
+          data: null,
+          message: 'Investment redeemption failed',
+        };
+      }
+    }
+  } else {
+    return {
+      error: true,
+      data: null,
+      message: 'No Internet Connection',
+    };
+  }
+};
+
+const getArmOTP = async membershipId => {
+  if (
+    store.getState().networkState &&
+    store.getState().networkState.network.isConnected &&
+    store.getState().networkState.network.isInternetReachable
+  ) {
+    if (auth?.currentUser?.stsTokenManager?.accessToken) {
+      headers = {
+        accept: 'application/json',
+        Authorization: `Bearer ${auth.currentUser?.stsTokenManager?.accessToken}`,
+        'Content-Type': 'application/json',
+      };
+      try {
+        const response = await axiosInstance.get(
+          `/investment/otp/?membershipId=${membershipId}`,
+          {
+            headers,
+          },
+        );
+        return {
+          title: 'Get Investment OTP',
+          error: false,
+          data: response?.data,
+          message: response?.data?.message,
+        };
+      } catch (error) {
+        return {
+          title: 'Get Investment OTP',
+          error: true,
+          data: null,
+          message: error,
+        };
+      }
+    }
+  } else {
+    return {
+      error: true,
+      data: null,
+      message: 'No Internet Connection',
+    };
+  }
+};
+
+const redeemLendaInvestment = async details => {
+  if (
+    store.getState().networkState &&
+    store.getState().networkState.network.isConnected &&
+    store.getState().networkState.network.isInternetReachable
+  ) {
+    if (auth?.currentUser?.stsTokenManager?.accessToken) {
+      headers = {
+        accept: 'application/json',
+        Authorization: `Bearer ${auth.currentUser?.stsTokenManager?.accessToken}`,
+        'Content-Type': 'application/json',
+      };
+      try {
+        const response = await axiosInstance.post(
+          `/lenda-investment/complete-redemption`,
+          details,
+          {
+            headers,
+          },
+        );
+        if (response?.data?.error) {
+          return {
+            title: 'Redeem Investment',
+            error: true,
+            data: null,
+            message: response?.data?.message,
+          };
+        }
+        return {
+          title: 'Redeem Investment',
+          error: false,
+          data: response?.data,
+          message: 'Investment redeemption successful',
+        };
+      } catch (error) {
+        return {
+          title: 'Redeem Investment',
+          error: true,
+          data: null,
+          message: 'Investment redeemption failed',
+        };
+      }
+    }
+  } else {
+    return {
+      error: true,
+      data: null,
+      message: 'No Internet Connection',
+    };
+  }
+};
+
+const getLendaOTP = async data => {
+  if (
+    store.getState().networkState &&
+    store.getState().networkState.network.isConnected &&
+    store.getState().networkState.network.isInternetReachable
+  ) {
+    if (auth?.currentUser?.stsTokenManager?.accessToken) {
+      headers = {
+        accept: 'application/json',
+        Authorization: `Bearer ${auth.currentUser?.stsTokenManager?.accessToken}`,
+        'Content-Type': 'application/json',
+      };
+      try {
+        const response = await axiosInstance.post(
+          `/lenda-investment/initiate-redemption-to-get-otp`,
+          data,
+          {
+            headers,
+          },
+        );
+        if (response?.data?.error) {
+          return {
+            title: 'Get Investment OTP',
+            error: true,
+            data: null,
+            message: response?.data?.message,
+          };
+        }
+        return {
+          title: 'Get Investment OTP',
+          error: false,
+          data: response?.data,
+          message: response?.data?.message,
+        };
+      } catch (error) {
+        return {
+          title: 'Top-Up Investment',
+          error: true,
+          data: null,
+          message: 'Get investment OTP failed',
+        };
+      }
+    }
+  } else {
+    return {
+      error: true,
+      data: null,
+      message: 'No Internet Connection',
+    };
+  }
+};
+
 export {
   getAllLendaProduct,
   getAllArmProduct,
@@ -495,4 +692,8 @@ export {
   createArmInvestment,
   topUpLendaInvestment,
   topUpArmInvestment,
+  redeemArmInvestment,
+  redeemLendaInvestment,
+  getArmOTP,
+  getLendaOTP,
 };

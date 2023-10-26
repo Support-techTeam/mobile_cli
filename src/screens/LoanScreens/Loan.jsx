@@ -65,7 +65,6 @@ const Loanscreen = () => {
   useEffect(() => {
     if (route.name === 'LoanHome') {
       const unsubscribe = navigation.addListener('focus', async () => {
-        // console.log('Loan focused..');
         getLoanuserData();
         getApprovedLoansData();
         getPendingLoansData();
