@@ -111,6 +111,19 @@ const AddButton = ({opened, toggleOpened}) => {
                   },
                 ],
               },
+              // style={[
+              //   styles.item,
+              //   opacity,
+              //   {
+              //     transform: [
+              //       {
+              //         translateY: animation.interpolate({
+              //           inputRange: [0, 1],
+              //           outputRange: [0, -100],
+              //         }),
+              //       },
+              //     ],
+              //   },
             ]}>
             <Image
               source={require('../../../assets/images/tawkto.png')}
@@ -145,7 +158,7 @@ const AddButton = ({opened, toggleOpened}) => {
             />
           </Animated.View>
         </TouchableWithoutFeedback> */}
-        <TouchableWithoutFeedback
+        {/* <TouchableWithoutFeedback
           onPress={() => {
             toggleOpened();
           }}>
@@ -177,7 +190,7 @@ const AddButton = ({opened, toggleOpened}) => {
               style={[styles.itemIcon, {tintColor: COLORS.white}]}
             />
           </Animated.View>
-        </TouchableWithoutFeedback>
+        </TouchableWithoutFeedback> */}
         {/* <View style={styles.center} /> */}
         <View style={styles.center2} />
         <View

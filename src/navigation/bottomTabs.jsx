@@ -218,7 +218,7 @@ export default function BottomTabs() {
           }}
         />
         <Tab.Screen
-          name="Settings"
+          name="More"
           component={Morescreens}
           options={{
             tabBarLabel: ({focused, position}) => (
@@ -231,7 +231,7 @@ export default function BottomTabs() {
                     marginLeft: position === 'beside-icon' ? 20 : 0,
                     marginTop: position === 'beside-icon' ? 3 : 0,
                   }}>
-                  Settings
+                  More
                 </Text>
               </>
             ),
