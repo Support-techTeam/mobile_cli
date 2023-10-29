@@ -12,7 +12,6 @@ import {
 import React, {useCallback, useContext, useEffect, useState} from 'react';
 // import ImagePicker from 'react-native-image-picker';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
-import * as ImagePicker from 'react-native-image-picker';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import Feather from 'react-native-vector-icons/Feather';
 import Entypo from 'react-native-vector-icons/Entypo';
@@ -20,8 +19,6 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import {getStatusBarHeight} from 'react-native-status-bar-height';
 import Buttons from '../buttons/Buttons';
 import {useNavigation, useRoute} from '@react-navigation/native';
-import DocumentPicker from 'react-native-document-picker';
-import * as permissions from 'react-native-permissions';
 // you may also import just the functions or constants that you will use from this library
 import {request, PERMISSIONS, openSettings} from 'react-native-permissions';
 import {createUploadDocument} from '../../stores/LoanStore';
@@ -202,29 +199,68 @@ const ProofofAdd = ({
   const launchCameraAsync1 = async () => {
     const permissopnResult = await requestCameraPermission();
     if (permissopnResult) {
-      await launchCamera(
-        {
-          mediaType: 'photo', // Specify 'photo' to capture images
-          maxWidth: 800, // Maximum width for the captured image
-          maxHeight: 600, // Maximum height for the captured image
-          quality: 1,
-        },
-        result => {
+      await launchCamera({
+        mediaType: 'photo', // Specify 'photo' to capture images
+        maxWidth: 800, // Maximum width for the captured image
+        maxHeight: 600, // Maximum height for the captured image
+        quality: 1,
+      })
+        .then(result => {
           if (result.didCancel) {
           } else if (result.error) {
-          } else {
-            handleImageSelection(result);
-            setUserDocs({...userDocs, utilityBill: result});
-            setFile({
-              uri: result?.assets[0]?.uri,
-              name: result?.assets[0]?.fileName,
-              type: result?.assets[0]?.type,
+          } else if (result?.errorCode) {
+            Toast.show({
+              type: 'error',
+              position: 'top',
+              topOffset: 50,
+              text1: 'Camera Access',
+              text2: result?.errorCode.replace('_', ' '),
+              visibilityTime: 5000,
+              autoHide: true,
+              onPress: () => Toast.hide(),
             });
+          } else {
+            if (result !== null && result !== undefined) {
+              handleImageSelection(result);
+              setUserDocs({...userDocs, utilityBill: result});
+              setFile({
+                uri: result?.assets[0]?.uri ?? result?.uri,
+                name: result?.assets[0]?.fileName ?? result?.fileName,
+                type: result?.assets[0]?.type ?? result?.type,
+              });
+            }
             setDocumentName('utilityBill');
             setNextRoute('PersonalPhoto');
           }
-        },
-      );
+        })
+        .catch(error => {});
+      // await launchCamera(
+      //   {
+      //     mediaType: 'photo', // Specify 'photo' to capture images
+      //     maxWidth: 800, // Maximum width for the captured image
+      //     maxHeight: 600, // Maximum height for the captured image
+      //     quality: 1,
+      //   },
+      //   result => {
+      //     if (result?.didCancel) {
+      //     } else if (result?.error) {
+      //     } else {
+      //       if(result !== null && result !== undefined){
+      //         handleImageSelection(result);
+      //         setUserDocs({...userDocs, utilityBill: result});
+      //         console.log('res', result)
+      //         setFile({
+      //           uri: result?.assets[0]?.uri ?? result?.uri,
+      //           name: result?.assets[0]?.fileName ?? result?.fileName,
+      //           type: result?.assets[0]?.type ?? result?.type,
+      //         });
+      //       }
+
+      //       setDocumentName('utilityBill');
+      //       setNextRoute('PersonalPhoto');
+      //     }
+      //   },
+      // );
     } else {
       Alert.alert(
         'Permission Required',
@@ -237,29 +273,65 @@ const ProofofAdd = ({
   const launchCameraAsync2 = async () => {
     const permissopnResult = await requestCameraPermission();
     if (permissopnResult) {
-      await launchCamera(
-        {
-          mediaType: 'photo', // Specify 'photo' to capture images
-          maxWidth: 800, // Maximum width for the captured image
-          maxHeight: 600, // Maximum height for the captured image
-          quality: 1,
-        },
-        result => {
+      await launchCamera({
+        mediaType: 'photo', // Specify 'photo' to capture images
+        maxWidth: 800, // Maximum width for the captured image
+        maxHeight: 600, // Maximum height for the captured image
+        quality: 1,
+      })
+        .then(result => {
           if (result.didCancel) {
           } else if (result.error) {
-          } else {
-            handleImageSelection(result);
-            setUserDocs({...userDocs, bankStatement: result});
-            setFile({
-              uri: result?.assets[0]?.uri,
-              name: result?.assets[0]?.fileName,
-              type: result?.assets[0]?.type,
+          } else if (result?.errorCode) {
+            Toast.show({
+              type: 'error',
+              position: 'top',
+              topOffset: 50,
+              text1: 'Camera Access',
+              text2: result?.errorCode.replace('_', ' '),
+              visibilityTime: 5000,
+              autoHide: true,
+              onPress: () => Toast.hide(),
             });
+          } else {
+            if (result !== null && result !== undefined) {
+              handleImageSelection(result);
+              setUserDocs({...userDocs, utilityBill: result});
+              setFile({
+                uri: result?.assets[0]?.uri ?? result?.uri,
+                name: result?.assets[0]?.fileName ?? result?.fileName,
+                type: result?.assets[0]?.type ?? result?.type,
+              });
+            }
             setDocumentName('bankStatement');
             setNextRoute('Passport');
           }
-        },
-      );
+        })
+        .catch(error => {});
+
+      // await launchCamera(
+      //   {
+      //     mediaType: 'photo', // Specify 'photo' to capture images
+      //     maxWidth: 800, // Maximum width for the captured image
+      //     maxHeight: 600, // Maximum height for the captured image
+      //     quality: 1,
+      //   },
+      //   result => {
+      //     if (result.didCancel) {
+      //     } else if (result.error) {
+      //     } else {
+      //       handleImageSelection(result);
+      //       setUserDocs({...userDocs, bankStatement: result});
+      //       setFile({
+      //         uri: result?.assets[0]?.uri,
+      //         name: result?.assets[0]?.fileName,
+      //         type: result?.assets[0]?.type,
+      //       });
+      //       setDocumentName('bankStatement');
+      //       setNextRoute('Passport');
+      //     }
+      //   },
+      // );
     } else {
       Alert.alert(
         'Permission Required',
@@ -272,29 +344,64 @@ const ProofofAdd = ({
   const launchCameraAsync3 = async () => {
     const permissopnResult = await requestCameraPermission();
     if (permissopnResult) {
-      await launchCamera(
-        {
-          mediaType: 'photo', // Specify 'photo' to capture images
-          maxWidth: 800, // Maximum width for the captured image
-          maxHeight: 600, // Maximum height for the captured image
-          quality: 1,
-        },
-        result => {
+      await launchCamera({
+        mediaType: 'photo', // Specify 'photo' to capture images
+        maxWidth: 800, // Maximum width for the captured image
+        maxHeight: 600, // Maximum height for the captured image
+        quality: 1,
+      })
+        .then(result => {
           if (result.didCancel) {
           } else if (result.error) {
-          } else {
-            handleImageSelection(result);
-            setUserDocs({...userDocs, passport: result});
-            setFile({
-              uri: result?.assets[0]?.uri,
-              name: result?.assets[0]?.fileName,
-              type: result?.assets[0]?.type,
+          } else if (result?.errorCode) {
+            Toast.show({
+              type: 'error',
+              position: 'top',
+              topOffset: 50,
+              text1: 'Camera Access',
+              text2: result?.errorCode.replace('_', ' '),
+              visibilityTime: 5000,
+              autoHide: true,
+              onPress: () => Toast.hide(),
             });
+          } else {
+            if (result !== null && result !== undefined) {
+              handleImageSelection(result);
+              setUserDocs({...userDocs, utilityBill: result});
+              setFile({
+                uri: result?.assets[0]?.uri ?? result?.uri,
+                name: result?.assets[0]?.fileName ?? result?.fileName,
+                type: result?.assets[0]?.type ?? result?.type,
+              });
+            }
             setDocumentName('passport');
             setNextRoute('Signature');
           }
-        },
-      );
+        })
+        .catch(error => {});
+      // await launchCamera(
+      //   {
+      //     mediaType: 'photo', // Specify 'photo' to capture images
+      //     maxWidth: 800, // Maximum width for the captured image
+      //     maxHeight: 600, // Maximum height for the captured image
+      //     quality: 1,
+      //   },
+      //   result => {
+      //     if (result.didCancel) {
+      //     } else if (result.error) {
+      //     } else {
+      //       handleImageSelection(result);
+      //       setUserDocs({...userDocs, passport: result});
+      //       setFile({
+      //         uri: result?.assets[0]?.uri,
+      //         name: result?.assets[0]?.fileName,
+      //         type: result?.assets[0]?.type,
+      //       });
+      //       setDocumentName('passport');
+      //       setNextRoute('Signature');
+      //     }
+      //   },
+      // );
     } else {
       Alert.alert(
         'Permission Required',
@@ -307,29 +414,64 @@ const ProofofAdd = ({
   const launchCameraAsync4 = async () => {
     const permissopnResult = await requestCameraPermission();
     if (permissopnResult) {
-      await launchCamera(
-        {
-          mediaType: 'photo', // Specify 'photo' to capture images
-          maxWidth: 800, // Maximum width for the captured image
-          maxHeight: 600, // Maximum height for the captured image
-          quality: 1,
-        },
-        result => {
+      await launchCamera({
+        mediaType: 'photo', // Specify 'photo' to capture images
+        maxWidth: 800, // Maximum width for the captured image
+        maxHeight: 600, // Maximum height for the captured image
+        quality: 1,
+      })
+        .then(result => {
           if (result.didCancel) {
           } else if (result.error) {
-          } else {
-            handleImageSelection(result);
-            setUserDocs({...userDocs, seal: result});
-            setFile({
-              uri: result?.assets[0]?.uri,
-              name: result?.assets[0]?.fileName,
-              type: result?.assets[0]?.type,
+          } else if (result?.errorCode) {
+            Toast.show({
+              type: 'error',
+              position: 'top',
+              topOffset: 50,
+              text1: 'Camera Access',
+              text2: result?.errorCode.replace('_', ' '),
+              visibilityTime: 5000,
+              autoHide: true,
+              onPress: () => Toast.hide(),
             });
+          } else {
+            if (result !== null && result !== undefined) {
+              handleImageSelection(result);
+              setUserDocs({...userDocs, utilityBill: result});
+              setFile({
+                uri: result?.assets[0]?.uri ?? result?.uri,
+                name: result?.assets[0]?.fileName ?? result?.fileName,
+                type: result?.assets[0]?.type ?? result?.type,
+              });
+            }
             setDocumentName('seal');
             setNextRoute('CAC');
           }
-        },
-      );
+        })
+        .catch(error => {});
+      // await launchCamera(
+      //   {
+      //     mediaType: 'photo', // Specify 'photo' to capture images
+      //     maxWidth: 800, // Maximum width for the captured image
+      //     maxHeight: 600, // Maximum height for the captured image
+      //     quality: 1,
+      //   },
+      //   result => {
+      //     if (result.didCancel) {
+      //     } else if (result.error) {
+      //     } else {
+      //       handleImageSelection(result);
+      //       setUserDocs({...userDocs, seal: result});
+      //       setFile({
+      //         uri: result?.assets[0]?.uri,
+      //         name: result?.assets[0]?.fileName,
+      //         type: result?.assets[0]?.type,
+      //       });
+      //       setDocumentName('seal');
+      //       setNextRoute('CAC');
+      //     }
+      //   },
+      // );
     } else {
       Alert.alert(
         'Permission Required',
@@ -342,29 +484,64 @@ const ProofofAdd = ({
   const launchCameraAsync5 = async () => {
     const permissopnResult = await requestCameraPermission();
     if (permissopnResult) {
-      await launchCamera(
-        {
-          mediaType: 'photo', // Specify 'photo' to capture images
-          maxWidth: 800, // Maximum width for the captured image
-          maxHeight: 600, // Maximum height for the captured image
-          quality: 1,
-        },
-        result => {
+      await launchCamera({
+        mediaType: 'photo', // Specify 'photo' to capture images
+        maxWidth: 800, // Maximum width for the captured image
+        maxHeight: 600, // Maximum height for the captured image
+        quality: 1,
+      })
+        .then(result => {
           if (result.didCancel) {
           } else if (result.error) {
-          } else {
-            handleImageSelection(result);
-            setUserDocs({...userDocs, cacCertificate: result});
-            setFile({
-              uri: result?.assets[0]?.uri,
-              name: result?.assets[0]?.fileName,
-              type: result?.assets[0]?.type,
+          } else if (result?.errorCode) {
+            Toast.show({
+              type: 'error',
+              position: 'top',
+              topOffset: 50,
+              text1: 'Camera Access',
+              text2: result?.errorCode.replace('_', ' '),
+              visibilityTime: 5000,
+              autoHide: true,
+              onPress: () => Toast.hide(),
             });
+          } else {
+            if (result !== null && result !== undefined) {
+              handleImageSelection(result);
+              setUserDocs({...userDocs, utilityBill: result});
+              setFile({
+                uri: result?.assets[0]?.uri ?? result?.uri,
+                name: result?.assets[0]?.fileName ?? result?.fileName,
+                type: result?.assets[0]?.type ?? result?.type,
+              });
+            }
             setDocumentName('cacCertificate');
             setNextRoute('Others');
           }
-        },
-      );
+        })
+        .catch(error => {});
+      // await launchCamera(
+      //   {
+      //     mediaType: 'photo', // Specify 'photo' to capture images
+      //     maxWidth: 800, // Maximum width for the captured image
+      //     maxHeight: 600, // Maximum height for the captured image
+      //     quality: 1,
+      //   },
+      //   result => {
+      //     if (result.didCancel) {
+      //     } else if (result.error) {
+      //     } else {
+      //       handleImageSelection(result);
+      //       setUserDocs({...userDocs, cacCertificate: result});
+      //       setFile({
+      //         uri: result?.assets[0]?.uri,
+      //         name: result?.assets[0]?.fileName,
+      //         type: result?.assets[0]?.type,
+      //       });
+      //       setDocumentName('cacCertificate');
+      //       setNextRoute('Others');
+      //     }
+      //   },
+      // );
     } else {
       Alert.alert(
         'Permission Required',
@@ -377,29 +554,65 @@ const ProofofAdd = ({
   const launchCameraAsync6 = async () => {
     const permissopnResult = await requestCameraPermission();
     if (permissopnResult) {
-      await launchCamera(
-        {
-          mediaType: 'photo', // Specify 'photo' to capture images
-          maxWidth: 800, // Maximum width for the captured image
-          maxHeight: 600, // Maximum height for the captured image
-          quality: 1,
-        },
-        result => {
+      await launchCamera({
+        mediaType: 'photo', // Specify 'photo' to capture images
+        maxWidth: 800, // Maximum width for the captured image
+        maxHeight: 600, // Maximum height for the captured image
+        quality: 1,
+      })
+        .then(result => {
           if (result.didCancel) {
           } else if (result.error) {
-          } else {
-            handleImageSelection(result);
-            setUserDocs({...userDocs, personalPhoto: result});
-            setFile({
-              uri: result?.assets[0]?.uri,
-              name: result?.assets[0]?.fileName,
-              type: result?.assets[0]?.type,
+          } else if (result?.errorCode) {
+            Toast.show({
+              type: 'error',
+              position: 'top',
+              topOffset: 50,
+              text1: 'Camera Access',
+              text2: result?.errorCode.replace('_', ' '),
+              visibilityTime: 5000,
+              autoHide: true,
+              onPress: () => Toast.hide(),
             });
+          } else {
+            if (result !== null && result !== undefined) {
+              handleImageSelection(result);
+              setUserDocs({...userDocs, utilityBill: result});
+              setFile({
+                uri: result?.assets[0]?.uri ?? result?.uri,
+                name: result?.assets[0]?.fileName ?? result?.fileName,
+                type: result?.assets[0]?.type ?? result?.type,
+              });
+            }
+
             setDocumentName('personalPhoto');
             setNextRoute('IdentityCard');
           }
-        },
-      );
+        })
+        .catch(error => {});
+      // await launchCamera(
+      //   {
+      //     mediaType: 'photo', // Specify 'photo' to capture images
+      //     maxWidth: 800, // Maximum width for the captured image
+      //     maxHeight: 600, // Maximum height for the captured image
+      //     quality: 1,
+      //   },
+      //   result => {
+      //     if (result.didCancel) {
+      //     } else if (result.error) {
+      //     } else {
+      //       handleImageSelection(result);
+      //       setUserDocs({...userDocs, personalPhoto: result});
+      //       setFile({
+      //         uri: result?.assets[0]?.uri,
+      //         name: result?.assets[0]?.fileName,
+      //         type: result?.assets[0]?.type,
+      //       });
+      //       setDocumentName('personalPhoto');
+      //       setNextRoute('IdentityCard');
+      //     }
+      //   },
+      // );
     } else {
       Alert.alert(
         'Permission Required',
@@ -412,29 +625,64 @@ const ProofofAdd = ({
   const launchCameraAsync7 = async () => {
     const permissopnResult = await requestCameraPermission();
     if (permissopnResult) {
-      await launchCamera(
-        {
-          mediaType: 'photo', // Specify 'photo' to capture images
-          maxWidth: 800, // Maximum width for the captured image
-          maxHeight: 600, // Maximum height for the captured image
-          quality: 1,
-        },
-        result => {
+      await launchCamera({
+        mediaType: 'photo', // Specify 'photo' to capture images
+        maxWidth: 800, // Maximum width for the captured image
+        maxHeight: 600, // Maximum height for the captured image
+        quality: 1,
+      })
+        .then(result => {
           if (result.didCancel) {
           } else if (result.error) {
-          } else {
-            handleImageSelection(result);
-            setUserDocs({...userDocs, identityCard: result});
-            setFile({
-              uri: result?.assets[0]?.uri,
-              name: result?.assets[0]?.fileName,
-              type: result?.assets[0]?.type,
+          } else if (result?.errorCode) {
+            Toast.show({
+              type: 'error',
+              position: 'top',
+              topOffset: 50,
+              text1: 'Camera Access',
+              text2: result?.errorCode.replace('_', ' '),
+              visibilityTime: 5000,
+              autoHide: true,
+              onPress: () => Toast.hide(),
             });
+          } else {
+            if (result !== null && result !== undefined) {
+              handleImageSelection(result);
+              setUserDocs({...userDocs, utilityBill: result});
+              setFile({
+                uri: result?.assets[0]?.uri ?? result?.uri,
+                name: result?.assets[0]?.fileName ?? result?.fileName,
+                type: result?.assets[0]?.type ?? result?.type,
+              });
+            }
             setDocumentName('identityCard');
             setNextRoute('BankStatement');
           }
-        },
-      );
+        })
+        .catch(error => {});
+      // await launchCamera(
+      //   {
+      //     mediaType: 'photo', // Specify 'photo' to capture images
+      //     maxWidth: 800, // Maximum width for the captured image
+      //     maxHeight: 600, // Maximum height for the captured image
+      //     quality: 1,
+      //   },
+      //   result => {
+      //     if (result.didCancel) {
+      //     } else if (result.error) {
+      //     } else {
+      //       handleImageSelection(result);
+      //       setUserDocs({...userDocs, identityCard: result});
+      //       setFile({
+      //         uri: result?.assets[0]?.uri,
+      //         name: result?.assets[0]?.fileName,
+      //         type: result?.assets[0]?.type,
+      //       });
+      //       setDocumentName('identityCard');
+      //       setNextRoute('BankStatement');
+      //     }
+      //   },
+      // );
     } else {
       Alert.alert(
         'Permission Required',
@@ -704,8 +952,10 @@ const ProofofAdd = ({
 
   const handleImageSelection = async result => {
     if (!result.canceled) {
-      setImage(result.assets[0].uri);
-      setShowConfirmModal(true);
+      if (result) {
+        setImage(result?.assets[0]?.uri ?? result?.uri);
+        setShowConfirmModal(true);
+      }
     }
   };
 

@@ -22,6 +22,7 @@ import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import {getLoanUserDetails, createArmDetails} from '../../stores/LoanStore';
 import data from '../../constants/data.json';
+import KeyboardAvoidingWrapper from '../../component/KeyBoardAvoiding/keyBoardAvoiding';
 
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
@@ -265,6 +266,7 @@ const ArmDetails = () => {
           *Please enter your valid bank account details*
         </Text>
       </View>
+      <KeyboardAvoidingWrapper>
       <ImageBackground
         source={require('../../../assets/signup.png')}
         resizeMode="cover"
@@ -547,6 +549,7 @@ const ArmDetails = () => {
           </View>
         </ScrollView>
       </ImageBackground>
+      </KeyboardAvoidingWrapper>
     </SafeAreaView>
   );
 };
@@ -559,7 +562,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   image: {
-    height: screenHeight,
+    // height: screenHeight,
     width: screenWidth,
     justifyContent: 'center',
   },

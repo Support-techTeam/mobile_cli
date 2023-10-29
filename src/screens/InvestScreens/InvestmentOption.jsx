@@ -59,31 +59,57 @@ const InvestmentOptionScreen = () => {
 
   const getLendaProducts = async () => {
     setIsLoading(true);
-    const res = await getAllLendaProduct();
-    if (res?.error) {
-    } else {
-      setData(res?.data);
-    }
+    getAllLendaProduct()
+      .then(res => {
+        if (res?.data?.length > 0) {
+          setData(res?.data);
+        }
+      })
+      .catch(e => {});
+    // const res = await getAllLendaProduct();
+    // if (res?.error) {
+    // } else {
+    //   if(res?.data?.length > 0) {
+    //     setData(res?.data);
+    //   }
+    // }
     setIsLoading(false);
   };
 
   const getArmProducts = async data => {
     setIsLoading(true);
-    const res = await getAllArmProduct(data);
-    if (res?.error) {
-    } else {
-      setData(res?.data);
-    }
+    getAllArmProduct(data)
+    .then(res => {
+      if (res?.data?.length > 0) {
+        setData(res?.data);
+      }
+    })
+    .catch(e => {});
+    // const res = await getAllArmProduct(data);
+    // if (res?.error) {
+    // } else {
+    //   if (res?.data?.length > 0) {
+    //     setData(res?.data);
+    //   }
+    // }
     setIsLoading(false);
   };
 
   const getSingleArmProductYield = async () => {
     setIsLoading(true);
-    const res = await getArmProductYield('ARMMMF');
-    if (res?.error) {
-    } else {
-      setYieldData(res?.data);
-    }
+    // const res = await getArmProductYield('ARMMMF');
+    getArmProductYield('ARMMMF')
+    .then(res => {
+      if (res?.error) {
+      } else {
+        setYieldData(res?.data);
+      }
+    })
+    .catch(e => {});
+    // if (res?.error) {
+    // } else {
+    //   setYieldData(res?.data);
+    // }
     setIsLoading(false);
   };
 
@@ -157,17 +183,15 @@ const InvestmentOptionScreen = () => {
             bounces={false}
             showsHorizontalScrollIndicator={false}
             showsVerticalScrollIndicator={true}
-            onScroll={() => setIsScrolling(true)}
-            onMomentumScrollEnd={() =>
-              setTimeout(() => {
-                setIsScrolling(false);
-              }, 500)
-            }
-            centerContent={true}
+            // onScroll={() => setIsScrolling(true)}
+            // onMomentumScrollEnd={() =>
+            //   setTimeout(() => {
+            //     setIsScrolling(false);
+            //   }, 500)
+            // }
             style={[styles.scrollView]}
-            contentContainerStyle={styles.contentContainer}
             alwaysBounceVertical={false}>
-            {(data && data.length == 0) || (data && data == undefined) ? (
+            {(data && data?.length == 0) || (data && data == undefined) ? (
               <View style={styles.transHistory}>
                 <View
                   style={{
@@ -184,7 +208,7 @@ const InvestmentOptionScreen = () => {
               </View>
             ) : (
               data &&
-              data.map((item, i) => {
+              data?.map((item, i) => {
                 return (
                   <TouchableOpacity
                     key={i}
@@ -227,8 +251,8 @@ const InvestmentOptionScreen = () => {
                               color: COLORS.dark,
                             }}>
                             {name === 'Arm'
-                              ? item.productCode
-                              : item.investmentName}
+                              ? item?.productCode
+                              : item?.investmentName}
                           </Text>
                           <Text
                             style={[
@@ -246,10 +270,10 @@ const InvestmentOptionScreen = () => {
                             {name === 'Arm'
                               ? `${
                                   yieldData
-                                    ? Number(yieldData?.yield).toFixed(2)
+                                    ? Number(yieldData?.yield)?.toFixed(2)
                                     : '0.00'
                                 }% Yield`
-                              : `${Number(item.interestRate).toFixed(
+                              : `${Number(item?.interestRate)?.toFixed(
                                   1,
                                 )}% Interest`}
                           </Text>
@@ -319,6 +343,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     backgroundColor: '#fff',
   },
+  scrollView: {
+    alignContent: 'flex-start',
+  },
   HeadView: {
     flexDirection: 'row',
     width: wp(80),
@@ -341,7 +368,6 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   titleView: {
-    paddingTop: 2,
     paddingBottom: 5,
     paddingHorizontal: 15,
     flexDirection: 'row',
@@ -352,11 +378,11 @@ const styles = StyleSheet.create({
   title: {
     fontWeight: '500',
     fontSize: hp(2.5),
-    lineHeight: 21,
+    // lineHeight: 21,
     color: '#14142B',
   },
   noTrans: {
-    fontFamily: 'MontSBold',
+    // fontFamily: 'MontSBold',
     fontSize: 18,
     textAlign: 'center',
     lineHeight: 26,

@@ -860,6 +860,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   input: {
+    color: '#14142B',
     height: 85,
   },
   getLoan: {

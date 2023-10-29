@@ -164,7 +164,6 @@ const Investscreen = () => {
     loanUserDetails?.loanDocumentDetails?.personalPhoto != '';
 
   const loadingList = ['string', 'string', 'string'];
-
   const status = [
     {
       id: 1,
@@ -229,16 +228,14 @@ const Investscreen = () => {
         ) : (
           <View
             style={{
-              width: wp('43.5%'),
-              height: hp('25%'),
+              width: wp(43.5),
+              height: hp(26),
               marginHorizontal: 2,
               borderRadius: 20,
               borderColor: '#F7F7FC',
               borderWidth: 2,
               overflow: 'hidden',
-              shadowOffset: 4,
-              shadowColor: '#F7F7FC',
-              shadowOpacity: 1,
+              justifyContent: 'center',
             }}>
             <View style={{paddingHorizontal: 10}}>
               <View
@@ -247,12 +244,12 @@ const Investscreen = () => {
                   justifyContent: 'space-between',
                   alignItems: 'center',
                 }}>
-                <View style={{width: '70%'}}>
+                <View style={{width: wp(27)}}>
                   <Text style={styles.state}>{item.state}</Text>
                 </View>
                 <Image
                   source={item.icon}
-                  style={{width: wp('10%')}}
+                  style={{width: wp(10)}}
                   resizeMode="contain"
                 />
               </View>
@@ -522,6 +519,7 @@ const Investscreen = () => {
               numColumns={1}
               showsHorizontalScrollIndicator={false}
               showsVerticalScrollIndicator={false}
+              contentContainerStyle={{flex: 1, justifyContent: 'center'}}
               horizontal
               renderItem={({item}) => <Slide item={item} />}
             />
@@ -580,6 +578,7 @@ const Investscreen = () => {
               data={status}
               showsHorizontalScrollIndicator={false}
               showsVerticalScrollIndicator={false}
+              contentContainerStyle={{flex: 1, justifyContent: 'center'}}
               horizontal
               renderItem={({item}) => <Slide item={item} />}
             />
@@ -683,14 +682,14 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   state: {
-    fontSize: 12,
+    fontSize: hp(1.6),
     fontWeight: '400',
     color: '#4E4B66',
   },
   amount: {
     marginTop: hp(0.5),
     fontFamily: 'serif',
-    fontSize: hp(3),
+    fontSize: hp(2.5),
     marginVertical: hp(2.2),
   },
 });

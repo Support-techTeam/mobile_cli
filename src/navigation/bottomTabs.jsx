@@ -21,6 +21,10 @@ import LoanStack from './LoanStack';
 import {Investscreen} from '../screens/InvestScreens';
 import AddButton from '../component/TabContainer/AddButton';
 import {useTabMenu} from '../context/TabContext';
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from 'react-native-responsive-screen';
 
 const Tab = createBottomTabNavigator();
 
@@ -273,18 +277,16 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   tabBar: {
-    // position: 'absolute',
-    padding: 0,
-    // marginHorizontal: 2,
-    left: 0,
-    right: 0,
-    bottom: 1,
+    paddingTop: 0,
+    marginTop: 0,
     height: 58,
-    borderRadius: 2,
-    borderWidth: 1,
+    marginBottom: 1,
+    paddingTop: 5,
+    paddingBottom: 5,
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
     borderColor: COLORS.grey,
     backgroundColor: COLORS.white,
-    // borderTopColor: 'transparent',
     shadowColor: COLORS.black,
     shadowOffset: {
       height: 6,

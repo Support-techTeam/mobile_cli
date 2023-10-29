@@ -126,7 +126,7 @@ const InvestmentSummaryScreen = () => {
           bounces={false}
           showsHorizontalScrollIndicator={false}
           showsVerticalScrollIndicator={true}
-          onScroll={() => setIsScrolling(true)}
+          // onScroll={() => setIsScrolling(true)}
           onMomentumScrollEnd={() =>
             setTimeout(() => {
               setIsScrolling(false);
@@ -180,6 +180,7 @@ const InvestmentSummaryScreen = () => {
                       marginVertical: 10,
                       justifyContent: 'flex-start',
                       textAlign: 'justify',
+                      fontSize: hp(1.6),
                       lineHeight: hp(3),
                     }}>
                     The ARM Money Market Fund offers a higher interest rate on
@@ -198,7 +199,7 @@ const InvestmentSummaryScreen = () => {
                       style={styles.InternalImage}
                       source={require('../../../assets/images/checkMark.png')}
                     />
-                    <Text style={styles?.itemText}>{item?.text}</Text>
+                    <Text style={[styles?.itemText, { fontSize: hp(1.6)}]}>{item?.text}</Text>
                   </View>
                 ))}
               </View>
@@ -237,7 +238,7 @@ const InvestmentSummaryScreen = () => {
                   alignSelf: 'center',
                   backgroundColor: '#EEEEEE',
                   paddingVertical: 5,
-                  width: wp(60),
+                  width: wp(90),
                 }}>
                 <Text style={styles.noTrans}>
                   Amount{' '}
@@ -337,17 +338,19 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   HeadView: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    alignSelf: 'center',
     flexDirection: 'row',
     width: wp(90),
-    justifyContent: 'center',
   },
   TopView: {
     justifyContent: 'space-between',
   },
   TextHead: {
     fontWeight: '700',
-    fontSize: 16,
-    lineHeight: 20,
+    fontSize: hp(3),
+    // lineHeight: 20,
     letterSpacing: 0.5,
   },
   demark: {
@@ -369,14 +372,13 @@ const styles = StyleSheet.create({
   title: {
     fontWeight: '500',
     fontSize: hp(2.5),
-    lineHeight: 21,
     color: '#14142B',
   },
   noTrans: {
     fontFamily: 'MontSBold',
-    fontSize: wp(4),
+    fontSize: hp(2),
     textAlign: 'center',
-    lineHeight: 26,
+    // lineHeight: 26,
   },
   transHistory: {
     padding: 14,

@@ -44,10 +44,10 @@ const Finance = () => {
       <ScrollView
         showsHorizontalScrollIndicator={false}
         showsVerticalScrollIndicator={false}>
-        <CustomView
+        {/* <CustomView
           label={`${bankDeets?.email === undefined ? 'N/A' : bankDeets?.email}`}
           subLabel="Email"
-        />
+        /> */}
 
         <CustomView
           label={`${

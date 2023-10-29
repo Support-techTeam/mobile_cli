@@ -117,6 +117,9 @@ const ProofOfAddress = () => {
             <Text style={styles.TextHead}>UPLOAD DOCUMENT</Text>
           </View>
         </View>
+        <View>
+          <Text> </Text>
+        </View>
       </View>
 
       <View style={styles.form}>
@@ -222,7 +225,6 @@ const styles = StyleSheet.create({
   tabText2: {
     fontFamily: 'serif',
     fontSize: 12,
-
     textAlign: 'center',
   },
   TextHead: {
@@ -230,6 +232,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 24,
     letterSpacing: 0.4,
+    textAlign: 'center',
+    
   },
   container: {
     flex: 1,
@@ -261,5 +265,5 @@ const styles = StyleSheet.create({
   camHead: {
     fontSize: 14,
     fontWeight: '400',
-  },
+  }
 });

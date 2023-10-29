@@ -33,11 +33,18 @@ const userLogin = async (email, password) => {
         message: 'Login Successful',
       };
     } catch (err) {
+      console.log(err.code);
+      const errorMsg =
+        err.code === 'auth/user-not-found'
+          ? 'User not found. Please check your email.'
+          : err.code === 'auth/wrong-password'
+          ? 'Incorrect password. Please try again.'
+          : 'An error occurred. Please try again later.';
       return {
         user: null,
         title: 'Account Login',
         error: true,
-        message: `${err.message}`,
+        message: errorMsg,
       };
     }
   } else {

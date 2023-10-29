@@ -880,17 +880,17 @@ const Loanscreen = () => {
   );
 
   const data = [
-    {id: 'pending', title: 'Pending Loans'},
-    {id: 'approved', title: 'Approved Loans'},
-    {id: 'paid', title: 'Paid Loans'},
     {id: 'all', title: 'All Loans'},
+    {id: 'approved', title: 'Approved Loans'},
+    {id: 'pending', title: 'Pending Loans'},
+    {id: 'paid', title: 'Paid Loans'},
   ];
 
   const renderScene = SceneMap({
-    pending: fourthRoute,
-    approved: SecondRoute,
-    paid: ThirdRoute,
     all: FirstRoute,
+    approved: SecondRoute,
+    pending: fourthRoute,
+    paid: ThirdRoute,
   });
 
   const status = [

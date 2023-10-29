@@ -3,10 +3,10 @@ import {FlatList, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const data = [
-  {id: 'pending', title: 'Pending Loans'},
-  {id: 'approved', title: 'Approved Loans'},
-  {id: 'paid', title: 'Paid Loans'},
   {id: 'all', title: 'All Loans'},
+  {id: 'approved', title: 'Approved Loans'},
+  {id: 'pending', title: 'Pending Loans'},
+  {id: 'paid', title: 'Paid Loans'},
 ];
 
 const CustomTabBar = ({navigationState, onIndexChange}) => {

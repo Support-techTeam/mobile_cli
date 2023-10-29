@@ -118,7 +118,9 @@ const InvestmentDetails = () => {
           {name === 'Arm' && (
             <View style={styles.detailsView}>
               <Text style={styles.desc}>Membership ID</Text>
-              <Text style={styles.amount}>{investment?.membershipId}</Text>
+              <Text style={styles.amount}>
+                {investment?.membershipId ?? 'NIL'}
+              </Text>
             </View>
           )}
 
@@ -187,10 +189,12 @@ const InvestmentDetails = () => {
               <Text style={styles.desc}>Account Balance</Text>
               <Text style={styles.amount}>
                 ₦
-                {Number(portfolioDetail?.accountBalance)
-                  .toFixed(2)
-                  ?.toString()
-                  ?.replace(/\B(?=(\d{3})+\b)/g, ',') ?? '0.00'}
+                {portfolioDetail?.accountBalance
+                  ? Number(portfolioDetail?.accountBalance)
+                      .toFixed(2)
+                      ?.toString()
+                      ?.replace(/\B(?=(\d{3})+\b)/g, ',')
+                  : '0.00'}
               </Text>
             </View>
           )}
@@ -409,8 +413,12 @@ const InvestmentDetails = () => {
                 marginHorizontal: 5,
               }}
               disabled={
-                name === 'Lenda' && investment?.investmentStatus === 'CLOSED'
-                  ? investment?.investmentStatus === 'CLOSED'
+                (name === 'Lenda' &&
+                  investment?.investmentStatus === 'CLOSED') ||
+                (name === 'Arm' && investment?.membershipId === null) ||
+                (name === 'Arm' && investment?.membershipId === '') ||
+                (name === 'Arm' && investment?.membershipId === undefined)
+                  ? true
                   : false
               }
               onPress={() => {
@@ -430,8 +438,12 @@ const InvestmentDetails = () => {
               <Buttons
                 label={'Top Up'}
                 disabled={
-                  name === 'Lenda' && investment?.investmentStatus === 'CLOSED'
-                    ? investment?.investmentStatus === 'CLOSED'
+                  (name === 'Lenda' &&
+                    investment?.investmentStatus === 'CLOSED') ||
+                  (name === 'Arm' && investment?.membershipId === null) ||
+                  (name === 'Arm' && investment?.membershipId === '') ||
+                  (name === 'Arm' && investment?.membershipId === undefined)
+                    ? true
                     : false
                 }
               />
@@ -444,8 +456,12 @@ const InvestmentDetails = () => {
                 marginHorizontal: 5,
               }}
               disabled={
-                name === 'Lenda' && investment?.investmentStatus === 'CLOSED'
-                  ? investment?.investmentStatus === 'CLOSED'
+                (name === 'Lenda' &&
+                  investment?.investmentStatus === 'CLOSED') ||
+                (name === 'Arm' && investment?.membershipId === null) ||
+                (name === 'Arm' && investment?.membershipId === '') ||
+                (name === 'Arm' && investment?.membershipId === undefined)
+                  ? true
                   : false
               }
               onPress={() => {
@@ -466,8 +482,12 @@ const InvestmentDetails = () => {
               <Buttons
                 label={'Redeem'}
                 disabled={
-                  name === 'Lenda' && investment?.investmentStatus === 'CLOSED'
-                    ? investment?.investmentStatus === 'CLOSED'
+                  (name === 'Lenda' &&
+                    investment?.investmentStatus === 'CLOSED') ||
+                  (name === 'Arm' && investment?.membershipId === null) ||
+                  (name === 'Arm' && investment?.membershipId === '') ||
+                  (name === 'Arm' && investment?.membershipId === undefined)
+                    ? true
                     : false
                 }
               />
