@@ -25,6 +25,7 @@ import {
   getLoanUserDetails,
 } from '../../stores/LoanStore';
 import {useRoute, useIsFocused} from '@react-navigation/native';
+import {getGuarantors} from '../../stores/GuarantorStore';
 
 const {width, height} = Dimensions.get('window');
 
@@ -38,8 +39,8 @@ const Loanscreen = () => {
   const [allLoansData, setAllLoansData] = useState([]);
   const [loanUserDetails, setLoanUserDetails] = useState(undefined);
   const [isLoading, setIsLoading] = useState(false);
+  const [guarantor, setGuarantor] = useState([]);
   const route = useRoute();
-  const isFocused = useIsFocused();
   //total approvedLoans
   let totalApprovedLoanAmount = 0;
 
@@ -64,12 +65,12 @@ const Loanscreen = () => {
   useEffect(() => {
     if (route.name === 'LoanHome') {
       const unsubscribe = navigation.addListener('focus', async () => {
-        // console.log('Loan focused..');
         getLoanuserData();
         getApprovedLoansData();
         getPendingLoansData();
         getAllLoansData();
         getPaidLoansData();
+        getGuarantorData();
       });
       return unsubscribe;
     }
@@ -169,6 +170,13 @@ const Loanscreen = () => {
       setPaidLoansData(res?.data);
     }
     setIsLoading(false);
+  };
+  const getGuarantorData = async () => {
+    const res = await getGuarantors();
+    if (res?.error) {
+    } else {
+      setGuarantor(res?.data);
+    }
   };
 
   const loadingList = ['string', 'string', 'string', 'string'];
@@ -872,17 +880,17 @@ const Loanscreen = () => {
   );
 
   const data = [
-    {id: 'pending', title: 'Pending Loans'},
-    {id: 'approved', title: 'Approved Loans'},
-    {id: 'paid', title: 'Paid Loans'},
     {id: 'all', title: 'All Loans'},
+    {id: 'approved', title: 'Approved Loans'},
+    {id: 'pending', title: 'Pending Loans'},
+    {id: 'paid', title: 'Paid Loans'},
   ];
 
   const renderScene = SceneMap({
-    pending: fourthRoute,
-    approved: SecondRoute,
-    paid: ThirdRoute,
     all: FirstRoute,
+    approved: SecondRoute,
+    pending: fourthRoute,
+    paid: ThirdRoute,
   });
 
   const status = [
@@ -944,7 +952,7 @@ const Loanscreen = () => {
           style={{
             flex: 1,
             backgroundColor: '#fff',
-            paddingTop: insets.top !== 0 ? insets.top / 2 : 'auto',
+            paddingTop: insets.top !== 0 ? insets.top : 18,
             paddingBottom: insets.bottom !== 0 ? insets.bottom / 2 : 'auto',
             paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
             paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
@@ -991,7 +999,7 @@ const Loanscreen = () => {
           style={{
             flex: 1,
             backgroundColor: '#fff',
-            paddingTop: insets.top !== 0 ? insets.top / 2 : 'auto',
+            paddingTop: insets.top !== 0 ? insets.top : 18,
             paddingBottom: insets.bottom !== 0 ? insets.bottom / 2 : 'auto',
             paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
             paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
@@ -1042,17 +1050,31 @@ const Loanscreen = () => {
             </View>
 
             <TouchableOpacity
-              onPress={() =>
+              onPress={() => {
+                if (guarantor && guarantor.length <= 0) {
+                  Toast.show({
+                    type: 'warning',
+                    position: 'top',
+                    topOffset: 50,
+                    text1: 'Guarantor Data',
+                    text2: 'Guarantor Data is not available',
+                    visibilityTime: 2000,
+                    autoHide: true,
+                    onPress: () => Toast.hide(),
+                  });
+                }
                 navigation.navigate(
                   `${
                     loanUserDetails === undefined ||
                     loanUserDetails?.loanDocumentDetails
                       ?.validIdentification === undefined
                       ? 'OnboardingHome'
-                      : 'GetLoan'
+                      : guarantor && guarantor.length > 0
+                      ? 'GetLoan'
+                      : 'AddGuarantors'
                   }`,
-                )
-              }>
+                );
+              }}>
               <View style={styles.getLoan}>
                 <Text style={styles.getText}>Get Loan</Text>
               </View>

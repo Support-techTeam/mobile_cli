@@ -7,21 +7,27 @@ import {
   Image,
   TouchableOpacity,
   Alert,
+  PermissionsAndroid,
 } from 'react-native';
-import React, {useContext, useEffect, useState} from 'react';
-import ImagePicker from 'react-native-image-picker';
+import React, {useCallback, useContext, useEffect, useState} from 'react';
+// import ImagePicker from 'react-native-image-picker';
+import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import Feather from 'react-native-vector-icons/Feather';
 import Entypo from 'react-native-vector-icons/Entypo';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import {getStatusBarHeight} from 'react-native-status-bar-height';
 import Buttons from '../buttons/Buttons';
-import {useNavigation} from '@react-navigation/native';
-import DocumentPicker from 'react-native-document-picker';
-// import {uploadProgress} from '../../stores/LoanStore';
+import {useNavigation, useRoute} from '@react-navigation/native';
+// you may also import just the functions or constants that you will use from this library
+import {request, PERMISSIONS, openSettings} from 'react-native-permissions';
+import {createUploadDocument} from '../../stores/LoanStore';
+import Toast from 'react-native-toast-message';
+import Spinner from 'react-native-loading-spinner-overlay/lib';
+import {uploadProgress} from '../../stores/LoanStore';
 
 const statusBarHeight = getStatusBarHeight();
-const uploadProgress = 0;
+// const uploadProgress = 0;
 const ProofofAdd = ({
   isCam,
   isProof,
@@ -30,37 +36,89 @@ const ProofofAdd = ({
   isBank,
   isPass,
   isSign,
+  isPer,
+  isId,
   deets,
 }) => {
   const [image, setImage] = useState(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [selectedDocument, setSelectedDocument] = useState(null);
+  const [isUpdating, setIsUpdating] = useState(false);
   const navigation = useNavigation();
+  const route = useRoute();
 
-  const docsDetails = deets?.params?.paramKey;
+  const {params} = route;
+  const {paramKey} = params;
+  const {
+    validIdentificationType,
+    validIdentification,
+    utilityBill,
+    bankStatement,
+    passport,
+    signature,
+    seal,
+    cacCertificate,
+    others,
+    identityCard,
+    personalPhoto,
+  } = paramKey;
 
-  const [userDocs, setUserDocs] = useState({
-    validIdentificationType:
-      docsDetails?.validIdentificationType === undefined
-        ? ''
-        : docsDetails?.validIdentificationType,
-    validIdentification:
-      docsDetails?.validIdentification === undefined
-        ? ''
-        : docsDetails?.validIdentification,
-    utilityBill:
-      docsDetails?.utilityBill === undefined ? '' : docsDetails?.utilityBill,
-    bankStatement:
-      docsDetails?.bankStatement === undefined
-        ? ''
-        : docsDetails?.bankStatement,
-    passport: docsDetails?.passport === undefined ? '' : docsDetails?.passport,
-    signature:
-      docsDetails?.signature === undefined ? '' : docsDetails?.signature,
-    seal: docsDetails?.seal === undefined ? '' : docsDetails?.seal,
-    cac: docsDetails?.cac === undefined ? '' : docsDetails?.cac,
-    others: docsDetails?.others === undefined ? '' : docsDetails?.others,
-  });
+  const [userDocs, setUserDocs] = useState(
+    {
+      validIdentificationType:
+        validIdentificationType === undefined ||
+        validIdentificationType === null ||
+        validIdentificationType === ''
+          ? ''
+          : validIdentificationType,
+      validIdentification:
+        validIdentification === undefined ||
+        validIdentification === null ||
+        validIdentification === ''
+          ? ''
+          : validIdentification,
+      utilityBill:
+        utilityBill === undefined || utilityBill === null || utilityBill === ''
+          ? ''
+          : utilityBill,
+      bankStatement:
+        bankStatement === undefined ||
+        bankStatement === null ||
+        bankStatement === ''
+          ? ''
+          : bankStatement,
+      passport:
+        passport === undefined || passport === null || passport === ''
+          ? ''
+          : passport,
+      signature:
+        signature === undefined || signature === null || signature === ''
+          ? ''
+          : signature,
+      seal: seal === undefined || seal === null || seal === '' ? '' : seal,
+      cacCertificate:
+        cacCertificate === undefined ||
+        cacCertificate === null ||
+        cacCertificate === ''
+          ? ''
+          : cacCertificate,
+      others:
+        others === undefined || others === null || others === '' ? '' : others,
+      identityCard:
+        identityCard === undefined ||
+        identityCard === null ||
+        identityCard === ''
+          ? ''
+          : identityCard,
+      personalPhoto:
+        personalPhoto === undefined ||
+        personalPhoto === null ||
+        personalPhoto === ''
+          ? ''
+          : personalPhoto,
+    },
+    [navigation],
+  );
 
   const [docsName, setDocsName] = useState({
     utilityBill: '',
@@ -68,220 +126,824 @@ const ProofofAdd = ({
     passport: '',
     signature: '',
     seal: '',
-    cac: '',
+    cacCertificate: '',
+    identityCard: '',
+    personalPhoto: '',
   });
+
   const [nextRoute, setNextRoute] = useState('');
-  // const {loansStore} = useContext(StoreContext);
-  // const {success, sucsMsg, uploadProgress, fileString} = loansStore;
 
   const [documentName, setDocumentName] = useState('');
 
-  const launchCameraAsync1 = async () => {
-    const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
+  const requestCameraPermission = async () => {
+    const status = await request(
+      Platform.OS === 'ios'
+        ? PERMISSIONS.IOS.CAMERA
+        : PERMISSIONS.ANDROID.CAMERA,
+    );
 
-    if (permissionResult.granted === false) {
+    if (status === 'granted') {
+      return true;
+    }
+    if (status === 'blocked') {
+      openSettings();
+      return false;
+    }
+    if (status === 'denied') {
+      openSettings();
+      return false;
+    }
+    if (status === 'unavailable') {
+      openSettings();
+      return false;
+    }
+    if (status === 'blocked') {
+      openSettings();
+      return false;
+    }
+    if (status === 'limited') {
+      return true;
+    }
+  };
+
+  const requestStoragePermission = async () => {
+    const status = await request(
+      Platform.OS === 'ios'
+        ? PERMISSIONS.IOS.PHOTO_LIBRARY
+        : PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE,
+    );
+    if (status === 'granted') {
+      return true;
+    }
+    if (status === 'blocked') {
+      openSettings();
+      return true;
+    }
+    if (status === 'denied') {
+      openSettings();
+      return false;
+    }
+    if (status === 'unavailable') {
+      openSettings();
+      return false;
+    }
+    if (status === 'blocked') {
+      openSettings();
+      return false;
+    }
+    if (status === 'limited') {
+      return true;
+    }
+  };
+
+  const launchCameraAsync1 = async () => {
+    const permissopnResult = await requestCameraPermission();
+    if (permissopnResult) {
+      await launchCamera({
+        mediaType: 'photo', // Specify 'photo' to capture images
+        maxWidth: 800, // Maximum width for the captured image
+        maxHeight: 600, // Maximum height for the captured image
+        quality: 1,
+      })
+        .then(result => {
+          if (result.didCancel) {
+          } else if (result.error) {
+          } else if (result?.errorCode) {
+            Toast.show({
+              type: 'error',
+              position: 'top',
+              topOffset: 50,
+              text1: 'Camera Access',
+              text2: result?.errorCode.replace('_', ' '),
+              visibilityTime: 5000,
+              autoHide: true,
+              onPress: () => Toast.hide(),
+            });
+          } else {
+            if (result !== null && result !== undefined) {
+              handleImageSelection(result);
+              setUserDocs({...userDocs, utilityBill: result});
+              setFile({
+                uri: result?.assets[0]?.uri ?? result?.uri,
+                name: result?.assets[0]?.fileName ?? result?.fileName,
+                type: result?.assets[0]?.type ?? result?.type,
+              });
+            }
+            setDocumentName('utilityBill');
+            setNextRoute('PersonalPhoto');
+          }
+        })
+        .catch(error => {});
+      // await launchCamera(
+      //   {
+      //     mediaType: 'photo', // Specify 'photo' to capture images
+      //     maxWidth: 800, // Maximum width for the captured image
+      //     maxHeight: 600, // Maximum height for the captured image
+      //     quality: 1,
+      //   },
+      //   result => {
+      //     if (result?.didCancel) {
+      //     } else if (result?.error) {
+      //     } else {
+      //       if(result !== null && result !== undefined){
+      //         handleImageSelection(result);
+      //         setUserDocs({...userDocs, utilityBill: result});
+      //         console.log('res', result)
+      //         setFile({
+      //           uri: result?.assets[0]?.uri ?? result?.uri,
+      //           name: result?.assets[0]?.fileName ?? result?.fileName,
+      //           type: result?.assets[0]?.type ?? result?.type,
+      //         });
+      //       }
+
+      //       setDocumentName('utilityBill');
+      //       setNextRoute('PersonalPhoto');
+      //     }
+      //   },
+      // );
+    } else {
       Alert.alert(
         'Permission Required',
         'Permission to access camera is required.',
       );
       return;
     }
-
-    try {
-      const result = await ImagePicker.launchImageLibrary({
-        allowsEditing: true,
-        aspect: [4, 2],
-        quality: 1,
-      });
-
-      handleImageSelection(result);
-      setUserDocs({...userDocs, utilityBill: result});
-      setFile({
-        uri: result?.assets[0]?.uri,
-        name: result?.assets[0]?.fileName,
-        type: result?.assets[0]?.type,
-      });
-      setDocumentName('utilityBill');
-      setNextRoute('BankStatement');
-    } catch (error) {}
   };
 
   const launchCameraAsync2 = async () => {
-    const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
+    const permissopnResult = await requestCameraPermission();
+    if (permissopnResult) {
+      await launchCamera({
+        mediaType: 'photo', // Specify 'photo' to capture images
+        maxWidth: 800, // Maximum width for the captured image
+        maxHeight: 600, // Maximum height for the captured image
+        quality: 1,
+      })
+        .then(result => {
+          if (result.didCancel) {
+          } else if (result.error) {
+          } else if (result?.errorCode) {
+            Toast.show({
+              type: 'error',
+              position: 'top',
+              topOffset: 50,
+              text1: 'Camera Access',
+              text2: result?.errorCode.replace('_', ' '),
+              visibilityTime: 5000,
+              autoHide: true,
+              onPress: () => Toast.hide(),
+            });
+          } else {
+            if (result !== null && result !== undefined) {
+              handleImageSelection(result);
+              setUserDocs({...userDocs, utilityBill: result});
+              setFile({
+                uri: result?.assets[0]?.uri ?? result?.uri,
+                name: result?.assets[0]?.fileName ?? result?.fileName,
+                type: result?.assets[0]?.type ?? result?.type,
+              });
+            }
+            setDocumentName('bankStatement');
+            setNextRoute('Passport');
+          }
+        })
+        .catch(error => {});
 
-    if (permissionResult.granted === false) {
+      // await launchCamera(
+      //   {
+      //     mediaType: 'photo', // Specify 'photo' to capture images
+      //     maxWidth: 800, // Maximum width for the captured image
+      //     maxHeight: 600, // Maximum height for the captured image
+      //     quality: 1,
+      //   },
+      //   result => {
+      //     if (result.didCancel) {
+      //     } else if (result.error) {
+      //     } else {
+      //       handleImageSelection(result);
+      //       setUserDocs({...userDocs, bankStatement: result});
+      //       setFile({
+      //         uri: result?.assets[0]?.uri,
+      //         name: result?.assets[0]?.fileName,
+      //         type: result?.assets[0]?.type,
+      //       });
+      //       setDocumentName('bankStatement');
+      //       setNextRoute('Passport');
+      //     }
+      //   },
+      // );
+    } else {
       Alert.alert(
         'Permission Required',
         'Permission to access camera is required.',
       );
       return;
     }
-
-    try {
-      const result = await ImagePicker.launchCamera({
-        allowsEditing: true,
-        aspect: [4, 2],
-        quality: 1,
-      });
-
-      handleImageSelection(result);
-      setUserDocs({...userDocs, bankStatement: result});
-      setFile({
-        uri: result?.assets[0]?.uri,
-        name: result?.assets[0]?.fileName,
-        type: result?.assets[0]?.type,
-      });
-      setDocumentName('bankStatement');
-      setNextRoute('Passport');
-    } catch (error) {}
   };
 
   const launchCameraAsync3 = async () => {
-    const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
-
-    if (permissionResult.granted === false) {
+    const permissopnResult = await requestCameraPermission();
+    if (permissopnResult) {
+      await launchCamera({
+        mediaType: 'photo', // Specify 'photo' to capture images
+        maxWidth: 800, // Maximum width for the captured image
+        maxHeight: 600, // Maximum height for the captured image
+        quality: 1,
+      })
+        .then(result => {
+          if (result.didCancel) {
+          } else if (result.error) {
+          } else if (result?.errorCode) {
+            Toast.show({
+              type: 'error',
+              position: 'top',
+              topOffset: 50,
+              text1: 'Camera Access',
+              text2: result?.errorCode.replace('_', ' '),
+              visibilityTime: 5000,
+              autoHide: true,
+              onPress: () => Toast.hide(),
+            });
+          } else {
+            if (result !== null && result !== undefined) {
+              handleImageSelection(result);
+              setUserDocs({...userDocs, utilityBill: result});
+              setFile({
+                uri: result?.assets[0]?.uri ?? result?.uri,
+                name: result?.assets[0]?.fileName ?? result?.fileName,
+                type: result?.assets[0]?.type ?? result?.type,
+              });
+            }
+            setDocumentName('passport');
+            setNextRoute('Signature');
+          }
+        })
+        .catch(error => {});
+      // await launchCamera(
+      //   {
+      //     mediaType: 'photo', // Specify 'photo' to capture images
+      //     maxWidth: 800, // Maximum width for the captured image
+      //     maxHeight: 600, // Maximum height for the captured image
+      //     quality: 1,
+      //   },
+      //   result => {
+      //     if (result.didCancel) {
+      //     } else if (result.error) {
+      //     } else {
+      //       handleImageSelection(result);
+      //       setUserDocs({...userDocs, passport: result});
+      //       setFile({
+      //         uri: result?.assets[0]?.uri,
+      //         name: result?.assets[0]?.fileName,
+      //         type: result?.assets[0]?.type,
+      //       });
+      //       setDocumentName('passport');
+      //       setNextRoute('Signature');
+      //     }
+      //   },
+      // );
+    } else {
       Alert.alert(
         'Permission Required',
         'Permission to access camera is required.',
       );
       return;
     }
-
-    try {
-      const result = await ImagePicker.launchCameraAsync({
-        allowsEditing: true,
-        aspect: [4, 2],
-        quality: 1,
-      });
-
-      handleImageSelection(result);
-      setFile({
-        uri: result?.assets[0]?.uri,
-        name: result?.assets[0]?.fileName,
-        type: result?.assets[0]?.type,
-      });
-      setDocumentName('passport');
-      setNextRoute('Signature');
-    } catch (error) {}
   };
+
   const launchCameraAsync4 = async () => {
-    const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
-
-    if (permissionResult.granted === false) {
+    const permissopnResult = await requestCameraPermission();
+    if (permissopnResult) {
+      await launchCamera({
+        mediaType: 'photo', // Specify 'photo' to capture images
+        maxWidth: 800, // Maximum width for the captured image
+        maxHeight: 600, // Maximum height for the captured image
+        quality: 1,
+      })
+        .then(result => {
+          if (result.didCancel) {
+          } else if (result.error) {
+          } else if (result?.errorCode) {
+            Toast.show({
+              type: 'error',
+              position: 'top',
+              topOffset: 50,
+              text1: 'Camera Access',
+              text2: result?.errorCode.replace('_', ' '),
+              visibilityTime: 5000,
+              autoHide: true,
+              onPress: () => Toast.hide(),
+            });
+          } else {
+            if (result !== null && result !== undefined) {
+              handleImageSelection(result);
+              setUserDocs({...userDocs, utilityBill: result});
+              setFile({
+                uri: result?.assets[0]?.uri ?? result?.uri,
+                name: result?.assets[0]?.fileName ?? result?.fileName,
+                type: result?.assets[0]?.type ?? result?.type,
+              });
+            }
+            setDocumentName('seal');
+            setNextRoute('CAC');
+          }
+        })
+        .catch(error => {});
+      // await launchCamera(
+      //   {
+      //     mediaType: 'photo', // Specify 'photo' to capture images
+      //     maxWidth: 800, // Maximum width for the captured image
+      //     maxHeight: 600, // Maximum height for the captured image
+      //     quality: 1,
+      //   },
+      //   result => {
+      //     if (result.didCancel) {
+      //     } else if (result.error) {
+      //     } else {
+      //       handleImageSelection(result);
+      //       setUserDocs({...userDocs, seal: result});
+      //       setFile({
+      //         uri: result?.assets[0]?.uri,
+      //         name: result?.assets[0]?.fileName,
+      //         type: result?.assets[0]?.type,
+      //       });
+      //       setDocumentName('seal');
+      //       setNextRoute('CAC');
+      //     }
+      //   },
+      // );
+    } else {
       Alert.alert(
         'Permission Required',
         'Permission to access camera is required.',
       );
       return;
     }
-
-    try {
-      const result = await ImagePicker.launchCameraAsync({
-        allowsEditing: true,
-        aspect: [4, 2],
-        quality: 1,
-      });
-
-      handleImageSelection(result);
-      setFile({
-        uri: result?.assets[0]?.uri,
-        name: result?.assets[0]?.fileName,
-        type: result?.assets[0]?.type,
-      });
-      setDocumentName('seal');
-      setNextRoute('CAC');
-    } catch (error) {}
   };
+
   const launchCameraAsync5 = async () => {
-    const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
-
-    if (permissionResult.granted === false) {
+    const permissopnResult = await requestCameraPermission();
+    if (permissopnResult) {
+      await launchCamera({
+        mediaType: 'photo', // Specify 'photo' to capture images
+        maxWidth: 800, // Maximum width for the captured image
+        maxHeight: 600, // Maximum height for the captured image
+        quality: 1,
+      })
+        .then(result => {
+          if (result.didCancel) {
+          } else if (result.error) {
+          } else if (result?.errorCode) {
+            Toast.show({
+              type: 'error',
+              position: 'top',
+              topOffset: 50,
+              text1: 'Camera Access',
+              text2: result?.errorCode.replace('_', ' '),
+              visibilityTime: 5000,
+              autoHide: true,
+              onPress: () => Toast.hide(),
+            });
+          } else {
+            if (result !== null && result !== undefined) {
+              handleImageSelection(result);
+              setUserDocs({...userDocs, utilityBill: result});
+              setFile({
+                uri: result?.assets[0]?.uri ?? result?.uri,
+                name: result?.assets[0]?.fileName ?? result?.fileName,
+                type: result?.assets[0]?.type ?? result?.type,
+              });
+            }
+            setDocumentName('cacCertificate');
+            setNextRoute('Others');
+          }
+        })
+        .catch(error => {});
+      // await launchCamera(
+      //   {
+      //     mediaType: 'photo', // Specify 'photo' to capture images
+      //     maxWidth: 800, // Maximum width for the captured image
+      //     maxHeight: 600, // Maximum height for the captured image
+      //     quality: 1,
+      //   },
+      //   result => {
+      //     if (result.didCancel) {
+      //     } else if (result.error) {
+      //     } else {
+      //       handleImageSelection(result);
+      //       setUserDocs({...userDocs, cacCertificate: result});
+      //       setFile({
+      //         uri: result?.assets[0]?.uri,
+      //         name: result?.assets[0]?.fileName,
+      //         type: result?.assets[0]?.type,
+      //       });
+      //       setDocumentName('cacCertificate');
+      //       setNextRoute('Others');
+      //     }
+      //   },
+      // );
+    } else {
       Alert.alert(
         'Permission Required',
         'Permission to access camera is required.',
       );
       return;
     }
+  };
 
-    try {
-      const result = await ImagePicker.launchCameraAsync({
-        allowsEditing: true,
-        aspect: [4, 2],
+  const launchCameraAsync6 = async () => {
+    const permissopnResult = await requestCameraPermission();
+    if (permissopnResult) {
+      await launchCamera({
+        mediaType: 'photo', // Specify 'photo' to capture images
+        maxWidth: 800, // Maximum width for the captured image
+        maxHeight: 600, // Maximum height for the captured image
         quality: 1,
-      });
+      })
+        .then(result => {
+          if (result.didCancel) {
+          } else if (result.error) {
+          } else if (result?.errorCode) {
+            Toast.show({
+              type: 'error',
+              position: 'top',
+              topOffset: 50,
+              text1: 'Camera Access',
+              text2: result?.errorCode.replace('_', ' '),
+              visibilityTime: 5000,
+              autoHide: true,
+              onPress: () => Toast.hide(),
+            });
+          } else {
+            if (result !== null && result !== undefined) {
+              handleImageSelection(result);
+              setUserDocs({...userDocs, utilityBill: result});
+              setFile({
+                uri: result?.assets[0]?.uri ?? result?.uri,
+                name: result?.assets[0]?.fileName ?? result?.fileName,
+                type: result?.assets[0]?.type ?? result?.type,
+              });
+            }
 
-      handleImageSelection(result);
-      setFile({
-        uri: result?.assets[0]?.uri,
-        name: result?.assets[0]?.fileName,
-        type: result?.assets[0]?.type,
-      });
-      setDocumentName('cac');
-      setNextRoute('Others');
-    } catch (error) {}
+            setDocumentName('personalPhoto');
+            setNextRoute('IdentityCard');
+          }
+        })
+        .catch(error => {});
+      // await launchCamera(
+      //   {
+      //     mediaType: 'photo', // Specify 'photo' to capture images
+      //     maxWidth: 800, // Maximum width for the captured image
+      //     maxHeight: 600, // Maximum height for the captured image
+      //     quality: 1,
+      //   },
+      //   result => {
+      //     if (result.didCancel) {
+      //     } else if (result.error) {
+      //     } else {
+      //       handleImageSelection(result);
+      //       setUserDocs({...userDocs, personalPhoto: result});
+      //       setFile({
+      //         uri: result?.assets[0]?.uri,
+      //         name: result?.assets[0]?.fileName,
+      //         type: result?.assets[0]?.type,
+      //       });
+      //       setDocumentName('personalPhoto');
+      //       setNextRoute('IdentityCard');
+      //     }
+      //   },
+      // );
+    } else {
+      Alert.alert(
+        'Permission Required',
+        'Permission to access camera is required.',
+      );
+      return;
+    }
   };
 
-  const pickDocument1 = async () => {
-    let result = await DocumentPicker.getDocumentAsync({});
-
-    setDocsName({...docsName, utilityBill: result});
-    setFile({name: result?.name, type: result?.mimeType, uri: result?.uri});
-    setDocumentName('utilityBill');
-    setNextRoute('BankStatement');
+  const launchCameraAsync7 = async () => {
+    const permissopnResult = await requestCameraPermission();
+    if (permissopnResult) {
+      await launchCamera({
+        mediaType: 'photo', // Specify 'photo' to capture images
+        maxWidth: 800, // Maximum width for the captured image
+        maxHeight: 600, // Maximum height for the captured image
+        quality: 1,
+      })
+        .then(result => {
+          if (result.didCancel) {
+          } else if (result.error) {
+          } else if (result?.errorCode) {
+            Toast.show({
+              type: 'error',
+              position: 'top',
+              topOffset: 50,
+              text1: 'Camera Access',
+              text2: result?.errorCode.replace('_', ' '),
+              visibilityTime: 5000,
+              autoHide: true,
+              onPress: () => Toast.hide(),
+            });
+          } else {
+            if (result !== null && result !== undefined) {
+              handleImageSelection(result);
+              setUserDocs({...userDocs, utilityBill: result});
+              setFile({
+                uri: result?.assets[0]?.uri ?? result?.uri,
+                name: result?.assets[0]?.fileName ?? result?.fileName,
+                type: result?.assets[0]?.type ?? result?.type,
+              });
+            }
+            setDocumentName('identityCard');
+            setNextRoute('BankStatement');
+          }
+        })
+        .catch(error => {});
+      // await launchCamera(
+      //   {
+      //     mediaType: 'photo', // Specify 'photo' to capture images
+      //     maxWidth: 800, // Maximum width for the captured image
+      //     maxHeight: 600, // Maximum height for the captured image
+      //     quality: 1,
+      //   },
+      //   result => {
+      //     if (result.didCancel) {
+      //     } else if (result.error) {
+      //     } else {
+      //       handleImageSelection(result);
+      //       setUserDocs({...userDocs, identityCard: result});
+      //       setFile({
+      //         uri: result?.assets[0]?.uri,
+      //         name: result?.assets[0]?.fileName,
+      //         type: result?.assets[0]?.type,
+      //       });
+      //       setDocumentName('identityCard');
+      //       setNextRoute('BankStatement');
+      //     }
+      //   },
+      // );
+    } else {
+      Alert.alert(
+        'Permission Required',
+        'Permission to access camera is required.',
+      );
+      return;
+    }
   };
+
+  const pickDocument1 = useCallback(async () => {
+    const permissopnResult = await requestStoragePermission();
+    if (permissopnResult) {
+      try {
+        const result = await launchImageLibrary({
+          presentationStyle: 'fullScreen',
+        });
+        setImage(result.assets[0].uri);
+        setDocsName({...docsName, utilityBill: result});
+        setFile({
+          uri: result?.assets[0]?.uri,
+          name: result?.assets[0]?.fileName,
+          type: result?.assets[0]?.type,
+        });
+        setDocumentName('utilityBill');
+        setNextRoute('PersonalPhoto');
+      } catch (err) {
+        // console.warn(err);
+      }
+    } else {
+      Alert.alert(
+        'Permission Required',
+        'Permission to access storage is required.',
+      );
+      return;
+    }
+  }, []);
+
   const pickDocumentS = async () => {
-    let result = await DocumentPicker.getDocumentAsync({});
+    const permissopnResult = await requestStoragePermission();
+    if (permissopnResult) {
+      try {
+        const result = await launchImageLibrary({
+          presentationStyle: 'fullScreen',
+        });
 
-    setDocsName({...docsName, signature: result});
-    setFile({name: result?.name, type: result?.mimeType, uri: result?.uri});
-    setDocumentName('signature');
-    setNextRoute('CompanySeals');
+        setImage(result.assets[0].uri);
+        setDocsName({...docsName, signature: result});
+        setFile({
+          uri: result?.assets[0]?.uri,
+          name: result?.assets[0]?.fileName,
+          type: result?.assets[0]?.type,
+        });
+        setDocumentName('signature');
+        setNextRoute('CompanySeals');
+      } catch (err) {
+        // console.warn(err);
+      }
+    } else {
+      Alert.alert(
+        'Permission Required',
+        'Permission to access storage is required.',
+      );
+      return;
+    }
   };
 
-  const pickDocument2 = async () => {
-    let result = await DocumentPicker.getDocumentAsync({});
+  const pickDocument2 = useCallback(async () => {
+    const permissopnResult = await requestStoragePermission();
+    if (permissopnResult) {
+      try {
+        const result = await launchImageLibrary({
+          presentationStyle: 'fullScreen',
+        });
+        setImage(result.assets[0].uri);
+        setDocsName({...docsName, bankStatement: result});
+        setFile({
+          uri: result?.assets[0]?.uri,
+          name: result?.assets[0]?.fileName,
+          type: result?.assets[0]?.type,
+        });
+        setDocumentName('bankStatement');
+        setNextRoute('Passport');
+      } catch (err) {
+        // console.warn(err);
+      }
+    } else {
+      Alert.alert(
+        'Permission Required',
+        'Permission to access storage is required.',
+      );
+      return;
+    }
+  }, []);
 
-    setDocsName({...docsName, bankStatement: result});
-    setFile({name: result?.name, type: result?.mimeType, uri: result?.uri});
-    setDocumentName('bankStatement');
-    setNextRoute('Passport');
-  };
+  const pickDocument3 = useCallback(async () => {
+    const permissopnResult = await requestStoragePermission();
+    if (permissopnResult) {
+      try {
+        const result = await launchImageLibrary({
+          presentationStyle: 'fullScreen',
+        });
+        setImage(result.assets[0].uri);
+        setDocsName({...docsName, passport: result});
+        setFile({
+          uri: result?.assets[0]?.uri,
+          name: result?.assets[0]?.fileName,
+          type: result?.assets[0]?.type,
+        });
+        setDocumentName('passport');
+        setNextRoute('Signature');
+      } catch (err) {
+        // console.warn(err);
+      }
+    } else {
+      Alert.alert(
+        'Permission Required',
+        'Permission to access storage is required.',
+      );
+      return;
+    }
+  }, []);
 
-  const pickDocument3 = async () => {
-    let result = await DocumentPicker.getDocumentAsync({});
+  const pickDocument4 = useCallback(async () => {
+    const permissopnResult = await requestStoragePermission();
+    if (permissopnResult) {
+      try {
+        const result = await launchImageLibrary({
+          presentationStyle: 'fullScreen',
+        });
+        setImage(result.assets[0].uri);
+        setDocsName({...docsName, signature: result});
+        setFile({
+          uri: result?.assets[0]?.uri,
+          name: result?.assets[0]?.fileName,
+          type: result?.assets[0]?.type,
+        });
+        setDocumentName('signature');
+        setNextRoute('CompanySeals');
+      } catch (err) {
+        // console.warn(err);
+      }
+    } else {
+      Alert.alert(
+        'Permission Required',
+        'Permission to access storage is required.',
+      );
+      return;
+    }
+  }, []);
 
-    setDocsName({...docsName, passport: result});
-    setFile({name: result?.name, type: result?.mimeType, uri: result?.uri});
-    setDocumentName('passport');
-    setNextRoute('Signature');
-  };
+  const pickDocument5 = useCallback(async () => {
+    const permissopnResult = await requestStoragePermission();
+    if (permissopnResult) {
+      try {
+        const result = await launchImageLibrary({
+          presentationStyle: 'fullScreen',
+        });
+        setImage(result.assets[0].uri);
+        setDocsName({...docsName, seal: result});
+        setFile({
+          uri: result?.assets[0]?.uri,
+          name: result?.assets[0]?.fileName,
+          type: result?.assets[0]?.type,
+        });
+        setDocumentName('seal');
+        setNextRoute('CAC');
+      } catch (err) {
+        // console.warn(err);
+      }
+    } else {
+      Alert.alert(
+        'Permission Required',
+        'Permission to access storage is required.',
+      );
+      return;
+    }
+  }, []);
 
-  const pickDocument4 = async () => {
-    let result = await DocumentPicker.getDocumentAsync({});
+  const pickDocument6 = useCallback(async () => {
+    const permissopnResult = await requestStoragePermission();
+    if (permissopnResult) {
+      try {
+        const result = await launchImageLibrary({
+          presentationStyle: 'fullScreen',
+        });
+        setImage(result.assets[0].uri);
+        setDocsName({...docsName, cacCertificate: result});
+        setFile({
+          name: result?.assets[0]?.fileName,
+          type: result?.assets[0]?.type,
+          uri: result?.assets[0]?.uri,
+        });
+        setDocumentName('cacCertificate');
+        setNextRoute('Others');
+      } catch (err) {
+        // console.warn(err);
+      }
+    } else {
+      Alert.alert(
+        'Permission Required',
+        'Permission to access storage is required.',
+      );
+      return;
+    }
+  }, []);
 
-    setDocsName({...docsName, signature: result});
-    setFile({name: result?.name, type: result?.mimeType, uri: result?.uri});
-    setDocumentName('signature');
-    setNextRoute('CompanySeals');
-  };
+  const pickDocument7 = useCallback(async () => {
+    const permissopnResult = await requestStoragePermission();
+    if (permissopnResult) {
+      try {
+        const result = await launchImageLibrary({
+          presentationStyle: 'fullScreen',
+        });
+        setImage(result.assets[0].uri);
+        setDocsName({...docsName, personalPhoto: result});
+        setFile({
+          name: result?.assets[0]?.fileName,
+          type: result?.assets[0]?.type,
+          uri: result?.assets[0]?.uri,
+        });
+        setDocumentName('personalPhoto');
+        setNextRoute('IdentityCard');
+      } catch (err) {
+        // console.warn(err);
+      }
+    } else {
+      Alert.alert(
+        'Permission Required',
+        'Permission to access storage is required.',
+      );
+      return;
+    }
+  }, []);
 
-  const pickDocument5 = async () => {
-    let result = await DocumentPicker.getDocumentAsync({});
-
-    setDocsName({...docsName, seal: result});
-    setFile({name: result?.name, type: result?.mimeType, uri: result?.uri});
-    setDocumentName('seal');
-    setNextRoute('CAC');
-  };
-
-  const pickDocument6 = async () => {
-    let result = await DocumentPicker.getDocumentAsync({});
-
-    setDocsName({...docsName, cac: result});
-    setFile({name: result?.name, type: result?.mimeType, uri: result?.uri});
-    setDocumentName('cac');
-    setNextRoute('Others');
-  };
+  const pickDocument8 = useCallback(async () => {
+    const permissopnResult = await requestStoragePermission();
+    if (permissopnResult) {
+      try {
+        const result = await launchImageLibrary({
+          presentationStyle: 'fullScreen',
+        });
+        setImage(result.assets[0].uri);
+        setDocsName({...docsName, identityCard: result});
+        setFile({
+          name: result?.assets[0]?.fileName,
+          type: result?.assets[0]?.type,
+          uri: result?.assets[0]?.uri,
+        });
+        setDocumentName('identityCard');
+        setNextRoute('BankStatement');
+      } catch (err) {
+        // console.warn(err);
+      }
+    } else {
+      Alert.alert(
+        'Permission Required',
+        'Permission to access storage is required.',
+      );
+      return;
+    }
+  }, []);
 
   const clearDocument = () => {
     setSelectedDocument(null);
@@ -290,8 +952,10 @@ const ProofofAdd = ({
 
   const handleImageSelection = async result => {
     if (!result.canceled) {
-      setImage(result.assets[0].uri);
-      setShowConfirmModal(true);
+      if (result) {
+        setImage(result?.assets[0]?.uri ?? result?.uri);
+        setShowConfirmModal(true);
+      }
     }
   };
 
@@ -315,40 +979,88 @@ const ProofofAdd = ({
     uri: '',
   });
 
-  const s3UploadFunction = () => {
-    // loansStore.createUploadDocument(fileUri, documentName);
+  const s3UploadFunction = async () => {
+    setIsUpdating(true);
+
+    createUploadDocument(fileUri, documentName)
+      .then(res => {
+        if (res?.error) {
+          Toast.show({
+            type: 'error',
+            position: 'top',
+            topOffset: 50,
+            text1: res?.title,
+            text2: res?.message,
+            visibilityTime: 5000,
+            autoHide: true,
+            onPress: () => Toast.hide(),
+          });
+        } else {
+          Toast.show({
+            type: 'success',
+            position: 'top',
+            topOffset: 50,
+            text1: res?.title,
+            text2: res?.message,
+            visibilityTime: 3000,
+            autoHide: true,
+            onPress: () => Toast.hide(),
+          });
+
+          setUserDocs(deetss => {
+            return {
+              ...deetss,
+              [documentName]: `${res?.data?.data?.url}`,
+            };
+          });
+
+          setTimeout(() => {
+            navigation.navigate(`${nextRoute}`, {
+              paramKey: {
+                ...paramKey,
+                [documentName]: `${res?.data?.data?.url}`,
+              },
+            });
+          }, 500);
+          setTimeout(() => {
+            setNextRoute('');
+          }, 2000);
+        }
+      })
+      .catch(err => {
+        Toast.show({
+          type: 'error',
+          position: 'top',
+          topOffset: 50,
+          text1: 'Uploading Documents',
+          text2: err?.message,
+          visibilityTime: 5000,
+          autoHide: true,
+          onPress: () => Toast.hide(),
+        });
+      })
+      .finally(() => {
+        setTimeout(() => {
+          setDocumentName('');
+        }, 3000);
+
+        setIsUpdating(false);
+      });
   };
-
-  // useEffect(() => {
-  //   if (success === 'upload successful') {
-  //     setUserDocs(deetss => {
-  //       return {
-  //         ...deetss,
-  //         [documentName]: `${fileString}`,
-  //       };
-  //     });
-  //     setTimeout(() => {
-  //       setDocumentName('');
-  //     }, 200);
-  //   }
-  // }, [documentName, fileString, success]);
-
-  // useEffect(() => {
-  //   if (sucsMsg === 'success') {
-  //     setTimeout(() => {
-  //       navigation.navigate(`${nextRoute}`, {paramKey: userDocs});
-  //     }, 1000);
-  //     setTimeout(() => {
-  //       setNextRoute('');
-  //     }, 200);
-  //   }
-  // }, [navigation, nextRoute, sucsMsg, userDocs]);
 
   return (
     <ScrollView
       bounces={false}
       showsHorizontalScrollIndicator={false}
       showsVerticalScrollIndicator={false}>
+      {isUpdating && (
+        <Spinner
+          textContent={'Please wait...'}
+          textStyle={{color: 'white'}}
+          visible={true}
+          overlayColor="rgba(78, 75, 102, 0.7)"
+        />
+      )}
       <Modal visible={showConfirmModal}>
         <View style={styles.modalContainer}>
           <View
@@ -374,9 +1086,6 @@ const ProofofAdd = ({
               <View style={styles.TopView}>
                 <Text style={styles.TextHead}>CONFIRM IMAGE</Text>
               </View>
-            </View>
-            <View>
-              <Text />
             </View>
           </View>
           <View style={styles.demark} />
@@ -419,10 +1128,21 @@ const ProofofAdd = ({
               </Text>
               <View style={styles.reqField}>
                 {docsName.utilityBill ? (
-                  <View>
-                    <Text style={{}}>{docsName.utilityBill.name}</Text>
-                    {/* <Text style={{}}>{documentSize}</Text> */}
-                  </View>
+                  <>
+                    <View>
+                      <Text>{docsName.utilityBill.name}</Text>
+                    </View>
+                    {image !== null && (
+                      <Image
+                        source={{uri: image}}
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          resizeMode: 'contain',
+                        }}
+                      />
+                    )}
+                  </>
                 ) : (
                   <>
                     <TouchableOpacity
@@ -463,7 +1183,7 @@ const ProofofAdd = ({
                   disabled={docsName.utilityBill === ''}
                 />
               </TouchableOpacity>
-              {uploadProgress && uploadProgress > 0 && (
+              {uploadProgress && uploadProgress > 0 ? (
                 <View
                   style={{
                     alignItems: 'center',
@@ -472,7 +1192,7 @@ const ProofofAdd = ({
                   }}>
                   <Text>{uploadProgress && uploadProgress}% complete</Text>
                 </View>
-              )}
+              ) : null}
             </>
           )}
           {isProof && isCam && (
@@ -512,7 +1232,8 @@ const ProofofAdd = ({
                 onPress={s3UploadFunction}>
                 <Buttons label="Upload" />
               </TouchableOpacity>
-              {uploadProgress && uploadProgress > 0 && (
+
+              {uploadProgress && uploadProgress > 0 ? (
                 <View
                   style={{
                     alignItems: 'center',
@@ -521,7 +1242,7 @@ const ProofofAdd = ({
                   }}>
                   <Text>{uploadProgress && uploadProgress}% complete</Text>
                 </View>
-              )}
+              ) : null}
             </>
           )}
 
@@ -535,10 +1256,21 @@ const ProofofAdd = ({
               </Text>
               <View style={styles.reqField}>
                 {docsName.seal ? (
-                  <View>
-                    <Text style={{}}>{docsName.seal.name}</Text>
-                    {/* <Text style={{}}>{documentSize}</Text> */}
-                  </View>
+                  <>
+                    <View>
+                      <Text>{docsName.seal.name}</Text>
+                    </View>
+                    {image !== null && (
+                      <Image
+                        source={{uri: image}}
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          resizeMode: 'contain',
+                        }}
+                      />
+                    )}
+                  </>
                 ) : (
                   <>
                     <TouchableOpacity
@@ -576,7 +1308,7 @@ const ProofofAdd = ({
                   disabled={docsName.seal === ''}
                 />
               </TouchableOpacity>
-              {uploadProgress && uploadProgress > 0 && (
+              {uploadProgress && uploadProgress > 0 ? (
                 <View
                   style={{
                     alignItems: 'center',
@@ -585,7 +1317,7 @@ const ProofofAdd = ({
                   }}>
                   <Text>{uploadProgress && uploadProgress}% complete</Text>
                 </View>
-              )}
+              ) : null}
             </>
           )}
           {isSeal && isCam && (
@@ -625,7 +1357,7 @@ const ProofofAdd = ({
                 onPress={s3UploadFunction}>
                 <Buttons label="Upload" />
               </TouchableOpacity>
-              {uploadProgress && uploadProgress > 0 && (
+              {uploadProgress && uploadProgress > 0 ? (
                 <View
                   style={{
                     alignItems: 'center',
@@ -634,7 +1366,7 @@ const ProofofAdd = ({
                   }}>
                   <Text>{uploadProgress && uploadProgress}% complete</Text>
                 </View>
-              )}
+              ) : null}
             </>
           )}
           {isCac && !isCam && (
@@ -646,11 +1378,22 @@ const ProofofAdd = ({
                 See samples
               </Text>
               <View style={styles.reqField}>
-                {docsName.cac ? (
-                  <View>
-                    <Text style={{}}>{docsName.cac.name}</Text>
-                    {/* <Text style={{}}>{documentSize}</Text> */}
-                  </View>
+                {docsName.cacCertificate ? (
+                  <>
+                    <View>
+                      <Text>{docsName.cacCertificate.name}</Text>
+                    </View>
+                    {image !== null && (
+                      <Image
+                        source={{uri: image}}
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          resizeMode: 'contain',
+                        }}
+                      />
+                    )}
+                  </>
                 ) : (
                   <>
                     <TouchableOpacity
@@ -674,21 +1417,24 @@ const ProofofAdd = ({
                 )}
               </View>
               <TouchableOpacity
-                disabled={docsName.cac === ''}
+                disabled={docsName.cacCertificate === ''}
                 style={{marginTop: 10}}
                 onPress={s3UploadFunction}>
-                <Buttons label="Upload" disabled={docsName.cac === ''} />
+                <Buttons
+                  label="Upload"
+                  disabled={docsName.cacCertificate === ''}
+                />
               </TouchableOpacity>
               <TouchableOpacity
-                disabled={docsName.cac === ''}
+                disabled={docsName.cacCertificate === ''}
                 style={{marginTop: 10}}
                 onPress={pickDocument1}>
                 <Buttons
                   label="Change Selection"
-                  disabled={docsName.cac === ''}
+                  disabled={docsName.cacCertificate === ''}
                 />
               </TouchableOpacity>
-              {uploadProgress && uploadProgress > 0 && (
+              {uploadProgress && uploadProgress > 0 ? (
                 <View
                   style={{
                     alignItems: 'center',
@@ -697,7 +1443,7 @@ const ProofofAdd = ({
                   }}>
                   <Text>{uploadProgress && uploadProgress}% complete</Text>
                 </View>
-              )}
+              ) : null}
             </>
           )}
           {isCac && isCam && (
@@ -737,7 +1483,7 @@ const ProofofAdd = ({
                 onPress={s3UploadFunction}>
                 <Buttons label="Upload" />
               </TouchableOpacity>
-              {uploadProgress && uploadProgress > 0 && (
+              {uploadProgress && uploadProgress > 0 ? (
                 <View
                   style={{
                     alignItems: 'center',
@@ -746,7 +1492,7 @@ const ProofofAdd = ({
                   }}>
                   <Text>{uploadProgress && uploadProgress}% complete</Text>
                 </View>
-              )}
+              ) : null}
             </>
           )}
           {isBank && !isCam && (
@@ -763,9 +1509,21 @@ const ProofofAdd = ({
               </Text>
               <View style={styles.reqField}>
                 {docsName.bankStatement ? (
-                  <View>
-                    <Text style={{}}>{docsName.bankStatement.name}</Text>
-                  </View>
+                  <>
+                    <View>
+                      <Text>{docsName.bankStatement.name}</Text>
+                    </View>
+                    {image !== null && (
+                      <Image
+                        source={{uri: image}}
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          resizeMode: 'contain',
+                        }}
+                      />
+                    )}
+                  </>
                 ) : (
                   <>
                     <TouchableOpacity
@@ -806,7 +1564,7 @@ const ProofofAdd = ({
                   disabled={docsName.bankStatement === ''}
                 />
               </TouchableOpacity>
-              {uploadProgress && uploadProgress > 0 && (
+              {uploadProgress && uploadProgress > 0 ? (
                 <View
                   style={{
                     alignItems: 'center',
@@ -815,7 +1573,7 @@ const ProofofAdd = ({
                   }}>
                   <Text>{uploadProgress && uploadProgress}% complete</Text>
                 </View>
-              )}
+              ) : null}
             </>
           )}
           {isBank && isCam && (
@@ -855,7 +1613,7 @@ const ProofofAdd = ({
                 onPress={s3UploadFunction}>
                 <Buttons label="Upload" />
               </TouchableOpacity>
-              {uploadProgress && uploadProgress > 0 && (
+              {uploadProgress && uploadProgress > 0 ? (
                 <View
                   style={{
                     alignItems: 'center',
@@ -864,7 +1622,7 @@ const ProofofAdd = ({
                   }}>
                   <Text>{uploadProgress && uploadProgress}% complete</Text>
                 </View>
-              )}
+              ) : null}
             </>
           )}
           {isPass && !isCam && (
@@ -880,10 +1638,21 @@ const ProofofAdd = ({
               </Text>
               <View style={styles.reqField}>
                 {docsName.passport ? (
-                  <View>
-                    <Text style={{}}>{docsName.passport.name}</Text>
-                    {/* <Text style={{}}>{documentSize}</Text> */}
-                  </View>
+                  <>
+                    <View>
+                      <Text>{docsName.passport.name}</Text>
+                    </View>
+                    {image !== null && (
+                      <Image
+                        source={{uri: image}}
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          resizeMode: 'contain',
+                        }}
+                      />
+                    )}
+                  </>
                 ) : (
                   <>
                     <TouchableOpacity
@@ -922,7 +1691,7 @@ const ProofofAdd = ({
                   disabled={docsName.passport === ''}
                 />
               </TouchableOpacity>
-              {uploadProgress && uploadProgress > 0 && (
+              {uploadProgress && uploadProgress > 0 ? (
                 <View
                   style={{
                     alignItems: 'center',
@@ -931,7 +1700,7 @@ const ProofofAdd = ({
                   }}>
                   <Text>{uploadProgress && uploadProgress}% complete</Text>
                 </View>
-              )}
+              ) : null}
             </>
           )}
           {isPass && isCam && (
@@ -971,7 +1740,7 @@ const ProofofAdd = ({
                 onPress={s3UploadFunction}>
                 <Buttons label="Upload" />
               </TouchableOpacity>
-              {uploadProgress && uploadProgress > 0 && (
+              {uploadProgress && uploadProgress > 0 ? (
                 <View
                   style={{
                     alignItems: 'center',
@@ -980,7 +1749,7 @@ const ProofofAdd = ({
                   }}>
                   <Text>{uploadProgress && uploadProgress}% complete</Text>
                 </View>
-              )}
+              ) : null}
             </>
           )}
           {isSign ? (
@@ -993,9 +1762,21 @@ const ProofofAdd = ({
               </Text>
               <View style={styles.reqField}>
                 {docsName.signature ? (
-                  <View>
-                    <Text style={{}}>{docsName.signature.name}</Text>
-                  </View>
+                  <>
+                    <View>
+                      <Text>{docsName.signature.name}</Text>
+                    </View>
+                    {image !== null && (
+                      <Image
+                        source={{uri: image}}
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          resizeMode: 'contain',
+                        }}
+                      />
+                    )}
+                  </>
                 ) : (
                   <>
                     <TouchableOpacity
@@ -1033,7 +1814,7 @@ const ProofofAdd = ({
                   disabled={docsName.signature === ''}
                 />
               </TouchableOpacity>
-              {uploadProgress && uploadProgress > 0 && (
+              {uploadProgress && uploadProgress > 0 ? (
                 <View
                   style={{
                     alignItems: 'center',
@@ -1042,10 +1823,266 @@ const ProofofAdd = ({
                   }}>
                   <Text>{uploadProgress && uploadProgress}% complete</Text>
                 </View>
-              )}
+              ) : null}
             </>
-          ) : (
-            <></>
+          ) : null}
+          {isPer && !isCam && (
+            <>
+              <Text style={styles.textHead}>
+                Take a clear picture or upload your Personal Photo{' '}
+              </Text>
+              <Text style={[styles.textHead, {color: '#054B99'}]}>
+                See samples
+              </Text>
+              <Text style={styles.textHead}>
+                Personal Photo size not more than 3MB
+              </Text>
+              <View style={styles.reqField}>
+                {docsName.personalPhoto ? (
+                  <>
+                    <View>
+                      <Text>{docsName.personalPhoto.name}</Text>
+                    </View>
+                    {image !== null && (
+                      <Image
+                        source={{uri: image}}
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          resizeMode: 'contain',
+                        }}
+                      />
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <TouchableOpacity
+                      style={{
+                        backgroundColor: '#24348B',
+                        padding: 10,
+                        borderRadius: 5,
+                      }}
+                      onPress={pickDocument7}>
+                      <Entypo
+                        name="upload-to-cloud"
+                        size={30}
+                        color="#FCFCFC"
+                      />
+                    </TouchableOpacity>
+                    <Text style={styles.takeText}>Browse Files</Text>
+                    <Text style={styles.takeText2}>
+                      File format: JPG, JPEG, PNG,PDF | Max File Size 3mb
+                    </Text>
+                  </>
+                )}
+              </View>
+
+              <TouchableOpacity
+                disabled={docsName.personalPhoto === ''}
+                style={{marginTop: 10}}
+                onPress={s3UploadFunction}>
+                <Buttons
+                  label="Upload"
+                  disabled={docsName.personalPhoto === ''}
+                />
+              </TouchableOpacity>
+              <TouchableOpacity
+                disabled={docsName.personalPhoto === ''}
+                style={{marginTop: 10}}
+                onPress={pickDocument1}>
+                <Buttons
+                  label="Change Selection"
+                  disabled={docsName.personalPhoto === ''}
+                />
+              </TouchableOpacity>
+              {uploadProgress && uploadProgress > 0 ? (
+                <View
+                  style={{
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginTop: 20,
+                  }}>
+                  <Text>{uploadProgress && uploadProgress}% complete</Text>
+                </View>
+              ) : null}
+            </>
+          )}
+          {isPer && isCam && (
+            <>
+              <Text style={styles.textHead}>
+                Take a clear picture or upload a Personal Photo
+              </Text>
+              <View style={styles.reqField}>
+                {image ? (
+                  <Image
+                    source={{uri: image}}
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      resizeMode: 'contain',
+                    }}
+                  />
+                ) : (
+                  <>
+                    <TouchableOpacity
+                      style={{
+                        backgroundColor: '#24348B',
+                        padding: 10,
+                        borderRadius: 5,
+                      }}
+                      onPress={launchCameraAsync6}>
+                      <FontAwesome name="camera" size={30} color="#FCFCFC" />
+                    </TouchableOpacity>
+                    <Text style={styles.takeText}>Tap to take a photo</Text>
+                  </>
+                )}
+              </View>
+              <TouchableOpacity
+                style={{opacity: 1, marginTop: 10}}
+                onPress={s3UploadFunction}>
+                <Buttons label="Upload" />
+              </TouchableOpacity>
+              {uploadProgress && uploadProgress > 0 ? (
+                <View
+                  style={{
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginTop: 20,
+                  }}>
+                  <Text>{uploadProgress && uploadProgress}% complete</Text>
+                </View>
+              ) : null}
+            </>
+          )}
+
+          {isId && !isCam && (
+            <>
+              <Text style={styles.textHead}>
+                Take a clear picture or upload your Id Card{' '}
+              </Text>
+              <Text style={[styles.textHead, {color: '#054B99'}]}>
+                See samples
+              </Text>
+              <Text style={styles.textHead}>
+                Id Card size not more than 3MB
+              </Text>
+              <View style={styles.reqField}>
+                {docsName.identityCard ? (
+                  <>
+                    <View>
+                      <Text>{docsName.identityCard.name}</Text>
+                    </View>
+                    {image !== null && (
+                      <Image
+                        source={{uri: image}}
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          resizeMode: 'contain',
+                        }}
+                      />
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <TouchableOpacity
+                      style={{
+                        backgroundColor: '#24348B',
+                        padding: 10,
+                        borderRadius: 5,
+                      }}
+                      onPress={pickDocument8}>
+                      <Entypo
+                        name="upload-to-cloud"
+                        size={30}
+                        color="#FCFCFC"
+                      />
+                    </TouchableOpacity>
+                    <Text style={styles.takeText}>Browse Files</Text>
+                    <Text style={styles.takeText2}>
+                      File format: JPG, JPEG, PNG,PDF | Max File Size 3mb
+                    </Text>
+                  </>
+                )}
+              </View>
+
+              <TouchableOpacity
+                disabled={docsName.identityCard === ''}
+                style={{marginTop: 10}}
+                onPress={s3UploadFunction}>
+                <Buttons
+                  label="Upload"
+                  disabled={docsName.identityCard === ''}
+                />
+              </TouchableOpacity>
+              <TouchableOpacity
+                disabled={docsName.identityCard === ''}
+                style={{marginTop: 10}}
+                onPress={pickDocument1}>
+                <Buttons
+                  label="Change Selection"
+                  disabled={docsName.identityCard === ''}
+                />
+              </TouchableOpacity>
+              {uploadProgress && uploadProgress > 0 ? (
+                <View
+                  style={{
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginTop: 20,
+                  }}>
+                  <Text>{uploadProgress && uploadProgress}% complete</Text>
+                </View>
+              ) : null}
+            </>
+          )}
+
+          {isId && isCam && (
+            <>
+              <Text style={styles.textHead}>
+                Take a clear picture or upload an Id Card
+              </Text>
+              <View style={styles.reqField}>
+                {image ? (
+                  <Image
+                    source={{uri: image}}
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      resizeMode: 'contain',
+                    }}
+                  />
+                ) : (
+                  <>
+                    <TouchableOpacity
+                      style={{
+                        backgroundColor: '#24348B',
+                        padding: 10,
+                        borderRadius: 5,
+                      }}
+                      onPress={launchCameraAsync7}>
+                      <FontAwesome name="camera" size={30} color="#FCFCFC" />
+                    </TouchableOpacity>
+                    <Text style={styles.takeText}>Tap to take a photo</Text>
+                  </>
+                )}
+              </View>
+              <TouchableOpacity
+                style={{opacity: 1, marginTop: 10}}
+                onPress={s3UploadFunction}>
+                <Buttons label="Upload" />
+              </TouchableOpacity>
+              {uploadProgress && uploadProgress > 0 ? (
+                <View
+                  style={{
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginTop: 20,
+                  }}>
+                  <Text>{uploadProgress && uploadProgress}% complete</Text>
+                </View>
+              ) : null}
+            </>
           )}
         </View>
       </View>
@@ -1056,9 +2093,7 @@ const ProofofAdd = ({
             <Text style={styles.removeText}>Remove</Text>
           </TouchableOpacity>
         </View>
-      ) : (
-        <></>
-      )}
+      ) : null}
     </ScrollView>
   );
 };
@@ -1093,7 +2128,6 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   textHead: {
-    
     fontSize: 12,
     color: '#6E7191',
   },
@@ -1170,7 +2204,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   removeText: {
-    
     fontSize: 18,
     color: '#ED2E7E',
   },
@@ -1189,7 +2222,7 @@ const styles = StyleSheet.create({
   },
   checkedText: {
     color: '#44AB3B',
-    
+
     fontSize: 24,
     lineHeight: 36,
     textTransform: 'capitalize',
@@ -1201,7 +2234,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   takeText2: {
-    
     marginTop: 10,
     fontSize: 10,
   },

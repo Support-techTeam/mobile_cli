@@ -20,18 +20,21 @@ import {
   BusinessDetails,
   NextOfKin,
   OnboardingHome,
+  ArmDetails,
 } from '../screens/ProfileOnboardings';
 import UpdatePersonalDetails from '../screens/ProfileOnboardings/UpdatePersonalDetails';
 import MyAccount from '../screens/MyAccountsScreens/MyAccount';
 import {
-  // BankStatement,
-  // CAC,
-  // CompanySeals,
-  // Others,
-  // Passport,
-  // Signature,
-  // ProofOfAddress,
+  BankStatement,
+  CAC,
+  CompanySeals,
+  Others,
+  Passport,
+  Signature,
   ValidIdentity,
+  ProofOfAddress,
+  IdentityCard,
+  PersonalPhoto,
 } from '../screens/ProfileOnboardings/AddDocuments';
 import FinalSubmit from '../screens/ProfileOnboardings/AddDocuments/FinalSubmit';
 import Securindex from '../screens/SecurityScreens/Securindex';
@@ -51,6 +54,15 @@ import StatusPage from '../screens/paybills/StausPage';
 import GetData from '../screens/paybills/GetData';
 import Electric from '../screens/paybills/ElectricityBills';
 import Cable from '../screens/paybills/Cable';
+import {
+  InvestmentOption,
+  InvestmentSummary,
+  InvestmentTransaction,
+  TransactionSummary,
+  InvestmentDetails,
+  InvestmentTopup,
+  InvestmentRedemption,
+} from '../screens/InvestScreens';
 //Pending
 
 // import BeneficiaryList from '../screens/TransferScreens/BeneficiaryList';
@@ -81,20 +93,16 @@ const AppStack = () => {
   useEffect(() => {
     // fetch profile
     if (auth.currentUser !== null) {
-      // console.log('Fetching profile');
       const fetchState = async () => {
         try {
           const res = await getProfileDetails();
           if (res?.data !== undefined) {
             if (res?.error) {
-              // console.error(error);
             } else {
               dispatch(setProfile(res?.data));
             }
           }
-        } catch (error) {
-          // console.error(error);
-        }
+        } catch (error) {}
       };
 
       fetchState();
@@ -172,6 +180,7 @@ const AppStack = () => {
           <Stack.Screen name="BusinessDetails" component={BusinessDetails} />
           <Stack.Screen name="NextOfKin" component={NextOfKin} />
           <Stack.Screen name="BankDetails" component={BankDetails} />
+          <Stack.Screen name="ArmDetails" component={ArmDetails} />
           {/* Settings */}
           <Stack.Screen name="MyAccount" component={MyAccount} />
           {/* Security */}
@@ -188,15 +197,16 @@ const AppStack = () => {
           <Stack.Screen name="ChangeLockPin" component={ChangeLockPin} />
           {/* Documents */}
           <Stack.Screen name="ValidIdentity" component={ValidIdentity} />
-          {/* <Stack.Screen name="ProofOfAddress" component={ProofOfAddress} /> */}
-          {/* <Stack.Screen name="CompanySeals" component={CompanySeals} />
-          <Stack.Screen name="CAC" component={CAC} />
+          <Stack.Screen name="ProofOfAddress" component={ProofOfAddress} />
           <Stack.Screen name="BankStatement" component={BankStatement} />
+          <Stack.Screen name="CompanySeals" component={CompanySeals} />
+          <Stack.Screen name="CAC" component={CAC} />
           <Stack.Screen name="Passport" component={Passport} />
           <Stack.Screen name="Signature" component={Signature} />
+          <Stack.Screen name="PersonalPhoto" component={PersonalPhoto} />
+          <Stack.Screen name="IdentityCard" component={IdentityCard} />
           <Stack.Screen name="SubmitDocs" component={FinalSubmit} />
-          <Stack.Screen name="Others" component={Others} /> */}
-
+          <Stack.Screen name="Others" component={Others} />
           {/* Bill payment */}
           <Stack.Screen name="Paybills" component={Paybills} />
           <Stack.Screen name="airtime" component={Airtime} />
@@ -207,6 +217,29 @@ const AppStack = () => {
           <Stack.Screen name="BillPin" component={BillPin} />
           <Stack.Screen name="StatusFailed" component={StatusFailed} />
           <Stack.Screen name="StatusSuc" component={StatusPage} />
+          {/* Investment */}
+          <Stack.Screen name="InvestmentOption" component={InvestmentOption} />
+          <Stack.Screen
+            name="InvestmentSummary"
+            component={InvestmentSummary}
+          />
+          <Stack.Screen
+            name="InvestmentTransaction"
+            component={InvestmentTransaction}
+          />
+          <Stack.Screen
+            name="TransactionSummary"
+            component={TransactionSummary}
+          />
+          <Stack.Screen
+            name="InvestmentDetails"
+            component={InvestmentDetails}
+          />
+          <Stack.Screen name="InvestmentTopup" component={InvestmentTopup} />
+          <Stack.Screen
+            name="InvestmentRedemption"
+            component={InvestmentRedemption}
+          />
         </>
       )}
     </Stack.Navigator>

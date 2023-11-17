@@ -107,27 +107,33 @@ const BankDeets = ({route}) => {
   }, []);
 
   const handleGetAllBanks = async () => {
-    const res = await getAllBankDetails();
-    if (res?.error) {
-      Toast.show({
-        type: 'error',
-        position: 'top',
-        topOffset: 50,
-        text1: res?.title,
-        text2: res?.data?.message,
-        visibilityTime: 5000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
-    } else {
-      const bankData = res?.data?.map((banks, i) => {
-        return {value: banks?.bankName, label: banks?.bankName, key: i};
-      });
+    getAllBankDetails()
+      .then(res => {
+        if (res) {
+          if (res?.error) {
+            Toast.show({
+              type: 'error',
+              position: 'top',
+              topOffset: 50,
+              text1: res?.title,
+              text2: res?.data?.message ?? "Unable to retrieve banks",
+              visibilityTime: 5000,
+              autoHide: true,
+              onPress: () => Toast.hide(),
+            });
+          } else {
+            const bankData = res?.data?.map((banks, i) => {
+              return {value: banks?.bankName, label: banks?.bankName, key: i};
+            });
 
-      if (currentBanks == undefined || currentBanks == '') {
-        setCurrentBanks(bankData);
-      }
-    }
+            if (currentBanks == undefined || currentBanks == '') {
+              setCurrentBanks(bankData);
+            }
+          }
+        }
+      })
+      .catch(error => {})
+      .finally(() => {});
   };
 
   useEffect(() => {
@@ -177,7 +183,7 @@ const BankDeets = ({route}) => {
         flex: 1,
         paddingHorizontal: 16,
         backgroundColor: '#fff',
-        paddingTop: insets.top !== 0 ? insets.top : 'auto',
+        paddingTop: insets.top !== 0 ? insets.top : 18,
         paddingBottom: insets.bottom !== 0 ? insets.bottom : 'auto',
         paddingLeft: insets.left !== 0 ? insets.left : 'auto',
         paddingRight: insets.right !== 0 ? insets.right : 'auto',

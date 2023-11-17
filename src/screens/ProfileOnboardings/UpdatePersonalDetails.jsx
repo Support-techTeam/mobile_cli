@@ -24,9 +24,11 @@ import Toast from 'react-native-toast-message';
 import {useSelector} from 'react-redux';
 import {getCity, getState} from '../../stores/ProfileStore';
 import {createUserProfile, updatePersonalDetails} from '../../stores/LoanStore';
-
-const screenHeight = Dimensions.get('window').height;
-const screenWidth = Dimensions.get('window').width;
+import KeyboardAvoidingWrapper from '../../component/KeyBoardAvoiding/keyBoardAvoiding';
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from 'react-native-responsive-screen';
 
 const titleData = [
   {value: '', label: 'Select Title'},
@@ -299,10 +301,10 @@ const UpdatePersonalDetails = () => {
       isValid = false;
     }
 
-    if (!userDetails.NoOfDependents) {
-      handleError('Please input No of dependents', 'NoOfDependents');
-      isValid = false;
-    }
+    // if (!userDetails.NoOfDependents) {
+    //   handleError('Please input No of dependents', 'NoOfDependents');
+    //   isValid = false;
+    // }
 
     if (isValid) {
       profileDetails?.email === undefined
@@ -487,7 +489,7 @@ const UpdatePersonalDetails = () => {
       style={{
         flex: 1,
         backgroundColor: '#fff',
-        paddingTop: insets.top !== 0 ? insets.top / 2 : 'auto',
+        paddingTop: insets.top !== 0 ? insets.top : 18,
         paddingBottom: insets.bottom !== 0 ? insets.bottom / 2 : 'auto',
         paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
         paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
@@ -543,356 +545,362 @@ const UpdatePersonalDetails = () => {
           Please update your personal details to get started.
         </Text>
       </View>
-      <ImageBackground
-        source={require('../../../assets/signup.png')}
-        resizeMode="stretch"
-        style={styles.image}>
-        <ScrollView
-          bounces={false}
-          showsHorizontalScrollIndicator={false}
-          showsVerticalScrollIndicator={false}
-          style={{
-            paddingHorizontal: 10,
-            marginBottom: insets.top + 60,
-          }}>
-          <View
+      <KeyboardAvoidingWrapper>
+        <ImageBackground
+          source={require('../../../assets/signup.png')}
+          resizeMode="cover"
+          style={styles.image}>
+          <ScrollView
+            bounces={false}
+            showsHorizontalScrollIndicator={false}
+            showsVerticalScrollIndicator={false}
             style={{
-              paddingTop: 25,
-              backgroundColor: '#FFFFFF',
-              borderRadius: 15,
-              paddingHorizontal: 15,
-              paddingVertical: 15,
-              opacity: 0.86,
-              borderColor: '#D9DBE9',
-              borderWidth: 2,
+              paddingHorizontal: 10,
+              marginBottom: insets.top + 60,
             }}>
-            <View style={{marginVertical: 20}}>
-              <CustomDropdown
-                label="Title"
-                isNeeded={true}
-                placeholder="Select Title"
-                placeholderStyle={styles.placeholderStyle}
-                selectedTextStyle={styles.selectedTextStyle}
-                data={titleData}
-                maxHeight={300}
-                labelField="label"
-                valueField="value"
-                value={userDetails.title}
-                onChange={option => {
-                  setUserDetails({...userDetails, title: option.value});
-                }}
-                onFocus={() => handleError(null, 'title')}
-                error={errors.title}
-              />
-            </View>
-
-            <Input
-              iconName="account-outline"
-              label="First Name"
-              placeholder="Enter your first name"
-              isNeeded={true}
-              defaultValue={profileDetails?.firstName}
-              onChangeText={text =>
-                setUserDetails({...userDetails, firstName: text.trim()})
-              }
-              onFocus={() => handleError(null, 'firstName')}
-              error={errors.firstname}
-            />
-
-            <Input
-              iconName="account-outline"
-              label="Last Name"
-              placeholder="Enter your last name"
-              defaultValue={profileDetails?.lastName}
-              onChangeText={text =>
-                setUserDetails({...userDetails, lastName: text.trim()})
-              }
-              isNeeded={true}
-              onFocus={() => handleError(null, 'lastName')}
-              error={errors.lastName}
-            />
-
-            <Input
-              iconName="email-outline"
-              label="Email"
-              placeholder="Enter your email"
-              keyboardType="email-address"
-              defaultValue={profileDetails?.email}
-              onChangeText={text =>
-                setUserDetails({...userDetails, email: text.trim()})
-              }
-              isNeeded={true}
-              onFocus={() => handleError(null, 'email')}
-              error={errors.email}
-            />
-
-            <InputPhone
-              label="Phone number"
-              layout="first"
-              isNeeded={true}
-              defaultCode="NG"
-              codeTextStyle={{color: '#6E7191'}}
-              defaultValue={profileDetails?.phoneNumber}
-              onChangeFormattedText={text =>
-                setUserDetails({...userDetails, phoneNumber: text})
-              }
-              onFocus={() => handleError(null, 'phoneNumber')}
-              error={errors.phoneNumber}
-            />
-
-            <View style={{marginVertical: 10}}>
-              <CustomDropdown
-                label="Gender"
-                onFocus={() => handleError(null, 'gender')}
-                // search
-                isNeeded={true}
-                iconName="gender-male-female"
-                placeholder="Select Gender"
-                placeholderStyle={styles.placeholderStyle}
-                selectedTextStyle={styles.selectedTextStyle}
-                data={genderData}
-                maxHeight={300}
-                labelField="label"
-                valueField="value"
-                value={userDetails.gender}
-                onChange={option => {
-                  setUserDetails({...userDetails, gender: option.value});
-                }}
-                error={errors.gender}
-              />
-            </View>
-
-            <Input
-              // onChangeText={text =>
-              //   setUserDetails({...userDetails, bvn: text.trim()})
-              // }
-              onFocus={() => handleError(null, 'bvn')}
-              iconName="shield-lock-outline"
-              label="BVN"
-              placeholder="Enter your BVN"
-              error={errors.bvn}
-              keyboardType="numeric"
-              isNeeded={true}
-              defaultValue={userDetails.bvn}
-            />
-
-            <Pressable onPress={showDatePicker}>
-              <Input
-                label="Date of Birth"
-                onFocus={() => handleError(null, 'dob')}
-                iconName="calendar-month-outline"
-                placeholder="2000 - 01 - 01"
-                defaultValue={userDetails.dob ? userDetails.dob.toString() : ''}
-                isDate={true}
-                editable={false}
-                showDatePicker={showDatePicker}
-                onChangeValue={text =>
-                  setUserDetails({...userDetails, dob: text})
-                }
-                isNeeded={true}
-                error={errors.dob}
-              />
-            </Pressable>
-
-            <DateTimePickerModal
-              isVisible={show}
-              testID="dateTimePicker"
-              defaultValue={userDetails.dob}
-              mode="date"
-              is24Hour={true}
-              onConfirm={handleConfirm}
-              onCancel={hideDatePicker}
-              textColor="#054B99"
-            />
-
-            <Input
-              label="Address"
-              defaultValue={userDetails.address}
-              onChangeText={text =>
-                setUserDetails({...userDetails, address: text})
-              }
-              onFocus={() => handleError(null, 'address')}
-              iconName="map-marker-outline"
-              placeholder="Enter your address"
-              error={errors.address}
-              isNeeded={true}
-            />
-
-            <Input
-              label="Country"
-              defaultValue={userDetails.country}
-              onChangeText={text =>
-                setUserDetails({...userDetails, country: text})
-              }
-              onFocus={() => handleError(null, 'country')}
-              iconName="flag-outline"
-              placeholder="Enter your country"
-              error={errors.country}
-              isNeeded={true}
-            />
-
             <View
-              style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-              <View style={{marginVertical: 10, paddingRight: 5, width: '50%'}}>
+              style={{
+                paddingTop: 25,
+                backgroundColor: '#FFFFFF',
+                borderRadius: 15,
+                paddingHorizontal: 15,
+                paddingVertical: 15,
+                opacity: 0.86,
+                borderColor: '#D9DBE9',
+                borderWidth: 2,
+              }}>
+              <View style={{marginVertical: 20}}>
                 <CustomDropdown
-                  label="State"
-                  onFocus={() => handleError(null, 'state')}
+                  label="Title"
                   isNeeded={true}
-                  placeholder="Select State"
+                  placeholder="Select Title"
                   placeholderStyle={styles.placeholderStyle}
                   selectedTextStyle={styles.selectedTextStyle}
-                  data={currentState ? currentState : stateData}
-                  // data={stateData}
+                  data={titleData}
                   maxHeight={300}
                   labelField="label"
                   valueField="value"
-                  value={userDetails.state}
+                  value={userDetails.title}
                   onChange={option => {
-                    setUserDetails({...userDetails, state: option.value});
+                    setUserDetails({...userDetails, title: option.value});
                   }}
-                  error={errors.state}
+                  onFocus={() => handleError(null, 'title')}
+                  error={errors.title}
                 />
               </View>
-              <View style={{marginVertical: 10, paddingLeft: 5, width: '50%'}}>
-                <CustomDropdown
-                  label="City"
-                  onFocus={() => handleError(null, 'city')}
-                  isNeeded={true}
-                  placeholder="Select LGA"
-                  placeholderStyle={styles.placeholderStyle}
-                  selectedTextStyle={styles.selectedTextStyle}
-                  data={currentCity ? currentCity : cityData}
-                  // data={cityData}
-                  maxHeight={300}
-                  labelField="label"
-                  valueField="value"
-                  value={userDetails.city}
-                  onChange={option => {
-                    setUserDetails({...userDetails, city: option.value});
-                  }}
-                  error={errors.city}
-                />
-              </View>
-            </View>
 
-            <View style={{marginVertical: 10}}>
-              <CustomDropdown
-                label="Residential Status"
-                onFocus={() => handleError(null, 'residentialStatus')}
-                iconName="home-outline"
+              <Input
+                iconName="account-outline"
+                label="First Name"
+                placeholder="Enter your first name"
                 isNeeded={true}
-                placeholderStyle={styles.placeholderStyle}
-                selectedTextStyle={styles.selectedTextStyle}
-                data={residencyData}
-                maxHeight={300}
-                labelField="label"
-                valueField="value"
-                value={userDetails.residentialStatus}
-                onChange={option => {
-                  setUserDetails({
-                    ...userDetails,
-                    residentialStatus: option.value,
-                  });
-                }}
-                error={errors.residentialStatus}
+                defaultValue={profileDetails?.firstName}
+                onChangeText={text =>
+                  setUserDetails({...userDetails, firstName: text.trim()})
+                }
+                onFocus={() => handleError(null, 'firstName')}
+                error={errors.firstname}
               />
-            </View>
 
-            <View style={{marginVertical: 10}}>
-              <CustomDropdown
-                label="When did you move to that address?"
-                onFocus={() =>
-                  handleError(null, 'yearYouMovedToCurrentAddress')
+              <Input
+                iconName="account-outline"
+                label="Last Name"
+                placeholder="Enter your last name"
+                defaultValue={profileDetails?.lastName}
+                onChangeText={text =>
+                  setUserDetails({...userDetails, lastName: text.trim()})
                 }
                 isNeeded={true}
-                placeholderStyle={styles.placeholderStyle}
-                selectedTextStyle={styles.selectedTextStyle}
-                data={wdymttaData}
-                maxHeight={300}
-                labelField="label"
-                valueField="value"
-                value={userDetails.yearYouMovedToCurrentAddress}
-                onChange={option => {
-                  setUserDetails({
-                    ...userDetails,
-                    yearYouMovedToCurrentAddress: option.value,
-                  });
-                }}
-                error={errors.yearYouMovedToCurrentAddress}
+                onFocus={() => handleError(null, 'lastName')}
+                error={errors.lastName}
               />
-            </View>
 
-            <View style={{marginVertical: 10}}>
-              <CustomDropdown
-                label="Marital Status"
-                onFocus={() => handleError(null, 'maritalStatus')}
+              <Input
+                iconName="email-outline"
+                label="Email"
+                placeholder="Enter your email"
+                keyboardType="email-address"
+                defaultValue={profileDetails?.email}
+                onChangeText={text =>
+                  setUserDetails({...userDetails, email: text.trim()})
+                }
                 isNeeded={true}
-                placeholderStyle={styles.placeholderStyle}
-                selectedTextStyle={styles.selectedTextStyle}
-                data={maritalData}
-                maxHeight={300}
-                labelField="label"
-                valueField="value"
-                value={userDetails.maritalStatus}
-                onChange={option => {
-                  setUserDetails({
-                    ...userDetails,
-                    maritalStatus: option.value,
-                  });
-                }}
-                error={errors.maritalStatus}
+                onFocus={() => handleError(null, 'email')}
+                error={errors.email}
               />
-            </View>
 
-            <View style={{marginVertical: 10}}>
-              <CustomDropdown
-                label="Educational Level"
-                onFocus={() => handleError(null, 'eduLevel')}
-                iconName="school-outline"
+              <InputPhone
+                label="Phone number"
+                layout="first"
                 isNeeded={true}
-                placeholderStyle={styles.placeholderStyle}
-                selectedTextStyle={styles.selectedTextStyle}
-                data={educationalData}
-                maxHeight={300}
-                labelField="label"
-                valueField="value"
-                value={userDetails.eduLevel}
-                onChange={option => {
-                  setUserDetails({
-                    ...userDetails,
-                    eduLevel: option.value,
-                  });
-                }}
-                error={errors.eduLevel}
+                defaultCode="NG"
+                codeTextStyle={{color: '#6E7191'}}
+                defaultValue={profileDetails?.phoneNumber}
+                onChangeFormattedText={text =>
+                  setUserDetails({...userDetails, phoneNumber: text})
+                }
+                onFocus={() => handleError(null, 'phoneNumber')}
+                error={errors.phoneNumber}
               />
-            </View>
 
-            <Input
-              label="Number of dependents"
-              onChangeText={text =>
-                setUserDetails({
-                  ...userDetails,
-                  NoOfDependents: parseInt(text, 10),
-                })
-              }
-              onFocus={() => handleError(null, 'NoOfDependents')}
-              error={errors.NoOfDependents}
-              defaultValue={profileDetails?.NoOfDependents?.toString()}
-              keyboardType="numeric"
-              isNeeded={true}
-            />
-
-            <TouchableOpacity
-              onPress={validate}
-              disabled={disableit}
-              style={{marginBottom: 30}}>
-              <View style={{marginBottom: 30, marginTop: 20}}>
-                <Buttons label="Save & Continue" disabled={disableit} />
+              <View style={{marginVertical: 10}}>
+                <CustomDropdown
+                  label="Gender"
+                  onFocus={() => handleError(null, 'gender')}
+                  // search
+                  isNeeded={true}
+                  iconName="gender-male-female"
+                  placeholder="Select Gender"
+                  placeholderStyle={styles.placeholderStyle}
+                  selectedTextStyle={styles.selectedTextStyle}
+                  data={genderData}
+                  maxHeight={300}
+                  labelField="label"
+                  valueField="value"
+                  value={userDetails.gender}
+                  onChange={option => {
+                    setUserDetails({...userDetails, gender: option.value});
+                  }}
+                  error={errors.gender}
+                />
               </View>
-            </TouchableOpacity>
-          </View>
-        </ScrollView>
-      </ImageBackground>
+
+              <Input
+                // onChangeText={text =>
+                //   setUserDetails({...userDetails, bvn: text.trim()})
+                // }
+                onFocus={() => handleError(null, 'bvn')}
+                iconName="shield-lock-outline"
+                label="BVN"
+                placeholder="Enter your BVN"
+                error={errors.bvn}
+                keyboardType="numeric"
+                isNeeded={true}
+                defaultValue={userDetails.bvn}
+              />
+
+              <Pressable onPress={showDatePicker}>
+                <Input
+                  label="Date of Birth"
+                  onFocus={() => handleError(null, 'dob')}
+                  iconName="calendar-month-outline"
+                  placeholder="2000 - 01 - 01"
+                  defaultValue={
+                    userDetails.dob ? userDetails.dob.toString() : ''
+                  }
+                  isDate={true}
+                  editable={false}
+                  showDatePicker={showDatePicker}
+                  onChangeValue={text =>
+                    setUserDetails({...userDetails, dob: text})
+                  }
+                  isNeeded={true}
+                  error={errors.dob}
+                />
+              </Pressable>
+
+              <DateTimePickerModal
+                isVisible={show}
+                testID="dateTimePicker"
+                defaultValue={userDetails.dob}
+                mode="date"
+                is24Hour={true}
+                onConfirm={handleConfirm}
+                onCancel={hideDatePicker}
+                textColor="#054B99"
+              />
+
+              <Input
+                label="Address"
+                defaultValue={userDetails.address}
+                onChangeText={text =>
+                  setUserDetails({...userDetails, address: text})
+                }
+                onFocus={() => handleError(null, 'address')}
+                iconName="map-marker-outline"
+                placeholder="Enter your address"
+                error={errors.address}
+                isNeeded={true}
+              />
+
+              <Input
+                label="Country"
+                defaultValue={userDetails.country}
+                onChangeText={text =>
+                  setUserDetails({...userDetails, country: text})
+                }
+                onFocus={() => handleError(null, 'country')}
+                iconName="flag-outline"
+                placeholder="Enter your country"
+                error={errors.country}
+                isNeeded={true}
+              />
+
+              <View
+                style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+                <View
+                  style={{marginVertical: 10, paddingRight: 5, width: '50%'}}>
+                  <CustomDropdown
+                    label="State"
+                    onFocus={() => handleError(null, 'state')}
+                    isNeeded={true}
+                    placeholder="Select State"
+                    placeholderStyle={styles.placeholderStyle}
+                    selectedTextStyle={styles.selectedTextStyle}
+                    data={currentState ? currentState : stateData}
+                    // data={stateData}
+                    maxHeight={300}
+                    labelField="label"
+                    valueField="value"
+                    value={userDetails.state}
+                    onChange={option => {
+                      setUserDetails({...userDetails, state: option.value});
+                    }}
+                    error={errors.state}
+                  />
+                </View>
+                <View
+                  style={{marginVertical: 10, paddingLeft: 5, width: '50%'}}>
+                  <CustomDropdown
+                    label="City"
+                    onFocus={() => handleError(null, 'city')}
+                    isNeeded={true}
+                    placeholder="Select LGA"
+                    placeholderStyle={styles.placeholderStyle}
+                    selectedTextStyle={styles.selectedTextStyle}
+                    data={currentCity ? currentCity : cityData}
+                    // data={cityData}
+                    maxHeight={300}
+                    labelField="label"
+                    valueField="value"
+                    value={userDetails.city}
+                    onChange={option => {
+                      setUserDetails({...userDetails, city: option.value});
+                    }}
+                    error={errors.city}
+                  />
+                </View>
+              </View>
+
+              <View style={{marginVertical: 10}}>
+                <CustomDropdown
+                  label="Residential Status"
+                  onFocus={() => handleError(null, 'residentialStatus')}
+                  iconName="home-outline"
+                  isNeeded={true}
+                  placeholderStyle={styles.placeholderStyle}
+                  selectedTextStyle={styles.selectedTextStyle}
+                  data={residencyData}
+                  maxHeight={300}
+                  labelField="label"
+                  valueField="value"
+                  value={userDetails.residentialStatus}
+                  onChange={option => {
+                    setUserDetails({
+                      ...userDetails,
+                      residentialStatus: option.value,
+                    });
+                  }}
+                  error={errors.residentialStatus}
+                />
+              </View>
+
+              <View style={{marginVertical: 10}}>
+                <CustomDropdown
+                  label="When did you move to that address?"
+                  onFocus={() =>
+                    handleError(null, 'yearYouMovedToCurrentAddress')
+                  }
+                  isNeeded={true}
+                  placeholderStyle={styles.placeholderStyle}
+                  selectedTextStyle={styles.selectedTextStyle}
+                  data={wdymttaData}
+                  maxHeight={300}
+                  labelField="label"
+                  valueField="value"
+                  value={userDetails.yearYouMovedToCurrentAddress}
+                  onChange={option => {
+                    setUserDetails({
+                      ...userDetails,
+                      yearYouMovedToCurrentAddress: option.value,
+                    });
+                  }}
+                  error={errors.yearYouMovedToCurrentAddress}
+                />
+              </View>
+
+              <View style={{marginVertical: 10}}>
+                <CustomDropdown
+                  label="Marital Status"
+                  onFocus={() => handleError(null, 'maritalStatus')}
+                  isNeeded={true}
+                  placeholderStyle={styles.placeholderStyle}
+                  selectedTextStyle={styles.selectedTextStyle}
+                  data={maritalData}
+                  maxHeight={300}
+                  labelField="label"
+                  valueField="value"
+                  value={userDetails.maritalStatus}
+                  onChange={option => {
+                    setUserDetails({
+                      ...userDetails,
+                      maritalStatus: option.value,
+                    });
+                  }}
+                  error={errors.maritalStatus}
+                />
+              </View>
+
+              <View style={{marginVertical: 10}}>
+                <CustomDropdown
+                  label="Educational Level"
+                  onFocus={() => handleError(null, 'eduLevel')}
+                  iconName="school-outline"
+                  isNeeded={true}
+                  placeholderStyle={styles.placeholderStyle}
+                  selectedTextStyle={styles.selectedTextStyle}
+                  data={educationalData}
+                  maxHeight={300}
+                  labelField="label"
+                  valueField="value"
+                  value={userDetails.eduLevel}
+                  onChange={option => {
+                    setUserDetails({
+                      ...userDetails,
+                      eduLevel: option.value,
+                    });
+                  }}
+                  error={errors.eduLevel}
+                />
+              </View>
+
+              <Input
+                label="Number of dependents"
+                onChangeText={text =>
+                  setUserDetails({
+                    ...userDetails,
+                    NoOfDependents: parseInt(text, 10),
+                  })
+                }
+                onFocus={() => handleError(null, 'NoOfDependents')}
+                error={errors.NoOfDependents}
+                defaultValue={profileDetails?.NoOfDependents?.toString()}
+                keyboardType="numeric"
+                isNeeded={true}
+              />
+
+              <TouchableOpacity
+                onPress={validate}
+                disabled={disableit}
+                style={{marginBottom: 30}}>
+                <View style={{marginBottom: 30, marginTop: 20}}>
+                  <Buttons label="Save & Continue" disabled={disableit} />
+                </View>
+              </TouchableOpacity>
+            </View>
+          </ScrollView>
+        </ImageBackground>
+      </KeyboardAvoidingWrapper>
     </SafeAreaView>
   );
 };
@@ -906,8 +914,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   image: {
-    height: screenHeight,
-    width: screenWidth,
+    // height: screenHeight,
+    width: wp('100%'),
     justifyContent: 'center',
   },
   HeadView: {

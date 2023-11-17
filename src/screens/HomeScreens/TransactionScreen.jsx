@@ -17,7 +17,7 @@ import Share from 'react-native-share';
 import {useClipboard} from '@react-native-clipboard/clipboard';
 import ViewShot from 'react-native-view-shot';
 import SendIntentAndroid from 'react-native-send-intent';
-import email from 'react-native-email'
+import email from 'react-native-email';
 
 const TransactionScreen = ({route}) => {
   const insets = useSafeAreaInsets();
@@ -29,18 +29,17 @@ const TransactionScreen = ({route}) => {
   const openSendSms = Id => {
     const text = `Hello, I would like to report a transaction, with Transaction ID: ${Id}`;
     if (Platform.OS === 'android') {
-    SendIntentAndroid.sendMail(
-      'support@tradelenda.com',
-      `Report Transaction`,
-      `${text}`,
-    );
-    }else{
+      SendIntentAndroid.sendMail(
+        'support@tradelenda.com',
+        `Report Transaction`,
+        `${text}`,
+      );
+    } else {
       email('support@tradelenda.com', {
         subject: 'Report Transaction',
         body: `${text}`,
-        checkCanOpen: false // Call Linking.canOpenURL prior to Linking.openURL
-    }).catch(console.error)
-
+        checkCanOpen: false, // Call Linking.canOpenURL prior to Linking.openURL
+      }).catch(console.error);
     }
   };
 
@@ -73,7 +72,7 @@ const TransactionScreen = ({route}) => {
       style={{
         flex: 1,
         backgroundColor: '#fff',
-        paddingTop: insets.top !== 0 ? insets.top / 2 : 'auto',
+        paddingTop: insets.top !== 0 ? insets.top : 18,
         paddingBottom: insets.bottom !== 0 ? insets.bottom / 2 : 'auto',
         paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
         paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
@@ -148,7 +147,6 @@ const TransactionScreen = ({route}) => {
               </View>
               <Text
                 style={{
-                  
                   fontWeight: '400',
                   marginTop: 8,
                 }}>
@@ -287,7 +285,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   TextHead: {
-    
     fontWeight: '700',
     fontSize: 16,
     lineHeight: 20,
@@ -313,7 +310,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   title: {
-    
     fontWeight: '800',
     paddingLeft: 20,
     fontSize: 14,
@@ -322,12 +318,10 @@ const styles = StyleSheet.create({
     paddingTop: 10,
   },
   infotext: {
-    
     color: '#6E7191',
     marginBottom: 4,
   },
   values: {
-    
     fontSize: 16,
     lineHeight: 24,
     fontWeight: '800',
@@ -335,14 +329,14 @@ const styles = StyleSheet.create({
   report: {
     color: '#ED2E7E',
     fontSize: 14,
-    
+
     fontWeight: 'bold',
     lineHeight: 24,
     letterSpacing: 0.5,
   },
   reportdesc: {
     color: '#6E7191',
-    
+
     fontSize: 12,
     lineHeight: 18,
   },

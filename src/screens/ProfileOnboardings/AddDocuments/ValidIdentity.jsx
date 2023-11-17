@@ -1,11 +1,13 @@
 import {View, Text, StyleSheet, TouchableOpacity, FlatList} from 'react-native';
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 import Input from '../../../component/inputField/input.component';
 import CustomDropdown from '../../../component/dropDown/dropdown.component';
 import Buttons from '../../../component/buttons/Buttons';
+import Spinner from 'react-native-loading-spinner-overlay';
+import {getLoanUserDetails} from '../../../stores/LoanStore';
 
 const idTypeData = [
   {value: '', label: 'Select ID Type'},
@@ -13,12 +15,15 @@ const idTypeData = [
   {value: 'Drivers License', label: 'Drivers License'},
   {value: 'International Passport', label: 'International Passport'},
   {value: 'Voters Card', label: 'Voters Card'},
+  {value: 'Birth Certificate', label: 'Birth Certificate'},
 ];
 
 const ITEM_HEIGHT = 100;
 const TobTabs = [
-  {name: 'Valid Identity', key: 'ValidIndentity'},
+  {name: 'Valid Identity', key: 'ValidIdentity'},
   {name: 'Proof of Address', key: 'ProofOfAddress'},
+  {name: 'Personal Photo', key: 'PersonalPhoto'},
+  {name: 'Identity Card (ARM)', key: 'IdentityCard'},
   {name: 'Bank Statement', key: 'BankStatement'},
   {name: 'Passport', key: 'Passport'},
   {name: 'Signature', key: 'Signature'},
@@ -32,7 +37,96 @@ const ValidIdentity = () => {
   const [formDetails, setFormDetails] = useState({
     validIdentificationType: '',
     validIdentification: '',
+    utilityBill: '',
+    bankStatement: '',
+    passport: '',
+    signature: '',
+    seal: '',
+    cacCertificate: '',
+    othersName: '',
+    others: '',
+    identityCard: '',
+    personalPhoto: '',
   });
+
+  const [orgDetails, setOrgDetails] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const route = useRoute();
+
+  useEffect(() => {
+    if (route.name === 'ValidIdentity') {
+      const unsubscribe = navigation.addListener('focus', async () => {
+        unSubBusinessDetails();
+      });
+      return unsubscribe;
+    }
+  }, [navigation]);
+
+  useEffect(() => {
+    unSubBusinessDetails();
+  }, []);
+
+  const unSubBusinessDetails = async () => {
+    setIsLoading(true);
+    const res = await getLoanUserDetails();
+    if (res?.error) {
+      // TODO: handle error
+    } else {
+      setOrgDetails(res?.data?.loanDocumentDetails);
+    }
+    setIsLoading(false);
+  };
+
+  useEffect(() => {
+    setFormDetails({
+      validIdentificationType:
+        orgDetails && orgDetails?.validIdentificationType === undefined
+          ? ''
+          : orgDetails?.validIdentificationType,
+      validIdentification:
+        orgDetails && orgDetails?.validIdentification === undefined
+          ? ''
+          : orgDetails?.validIdentification,
+      utilityBill:
+        orgDetails && orgDetails?.utilityBill === undefined
+          ? ''
+          : orgDetails?.utilityBill,
+      bankStatement:
+        orgDetails && orgDetails?.bankStatement === undefined
+          ? ''
+          : orgDetails?.bankStatement,
+      passport:
+        orgDetails && orgDetails?.passport === undefined
+          ? ''
+          : orgDetails?.passport,
+      signature:
+        orgDetails && orgDetails?.signature === undefined
+          ? ''
+          : orgDetails?.signature,
+      seal:
+        orgDetails && orgDetails?.seal === undefined ? '' : orgDetails?.seal,
+      cacCertificate:
+        orgDetails && orgDetails?.cacCertificate === undefined
+          ? ''
+          : orgDetails?.cacCertificate,
+      othersName:
+        orgDetails && orgDetails?.othersName === undefined
+          ? ''
+          : orgDetails?.othersName,
+      others:
+        orgDetails && orgDetails?.others === undefined
+          ? ''
+          : orgDetails?.others,
+      identityCard:
+        orgDetails && orgDetails?.identityCard === undefined
+          ? ''
+          : orgDetails?.identityCard,
+      personalPhoto:
+        orgDetails && orgDetails?.personalPhoto === undefined
+          ? ''
+          : orgDetails?.personalPhoto,
+    });
+  }, [orgDetails, navigation]);
 
   const disableit =
     !formDetails.validIdentification || !formDetails.validIdentificationType;
@@ -60,11 +154,19 @@ const ValidIdentity = () => {
       style={{
         flex: 1,
         backgroundColor: '#fff',
-        paddingTop: insets.top !== 0 ? insets.top / 2 : 'auto',
+        paddingTop: insets.top !== 0 ? insets.top : 18,
         paddingBottom: insets.bottom !== 0 ? insets.bottom / 2 : 'auto',
         paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
         paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
       }}>
+      {isLoading && (
+        <Spinner
+          textContent={'Loading...'}
+          textStyle={{color: 'white'}}
+          visible={true}
+          overlayColor="rgba(78, 75, 102, 0.7)"
+        />
+      )}
       <View
         style={{
           flexDirection: 'row',
@@ -188,7 +290,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#054B99',
   },
   tabText: {
-    
     fontSize: 12,
     fontWeight: '600',
     textAlign: 'center',
@@ -199,7 +300,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   TextHead: {
-    
     fontWeight: '700',
     fontSize: 16,
     lineHeight: 24,
@@ -214,7 +314,6 @@ const styles = StyleSheet.create({
     marginVertical: 16,
   },
   header: {
-    
     fontSize: 20,
     fontWeight: '700',
     letterSpacing: 1,
@@ -232,10 +331,8 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: 'bold',
     color: 'black',
-    
   },
   camHead: {
-    
     fontSize: 14,
     fontWeight: '400',
   },

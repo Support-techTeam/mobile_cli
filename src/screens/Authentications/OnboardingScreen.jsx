@@ -13,9 +13,11 @@ import {
 import React, {useState} from 'react';
 import {useNavigation} from '@react-navigation/native';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
-import {userLogOut} from '../../stores/AuthStore';
-import {resetStore} from '../../util/redux/store';
-
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from 'react-native-responsive-screen';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 const {width, height} = Dimensions.get('window');
 const midth = Dimensions.get('window').width;
 const hidth = Dimensions.get('window').height;
@@ -48,9 +50,9 @@ const Slide = ({item}) => {
       <View
         style={{
           position: 'absolute',
-          top: hidth * 0.59,
+          top: hp(65),
           marginBottom: 0,
-          width: '100%',
+          width: wp(100),
           paddingLeft: 24,
         }}>
         <Text style={styles.watermark}>{item.title}</Text>
@@ -63,10 +65,17 @@ const OnboardingScreen = () => {
   const [currentslide, setCurrentSlide] = useState(0);
   const insets = useSafeAreaInsets();
   const Footer = () => {
+    const handleCompleteOnboarding = async () => {
+      // Set the onboarding state as completed
+      try {
+        await AsyncStorage.setItem('onboardingCompleted', JSON.stringify(true));
+      } catch (error) {}
+    };
     return (
       <View
         style={{
-          height: height * 0.25,
+          height: hp(25),
+          // height: height * 0.25,
           justifyContent: 'space-between',
         }}>
         <View
@@ -83,7 +92,6 @@ const OnboardingScreen = () => {
                 currentslide === index && {
                   borderColor: '#054B99',
                   borderWidth: 2,
-                  backgroundColor: '',
                 },
               ]}
             />
@@ -91,43 +99,33 @@ const OnboardingScreen = () => {
         </View>
 
         <View style={{marginBottom: 50}}>
-          <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
+          <TouchableOpacity
+            onPress={() => {
+              handleCompleteOnboarding();
+              navigation.navigate('SignUp');
+            }}>
             <View
               style={{
                 marginBottom: 2,
                 marginLeft: 24,
                 marginRight: 18,
                 backgroundColor: '#054B99',
-                height: 48,
+                height: hp(6),
                 borderRadius: 12,
                 justifyContent: 'center',
                 alignItems: 'center',
               }}>
-              <Text style={{fontWeight: '500', color: '#fff'}}>
+              <Text
+                style={{fontWeight: '500', color: '#fff', fontSize: hp(2.5)}}>
                 Get Started
               </Text>
             </View>
           </TouchableOpacity>
 
-          <Pressable onPress={() => navigation.navigate('Login')}>
-            <View
-              style={{
-                marginTop: 16,
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexDirection: 'row',
-              }}>
-              <Text style={{fontSize: 16}}>Already have an account? </Text>
-              <Text style={{color: '#054B99', fontSize: 16}}>Log in</Text>
-            </View>
-          </Pressable>
           <Pressable
-            onPress={async () => {
-              const res = await userLogOut();
-              if (res?.error) {
-              } else {
-                await resetStore();
-              }
+            onPress={() => {
+              handleCompleteOnboarding();
+              navigation.navigate('Login');
             }}>
             <View
               style={{
@@ -136,8 +134,12 @@ const OnboardingScreen = () => {
                 justifyContent: 'center',
                 flexDirection: 'row',
               }}>
-              <Text style={{fontSize: 16}}>Already have an account? </Text>
-              <Text style={{color: '#054B99', fontSize: 16}}>Log out</Text>
+              <Text style={{fontSize: hp('2.5%')}}>
+                Already have an account?{' '}
+              </Text>
+              <Text style={{color: '#054B99', fontSize: hp('2.5%')}}>
+                Log in
+              </Text>
             </View>
           </Pressable>
         </View>
@@ -146,7 +148,7 @@ const OnboardingScreen = () => {
   };
   const updateCurrentSlide = e => {
     const contentOffsetX = e.nativeEvent.contentOffset.x;
-    const currentIndex = Math.round(contentOffsetX / width);
+    const currentIndex = Math.round(contentOffsetX / wp(100));
     setCurrentSlide(currentIndex);
   };
   return (
@@ -154,16 +156,16 @@ const OnboardingScreen = () => {
       style={{
         flex: 1,
         backgroundColor: '#fff',
-        // paddingTop: insets.top !== 0 ? insets.top : 'auto',
-        paddingBottom: insets.bottom !== 0 ? insets.bottom / 2 : 'auto',
-        paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
-        paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
+        // paddingTop: insets.top !== 0 ? insets.top : 18,
+        // paddingBottom: insets.bottom !== 0 ? insets.bottom / 2 : 'auto',
+        // paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
+        // paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
       }}>
       <FlatList
         onMomentumScrollEnd={updateCurrentSlide}
         data={slides}
         pagingEnabled
-        contentContainerStyle={{height: height * 0.77}}
+        contentContainerStyle={{height: hp(80)}}
         showsHorizontalScrollIndicator={false}
         showsVerticalScrollIndicator={false}
         horizontal
@@ -187,19 +189,18 @@ const styles = StyleSheet.create({
   },
   content: {
     paddingRight: 40,
-    // fontSize: 28,
-    fontSize: width * 0.072,
+    fontSize: hp(5),
     color: '#054B99',
     fontFamily: 'serif',
     letterSpacing: 0.4,
   },
   image: {
-    maxHeight: height,
-    maxWidth: width,
-    width: midth,
-    height: height * 0.72,
-    resizeMode: 'contain',
-    borderWidth: 1,
+    maxHeight: hp(80),
+    maxWidth: wp(100),
+    width: wp(100),
+    height: hp(80),
+    resizeMode: 'cover',
+    borderWidth: 0,
   },
   imageContainer: {
     position: 'relative',
@@ -207,9 +208,9 @@ const styles = StyleSheet.create({
   },
   watermark: {
     position: 'absolute',
-    top: height * 0.04,
+    top: hp(1),
     left: 0,
-    fontSize: width * 0.077,
+    fontSize: hp(3.5),
     fontWeight: '600',
     paddingLeft: 5,
     color: '#054B99',

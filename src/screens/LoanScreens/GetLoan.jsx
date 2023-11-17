@@ -263,7 +263,7 @@ const GetLoan = () => {
       style={{
         flex: 1,
         backgroundColor: '#fff',
-        paddingTop: insets.top !== 0 ? insets.top / 2 : 'auto',
+        paddingTop: insets.top !== 0 ? insets.top : 18,
         paddingBottom: insets.bottom !== 0 ? insets.bottom / 2 : 'auto',
         paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
         paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
@@ -860,6 +860,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   input: {
+    color: '#14142B',
     height: 85,
   },
   getLoan: {

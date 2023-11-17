@@ -1,7 +1,7 @@
 {
   "name": "Tradelenda",
   "displayName": "Tradelenda",
-  "version": "3.0.0",
+  "version": "3.0.2",
   "orientation": "portrait",
   "BASE_URL": "https://sjrg8dpghv.us-east-1.awsapprunner.com",
   "BASE_API_URL": "https://eywxitmij3.us-east-1.awsapprunner.com/api/v1",

@@ -38,7 +38,7 @@ const createGuarantor = async data => {
         return {
           title: 'Create Guarantor',
           error: false,
-          data: response.data,
+          data: response?.data,
           message:
             'Guarantor added successfully. Please notify your guarantor to check their mail!',
         };
@@ -79,7 +79,7 @@ const getGuarantors = async () => {
         return {
           title: 'Get Guarantors',
           error: false,
-          data: response.data,
+          data: response?.data,
           message: 'success',
         };
       } catch (error) {
@@ -119,7 +119,7 @@ const getGuarantor = async id => {
         return {
           title: 'Get Guarantor',
           error: false,
-          data: response.data,
+          data: response?.data,
           message: 'success',
         };
       } catch (error) {
@@ -163,7 +163,7 @@ const sendOtp = async data => {
         return {
           title: 'Send Otp',
           error: false,
-          data: response.data,
+          data: response?.data,
           message:
             'We have sent your guarantor a mail. You will be navigated shortly!',
         };

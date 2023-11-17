@@ -26,23 +26,28 @@ const toastConfig = {
     <BaseToast
       {...props}
       style={{
+        flex: 1,
         borderLeftColor: '#28a745',
         borderRightColor: '#28a745',
         borderRightWidth: 2,
         backgroundColor: '#28a745',
+        flexWrap: 'wrap',
       }}
       contentContainerStyle={{
         paddingHorizontal: 15,
         backgroundColor: '#28a745',
+        flexWrap: 'wrap',
       }}
       text1Style={{
         fontSize: 15,
         fontWeight: '400',
         color: 'white',
+        flexWrap: 'wrap',
       }}
       text2Style={{
         fontSize: 14,
         color: 'white',
+        flexWrap: 'wrap',
       }}
     />
   ),
@@ -51,6 +56,8 @@ const toastConfig = {
     <ErrorToast
       {...props}
       style={{
+        flexWrap: 'wrap',
+        flex: 1,
         borderLeftColor: '#dc3545',
         borderRightColor: '#dc3545',
         borderRightWidth: 2,
@@ -59,15 +66,19 @@ const toastConfig = {
       contentContainerStyle={{
         paddingHorizontal: 15,
         backgroundColor: '#dc3545',
+        flexWrap: 'wrap',
+        flex: 1,
       }}
       text1Style={{
         fontSize: 15,
         fontWeight: '400',
         color: 'white',
+        flexWrap: 'wrap',
       }}
       text2Style={{
         fontSize: 14,
         color: 'white',
+        flexWrap: 'wrap',
       }}
     />
   ),

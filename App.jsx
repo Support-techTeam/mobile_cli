@@ -1,26 +1,16 @@
 /* eslint-disable react-native/no-inline-styles */
 import React, {useEffect, useState, useRef} from 'react';
 import {
-  Button,
   Platform,
-  ScrollView,
   StatusBar,
   StyleSheet,
-  Text,
   View,
   AppState,
   LogBox,
+  Text,
+  Button,
 } from 'react-native';
-
-import SplashScreen from 'react-native-splash-screen';
-import SpInAppUpdates, {
-  IncomingStatusUpdateEvent,
-  NeedsUpdateResponse,
-  IAUUpdateKind,
-  StartUpdateOptions,
-  StatusUpdateEvent,
-  IAUInstallStatus,
-} from 'sp-react-native-in-app-updates';
+import SpInAppUpdates, {IAUUpdateKind} from 'sp-react-native-in-app-updates';
 import {version} from './app.json';
 import Toast from 'react-native-toast-message';
 import {useAsyncStorage} from '@react-native-async-storage/async-storage';
@@ -33,7 +23,7 @@ import {
 } from '@datadog/mobile-react-native';
 import AppNavigationContainer from './src/navigation';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
-import {Provider as PaperProvider} from 'react-native-paper';
+import {Provider as PaperProvider, Portal} from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {Provider} from 'react-redux';
 import {PersistGate} from 'redux-persist/integration/react';
@@ -42,6 +32,9 @@ import {LightTheme} from './src/constants/lightTheme';
 import EnterPin from './src/screens/SecurityScreens/EnterPinScreen';
 import {getAllPin} from './src/stores/SecurityStore';
 import NetworkStatus from './src/util/NetworkService';
+import RNRestart from 'react-native-restart';
+import COLORS from './src/constants/colors';
+
 const inAppUpdates = new SpInAppUpdates(false);
 LogBox.ignoreAllLogs();
 
@@ -64,19 +57,45 @@ datadogConfiguration.nativeCrashReportEnabled = true;
 // Optional: sample RUM sessions (here, 80% of session will be sent to Datadog. Default = 100%)
 datadogConfiguration.sampleRate = 80;
 
-function App() {
-  // const insets = useSafeAreaInsets();
+const STYLES = ['default', 'dark-content', 'light-content'];
+const TRANSITIONS = ['fade', 'slide', 'none'];
 
+function App() {
   const appMainState = useRef(AppState.currentState);
   const [appState, setAppState] = useState(appMainState.current);
   const [isLocked, setIsLocked] = useState('');
   const [hasPin, setHasPin] = useState(false);
   const {getItem, setItem} = useAsyncStorage('@lockState');
-
   const readItemFromStorage = async () => {
     const item = await getItem();
     setIsLocked(item);
   };
+
+  const [hidden, setHidden] = useState(false);
+  const [statusBarStyle, setStatusBarStyle] = useState(STYLES[0]);
+  const [statusBarTransition, setStatusBarTransition] = useState(
+    TRANSITIONS[0],
+  );
+
+  // const changeStatusBarVisibility = () => setHidden(!hidden);
+
+  // const changeStatusBarStyle = () => {
+  //   const styleId = STYLES.indexOf(statusBarStyle) + 1;
+  //   if (styleId === STYLES.length) {
+  //     setStatusBarStyle(STYLES[0]);
+  //   } else {
+  //     setStatusBarStyle(STYLES[styleId]);
+  //   }
+  // };
+
+  // const changeStatusBarTransition = () => {
+  //   const transition = TRANSITIONS.indexOf(statusBarTransition) + 1;
+  //   if (transition === TRANSITIONS.length) {
+  //     setStatusBarTransition(TRANSITIONS[0]);
+  //   } else {
+  //     setStatusBarTransition(TRANSITIONS[transition]);
+  //   }
+  // };
 
   const writeItemToStorage = async newValue => {
     await setItem(newValue);
@@ -147,6 +166,12 @@ function App() {
     });
     if (totalBytesToDownload === bytesDownloaded) {
       Toast.hide();
+      if (Platform.OS === 'android') {
+        inAppUpdates.installUpdate();
+        if (status.status == '5') {
+          RNRestart.restart();
+        }
+      }
     }
   };
 
@@ -192,39 +217,33 @@ function App() {
     ...LightTheme,
   };
 
-  useEffect(() => {
-    const getUserStore = async () => {
-      const appData = await AsyncStorage.getItem('isAppFirstLaunched');
-      if (appData == null) {
-        AsyncStorage.setItem('isAppFirstLaunched', 'false');
-      } else {
-      }
-    };
-    getUserStore();
-
-    return () => {
-      getUserStore();
-    };
-  }, []);
-
   return (
     <SafeAreaProvider style={styles.rootContainer}>
       <PaperProvider theme={theme}>
-        <DatadogProvider configuration={datadogConfiguration}>
-          <StatusBar translucent={true} />
-          {isLocked && isLocked === 'true' && hasPin ? (
-            <EnterPin toggleVisibility={() => toggleVisibility()} />
-          ) : (
-            <View style={styles.container}>
-              <Provider store={store}>
-                <PersistGate persistor={persistor} loading={null}>
-                  <NetworkStatus />
-                  <AppNavigationContainer />
-                </PersistGate>
-              </Provider>
-            </View>
-          )}
-        </DatadogProvider>
+        <Portal>
+          <DatadogProvider configuration={datadogConfiguration}>
+            {/* <StatusBar translucent={true} /> */}
+            <StatusBar
+              animated={true}
+              backgroundColor={COLORS.lendaBlue}
+              barStyle={'default'}
+              showHideTransition={statusBarTransition}
+              hidden={hidden}
+            />
+            {isLocked && isLocked === 'true' && hasPin ? (
+              <EnterPin toggleVisibility={() => toggleVisibility()} />
+            ) : (
+              <View style={styles.container}>
+                <Provider store={store}>
+                  <PersistGate persistor={persistor} loading={null}>
+                    <NetworkStatus />
+                    <AppNavigationContainer />
+                  </PersistGate>
+                </Provider>
+              </View>
+            )}
+          </DatadogProvider>
+        </Portal>
       </PaperProvider>
     </SafeAreaProvider>
   );

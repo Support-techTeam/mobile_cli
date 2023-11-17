@@ -22,7 +22,7 @@ const AirtimeConfirm = ({route}) => {
       style={{
         flex: 1,
         backgroundColor: '#fff',
-        paddingTop: insets.top !== 0 ? insets.top / 2 : 'auto',
+        paddingTop: insets.top !== 0 ? insets.top : 18,
         paddingBottom: insets.bottom !== 0 ? insets.bottom / 2 : 'auto',
         paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
         paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
@@ -62,9 +62,7 @@ const AirtimeConfirm = ({route}) => {
           style={[styles.innercontainer]}>
           <View style={{marginTop: 24, alignItems: 'center'}}>
             <View style={{alignItems: 'center'}}>
-              <Text style={{ marginBottom: 8}}>
-                Amount
-              </Text>
+              <Text style={{marginBottom: 8}}>Amount</Text>
               <Text style={{fontFamily: 'serif', marginBottom: 8}}>
                 ₦{' '}
                 {new Intl.NumberFormat('en-US', {
@@ -73,9 +71,7 @@ const AirtimeConfirm = ({route}) => {
                   maximumFractionDigits: 2,
                 }).format(parseFloat(airtimeDetails?.amount))}
               </Text>
-              <Text style={{ marginBottom: 8}}>
-                To:
-              </Text>
+              <Text style={{marginBottom: 8}}>To:</Text>
               <Text style={{fontFamily: 'serif', marginBottom: 8}}>
                 {airtimeDetails?.number}
               </Text>
@@ -85,9 +81,7 @@ const AirtimeConfirm = ({route}) => {
             <View style={styles.detailView}>
               <View
                 style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-                <Text style={{ marginBottom: 8}}>
-                  Bill Type:
-                </Text>
+                <Text style={{marginBottom: 8}}>Bill Type:</Text>
                 <Text
                   style={{
                     fontFamily: 'serif',
@@ -104,9 +98,7 @@ const AirtimeConfirm = ({route}) => {
                     flexDirection: 'row',
                     justifyContent: 'space-between',
                   }}>
-                  <Text style={{ marginBottom: 8}}>
-                    Data Plan:
-                  </Text>
+                  <Text style={{marginBottom: 8}}>Data Plan:</Text>
                   <Text
                     style={{
                       fontFamily: 'serif',
@@ -124,9 +116,7 @@ const AirtimeConfirm = ({route}) => {
                     flexDirection: 'row',
                     justifyContent: 'space-between',
                   }}>
-                  <Text style={{ marginBottom: 8}}>
-                    Meter Number:
-                  </Text>
+                  <Text style={{marginBottom: 8}}>Meter Number:</Text>
                   <Text
                     style={{
                       fontFamily: 'serif',
@@ -144,9 +134,7 @@ const AirtimeConfirm = ({route}) => {
                     flexDirection: 'row',
                     justifyContent: 'space-between',
                   }}>
-                  <Text style={{ marginBottom: 8}}>
-                    Card Number:
-                  </Text>
+                  <Text style={{marginBottom: 8}}>Card Number:</Text>
                   <Text
                     style={{
                       fontFamily: 'serif',
@@ -164,9 +152,7 @@ const AirtimeConfirm = ({route}) => {
                     flexDirection: 'row',
                     justifyContent: 'space-between',
                   }}>
-                  <Text style={{ marginBottom: 8}}>
-                    Bouquet:
-                  </Text>
+                  <Text style={{marginBottom: 8}}>Bouquet:</Text>
                   <Text
                     style={{
                       fontFamily: 'serif',
@@ -185,9 +171,7 @@ const AirtimeConfirm = ({route}) => {
                     flexDirection: 'row',
                     justifyContent: 'space-between',
                   }}>
-                  <Text style={{ marginBottom: 8}}>
-                    Subscription:
-                  </Text>
+                  <Text style={{marginBottom: 8}}>Subscription:</Text>
                   <Text
                     style={{
                       fontFamily: 'serif',
@@ -204,9 +188,7 @@ const AirtimeConfirm = ({route}) => {
                   justifyContent: 'space-between',
                   marginTop: 15,
                 }}>
-                <Text style={{ marginBottom: 8}}>
-                  Transaction Fee:
-                </Text>
+                <Text style={{marginBottom: 8}}>Transaction Fee:</Text>
                 <Text style={{fontFamily: 'serif', marginBottom: 8}}>
                   ₦{' '}
                   {airtimeDetails?.transactionFee
@@ -222,9 +204,7 @@ const AirtimeConfirm = ({route}) => {
             <View style={[styles.detailView, {backgroundColor: '#fff'}]}>
               <View
                 style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-                <Text style={{ marginBottom: 8}}>
-                  Description
-                </Text>
+                <Text style={{marginBottom: 8}}>Description</Text>
                 <Text style={{fontFamily: 'serif', marginBottom: 8}}>
                   {airtimeDetails?.network} {airtimeDetails?.service}
                 </Text>
@@ -236,7 +216,7 @@ const AirtimeConfirm = ({route}) => {
                   justifyContent: 'space-between',
                   marginTop: 15,
                 }}>
-                <Text style={{ marginBottom: 8}}>
+                <Text style={{marginBottom: 8}}>
                   {airtimeDetails?.service == 'electricity purchase' ||
                   airtimeDetails?.service == 'cable_tv purchase'
                     ? 'Provider'
@@ -294,7 +274,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 24,
     color: '#14142B',
-    
   },
   cont: {
     position: 'relative',
@@ -331,7 +310,6 @@ const styles = StyleSheet.create({
   },
 
   desc: {
-    
     fontSize: 12,
     fontWeight: '400',
     lineHeight: 18,

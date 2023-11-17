@@ -77,8 +77,7 @@ const Electric = () => {
       meterNumber: airtimeDetails.meterNumber.toString(),
     };
     const res = await verifyMeter(data);
-    // console.log(data);
-    // console.log(res);
+
     if (res?.error) {
       Toast.show({
         type: 'error',
@@ -116,7 +115,7 @@ const Electric = () => {
       style={{
         flex: 1,
         backgroundColor: '#fff',
-        paddingTop: insets.top !== 0 ? insets.top / 2 : 'auto',
+        paddingTop: insets.top !== 0 ? insets.top : 18,
         paddingBottom: insets.bottom !== 0 ? insets.bottom / 2 : 'auto',
         paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
         paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',

@@ -5,8 +5,9 @@ import {
   TouchableOpacity,
   FlatList,
   ScrollView,
+  Image,
 } from 'react-native';
-import React, {useState, useEffect, useContext} from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import Entypo from 'react-native-vector-icons/Entypo';
 import {useNavigation, useRoute} from '@react-navigation/native';
@@ -17,12 +18,17 @@ import CustomInput from '../../../component/custominput/CustomInput';
 import Buttons from '../../../component/buttons/Buttons';
 import {createUploadDocument, uploadProgress} from '../../../stores/LoanStore';
 import Toast from 'react-native-toast-message';
+import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
+import {request, PERMISSIONS, openSettings} from 'react-native-permissions';
+import Spinner from 'react-native-loading-spinner-overlay';
 
 const ITEM_HEIGHT = 100;
 
 const TobTabs = [
-  {name: 'Valid Identity', key: 'ValidIndentity'},
+  {name: 'Valid Identity', key: 'ValidIdentity'},
   {name: 'Proof of Address', key: 'ProofOfAddress'},
+  {name: 'Personal Photo', key: 'PersonalPhoto'},
+  {name: 'Identity Card (ARM)', key: 'IdentityCard'},
   {name: 'Bank Statement', key: 'BankStatement'},
   {name: 'Passport', key: 'Passport'},
   {name: 'Signature', key: 'Signature'},
@@ -32,8 +38,10 @@ const TobTabs = [
   {name: 'Submit All', key: 'SubmitDocs'},
 ];
 
-const Others = ({route}) => {
-  const docsDetails = route?.params?.paramKey;
+const Others = () => {
+  const route = useRoute();
+  const {params} = route;
+  const {paramKey} = params;
 
   const [userDocs, setUserDocs] = useState({
     validIdentificationType: '',
@@ -43,74 +51,115 @@ const Others = ({route}) => {
     passport: '',
     signature: '',
     seal: '',
-    cac: '',
-    othersName: '',
+    cacCertificate: '',
     others: '',
+    othersName: '',
+    identityCard: '',
+    personalPhoto: '',
   });
 
   useEffect(() => {
     setUserDocs({
       validIdentificationType:
-        docsDetails?.validIdentificationType === undefined
+        paramKey?.validIdentificationType === undefined
           ? ''
-          : docsDetails?.validIdentificationType,
+          : paramKey?.validIdentificationType,
       validIdentification:
-        docsDetails?.validIdentification === undefined
+        paramKey?.validIdentification === undefined
           ? ''
-          : docsDetails?.validIdentification,
+          : paramKey?.validIdentification,
       utilityBill:
-        docsDetails?.utilityBill === undefined ? '' : docsDetails?.utilityBill,
+        paramKey?.utilityBill === undefined ? '' : paramKey?.utilityBill,
       bankStatement:
-        docsDetails?.bankStatement === undefined
-          ? ''
-          : docsDetails?.bankStatement,
-      passport:
-        docsDetails?.passport === undefined ? '' : docsDetails?.passport,
-      signature:
-        docsDetails?.signature === undefined ? '' : docsDetails?.signature,
-      seal: docsDetails?.seal === undefined ? '' : docsDetails?.seal,
-      cac: docsDetails?.cac === undefined ? '' : docsDetails?.cac,
+        paramKey?.bankStatement === undefined ? '' : paramKey?.bankStatement,
+      passport: paramKey?.passport === undefined ? '' : paramKey?.passport,
+      signature: paramKey?.signature === undefined ? '' : paramKey?.signature,
+      seal: paramKey?.seal === undefined ? '' : paramKey?.seal,
+      cacCertificate:
+        paramKey?.cacCertificate === undefined ? '' : paramKey?.cacCertificate,
       othersName:
-        docsDetails?.othersName === undefined ? '' : docsDetails?.othersName,
-      others: docsDetails?.others === undefined ? '' : docsDetails?.others,
+        paramKey?.othersName === undefined ? '' : paramKey?.othersName,
+      others: paramKey?.others === undefined ? '' : paramKey?.others,
+      identityCard:
+        paramKey?.identityCard === undefined ? '' : paramKey?.identityCard,
+      personalPhoto:
+        paramKey?.personalPhoto === undefined ? '' : paramKey?.personalPhoto,
     });
-  }, [docsDetails]);
+  }, [paramKey]);
 
   const activeTab = 'Others';
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const [selectedDocument, setSelectedDocument] = useState(null);
-
-  const disableit = !userDocs.othersName || !selectedDocument;
-
-  const pickDocument = async () => {
-    try {
-      let result = await DocumentPicker.pick({});
-      // console.log(
-      //   result.uri, // The URI of the selected document
-      //   result.type, // Mime type
-      //   result.name, // The name of the file
-      //   result.size, // File size (in bytes)
-      // );
-      setSelectedDocument(result);
-      setFile({name: result?.name, type: result?.mimeType, uri: result?.uri});
-    } catch (err) {
-      if (DocumentPicker.isCancel(err)) {
-        // User cancelled the document picker
-      } else {
-        // Handle other errors
-      }
-    }
-  };
-
+  const [image, setImage] = useState(null);
+  const [isUpdating, setIsUpdating] = useState(false);
   const [fileUri, setFile] = useState({
     name: '',
     type: '',
     uri: '',
   });
 
+  const disableit = !userDocs.othersName || !selectedDocument;
+
+  const requestStoragePermission = async () => {
+    const status = await request(
+      Platform.OS === 'ios'
+        ? PERMISSIONS.IOS.PHOTO_LIBRARY
+        : PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE,
+    );
+
+    if (status === 'granted') {
+      return true;
+    }
+    if (status === 'blocked') {
+      openSettings();
+      return true;
+    }
+    if (status === 'denied') {
+      openSettings();
+      return false;
+    }
+    if (status === 'unavailable') {
+      openSettings();
+      return false;
+    }
+    if (status === 'blocked') {
+      openSettings();
+      return false;
+    }
+    if (status === 'limited') {
+      return true;
+    }
+  };
+
+  const pickDocument = useCallback(async () => {
+    const permissopnResult = await requestStoragePermission();
+    if (permissopnResult) {
+      try {
+        const result = await launchImageLibrary({
+          presentationStyle: 'fullScreen',
+        });
+        setSelectedDocument(result?.assets[0]);
+        setImage(result.assets[0].uri);
+        setFile({
+          uri: result?.assets[0]?.uri,
+          name: result?.assets[0]?.fileName,
+          type: result?.assets[0]?.type,
+        });
+      } catch (err) {
+        // console.warn(err);
+      }
+    } else {
+      Alert.alert(
+        'Permission Required',
+        'Permission to access storage is required.',
+      );
+      return;
+    }
+  }, []);
+
   const s3UploadFunction = async () => {
-    // setIsUpdating(true);
+    setIsUpdating(true);
     const res = await createUploadDocument(fileUri, 'signature');
     if (res?.error) {
       Toast.show({
@@ -134,25 +183,21 @@ const Others = ({route}) => {
         autoHide: true,
         onPress: () => Toast.hide(),
       });
+      setUserDocs(deetss => {
+        return {
+          ...deetss,
+          others: `${res?.data?.data?.url}`,
+        };
+      });
 
-      // console.log('res', res);
-      // setUserDocs(deetss => {
-      //   return {
-      //     ...deetss,
-      //     others: `${fileString}`,
-      //   };
-      // });
+      setTimeout(() => {
+        navigation.navigate('SubmitDocs', {
+          paramKey: {...userDocs, others: `${res?.data?.data?.url}`},
+        });
+      }, 1000);
     }
-    // setIsUpdating(false);
+    setIsUpdating(false);
   };
-
-  // useEffect(() => {
-  //   if (othersSus === 'othersscs') {
-  //     setTimeout(() => {
-  //       navigation.navigate('SubmitDocs', { paramKey: userDocs });
-  //     }, 1000);
-  //   }
-  // }, [navigation, othersSus, userDocs]);
 
   const renderItem = ({item}) => {
     const isActive = item.key === activeTab;
@@ -173,11 +218,19 @@ const Others = ({route}) => {
       style={{
         flex: 1,
         backgroundColor: '#fff',
-        paddingTop: insets.top !== 0 ? insets.top / 2 : 'auto',
+        paddingTop: insets.top !== 0 ? insets.top : 18,
         paddingBottom: insets.bottom !== 0 ? insets.bottom / 2 : 'auto',
         paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
         paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
       }}>
+      {isUpdating && (
+        <Spinner
+          textContent={'Please wait...'}
+          textStyle={{color: 'white'}}
+          visible={true}
+          overlayColor="rgba(78, 75, 102, 0.7)"
+        />
+      )}
       <View
         style={{
           flexDirection: 'row',
@@ -237,9 +290,21 @@ const Others = ({route}) => {
 
         <View style={styles.reqField}>
           {selectedDocument ? (
-            <View>
-              <Text style={{}}>{selectedDocument.name}</Text>
-            </View>
+            <>
+              <View>
+                <Text style={{}}>{selectedDocument.fileName}</Text>
+              </View>
+              {image !== null && (
+                <Image
+                  source={{uri: image}}
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    resizeMode: 'contain',
+                  }}
+                />
+              )}
+            </>
           ) : (
             <>
               <TouchableOpacity

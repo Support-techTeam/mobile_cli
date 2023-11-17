@@ -14,18 +14,19 @@ import React, {useEffect, useState} from 'react';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import {useNavigation, useRoute} from '@react-navigation/native';
-import Spinner from 'react-native-loading-spinner-overlay/lib';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 import Input from '../../component/inputField/input.component';
 import CustomDropdown from '../../component/dropDown/dropdown.component';
 import Buttons from '../../component/buttons/Buttons';
 import Toast from 'react-native-toast-message';
+import Spinner from 'react-native-loading-spinner-overlay/lib';
 import {getCity, getState} from '../../stores/ProfileStore';
 import {
   createBusinessDetails,
   getLoanUserDetails,
   updateBusinessDetails,
 } from '../../stores/LoanStore';
+import KeyboardAvoidingWrapper from '../../component/KeyBoardAvoiding/keyBoardAvoiding';
 
 const businessTypeData = [
   {value: '', label: 'Select type'},
@@ -353,8 +354,6 @@ const BusinessDetails = () => {
   const handleCreateBusinessDetails = async () => {
     setIsUpdating(true);
     const res = await createBusinessDetails(businessDetails);
-    // console.log('businessDetails', businessDetails);
-    // console.log(res);
     if (res?.error) {
       Toast.show({
         type: 'error',
@@ -502,7 +501,7 @@ const BusinessDetails = () => {
       style={{
         flex: 1,
         backgroundColor: '#fff',
-        paddingTop: insets.top !== 0 ? insets.top / 2 : 'auto',
+        paddingTop: insets.top !== 0 ? insets.top : 18,
         paddingBottom: insets.bottom !== 0 ? insets.bottom / 2 : 'auto',
         paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
         paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
@@ -558,478 +557,485 @@ const BusinessDetails = () => {
         </Text>
       </View>
       {/* <View style={styles.demark} /> */}
-      <ImageBackground
-        source={require('../../../assets/signup.png')}
-        resizeMode="stretch"
-        style={styles.image}>
-        <ScrollView
-          bounces={false}
-          showsHorizontalScrollIndicator={false}
-          showsVerticalScrollIndicator={false}
-          // style={[styles.innercontainer]}
-          style={{
-            paddingHorizontal: 10,
-            marginBottom: insets.top + 60,
-          }}>
-          <View
+      <KeyboardAvoidingWrapper>
+        <ImageBackground
+          source={require('../../../assets/signup.png')}
+          resizeMode="cover"
+          style={styles.image}>
+          <ScrollView
+            bounces={false}
+            showsHorizontalScrollIndicator={false}
+            showsVerticalScrollIndicator={false}
+            // style={[styles.innercontainer]}
             style={{
-              paddingTop: 25,
-              backgroundColor: '#FFFFFF',
-              borderRadius: 15,
-              paddingHorizontal: 15,
-              paddingVertical: 15,
-              opacity: 0.86,
-              borderColor: '#D9DBE9',
-              borderWidth: 2,
+              paddingHorizontal: 10,
+              marginBottom: insets.top + 60,
             }}>
-            <View style={{marginVertical: 10}}>
-              <CustomDropdown
-                label="Type of business"
-                isNeeded={true}
-                placeholder="Select type"
-                placeholderStyle={styles.placeholderStyle}
-                selectedTextStyle={styles.selectedTextStyle}
-                data={businessTypeData}
-                maxHeight={300}
-                labelField="label"
-                valueField="value"
-                value={businessDetails.businessType}
-                onChange={option => {
-                  setBusinessDetails({
-                    ...businessDetails,
-                    businessType: option.value,
-                  });
-                }}
-              />
-            </View>
-
-            <Input
-              iconName="domain"
-              label="Name of business"
-              placeholder="Enter name of business"
-              isNeeded={true}
-              defaultValue={businessDetails?.businessName}
-              onChangeText={text =>
-                setBusinessDetails({
-                  ...businessDetails,
-                  businessName: text.trim(),
-                })
-              }
-            />
-
-            <View style={{marginVertical: 10}}>
-              <CustomDropdown
-                label="Is your business registered?"
-                isNeeded={true}
-                placeholder="Select status"
-                placeholderStyle={styles.placeholderStyle}
-                selectedTextStyle={styles.selectedTextStyle}
-                data={businessRegData}
-                maxHeight={300}
-                labelField="label"
-                valueField="value"
-                value={businessDetails.registered}
-                onChange={option => {
-                  setBusinessDetails({
-                    ...businessDetails,
-                    registered: option.value,
-                  });
-                }}
-              />
-            </View>
-
-            <Input
-              label="Position in the company"
-              placeholder="Enter your position"
-              isNeeded={true}
-              defaultValue={businessDetails?.positionInOrg}
-              onChangeText={text =>
-                setBusinessDetails({...businessDetails, positionInOrg: text})
-              }
-            />
-
-            <Input
-              label="Shares in the company"
-              placeholder="Enter your shares percentage"
-              defaultValue={businessDetails?.shareInOrg}
-              onChangeText={text =>
-                setBusinessDetails({...businessDetails, shareInOrg: text})
-              }
-            />
-
-            <Pressable onPress={showDatePicker}>
-              <Input
-                label="Date of establishment"
-                placeholder="2000 - 01 - 01"
-                iconName="calendar-month-outline"
-                defaultValue={
-                  businessDetails.establishmentDate
-                    ? businessDetails.establishmentDate?.substr(0, 10)
-                    : ''
-                }
-                isDate={true}
-                editable={false}
-                showDatePicker={showDatePicker}
-                onChangeValue={text =>
-                  setBusinessDetails({
-                    ...businessDetails,
-                    establishmentDate: text,
-                  })
-                }
-                isNeeded={true}
-              />
-            </Pressable>
-
-            <DateTimePickerModal
-              isVisible={show}
-              testID="dateTimePicker"
-              defaultValue={businessDetails?.establishmentDate}
-              mode="date"
-              is24Hour={true}
-              onConfirm={handleConfirm}
-              onCancel={hideDatePicker}
-              textColor="#054B99"
-            />
-
-            <Input
-              label="RC/BN Number"
-              placeholder="Enter RC/BN number"
-              defaultValue={businessDetails?.rcNum}
-              onChangeText={text =>
-                setBusinessDetails({...businessDetails, rcNum: text})
-              }
-              keyboardType="numeric"
-            />
-
-            <Input
-              label="Business address"
-              placeholder="Enter business address"
-              isNeeded={true}
-              defaultValue={businessDetails?.businessAddress}
-              iconName="home-outline"
-              onChangeText={text =>
-                setBusinessDetails({...businessDetails, businessAddress: text})
-              }
-            />
-
-            <Pressable onPress={showAddressDatePicker}>
-              <Input
-                label="When did you move to this address?"
-                placeholder="2000 - 01 - 01"
-                defaultValue={
-                  businessDetails.whenDidYouMoveToThisBusinessLocation
-                    ? businessDetails.whenDidYouMoveToThisBusinessLocation?.substr(
-                        0,
-                        10,
-                      )
-                    : ''
-                }
-                iconName="calendar-month-outline"
-                isDate={true}
-                editable={false}
-                showDatePicker={showAddressDatePicker}
-                onChangeValue={text =>
-                  setBusinessDetails({
-                    ...businessDetails,
-                    whenDidYouMoveToThisBusinessLocation: text,
-                  })
-                }
-                isNeeded={true}
-              />
-            </Pressable>
-
-            <DateTimePickerModal
-              isVisible={showDate}
-              testID="dateTimePicker"
-              defaultValue={
-                businessDetails?.whenDidYouMoveToThisBusinessLocation
-              }
-              mode="date"
-              is24Hour={true}
-              onConfirm={handleConfirmAddressDate}
-              onCancel={hideAddressDatePicker}
-              textColor="#054B99"
-            />
-
-            <Input
-              label="Country"
-              placeholder="Enter country"
-              iconName="flag-outline"
-              isNeeded={true}
-              defaultValue={businessDetails?.country}
-              onChangeText={text =>
-                setBusinessDetails({...businessDetails, country: text})
-              }
-            />
-
             <View
-              style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-              <View style={{marginVertical: 10, paddingRight: 5, width: '50%'}}>
+              style={{
+                paddingTop: 25,
+                backgroundColor: '#FFFFFF',
+                borderRadius: 15,
+                paddingHorizontal: 15,
+                paddingVertical: 15,
+                opacity: 0.86,
+                borderColor: '#D9DBE9',
+                borderWidth: 2,
+              }}>
+              <View style={{marginVertical: 10}}>
                 <CustomDropdown
-                  label="State"
+                  label="Type of business"
                   isNeeded={true}
-                  placeholder="Select State"
+                  placeholder="Select type"
                   placeholderStyle={styles.placeholderStyle}
                   selectedTextStyle={styles.selectedTextStyle}
-                  data={currentState ? currentState : stateData}
-                  // data={stateData}
+                  data={businessTypeData}
                   maxHeight={300}
                   labelField="label"
                   valueField="value"
-                  value={businessDetails.state}
+                  value={businessDetails.businessType}
                   onChange={option => {
                     setBusinessDetails({
                       ...businessDetails,
-                      state: option.value,
+                      businessType: option.value,
                     });
                   }}
                 />
               </View>
-              <View style={{marginVertical: 10, paddingLeft: 5, width: '50%'}}>
+
+              <Input
+                iconName="domain"
+                label="Name of business"
+                placeholder="Enter name of business"
+                isNeeded={true}
+                defaultValue={businessDetails?.businessName}
+                onChangeText={text =>
+                  setBusinessDetails({
+                    ...businessDetails,
+                    businessName: text.trim(),
+                  })
+                }
+              />
+
+              <View style={{marginVertical: 10}}>
                 <CustomDropdown
-                  label="City"
+                  label="Is your business registered?"
                   isNeeded={true}
-                  placeholder="Select LGA"
+                  placeholder="Select status"
                   placeholderStyle={styles.placeholderStyle}
                   selectedTextStyle={styles.selectedTextStyle}
-                  data={currentCity ? currentCity : cityData}
-                  // data={cityData}
+                  data={businessRegData}
                   maxHeight={300}
                   labelField="label"
                   valueField="value"
-                  value={businessDetails.city}
+                  value={businessDetails.registered}
                   onChange={option => {
                     setBusinessDetails({
                       ...businessDetails,
-                      city: option.value,
+                      registered: option.value,
                     });
                   }}
                 />
               </View>
-            </View>
 
-            <View style={{marginVertical: 10}}>
-              <CustomDropdown
-                label="Is your business location owned or rented"
+              <Input
+                label="Position in the company"
+                placeholder="Enter your position"
                 isNeeded={true}
-                placeholderStyle={styles.placeholderStyle}
-                selectedTextStyle={styles.selectedTextStyle}
-                data={ownedOrRentedData}
-                maxHeight={300}
-                labelField="label"
-                valueField="value"
-                value={businessDetails.residentialStatus}
-                onChange={option => {
+                defaultValue={businessDetails?.positionInOrg}
+                onChangeText={text =>
+                  setBusinessDetails({...businessDetails, positionInOrg: text})
+                }
+              />
+
+              <Input
+                label="Shares in the company"
+                placeholder="Enter your shares percentage"
+                defaultValue={businessDetails?.shareInOrg}
+                onChangeText={text =>
+                  setBusinessDetails({...businessDetails, shareInOrg: text})
+                }
+              />
+
+              <Pressable onPress={showDatePicker}>
+                <Input
+                  label="Date of establishment"
+                  placeholder="2000 - 01 - 01"
+                  iconName="calendar-month-outline"
+                  defaultValue={
+                    businessDetails.establishmentDate
+                      ? businessDetails.establishmentDate?.substr(0, 10)
+                      : ''
+                  }
+                  isDate={true}
+                  editable={false}
+                  showDatePicker={showDatePicker}
+                  onChangeValue={text =>
+                    setBusinessDetails({
+                      ...businessDetails,
+                      establishmentDate: text,
+                    })
+                  }
+                  isNeeded={true}
+                />
+              </Pressable>
+
+              <DateTimePickerModal
+                isVisible={show}
+                testID="dateTimePicker"
+                defaultValue={businessDetails?.establishmentDate}
+                mode="date"
+                is24Hour={true}
+                onConfirm={handleConfirm}
+                onCancel={hideDatePicker}
+                textColor="#054B99"
+              />
+
+              <Input
+                label="RC/BN Number"
+                placeholder="Enter RC/BN number"
+                defaultValue={businessDetails?.rcNum}
+                onChangeText={text =>
+                  setBusinessDetails({...businessDetails, rcNum: text})
+                }
+                keyboardType="numeric"
+              />
+
+              <Input
+                label="Business address"
+                placeholder="Enter business address"
+                isNeeded={true}
+                defaultValue={businessDetails?.businessAddress}
+                iconName="home-outline"
+                onChangeText={text =>
                   setBusinessDetails({
                     ...businessDetails,
-                    ownedOrRented: option.value,
-                  });
-                }}
+                    businessAddress: text,
+                  })
+                }
               />
-            </View>
 
-            <Input
-              label="Number of employees"
-              placeholder="Enter number of employees"
-              iconName="account-group-outline"
-              isNeeded={true}
-              keyboardType="numeric"
-              defaultValue={businessDetails?.totalEmployees?.toString()}
-              onChangeText={text =>
-                setBusinessDetails({
-                  ...businessDetails,
-                  totalEmployees: Number(text),
-                })
-              }
-            />
+              <Pressable onPress={showAddressDatePicker}>
+                <Input
+                  label="When did you move to this address?"
+                  placeholder="2000 - 01 - 01"
+                  defaultValue={
+                    businessDetails.whenDidYouMoveToThisBusinessLocation
+                      ? businessDetails.whenDidYouMoveToThisBusinessLocation?.substr(
+                          0,
+                          10,
+                        )
+                      : ''
+                  }
+                  iconName="calendar-month-outline"
+                  isDate={true}
+                  editable={false}
+                  showDatePicker={showAddressDatePicker}
+                  onChangeValue={text =>
+                    setBusinessDetails({
+                      ...businessDetails,
+                      whenDidYouMoveToThisBusinessLocation: text,
+                    })
+                  }
+                  isNeeded={true}
+                />
+              </Pressable>
 
-            <View style={{marginVertical: 10}}>
-              <CustomDropdown
-                label="Is your business women led?"
+              <DateTimePickerModal
+                isVisible={showDate}
+                testID="dateTimePicker"
+                defaultValue={
+                  businessDetails?.whenDidYouMoveToThisBusinessLocation
+                }
+                mode="date"
+                is24Hour={true}
+                onConfirm={handleConfirmAddressDate}
+                onCancel={hideAddressDatePicker}
+                textColor="#054B99"
+              />
+
+              <Input
+                label="Country"
+                placeholder="Enter country"
+                iconName="flag-outline"
                 isNeeded={true}
-                placeholderStyle={styles.placeholderStyle}
-                selectedTextStyle={styles.selectedTextStyle}
-                data={womanLedData}
-                maxHeight={300}
-                labelField="label"
-                valueField="value"
-                value={businessDetails.womenLed}
-                onChange={option => {
-                  setBusinessDetails({
-                    ...businessDetails,
-                    womenLed: option.value,
-                  });
-                }}
+                defaultValue={businessDetails?.country}
+                onChangeText={text =>
+                  setBusinessDetails({...businessDetails, country: text})
+                }
               />
-            </View>
 
-            <View style={{marginVertical: 10}}>
-              <CustomDropdown
-                label="Is your business sharia compliant?"
-                isNeeded={true}
-                placeholderStyle={styles.placeholderStyle}
-                selectedTextStyle={styles.selectedTextStyle}
-                data={sharComData}
-                maxHeight={300}
-                labelField="label"
-                valueField="value"
-                value={businessDetails.shariaCom}
-                onChange={option => {
-                  setBusinessDetails({
-                    ...businessDetails,
-                    shariaCom: option.value,
-                  });
-                }}
-              />
-            </View>
-            <Input
-              label="Number of outlets"
-              placeholder="Enter number of outlets"
-              isNeeded={true}
-              keyboardType="numeric"
-              defaultValue={businessDetails?.NoOfOutlets?.toString()}
-              onChangeText={text =>
-                setBusinessDetails({
-                  ...businessDetails,
-                  NoOfOutlets: Number(text),
-                })
-              }
-            />
-
-            <View style={{marginVertical: 10}}>
-              <CustomDropdown
-                label="How do you sell"
-                isNeeded={true}
-                placeholderStyle={styles.placeholderStyle}
-                selectedTextStyle={styles.selectedTextStyle}
-                data={salesMethodData}
-                maxHeight={300}
-                labelField="label"
-                valueField="value"
-                value={businessDetails.salesMethod}
-                onChange={option => {
-                  setBusinessDetails({
-                    ...businessDetails,
-                    salesMethod: option.value,
-                  });
-                }}
-              />
-            </View>
-
-            <View style={{marginVertical: 10}}>
-              <CustomDropdown
-                label="Industry"
-                isNeeded={true}
-                placeholderStyle={styles.placeholderStyle}
-                selectedTextStyle={styles.selectedTextStyle}
-                data={industryData}
-                maxHeight={300}
-                labelField="label"
-                valueField="value"
-                value={businessDetails.industry}
-                onChange={option => {
-                  setBusinessDetails({
-                    ...businessDetails,
-                    industry: option.value,
-                  });
-                }}
-              />
-            </View>
-
-            <View style={{marginVertical: 10}}>
-              <CustomDropdown
-                label="Average monthly sales"
-                isNeeded={true}
-                placeholderStyle={styles.placeholderStyle}
-                selectedTextStyle={styles.selectedTextStyle}
-                data={monthlySalesData}
-                maxHeight={300}
-                labelField="label"
-                valueField="value"
-                value={businessDetails.monthlySales}
-                onChange={option => {
-                  setBusinessDetails({
-                    ...businessDetails,
-                    monthlySales: option.value,
-                  });
-                }}
-              />
-            </View>
-
-            <View style={{marginVertical: 10}}>
-              <CustomDropdown
-                label="Average monthly expenses"
-                isNeeded={true}
-                placeholderStyle={styles.placeholderStyle}
-                selectedTextStyle={styles.selectedTextStyle}
-                data={monthlyExpData}
-                maxHeight={300}
-                labelField="label"
-                valueField="value"
-                value={businessDetails.monthlyExpenses}
-                onChange={option => {
-                  setBusinessDetails({
-                    ...businessDetails,
-                    monthlyExpenses: option.value,
-                  });
-                }}
-              />
-            </View>
-
-            <View style={{marginVertical: 10}}>
-              <CustomDropdown
-                label="How long have you been in business?"
-                isNeeded={true}
-                placeholderStyle={styles.placeholderStyle}
-                selectedTextStyle={styles.selectedTextStyle}
-                data={businessDurationData}
-                maxHeight={300}
-                labelField="label"
-                valueField="value"
-                value={businessDetails.businessDuration}
-                onChange={option => {
-                  setBusinessDetails({
-                    ...businessDetails,
-                    businessDuration: option.value,
-                  });
-                }}
-              />
-            </View>
-
-            <Input
-              label="MAMERT"
-              placeholder="Enter mamert"
-              keyboardType="numeric"
-              defaultValue={businessDetails?.MAMERT}
-              onChangeText={text =>
-                setBusinessDetails({...businessDetails, MAMERT: text})
-              }
-            />
-
-            <Input
-              label="TIN"
-              placeholder="Enter Tax Id Number"
-              keyboardType="numeric"
-              defaultValue={businessDetails?.tin}
-              onChangeText={text =>
-                setBusinessDetails({...businessDetails, tin: text})
-              }
-            />
-
-            <TouchableOpacity
-              onPress={
-                orgDetails?.businessName === undefined
-                  ? handleCreateBusinessDetails
-                  : handleUpdateBusinessDetails
-              }
-              disabled={disableit}>
-              <View style={{marginBottom: 40, marginTop: 20}}>
-                <Buttons label={'Save & Continue'} disabled={disableit} />
+              <View
+                style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+                <View
+                  style={{marginVertical: 10, paddingRight: 5, width: '50%'}}>
+                  <CustomDropdown
+                    label="State"
+                    isNeeded={true}
+                    placeholder="Select State"
+                    placeholderStyle={styles.placeholderStyle}
+                    selectedTextStyle={styles.selectedTextStyle}
+                    data={currentState ? currentState : stateData}
+                    // data={stateData}
+                    maxHeight={300}
+                    labelField="label"
+                    valueField="value"
+                    value={businessDetails.state}
+                    onChange={option => {
+                      setBusinessDetails({
+                        ...businessDetails,
+                        state: option.value,
+                      });
+                    }}
+                  />
+                </View>
+                <View
+                  style={{marginVertical: 10, paddingLeft: 5, width: '50%'}}>
+                  <CustomDropdown
+                    label="City"
+                    isNeeded={true}
+                    placeholder="Select LGA"
+                    placeholderStyle={styles.placeholderStyle}
+                    selectedTextStyle={styles.selectedTextStyle}
+                    data={currentCity ? currentCity : cityData}
+                    // data={cityData}
+                    maxHeight={300}
+                    labelField="label"
+                    valueField="value"
+                    value={businessDetails.city}
+                    onChange={option => {
+                      setBusinessDetails({
+                        ...businessDetails,
+                        city: option.value,
+                      });
+                    }}
+                  />
+                </View>
               </View>
-            </TouchableOpacity>
-          </View>
-        </ScrollView>
-      </ImageBackground>
+
+              <View style={{marginVertical: 10}}>
+                <CustomDropdown
+                  label="Is your business location owned or rented"
+                  isNeeded={true}
+                  placeholderStyle={styles.placeholderStyle}
+                  selectedTextStyle={styles.selectedTextStyle}
+                  data={ownedOrRentedData}
+                  maxHeight={300}
+                  labelField="label"
+                  valueField="value"
+                  value={businessDetails.residentialStatus}
+                  onChange={option => {
+                    setBusinessDetails({
+                      ...businessDetails,
+                      ownedOrRented: option.value,
+                    });
+                  }}
+                />
+              </View>
+
+              <Input
+                label="Number of employees"
+                placeholder="Enter number of employees"
+                iconName="account-group-outline"
+                isNeeded={true}
+                keyboardType="numeric"
+                defaultValue={businessDetails?.totalEmployees?.toString()}
+                onChangeText={text =>
+                  setBusinessDetails({
+                    ...businessDetails,
+                    totalEmployees: Number(text),
+                  })
+                }
+              />
+
+              <View style={{marginVertical: 10}}>
+                <CustomDropdown
+                  label="Is your business women led?"
+                  isNeeded={true}
+                  placeholderStyle={styles.placeholderStyle}
+                  selectedTextStyle={styles.selectedTextStyle}
+                  data={womanLedData}
+                  maxHeight={300}
+                  labelField="label"
+                  valueField="value"
+                  value={businessDetails.womenLed}
+                  onChange={option => {
+                    setBusinessDetails({
+                      ...businessDetails,
+                      womenLed: option.value,
+                    });
+                  }}
+                />
+              </View>
+
+              <View style={{marginVertical: 10}}>
+                <CustomDropdown
+                  label="Is your business sharia compliant?"
+                  isNeeded={true}
+                  placeholderStyle={styles.placeholderStyle}
+                  selectedTextStyle={styles.selectedTextStyle}
+                  data={sharComData}
+                  maxHeight={300}
+                  labelField="label"
+                  valueField="value"
+                  value={businessDetails.shariaCom}
+                  onChange={option => {
+                    setBusinessDetails({
+                      ...businessDetails,
+                      shariaCom: option.value,
+                    });
+                  }}
+                />
+              </View>
+              <Input
+                label="Number of outlets"
+                placeholder="Enter number of outlets"
+                isNeeded={true}
+                keyboardType="numeric"
+                defaultValue={businessDetails?.NoOfOutlets?.toString()}
+                onChangeText={text =>
+                  setBusinessDetails({
+                    ...businessDetails,
+                    NoOfOutlets: Number(text),
+                  })
+                }
+              />
+
+              <View style={{marginVertical: 10}}>
+                <CustomDropdown
+                  label="How do you sell"
+                  isNeeded={true}
+                  placeholderStyle={styles.placeholderStyle}
+                  selectedTextStyle={styles.selectedTextStyle}
+                  data={salesMethodData}
+                  maxHeight={300}
+                  labelField="label"
+                  valueField="value"
+                  value={businessDetails.salesMethod}
+                  onChange={option => {
+                    setBusinessDetails({
+                      ...businessDetails,
+                      salesMethod: option.value,
+                    });
+                  }}
+                />
+              </View>
+
+              <View style={{marginVertical: 10}}>
+                <CustomDropdown
+                  label="Industry"
+                  isNeeded={true}
+                  placeholderStyle={styles.placeholderStyle}
+                  selectedTextStyle={styles.selectedTextStyle}
+                  data={industryData}
+                  maxHeight={300}
+                  labelField="label"
+                  valueField="value"
+                  value={businessDetails.industry}
+                  onChange={option => {
+                    setBusinessDetails({
+                      ...businessDetails,
+                      industry: option.value,
+                    });
+                  }}
+                />
+              </View>
+
+              <View style={{marginVertical: 10}}>
+                <CustomDropdown
+                  label="Average monthly sales"
+                  isNeeded={true}
+                  placeholderStyle={styles.placeholderStyle}
+                  selectedTextStyle={styles.selectedTextStyle}
+                  data={monthlySalesData}
+                  maxHeight={300}
+                  labelField="label"
+                  valueField="value"
+                  value={businessDetails.monthlySales}
+                  onChange={option => {
+                    setBusinessDetails({
+                      ...businessDetails,
+                      monthlySales: option.value,
+                    });
+                  }}
+                />
+              </View>
+
+              <View style={{marginVertical: 10}}>
+                <CustomDropdown
+                  label="Average monthly expenses"
+                  isNeeded={true}
+                  placeholderStyle={styles.placeholderStyle}
+                  selectedTextStyle={styles.selectedTextStyle}
+                  data={monthlyExpData}
+                  maxHeight={300}
+                  labelField="label"
+                  valueField="value"
+                  value={businessDetails.monthlyExpenses}
+                  onChange={option => {
+                    setBusinessDetails({
+                      ...businessDetails,
+                      monthlyExpenses: option.value,
+                    });
+                  }}
+                />
+              </View>
+
+              <View style={{marginVertical: 10}}>
+                <CustomDropdown
+                  label="How long have you been in business?"
+                  isNeeded={true}
+                  placeholderStyle={styles.placeholderStyle}
+                  selectedTextStyle={styles.selectedTextStyle}
+                  data={businessDurationData}
+                  maxHeight={300}
+                  labelField="label"
+                  valueField="value"
+                  value={businessDetails.businessDuration}
+                  onChange={option => {
+                    setBusinessDetails({
+                      ...businessDetails,
+                      businessDuration: option.value,
+                    });
+                  }}
+                />
+              </View>
+
+              <Input
+                label="MAMERT"
+                placeholder="Enter mamert"
+                keyboardType="numeric"
+                defaultValue={businessDetails?.MAMERT}
+                onChangeText={text =>
+                  setBusinessDetails({...businessDetails, MAMERT: text})
+                }
+              />
+
+              <Input
+                label="TIN"
+                placeholder="Enter Tax Id Number"
+                keyboardType="numeric"
+                defaultValue={businessDetails?.tin}
+                onChangeText={text =>
+                  setBusinessDetails({...businessDetails, tin: text})
+                }
+              />
+
+              <TouchableOpacity
+                onPress={
+                  orgDetails?.businessName === undefined
+                    ? handleCreateBusinessDetails
+                    : handleUpdateBusinessDetails
+                }
+                disabled={disableit}>
+                <View style={{marginBottom: 40, marginTop: 20}}>
+                  <Buttons label={'Save & Continue'} disabled={disableit} />
+                </View>
+              </TouchableOpacity>
+            </View>
+          </ScrollView>
+        </ImageBackground>
+      </KeyboardAvoidingWrapper>
     </SafeAreaView>
   );
 };
@@ -1042,7 +1048,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   image: {
-    height: screenHeight,
+    // height: screenHeight,
     width: screenWidth,
     justifyContent: 'center',
   },

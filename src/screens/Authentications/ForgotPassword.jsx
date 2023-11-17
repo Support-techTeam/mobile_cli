@@ -19,9 +19,11 @@ import Button from '../../component/buttons/Button';
 import {forgotPassword} from '../../stores/AuthStore';
 import Toast from 'react-native-toast-message';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from 'react-native-responsive-screen';
 
-const screenHeight = Dimensions.get('window').height;
-const screenWidth = Dimensions.get('window').width;
 const ForgotPassword = () => {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
@@ -88,29 +90,29 @@ const ForgotPassword = () => {
       style={{
         flex: 1,
         backgroundColor: '#fff',
-        paddingTop: insets.top !== 0 ? insets.top / 2 : 'auto',
+        paddingTop: insets.top !== 0 ? insets.top : 18,
         paddingBottom: insets.bottom !== 0 ? insets.bottom / 2 : 'auto',
         paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
         paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
       }}>
-      <ImageBackground
-        source={require('../../../assets/forgotPass.png')}
-        resizeMode="stretch"
-        style={styles.image}>
-        <ScrollView
-          bounces={false}
-          showsHorizontalScrollIndicator={false}
-          showsVerticalScrollIndicator={false}
-          style={{paddingHorizontal: 20}}>
-          {isLoading && (
-            <Spinner
-              textContent={'Loading...'}
-              textStyle={{color: 'white'}}
-              visible={true}
-              overlayColor="rgba(78, 75, 102, 0.7)"
-            />
-          )}
-          <KeyboardAvoidingWrapper>
+      <KeyboardAvoidingWrapper>
+        <ImageBackground
+          source={require('../../../assets/forgotPass.png')}
+          resizeMode="stretch"
+          style={styles.image}>
+          <ScrollView
+            bounces={false}
+            showsHorizontalScrollIndicator={false}
+            showsVerticalScrollIndicator={false}
+            style={{paddingHorizontal: 16}}>
+            {isLoading && (
+              <Spinner
+                textContent={'Loading...'}
+                textStyle={{color: 'white'}}
+                visible={true}
+                overlayColor="rgba(78, 75, 102, 0.7)"
+              />
+            )}
             <View style={{marginBottom: 40}}>
               <View>
                 <View style={{alignItems: 'center', paddingHorizontal: 12}}>
@@ -129,7 +131,6 @@ const ForgotPassword = () => {
                           borderRadius: 5,
                           flexDirection: 'row',
                           justifyContent: 'flex-start',
-                          // flexGrow: 1,
                         }}>
                         <View>
                           <Icon name="chevron-left" size={30} color="black" />
@@ -184,53 +185,49 @@ const ForgotPassword = () => {
                 />
               </View>
             </View>
-          </KeyboardAvoidingWrapper>
-        </ScrollView>
-      </ImageBackground>
+          </ScrollView>
+        </ImageBackground>
+      </KeyboardAvoidingWrapper>
     </SafeAreaView>
   );
 };
 
-// export default ForgotPassword;
 export default ForgotPassword;
 
 const styles = StyleSheet.create({
   container: {},
   demark: {
-    width: '100%',
+    width: wp('100%'),
     height: 2,
     borderRadius: 1,
     backgroundColor: '#D9DBE9',
-    // marginTop: 16,
     marginBottom: 10,
   },
   signupView: {
     alignItems: 'center',
-    width: '93%',
+    width: wp('80%'),
   },
   signupText: {
     fontWeight: '700',
-    fontSize: 30,
-    // letterSpacing: 3.5,
+    fontSize: hp('4%'),
+    // fontSize: 30,
     fontFamily: 'serif',
     paddingTop: 16,
     lineHeight: 48,
     color: '#14142B',
-    // marginLeft:-2.5
   },
   extraText: {
     textAlign: 'center',
     fontFamily: 'serif',
     marginLeft: 10,
-    fontSize: 14,
+    fontSize: hp('2%'),
+    // fontSize: 14,
     lineHeight: 21,
     color: '#000000',
     paddingHorizontal: 15,
-    // marginLeft:-20.5
   },
 
   signUp: {
-    // backgroundColor: '#054B99',
     height: 48,
     borderRadius: 12,
     justifyContent: 'center',
@@ -238,8 +235,8 @@ const styles = StyleSheet.create({
     marginTop: 28,
   },
   image: {
-    height: screenHeight,
-    width: screenWidth,
+    height: hp('100%'),
+    width: wp('100%'),
     justifyContent: 'center',
   },
 });

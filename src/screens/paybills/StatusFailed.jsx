@@ -24,7 +24,7 @@ const StatusFailed = () => {
       style={{
         flex: 1,
         backgroundColor: '#F7F7FC',
-        paddingTop: insets.top !== 0 ? insets.top / 2 : 'auto',
+        paddingTop: insets.top !== 0 ? insets.top : 18,
         paddingBottom: insets.bottom !== 0 ? insets.bottom / 2 : 'auto',
         paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
         paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
@@ -65,7 +65,7 @@ const StatusFailed = () => {
           <Text
             style={{
               marginTop: 24,
-              
+
               fontSize: 20,
               color: '#14142B',
             }}>
@@ -74,7 +74,7 @@ const StatusFailed = () => {
           <Text
             style={{
               marginTop: 14,
-              
+
               fontSize: 14,
               color: '#4E4B66',
             }}>

@@ -1,5 +1,5 @@
 import {View, Text, StyleSheet, TouchableOpacity, FlatList} from 'react-native';
-import React, {useContext, useEffect} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import {useNavigation} from '@react-navigation/native';
 import Spinner from 'react-native-loading-spinner-overlay/lib';
@@ -14,8 +14,10 @@ import {
 const ITEM_HEIGHT = 100;
 
 const TobTabs = [
-  {name: 'Valid Identity', key: 'ValidIndentity'},
+  {name: 'Valid Identity', key: 'ValidIdentity'},
   {name: 'Proof of Address', key: 'ProofOfAddress'},
+  {name: 'Personal Photo', key: 'PersonalPhoto'},
+  {name: 'Identity Card (ARM)', key: 'IdentityCard'},
   {name: 'Bank Statement', key: 'BankStatement'},
   {name: 'Passport', key: 'Passport'},
   {name: 'Signature', key: 'Signature'},
@@ -64,10 +66,19 @@ const FinalSubmit = ({route}) => {
     signature:
       docsDetails?.signature === undefined ? '' : docsDetails?.signature,
     seal: docsDetails?.seal === undefined ? '' : docsDetails?.seal,
-    cacCertificate: docsDetails?.cac === undefined ? '' : docsDetails?.cac,
+    cacCertificate:
+      docsDetails?.cacCertificate === undefined
+        ? ''
+        : docsDetails?.cacCertificate,
     othersName:
       docsDetails?.othersName === undefined ? '' : docsDetails?.othersName,
     others: docsDetails?.others === undefined ? '' : docsDetails?.others,
+    identityCard:
+      docsDetails?.identityCard === undefined ? '' : docsDetails?.identityCard,
+    personalPhoto:
+      docsDetails?.personalPhoto === undefined
+        ? ''
+        : docsDetails?.personalPhoto,
     cac7: '',
     cac2: '',
     lpoFile: '',
@@ -100,9 +111,9 @@ const FinalSubmit = ({route}) => {
         autoHide: true,
         onPress: () => Toast.hide(),
       });
-      // setTimeout(() => {
-      // navigation.navigate('GetLoan');
-      // }, 1000);
+      setTimeout(() => {
+        navigation.navigate('GetLoan');
+      }, 1000);
     }
     setIsUpdating(false);
   };
@@ -132,23 +143,24 @@ const FinalSubmit = ({route}) => {
         autoHide: true,
         onPress: () => Toast.hide(),
       });
-      // setTimeout(() => {
-      // navigation.navigate('MyAccount');
-      // }, 1000);
+      setTimeout(() => {
+        navigation.navigate('MyAccount');
+      }, 1000);
     }
     setIsUpdating(false);
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      {isLoading && (
-        <Spinner
-          textContent={'Submitting ...'}
-          textStyle={{color: 'white'}}
-          visible={true}
-          overlayColor="rgba(78, 75, 102, 0.7)"
-        />
-      )}
+      {isLoading ||
+        (isUpdating && (
+          <Spinner
+            textContent={'Submitting ...'}
+            textStyle={{color: 'white'}}
+            visible={true}
+            overlayColor="rgba(78, 75, 102, 0.7)"
+          />
+        ))}
       <View
         style={{
           flexDirection: 'row',

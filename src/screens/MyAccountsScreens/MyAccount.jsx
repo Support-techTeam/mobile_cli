@@ -7,14 +7,16 @@ import {
   Pressable,
   Alert,
   PermissionsAndroid,
+  Platform,
 } from 'react-native';
 import React, {useState} from 'react';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import {useNavigation} from '@react-navigation/native';
-import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import {TabView, SceneMap, TabBar} from 'react-native-tab-view';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
+import {request, PERMISSIONS, openSettings} from 'react-native-permissions';
+import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 
 import Personal from '../../component/MyAccountTabs/PersonalTab';
 import Business from '../../component/MyAccountTabs/BusinessTab';
@@ -28,23 +30,44 @@ const MyAccount = () => {
   const insets = useSafeAreaInsets();
   const handleImageSelection = async result => {
     if (!result.canceled) {
-      setImage(result.assets[0].uri);
+      setImage(result?.assets[0]?.uri);
+    }
+  };
+
+  const requestCameraPermission = async () => {
+    const status = await request(
+      Platform.OS === 'ios'
+        ? PERMISSIONS.IOS.CAMERA
+        : PERMISSIONS.ANDROID.CAMERA,
+    );
+
+    if (status === 'granted') {
+      return true;
+    }
+    if (status === 'blocked') {
+      openSettings();
+      return false;
+    }
+    if (status === 'denied') {
+      openSettings();
+      return false;
+    }
+    if (status === 'unavailable') {
+      openSettings();
+      return false;
+    }
+    if (status === 'blocked') {
+      openSettings();
+      return false;
+    }
+    if (status === 'limited') {
+      return true;
     }
   };
 
   const launchCameraAsync = async () => {
-    const permissionResult = await PermissionsAndroid.requestMultiple([
-      PermissionsAndroid.PERMISSIONS.CAMERA,
-      PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-    ]);
-
-    if (
-      permissionResult['android.permission.CAMERA'] ===
-        PermissionsAndroid.RESULTS.GRANTED &&
-      permissionResult['android.permission.WRITE_EXTERNAL_STORAGE'] ===
-        PermissionsAndroid.RESULTS.GRANTED
-    ) {
-      // console.log('Grantd');
+    const permissopnResult = await requestCameraPermission();
+    if (permissopnResult) {
       await launchCamera(
         {
           mediaType: 'photo', // Specify 'photo' to capture images
@@ -52,13 +75,11 @@ const MyAccount = () => {
           maxHeight: 600, // Maximum height for the captured image
           quality: 1,
         },
-        response => {
-          if (response.didCancel) {
-            // console.log('User cancelled the camera');
-          } else if (response.error) {
-            // console.error('ImagePicker Error:', response.error);
+        result => {
+          if (result.didCancel) {
+          } else if (result.error) {
           } else {
-            handleImageSelection(response);
+            handleImageSelection(result);
           }
         },
       );
@@ -70,6 +91,7 @@ const MyAccount = () => {
       return;
     }
   };
+
 
   const navigation = useNavigation();
 
@@ -94,7 +116,7 @@ const MyAccount = () => {
       style={{
         flex: 1,
         backgroundColor: '#fff',
-        paddingTop: insets.top !== 0 ? insets.top / 2 : 'auto',
+        paddingTop: insets.top !== 0 ? insets.top : 18,
         paddingBottom: insets.bottom !== 0 ? insets.bottom / 2 : 'auto',
         paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
         paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
@@ -106,7 +128,7 @@ const MyAccount = () => {
           alignItems: 'center',
           marginHorizontal: 15,
         }}>
-        <TouchableOpacity onPress={() => navigation.navigate('More')}>
+        <TouchableOpacity onPress={() => navigation.navigate('Home')}>
           <View
             style={{
               borderWidth: 0.5,
@@ -186,7 +208,6 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   TextHead: {
-    
     fontWeight: '700',
     fontSize: 16,
     lineHeight: 20,
@@ -203,7 +224,6 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   ProfileText: {
-    
     fontWeight: '600',
     fontSize: 24,
     lineHeight: 36,
@@ -235,7 +255,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: 'bold',
     color: 'black',
-    
   },
   tabText2: {
     fontFamily: 'serif',

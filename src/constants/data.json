@@ -1,0 +1,269 @@
+{
+  "title": [
+    {"value": "", "label": "Select Option"},
+    {"value": "Mr", "label": "Mr"},
+    {"value": "Mrs", "label": "Mrs"},
+    {"value": "Miss", "label": "Miss"}
+  ],
+  "genders": [
+    {"value": "", "label": "Select Option"},
+    {"value": "Male", "label": "Male"},
+    {"value": "Female", "label": "Female"}
+  ],
+  "relationshipTypes": [
+    {"value": "", "label": "Select Option"},
+    {"value": "Guardian", "label": "Guardian"},
+    {"value": "Aunt", "label": "Aunt"},
+    {"value": "Brother", "label": "Brother"},
+    {"value": "Daughter", "label": "Daughter"},
+    {"value": "Father", "label": "Father"},
+    {"value": "Husband", "label": "Husband"},
+    {"value": "Mother", "label": "Mother"},
+    {"value": "Sister", "label": "Sister"},
+    {"value": "Son", "label": "Son"},
+    {"value": "Wife", "label": "Wife"},
+    {"value": "Uncle", "label": "Uncle"}
+  ],
+  "idTypes": [
+    {"value": "", "label": "Select Option"},
+    {"value": "Birth Certificate", "label": "Birth Certificate"},
+    {"value": "International Passport", "label": "International Passport"},
+    {"value": "Drivers License", "label": "Drivers License"},
+    {"value": "Voters Card", "label": "Voters Card"},
+    {"value": "NIN", "label": "NIN"}
+  ],
+  "utilityBillTypes": [
+    {"value": "", "label": "Select Option"},
+    {"value": "Electricity", "label": "Electricity"},
+    {"value": "Telephone", "label": "Telephone"},
+    {"value": "Waste management", "label": "Waste management"},
+    {"value": "Water corporation", "label": "Water corporation"},
+    {"value": "Estate management", "label": "Estate management"},
+    {"value": "Bank statement", "label": "Bank statement"},
+    {"value": "Tenancy Agreement", "label": "Tenancy Agreement"},
+    {"value": "Valid Driver's License", "label": "Valid Driver's License"}
+  ],
+  "employmentStatuses": [
+    {"value": "", "label": "Select Option"},
+    {"value": "Permanent", "label": "Permanent"},
+    {"value": "Contract", "label": "Contract"},
+    {"value": "Self Employed", "label": "Self Employed"},
+    {"value": "Unemployed", "label": "Unemployed"},
+    {"value": "Retired", "label": "Retired"}
+  ],
+
+  "incomeRanges": [
+    {"value": "", "label": "Select Option"},
+    {"value": "Below - 1M", "label": "Below - 1M"},
+    {"value": "1M - 2M", "label": "1M - 2M"},
+    {"value": "2M - 5M", "label": "2M - 5M"},
+    {"value": "5M - 10M", "label": "5M - 10M"},
+    {"value": "Above - 10M", "label": "Above - 10M"}
+  ],
+
+  "redemptionReasons": [
+    {"value": "", "label": "Select Option"},
+    {"value": "Business", "label": "Business"},
+    {"value": "Rent", "label": "Rent"},
+    {"value": "Property purchase", "label": "Property purchase"},
+    {"value": "Entertainment", "label": "Entertainment"},
+    {
+      "value": "Return on investment not enough",
+      "label": "Return on investment not enough"
+    },
+    {"value": "Other investments(ARM)", "label": "Other investments(ARM)"},
+    {
+      "value": "Other investment(outside ARM)",
+      "label": "Other investment(outside ARM)"
+    },
+    {"value": "Poor service", "label": "Poor service"}
+  ],
+  "kycLevel": [
+    {
+      "value": "",
+      "label": "Select Option"
+    },
+    {
+      "value": "Tier-1",
+      "label": "Tier-1",
+      "level": "Tier-1",
+      "maximumSingleInvestmentAmount": "₦20,000",
+      "maximumSingleRedemptionAmount": "₦30,000",
+      "maximumCumulativeInvestmentAmount": "₦200,000",
+      "onboardingRequirement": [
+        "Basic Infomation",
+        "Bank Account Details",
+        "BVN Details",
+        "Passport Photograph"
+      ]
+    }
+  ],
+  "politicallyExposedPersonsCategory": [
+    {"value": "", "label": "Select Option"},
+    {"value": "Head Of State", "label": "Head Of State"},
+    {"value": "State Governors", "label": "State Governors"},
+    {
+      "value": "Local Government Chairmen",
+      "label": "Local Government Chairmen"
+    },
+    {"value": "Senior Politicians", "label": "Senior Politicians"},
+    {
+      "value": "Senior Government Officials",
+      "label": "Senior Government Officials"
+    },
+    {
+      "value": "Judicial or Military Officials",
+      "label": "Judicial or Military Officials"
+    },
+    {
+      "value": "Senior Executives of state owned companies",
+      "label": "Senior Executives of state owned companies"
+    },
+    {
+      "value": "Important Political party officials",
+      "label": "Important Political party officials"
+    },
+    {
+      "value": "Family members or close associates of PEPs",
+      "label": "Family members or close associates of PEPs"
+    },
+    {"value": "Members of royal families", "label": "embers of royal families"},
+    {"value": "Diplomats", "label": "Diplomats"},
+    {
+      "value": "Directors and Board Members of Corporate Organizations",
+      "label": "Directors and Board Members of Corporate Organizations"
+    }
+  ],
+  "banks": [
+    {
+      "bankName": "ACCESS BANK PLC",
+      "bankCode": "ABNGNGLA",
+      "branchCode": ""
+    },
+    {
+      "bankName": "ACCESS",
+      "bankCode": "ABNGNGLA",
+      "branchCode": "ACCESS"
+    },
+    {
+      "bankName": "LAGOS",
+      "bankCode": "AFRNNGLA",
+      "branchCode": "LAGOS"
+    },
+    {
+      "bankName": "LAGOS",
+      "bankCode": "CITINGLA",
+      "branchCode": "LAGOS"
+    },
+    {
+      "bankName": "DIAMOND",
+      "bankCode": "DBLNNGLA",
+      "branchCode": "DIAMOND"
+    },
+    {
+      "bankName": "ECOBANK",
+      "bankCode": "ECOCNGLA",
+      "branchCode": "ECOBANK"
+    },
+    {
+      "bankName": "FIRST BANK",
+      "bankCode": "FBNINGLA",
+      "branchCode": "FIRST BANK"
+    },
+    {
+      "bankName": "FCMB",
+      "bankCode": "FCMBNGLA",
+      "branchCode": "FCMB"
+    },
+    {
+      "bankName": "FIDELITY",
+      "bankCode": "FIDTNGLA",
+      "branchCode": "FIDELITY"
+    },
+    {
+      "bankName": "RAND MERCHANT BANK",
+      "bankCode": "FIRNNGLA",
+      "branchCode": "LAGOS"
+    },
+    {
+      "bankName": "GTBANK",
+      "bankCode": "GTBINGLA",
+      "branchCode": "GTBANK"
+    },
+    {
+      "bankName": "HERITAGE",
+      "bankCode": "HBCLNGLA",
+      "branchCode": "HERITAGE"
+    },
+    {
+      "bankName": "UNITY",
+      "bankCode": "ICITNGLA",
+      "branchCode": "UNITY"
+    },
+    {
+      "bankName": "JAIZ",
+      "bankCode": "JAIZNGLA",
+      "branchCode": "JAIZ"
+    },
+    {
+      "bankName": "STERLING",
+      "bankCode": "NAMENGLA",
+      "branchCode": "STERLING"
+    },
+    {
+      "bankName": "LAGOS",
+      "bankCode": "PLNINGLA",
+      "branchCode": "LAGOS"
+    },
+    {
+      "bankName": "SKYE",
+      "bankCode": "PRDTNGLA",
+      "branchCode": "SKYE"
+    },
+    {
+      "bankName": "STANBIC IBTC",
+      "bankCode": "SBICNGLA",
+      "branchCode": "STANBIC IBTC"
+    },
+    {
+      "bankName": "LAGOS",
+      "bankCode": "SCBLNGLA",
+      "branchCode": "LAGOS"
+    },
+    {
+      "bankName": "LAGOS",
+      "bankCode": "SPRGNGLA",
+      "branchCode": "LAGOS"
+    },
+    {
+      "bankName": "LAGOS",
+      "bankCode": "SUTGNGLA",
+      "branchCode": "LAGOS"
+    },
+    {
+      "bankName": "UNION",
+      "bankCode": "UBNINGLA",
+      "branchCode": "UNION"
+    },
+    {
+      "bankName": "PROVIDUS BANK",
+      "bankCode": "UMPLNGLA",
+      "branchCode": "PROVIDUS"
+    },
+    {
+      "bankName": "LAGOS",
+      "bankCode": "UNAFNGLA",
+      "branchCode": "LAGOS"
+    },
+    {
+      "bankName": "WEMA",
+      "bankCode": "WEMANGLA",
+      "branchCode": "WEMA"
+    },
+    {
+      "bankName": "ZENITH",
+      "bankCode": "ZEIBNGLA",
+      "branchCode": "ZENITH"
+    }
+  ]
+}

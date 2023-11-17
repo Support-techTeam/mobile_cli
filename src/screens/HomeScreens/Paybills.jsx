@@ -35,7 +35,7 @@ const Paybills = () => {
       style={{
         flex: 1,
         backgroundColor: '#fff',
-        paddingTop: insets.top !== 0 ? insets.top / 2 : 'auto',
+        paddingTop: insets.top !== 0 ? insets.top : 18,
         paddingBottom: insets.bottom !== 0 ? insets.bottom / 2 : 'auto',
         paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
         paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
@@ -110,7 +110,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   notihead: {
-    
     fontSize: 14,
     lineHeight: 24,
     color: '#6E7191',
@@ -144,7 +143,6 @@ const styles = StyleSheet.create({
     marginRight: 16,
   },
   hello: {
-    
     fontWeight: '800',
     fontSize: 16,
     lineHeight: 24,
@@ -158,14 +156,12 @@ const styles = StyleSheet.create({
     borderColor: '#D9DBE9',
   },
   tabtexts: {
-    
     fontSize: 12,
     fontWeight: '600',
     lineHeight: 18,
     textAlign: 'center',
   },
   TextHead: {
-    
     fontWeight: '700',
     fontSize: 16,
     lineHeight: 24,
@@ -189,14 +185,13 @@ const styles = StyleSheet.create({
   },
   wallet: {
     color: '#fff',
-    
+
     fontWeight: '400',
     fontSize: 14,
     lineHeight: 18,
     paddingLeft: 10,
   },
   prices: {
-    
     fontSize: 20,
     fontWeight: '500',
     color: '#fff',
@@ -210,7 +205,7 @@ const styles = StyleSheet.create({
     // paddingHorizontal:12,
     textAlign: 'center',
     color: '#054B99',
-    
+
     fontWeight: '500',
     fontSize: 16,
     marginTop: 20,
@@ -224,7 +219,6 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   extrat: {
-    
     color: '#fff',
     fontWeight: '500',
     fontSize: 14,
@@ -238,21 +232,18 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   title: {
-    
     fontSize: 14,
     fontWeight: '800',
     lineHeight: 21,
     color: '#14142B',
   },
   price: {
-    
     fontSize: 16,
     fontWeight: '800',
     lineHeight: 24,
     color: '#14142B',
   },
   desc: {
-    
     fontSize: 12,
     fontWeight: '400',
     lineHeight: 18,

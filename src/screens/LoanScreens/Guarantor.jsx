@@ -75,19 +75,18 @@ const Guarantor = () => {
   };
 
   const loadingList = ['string', 'string', 'string', 'string'];
-
   return (
-    <>
+    <SafeAreaView
+      style={{
+        flex: 1,
+        backgroundColor: '#fff',
+        paddingTop: insets.top !== 0 ? insets.top : 18,
+        paddingBottom: insets.bottom !== 0 ? insets.bottom : 'auto',
+        paddingLeft: insets.left !== 0 ? insets.left : 'auto',
+        paddingRight: insets.right !== 0 ? insets.right : 'auto',
+      }}>
       {isLoading ? (
-        <SafeAreaView
-          style={{
-            flex: 1,
-            backgroundColor: '#fff',
-            paddingTop: insets.top !== 0 ? insets.top : 'auto',
-            paddingBottom: insets.bottom !== 0 ? insets.bottom : 'auto',
-            paddingLeft: insets.left !== 0 ? insets.left : 'auto',
-            paddingRight: insets.right !== 0 ? insets.right : 'auto',
-          }}>
+        <>
           <View style={styles.innerContainer}>
             <View style={{flexDirection: 'row', width: '45%'}}>
               <View style={{flexDirection: 'row'}}>
@@ -163,17 +162,9 @@ const Guarantor = () => {
               </View>
             </View>
           </View>
-        </SafeAreaView>
+        </>
       ) : (
-        <SafeAreaView
-          style={{
-            flex: 1,
-            backgroundColor: '#fff',
-            paddingTop: insets.top !== 0 ? insets.top / 2 : 'auto',
-            paddingBottom: insets.bottom !== 0 ? insets.bottom / 2 : 'auto',
-            paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
-            paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
-          }}>
+        <>
           <View style={styles.innerContainer}>
             <View style={{flexDirection: 'row', width: '45%'}}>
               <View style={{flexDirection: 'row'}}>
@@ -321,9 +312,9 @@ const Guarantor = () => {
               </View>
             </View>
           </View>
-        </SafeAreaView>
+        </>
       )}
-    </>
+    </SafeAreaView>
   );
 };
 

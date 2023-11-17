@@ -13,7 +13,8 @@ import SplashScreen from 'react-native-splash-screen';
 import Splashscreen from './Splashscreen';
 import NetworkScreen from './NetworkError';
 import {useSelector} from 'react-redux';
-import {networkState} from '../util/redux/networkState/network.slice';
+// import {networkState} from '../util/redux/networkState/network.slice';
+import {TabContextProvider} from '../context/TabContext';
 
 const AppNavigationContainer = () => {
   const navigationRef = useNavigationContainerRef();
@@ -42,31 +43,32 @@ const AppNavigationContainer = () => {
     return subscriber;
   }, []);
   return (
-    <NavigationContainer
-      theme={scheme === 'dark' ? DarkTheme : DefaultTheme}
-      ref={navigationRef}
-      onReady={() => {
-        routeNameRef.current = navigationRef.getCurrentRoute();
-      }}
-      onStateChange={async () => {
-        const previousRouteName = routeNameRef.current;
-        const currentRouteName = navigationRef.getCurrentRoute();
-        console.log(currentRouteName);
-      }}>
-      {isLoading ? (
-        <Splashscreen text="Checking Authentication..." />
-      ) : user ? (
-        networkState &&
-        networkState?.isConnected &&
-        networkState?.isInternetReachable ? (
-          <AppStack />
+    <TabContextProvider>
+      <NavigationContainer
+        theme={scheme === 'dark' ? DarkTheme : DefaultTheme}
+        ref={navigationRef}
+        onReady={() => {
+          routeNameRef.current = navigationRef.getCurrentRoute();
+        }}
+        onStateChange={async () => {
+          const previousRouteName = routeNameRef.current;
+          const currentRouteName = navigationRef.getCurrentRoute();
+        }}>
+        {isLoading ? (
+          <Splashscreen text="Checking Authentication..." />
+        ) : user ? (
+          networkState &&
+          networkState?.isConnected &&
+          networkState?.isInternetReachable ? (
+            <AppStack />
+          ) : (
+            <NetworkScreen />
+          )
         ) : (
-          <NetworkScreen />
-        )
-      ) : (
-        <AuthStack />
-      )}
-    </NavigationContainer>
+          <AuthStack />
+        )}
+      </NavigationContainer>
+    </TabContextProvider>
   );
 };
 

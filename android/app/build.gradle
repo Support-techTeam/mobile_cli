@@ -100,8 +100,9 @@ android {
         applicationId 'com.tradelenda.app'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionName "3.0.2"
-        versionCode 32
+        versionName "3.0.3"
+        versionCode 34
+        multiDexEnabled true
     }
 
      if (isNewArchitectureEnabled()) {

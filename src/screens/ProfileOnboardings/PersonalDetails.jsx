@@ -24,9 +24,11 @@ import {setReduxState} from '../../util/redux/locationData/location.data.slice';
 import Toast from 'react-native-toast-message';
 import {setProfile} from '../../util/redux/userProfile/user.profile.slice';
 import {useBottomTabBarHeight} from '@react-navigation/bottom-tabs';
-
-const screenHeight = Dimensions.get('window').height;
-const screenWidth = Dimensions.get('window').width;
+import KeyboardAvoidingWrapper from '../../component/KeyBoardAvoiding/keyBoardAvoiding';
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from 'react-native-responsive-screen';
 
 const titleData = [
   {value: '', label: 'Select Title'},
@@ -264,10 +266,10 @@ const PersonalDetails = () => {
       isValid = false;
     }
 
-    if (!userDetails.NoOfDependents) {
-      handleError('Please input No of dependents', 'NoOfDependents');
-      isValid = false;
-    }
+    // if (!userDetails.NoOfDependents) {
+    //   handleError('Please input No of dependents', 'NoOfDependents');
+    //   isValid = false;
+    // }
     if (!userDetails.referredByOption) {
       handleError('Please input referred by option', 'referredByOption');
       isValid = false;
@@ -422,7 +424,7 @@ const PersonalDetails = () => {
             flex: 1,
             backgroundColor: '#fff',
             paddingHorizontal: 16,
-            paddingTop: insets.top !== 0 ? insets.top / 2 : 'auto',
+            paddingTop: insets.top !== 0 ? insets.top : 18,
             paddingBottom: insets.bottom !== 0 ? insets.bottom / 2 : 'auto',
             paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
             paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
@@ -451,7 +453,7 @@ const PersonalDetails = () => {
           style={{
             flex: 1,
             backgroundColor: '#fff',
-            paddingTop: insets.top !== 0 ? insets.top / 2 : 'auto',
+            paddingTop: insets.top !== 0 ? insets.top : 18,
             paddingBottom: insets.bottom !== 0 ? insets.bottom / 2 : 'auto',
             paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
             paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
@@ -464,442 +466,452 @@ const PersonalDetails = () => {
               overlayColor="rgba(78, 75, 102, 0.7)"
             />
           )}
-          <ImageBackground
-            source={require('../../../assets/signup.png')}
-            resizeMode="stretch"
-            style={styles.image}>
-            <ScrollView
-              bounces={false}
-              showsHorizontalScrollIndicator={false}
-              showsVerticalScrollIndicator={false}
-              style={{
-                paddingHorizontal: 10,
-                marginBottom: tabBarHeight + 25,
-              }}>
-              <View style={styles.HeadView}>
-                <View style={styles.TopView}>
-                  <Text style={styles.TextHead}>CREATE PROFILE</Text>
-                </View>
-                <Text style={[styles.extraText, {marginBottom: 40}]}>
-                  Please create a profile to get started.
-                </Text>
-              </View>
-              <View
+          <KeyboardAvoidingWrapper>
+            <ImageBackground
+              source={require('../../../assets/signup.png')}
+              resizeMode="cover"
+              style={styles.image}>
+              <ScrollView
+                bounces={false}
+                showsHorizontalScrollIndicator={false}
+                showsVerticalScrollIndicator={false}
                 style={{
-                  paddingTop: 25,
-                  backgroundColor: '#FFFFFF',
-                  borderRadius: 15,
-                  paddingHorizontal: 15,
-                  paddingVertical: 15,
-                  opacity: 0.86,
-                  borderColor: '#D9DBE9',
-                  borderWidth: 2,
+                  paddingHorizontal: 10,
+                  marginBottom: tabBarHeight + 25,
                 }}>
-                <View style={{marginVertical: 10}}>
-                  <CustomDropdown
-                    label="Title"
-                    onFocus={() => handleError(null, 'title')}
-                    // search
-                    isNeeded={true}
-                    // iconName="gender-male-female"
-                    placeholder="Select Title"
-                    placeholderStyle={styles.placeholderStyle}
-                    selectedTextStyle={styles.selectedTextStyle}
-                    data={titleData}
-                    maxHeight={300}
-                    labelField="label"
-                    valueField="value"
-                    value={userDetails.title}
-                    onChange={option => {
-                      setUserDetails({...userDetails, title: option.value});
-                    }}
-                    error={errors.title}
-                  />
+                <View style={styles.HeadView}>
+                  <View style={styles.TopView}>
+                    <Text style={styles.TextHead}>CREATE PROFILE</Text>
+                  </View>
+                  <Text style={[styles.extraText, {marginBottom: 40}]}>
+                    Please create a profile to get started.
+                  </Text>
                 </View>
-                <Input
-                  // onChangeText={text => handleOnchange(text, 'firstname')}
-                  onChangeText={text =>
-                    setUserDetails({...userDetails, firstName: text.trim()})
-                  }
-                  onFocus={() => handleError(null, 'firstName')}
-                  iconName="account-outline"
-                  label="First Name"
-                  placeholder="Enter your first name"
-                  error={errors.firstname}
-                  isNeeded={true}
-                  defaultValue={
-                    user && JSON.parse(user)?.displayName?.split(' ')[0]
-                  }
-                />
-
-                <Input
-                  onChangeText={text =>
-                    setUserDetails({...userDetails, lastName: text.trim()})
-                  }
-                  onFocus={() => handleError(null, 'lastName')}
-                  iconName="account-outline"
-                  label="Last Name"
-                  placeholder="Enter your first name"
-                  error={errors.lastName}
-                  isNeeded={true}
-                  defaultValue={
-                    user && JSON.parse(user)?.displayName?.split(' ')[1]
-                  }
-                />
-
-                <Input
-                  onChangeText={text =>
-                    setUserDetails({...userDetails, email: text.trim()})
-                  }
-                  onFocus={() => handleError(null, 'email')}
-                  iconName="email-outline"
-                  label="Email"
-                  placeholder="Enter your email"
-                  error={errors.email}
-                  isNeeded={true}
-                  editable={
-                    user && JSON.parse(user)?.user?.email ? false : true
-                  }
-                  defaultValue={user && JSON.parse(user)?.email}
-                />
-
-                <InputPhone
-                  label="Phone number"
-                  onFocus={() => handleError(null, 'phoneNumber')}
-                  layout="first"
-                  isNeeded={true}
-                  defaultCode="NG"
-                  error={errors.phoneNumber}
-                  codeTextStyle={{color: '#6E7191'}}
-                  defaultValue={userDetails?.phoneNumber}
-                  onChangeFormattedText={text =>
-                    setUserDetails({...userDetails, phoneNumber: text})
-                  }
-                />
-
-                <View style={{marginVertical: 10}}>
-                  <CustomDropdown
-                    label="Gender"
-                    onFocus={() => handleError(null, 'gender')}
-                    // search
-                    isNeeded={true}
-                    iconName="gender-male-female"
-                    placeholder="Select Gender"
-                    placeholderStyle={styles.placeholderStyle}
-                    selectedTextStyle={styles.selectedTextStyle}
-                    data={genderData}
-                    maxHeight={300}
-                    labelField="label"
-                    valueField="value"
-                    value={userDetails.gender}
-                    onChange={option => {
-                      setUserDetails({...userDetails, gender: option.value});
-                    }}
-                    error={errors.gender}
-                  />
-                </View>
-
-                <Input
-                  onChangeText={text =>
-                    setUserDetails({...userDetails, bvn: text.trim()})
-                  }
-                  onFocus={() => handleError(null, 'bvn')}
-                  iconName="shield-lock-outline"
-                  label="BVN"
-                  placeholder="Enter your BVN"
-                  error={errors.bvn}
-                  keyboardType="numeric"
-                  isNeeded={true}
-                />
-
-                <Input
-                  label="NIN"
-                  onChangeText={text =>
-                    setUserDetails({...userDetails, nin: text.trim()})
-                  }
-                  onFocus={() => handleError(null, 'nin')}
-                  iconName="shield-lock-outline"
-                  placeholder="Enter your NIN"
-                  error={errors.nin}
-                  keyboardType="numeric"
-                  isNeeded={true}
-                />
-
-                <Pressable onPress={showDatePicker}>
-                  <Input
-                    label="Date of Birth"
-                    onFocus={() => handleError(null, 'dob')}
-                    iconName="calendar-month-outline"
-                    placeholder="2000 - 01 - 01"
-                    defaultValue={
-                      userDetails.dob ? userDetails.dob.toString() : ''
-                    }
-                    isDate={true}
-                    editable={false}
-                    showDatePicker={showDatePicker}
-                    onChangeValue={text =>
-                      setUserDetails({...userDetails, dob: text})
-                    }
-                    isNeeded={true}
-                    error={errors.dob}
-                  />
-                </Pressable>
-
-                <DateTimePickerModal
-                  isVisible={show}
-                  testID="dateTimePicker"
-                  defaultValue={userDetails.dob}
-                  mode="date"
-                  is24Hour={true}
-                  onConfirm={handleConfirm}
-                  onCancel={hideDatePicker}
-                  textColor="#054B99"
-                />
-
-                <Input
-                  label="Address"
-                  defaultValue={userDetails.address}
-                  onChangeText={text =>
-                    setUserDetails({...userDetails, address: text})
-                  }
-                  onFocus={() => handleError(null, 'address')}
-                  iconName="map-marker-outline"
-                  placeholder="Enter your address"
-                  error={errors.address}
-                  isNeeded={true}
-                />
-
-                <Input
-                  label="Country"
-                  defaultValue={userDetails.country}
-                  onChangeText={text =>
-                    setUserDetails({...userDetails, country: text})
-                  }
-                  onFocus={() => handleError(null, 'country')}
-                  iconName="flag-outline"
-                  placeholder="Enter your country"
-                  error={errors.country}
-                  isNeeded={true}
-                />
-
                 <View
                   style={{
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
+                    paddingTop: 25,
+                    backgroundColor: '#FFFFFF',
+                    borderRadius: 15,
+                    paddingHorizontal: 15,
+                    paddingVertical: 15,
+                    opacity: 0.86,
+                    borderColor: '#D9DBE9',
+                    borderWidth: 2,
                   }}>
-                  <View
-                    style={{marginVertical: 10, paddingRight: 5, width: '50%'}}>
+                  <View style={{marginVertical: 10}}>
                     <CustomDropdown
-                      label="State"
-                      onFocus={() => handleError(null, 'state')}
+                      label="Title"
+                      onFocus={() => handleError(null, 'title')}
+                      // search
                       isNeeded={true}
-                      placeholder="Select State"
+                      // iconName="gender-male-female"
+                      placeholder="Select Title"
                       placeholderStyle={styles.placeholderStyle}
                       selectedTextStyle={styles.selectedTextStyle}
-                      data={currentState ? currentState : stateData}
-                      // data={genderData}
+                      data={titleData}
                       maxHeight={300}
                       labelField="label"
                       valueField="value"
-                      value={userDetails.state}
+                      value={userDetails.title}
                       onChange={option => {
-                        setUserDetails({...userDetails, state: option.value});
+                        setUserDetails({...userDetails, title: option.value});
                       }}
-                      error={errors.state}
+                      error={errors.title}
                     />
                   </View>
-                  <View
-                    style={{marginVertical: 10, paddingLeft: 5, width: '50%'}}>
+                  <Input
+                    // onChangeText={text => handleOnchange(text, 'firstname')}
+                    onChangeText={text =>
+                      setUserDetails({...userDetails, firstName: text.trim()})
+                    }
+                    onFocus={() => handleError(null, 'firstName')}
+                    iconName="account-outline"
+                    label="First Name"
+                    placeholder="Enter your first name"
+                    error={errors.firstname}
+                    isNeeded={true}
+                    defaultValue={
+                      user && JSON.parse(user)?.displayName?.split(' ')[0]
+                    }
+                  />
+
+                  <Input
+                    onChangeText={text =>
+                      setUserDetails({...userDetails, lastName: text.trim()})
+                    }
+                    onFocus={() => handleError(null, 'lastName')}
+                    iconName="account-outline"
+                    label="Last Name"
+                    placeholder="Enter your first name"
+                    error={errors.lastName}
+                    isNeeded={true}
+                    defaultValue={
+                      user && JSON.parse(user)?.displayName?.split(' ')[1]
+                    }
+                  />
+
+                  <Input
+                    onChangeText={text =>
+                      setUserDetails({...userDetails, email: text.trim()})
+                    }
+                    onFocus={() => handleError(null, 'email')}
+                    iconName="email-outline"
+                    label="Email"
+                    placeholder="Enter your email"
+                    error={errors.email}
+                    isNeeded={true}
+                    editable={
+                      user && JSON.parse(user)?.user?.email ? false : true
+                    }
+                    defaultValue={user && JSON.parse(user)?.email}
+                  />
+
+                  <InputPhone
+                    label="Phone number"
+                    onFocus={() => handleError(null, 'phoneNumber')}
+                    layout="first"
+                    isNeeded={true}
+                    defaultCode="NG"
+                    error={errors.phoneNumber}
+                    codeTextStyle={{color: '#6E7191'}}
+                    defaultValue={userDetails?.phoneNumber}
+                    onChangeFormattedText={text =>
+                      setUserDetails({...userDetails, phoneNumber: text})
+                    }
+                  />
+
+                  <View style={{marginVertical: 10}}>
                     <CustomDropdown
-                      label="City"
-                      onFocus={() => handleError(null, 'city')}
+                      label="Gender"
+                      onFocus={() => handleError(null, 'gender')}
+                      // search
                       isNeeded={true}
-                      placeholder="Select LGA"
+                      iconName="gender-male-female"
+                      placeholder="Select Gender"
                       placeholderStyle={styles.placeholderStyle}
                       selectedTextStyle={styles.selectedTextStyle}
-                      data={currentCity ? currentCity : cityData}
+                      data={genderData}
                       maxHeight={300}
                       labelField="label"
                       valueField="value"
-                      value={userDetails.city}
+                      value={userDetails.gender}
                       onChange={option => {
-                        setUserDetails({...userDetails, city: option.value});
+                        setUserDetails({...userDetails, gender: option.value});
                       }}
-                      error={errors.city}
+                      error={errors.gender}
                     />
                   </View>
-                </View>
 
-                <View style={{marginVertical: 10}}>
-                  <CustomDropdown
-                    label="Residential Status"
-                    onFocus={() => handleError(null, 'residentialStatus')}
-                    iconName="home-outline"
-                    isNeeded={true}
-                    placeholderStyle={styles.placeholderStyle}
-                    selectedTextStyle={styles.selectedTextStyle}
-                    data={residencyData}
-                    maxHeight={300}
-                    labelField="label"
-                    valueField="value"
-                    value={userDetails.residentialStatus}
-                    onChange={option => {
-                      setUserDetails({
-                        ...userDetails,
-                        residentialStatus: option.value,
-                      });
-                    }}
-                    error={errors.residentialStatus}
-                  />
-                </View>
-
-                <View style={{marginVertical: 10}}>
-                  <CustomDropdown
-                    label="When did you move to that address?"
-                    onFocus={() =>
-                      handleError(null, 'yearYouMovedToCurrentAddress')
-                    }
-                    isNeeded={true}
-                    placeholderStyle={styles.placeholderStyle}
-                    selectedTextStyle={styles.selectedTextStyle}
-                    data={wdymttaData}
-                    maxHeight={300}
-                    labelField="label"
-                    valueField="value"
-                    value={userDetails.yearYouMovedToCurrentAddress}
-                    onChange={option => {
-                      setUserDetails({
-                        ...userDetails,
-                        yearYouMovedToCurrentAddress: option.value,
-                      });
-                    }}
-                    error={errors.yearYouMovedToCurrentAddress}
-                  />
-                </View>
-
-                <View style={{marginVertical: 10}}>
-                  <CustomDropdown
-                    label="Marital Status"
-                    onFocus={() => handleError(null, 'maritalStatus')}
-                    isNeeded={true}
-                    placeholderStyle={styles.placeholderStyle}
-                    selectedTextStyle={styles.selectedTextStyle}
-                    data={maritalData}
-                    maxHeight={300}
-                    labelField="label"
-                    valueField="value"
-                    value={userDetails.maritalStatus}
-                    onChange={option => {
-                      setUserDetails({
-                        ...userDetails,
-                        maritalStatus: option.value,
-                      });
-                    }}
-                    error={errors.maritalStatus}
-                  />
-                </View>
-
-                <View style={{marginVertical: 10}}>
-                  <CustomDropdown
-                    label="Educational Level"
-                    onFocus={() => handleError(null, 'eduLevel')}
-                    iconName="school-outline"
-                    isNeeded={true}
-                    placeholderStyle={styles.placeholderStyle}
-                    selectedTextStyle={styles.selectedTextStyle}
-                    data={educationalData}
-                    maxHeight={300}
-                    labelField="label"
-                    valueField="value"
-                    value={userDetails.eduLevel}
-                    onChange={option => {
-                      setUserDetails({
-                        ...userDetails,
-                        eduLevel: option.value,
-                      });
-                    }}
-                    error={errors.eduLevel}
-                  />
-                </View>
-
-                <Input
-                  label="Number of dependents"
-                  onChangeText={text =>
-                    setUserDetails({
-                      ...userDetails,
-                      NoOfDependents: parseInt(text, 10),
-                    })
-                  }
-                  onFocus={() => handleError(null, 'NoOfDependents')}
-                  error={errors.NoOfDependents}
-                  keyboardType="numeric"
-                  isNeeded={true}
-                />
-
-                <View style={{marginVertical: 10}}>
-                  <CustomDropdown
-                    label="How did you hear about TradeLenda?"
-                    onFocus={() => handleError(null, 'referredByOption')}
-                    iconName="account-voice"
-                    isNeeded={true}
-                    placeholderStyle={styles.placeholderStyle}
-                    selectedTextStyle={styles.selectedTextStyle}
-                    data={referralOptionData}
-                    maxHeight={300}
-                    labelField="label"
-                    valueField="value"
-                    value={userDetails.referredByOption}
-                    onChange={option => {
-                      setUserDetails({
-                        ...userDetails,
-                        referredByOption: option.value,
-                      });
-                    }}
-                    error={errors.referredByOption}
-                  />
-                </View>
-
-                {userDetails.referredByOption &&
-                userDetails.referredByOption === 'By Referral' ? (
                   <Input
-                    label="Referral Code (i.e XZRHNC)"
-                    defaultValue={userDetails?.referredByCode}
                     onChangeText={text =>
-                      setUserDetails({...userDetails, referredByCode: text})
+                      setUserDetails({...userDetails, bvn: text.trim()})
                     }
+                    onFocus={() => handleError(null, 'bvn')}
+                    iconName="shield-lock-outline"
+                    label="BVN"
+                    placeholder="Enter your BVN"
+                    error={errors.bvn}
+                    keyboardType="numeric"
                     isNeeded={true}
                   />
-                ) : userDetails?.referredByOption &&
-                  userDetails?.referredByOption !== '' ? (
-                  <Input
-                    label={
-                      userDetails?.referredByOption == 'From a friend'
-                        ? 'Please specify friends email or name'
-                        : userDetails?.referredByOption == 'Others'
-                        ? 'Please specify other referral'
-                        : userDetails?.referredByOption == 'Social Media'
-                        ? `Please specify referral ${userDetails?.referredByOption.toLowerCase()} platform`
-                        : `Please specify referral ${userDetails?.referredByOption.toLowerCase()} name`
-                    }
-                    defaultValue={userDetails?.referredByAnswer}
-                    onChangeText={text =>
-                      setUserDetails({...userDetails, referredByAnswer: text})
-                    }
-                    isNeeded={true}
-                  />
-                ) : null}
 
-                <TouchableOpacity
-                  // onPress={() => handleCreateUser()}
-                  onPress={() => validate()}
-                  disabled={disableit}>
-                  <View style={{marginBottom: 5, marginTop: 20}}>
-                    <Buttons label="Save & Continue" disabled={disableit} />
+                  <Input
+                    label="NIN"
+                    onChangeText={text =>
+                      setUserDetails({...userDetails, nin: text.trim()})
+                    }
+                    onFocus={() => handleError(null, 'nin')}
+                    iconName="shield-lock-outline"
+                    placeholder="Enter your NIN"
+                    error={errors.nin}
+                    keyboardType="numeric"
+                    isNeeded={true}
+                  />
+
+                  <Pressable onPress={showDatePicker}>
+                    <Input
+                      label="Date of Birth"
+                      onFocus={() => handleError(null, 'dob')}
+                      iconName="calendar-month-outline"
+                      placeholder="2000 - 01 - 01"
+                      defaultValue={
+                        userDetails.dob ? userDetails.dob.toString() : ''
+                      }
+                      isDate={true}
+                      editable={false}
+                      showDatePicker={showDatePicker}
+                      onChangeValue={text =>
+                        setUserDetails({...userDetails, dob: text})
+                      }
+                      isNeeded={true}
+                      error={errors.dob}
+                    />
+                  </Pressable>
+
+                  <DateTimePickerModal
+                    isVisible={show}
+                    testID="dateTimePicker"
+                    defaultValue={userDetails.dob}
+                    mode="date"
+                    is24Hour={true}
+                    onConfirm={handleConfirm}
+                    onCancel={hideDatePicker}
+                    textColor="#054B99"
+                  />
+
+                  <Input
+                    label="Address"
+                    defaultValue={userDetails.address}
+                    onChangeText={text =>
+                      setUserDetails({...userDetails, address: text})
+                    }
+                    onFocus={() => handleError(null, 'address')}
+                    iconName="map-marker-outline"
+                    placeholder="Enter your address"
+                    error={errors.address}
+                    isNeeded={true}
+                  />
+
+                  <Input
+                    label="Country"
+                    defaultValue={userDetails.country}
+                    onChangeText={text =>
+                      setUserDetails({...userDetails, country: text})
+                    }
+                    onFocus={() => handleError(null, 'country')}
+                    iconName="flag-outline"
+                    placeholder="Enter your country"
+                    error={errors.country}
+                    isNeeded={true}
+                  />
+
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                    }}>
+                    <View
+                      style={{
+                        marginVertical: 10,
+                        paddingRight: 5,
+                        width: '50%',
+                      }}>
+                      <CustomDropdown
+                        label="State"
+                        onFocus={() => handleError(null, 'state')}
+                        isNeeded={true}
+                        placeholder="Select State"
+                        placeholderStyle={styles.placeholderStyle}
+                        selectedTextStyle={styles.selectedTextStyle}
+                        data={currentState ? currentState : stateData}
+                        // data={genderData}
+                        maxHeight={300}
+                        labelField="label"
+                        valueField="value"
+                        value={userDetails.state}
+                        onChange={option => {
+                          setUserDetails({...userDetails, state: option.value});
+                        }}
+                        error={errors.state}
+                      />
+                    </View>
+                    <View
+                      style={{
+                        marginVertical: 10,
+                        paddingLeft: 5,
+                        width: '50%',
+                      }}>
+                      <CustomDropdown
+                        label="City"
+                        onFocus={() => handleError(null, 'city')}
+                        isNeeded={true}
+                        placeholder="Select LGA"
+                        placeholderStyle={styles.placeholderStyle}
+                        selectedTextStyle={styles.selectedTextStyle}
+                        data={currentCity ? currentCity : cityData}
+                        maxHeight={300}
+                        labelField="label"
+                        valueField="value"
+                        value={userDetails.city}
+                        onChange={option => {
+                          setUserDetails({...userDetails, city: option.value});
+                        }}
+                        error={errors.city}
+                      />
+                    </View>
                   </View>
-                </TouchableOpacity>
-              </View>
-            </ScrollView>
-          </ImageBackground>
+
+                  <View style={{marginVertical: 10}}>
+                    <CustomDropdown
+                      label="Residential Status"
+                      onFocus={() => handleError(null, 'residentialStatus')}
+                      iconName="home-outline"
+                      isNeeded={true}
+                      placeholderStyle={styles.placeholderStyle}
+                      selectedTextStyle={styles.selectedTextStyle}
+                      data={residencyData}
+                      maxHeight={300}
+                      labelField="label"
+                      valueField="value"
+                      value={userDetails.residentialStatus}
+                      onChange={option => {
+                        setUserDetails({
+                          ...userDetails,
+                          residentialStatus: option.value,
+                        });
+                      }}
+                      error={errors.residentialStatus}
+                    />
+                  </View>
+
+                  <View style={{marginVertical: 10}}>
+                    <CustomDropdown
+                      label="When did you move to that address?"
+                      onFocus={() =>
+                        handleError(null, 'yearYouMovedToCurrentAddress')
+                      }
+                      isNeeded={true}
+                      placeholderStyle={styles.placeholderStyle}
+                      selectedTextStyle={styles.selectedTextStyle}
+                      data={wdymttaData}
+                      maxHeight={300}
+                      labelField="label"
+                      valueField="value"
+                      value={userDetails.yearYouMovedToCurrentAddress}
+                      onChange={option => {
+                        setUserDetails({
+                          ...userDetails,
+                          yearYouMovedToCurrentAddress: option.value,
+                        });
+                      }}
+                      error={errors.yearYouMovedToCurrentAddress}
+                    />
+                  </View>
+
+                  <View style={{marginVertical: 10}}>
+                    <CustomDropdown
+                      label="Marital Status"
+                      onFocus={() => handleError(null, 'maritalStatus')}
+                      isNeeded={true}
+                      placeholderStyle={styles.placeholderStyle}
+                      selectedTextStyle={styles.selectedTextStyle}
+                      data={maritalData}
+                      maxHeight={300}
+                      labelField="label"
+                      valueField="value"
+                      value={userDetails.maritalStatus}
+                      onChange={option => {
+                        setUserDetails({
+                          ...userDetails,
+                          maritalStatus: option.value,
+                        });
+                      }}
+                      error={errors.maritalStatus}
+                    />
+                  </View>
+
+                  <View style={{marginVertical: 10}}>
+                    <CustomDropdown
+                      label="Educational Level"
+                      onFocus={() => handleError(null, 'eduLevel')}
+                      iconName="school-outline"
+                      isNeeded={true}
+                      placeholderStyle={styles.placeholderStyle}
+                      selectedTextStyle={styles.selectedTextStyle}
+                      data={educationalData}
+                      maxHeight={300}
+                      labelField="label"
+                      valueField="value"
+                      value={userDetails.eduLevel}
+                      onChange={option => {
+                        setUserDetails({
+                          ...userDetails,
+                          eduLevel: option.value,
+                        });
+                      }}
+                      error={errors.eduLevel}
+                    />
+                  </View>
+
+                  <Input
+                    label="Number of dependents"
+                    onChangeText={text =>
+                      setUserDetails({
+                        ...userDetails,
+                        NoOfDependents: parseInt(text, 10),
+                      })
+                    }
+                    onFocus={() => handleError(null, 'NoOfDependents')}
+                    error={errors.NoOfDependents}
+                    keyboardType="numeric"
+                    isNeeded={true}
+                  />
+
+                  <View style={{marginVertical: 10}}>
+                    <CustomDropdown
+                      label="How did you hear about TradeLenda?"
+                      onFocus={() => handleError(null, 'referredByOption')}
+                      iconName="account-voice"
+                      isNeeded={true}
+                      placeholderStyle={styles.placeholderStyle}
+                      selectedTextStyle={styles.selectedTextStyle}
+                      data={referralOptionData}
+                      maxHeight={300}
+                      labelField="label"
+                      valueField="value"
+                      value={userDetails.referredByOption}
+                      onChange={option => {
+                        setUserDetails({
+                          ...userDetails,
+                          referredByOption: option.value,
+                        });
+                      }}
+                      error={errors.referredByOption}
+                    />
+                  </View>
+
+                  {userDetails.referredByOption &&
+                  userDetails.referredByOption === 'By Referral' ? (
+                    <Input
+                      label="Referral Code (i.e XZRHNC)"
+                      defaultValue={userDetails?.referredByCode}
+                      onChangeText={text =>
+                        setUserDetails({...userDetails, referredByCode: text})
+                      }
+                      isNeeded={true}
+                    />
+                  ) : userDetails?.referredByOption &&
+                    userDetails?.referredByOption !== '' ? (
+                    <Input
+                      label={
+                        userDetails?.referredByOption == 'From a friend'
+                          ? 'Please specify friends email or name'
+                          : userDetails?.referredByOption == 'Others'
+                          ? 'Please specify other referral'
+                          : userDetails?.referredByOption == 'Social Media'
+                          ? `Please specify referral ${userDetails?.referredByOption.toLowerCase()} platform`
+                          : `Please specify referral ${userDetails?.referredByOption.toLowerCase()} name`
+                      }
+                      defaultValue={userDetails?.referredByAnswer}
+                      onChangeText={text =>
+                        setUserDetails({...userDetails, referredByAnswer: text})
+                      }
+                      isNeeded={true}
+                    />
+                  ) : null}
+
+                  <TouchableOpacity
+                    // onPress={() => handleCreateUser()}
+                    onPress={() => validate()}
+                    disabled={disableit}>
+                    <View style={{marginBottom: 5, marginTop: 20}}>
+                      <Buttons label="Save & Continue" disabled={disableit} />
+                    </View>
+                  </TouchableOpacity>
+                </View>
+              </ScrollView>
+            </ImageBackground>
+          </KeyboardAvoidingWrapper>
         </SafeAreaView>
       )}
     </>
@@ -1070,8 +1082,8 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   image: {
-    height: screenHeight,
-    width: screenWidth,
+    // height: screenHeight,
+    width: wp('100%'),
     justifyContent: 'center',
   },
 });

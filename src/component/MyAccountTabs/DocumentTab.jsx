@@ -32,8 +32,7 @@ const Document = () => {
   return (
     <View style={styles.container}>
       <TouchableOpacity
-        // onPress={() => navigation.navigate('ValidIndentity')}
-        onPress={() => navigation.navigate('Home')}
+        onPress={() => navigation.navigate('ValidIdentity')}
         style={{marginBottom: 20}}>
         <Buttons label={'Update Documents'} />
       </TouchableOpacity>

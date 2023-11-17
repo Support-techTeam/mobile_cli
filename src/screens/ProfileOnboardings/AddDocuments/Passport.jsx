@@ -10,8 +10,10 @@ import ProofofAdd from '../../../component/Idtypes/ProofOfAddress';
 
 const ITEM_HEIGHT = 100;
 const TobTabs = [
-  {name: 'Valid Identity', key: 'ValidIndentity'},
+  {name: 'Valid Identity', key: 'ValidIdentity'},
   {name: 'Proof of Address', key: 'ProofOfAddress'},
+  {name: 'Personal Photo', key: 'PersonalPhoto'},
+  {name: 'Identity Card (ARM)', key: 'IdentityCard'},
   {name: 'Bank Statement', key: 'BankStatement'},
   {name: 'Passport', key: 'Passport'},
   {name: 'Signature', key: 'Signature'},
@@ -21,38 +23,15 @@ const TobTabs = [
   {name: 'Submit All', key: 'SubmitDocs'},
 ];
 
-const Passport = ({route}) => {
-  const docsDetails = route?.params?.paramKey;
-
-  const userDocs = {
-    validIdentificationType:
-      docsDetails?.validIdentificationType === undefined
-        ? ''
-        : docsDetails?.validIdentificationType,
-    validIdentification:
-      docsDetails?.validIdentification === undefined
-        ? ''
-        : docsDetails?.validIdentification,
-    utilityBill:
-      docsDetails?.utilityBill === undefined ? '' : docsDetails?.utilityBill,
-    bankStatement:
-      docsDetails?.bankStatement === undefined
-        ? ''
-        : docsDetails?.bankStatement,
-    passport: docsDetails?.passport === undefined ? '' : docsDetails?.passport,
-    signature:
-      docsDetails?.signature === undefined ? '' : docsDetails?.signature,
-    seal: docsDetails?.seal === undefined ? '' : docsDetails?.seal,
-    cac: docsDetails?.cac === undefined ? '' : docsDetails?.cac,
-  };
+const Passport = () => {
+  const route = useRoute();
+  const {params} = route;
+  const {paramKey} = params;
 
   const activeTab = 'Passport';
   const [index, setIndex] = useState(0);
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
-  // const route = useRoute();
-  // const curentRoute = route.name;
-  // const previousRoute = navigation.getState()?.routes.slice(-2)[0]?.name;
 
   const renderItem = ({item}) => {
     const isActive = item.key === activeTab;
@@ -111,7 +90,7 @@ const Passport = ({route}) => {
       style={{
         flex: 1,
         backgroundColor: '#fff',
-        paddingTop: insets.top !== 0 ? insets.top / 2 : 'auto',
+        paddingTop: insets.top !== 0 ? insets.top : 18,
         paddingBottom: insets.bottom !== 0 ? insets.bottom / 2 : 'auto',
         paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
         paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
@@ -203,7 +182,7 @@ const Passport = ({route}) => {
 
         <TouchableOpacity
           onPress={() =>
-            navigation.navigate('Signature', {paramKey: userDocs})
+            navigation.navigate('Signature', {paramKey: {...paramKey}})
           }>
           <View style={[styles.tobTab, {backgroundColor: '#054B99'}]}>
             <Text style={[styles.tabText, {color: 'white'}]}>Skip</Text>
@@ -229,7 +208,6 @@ const styles = StyleSheet.create({
     marginHorizontal: 2,
   },
   tabText: {
-    
     fontSize: 12,
     fontWeight: '600',
     textAlign: 'center',
@@ -247,7 +225,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#054B99',
   },
   TextHead: {
-    
     fontWeight: '700',
     fontSize: 16,
     lineHeight: 24,
@@ -262,7 +239,6 @@ const styles = StyleSheet.create({
     marginVertical: 16,
   },
   header: {
-    
     fontSize: 20,
     fontWeight: '700',
     letterSpacing: 1,
@@ -280,10 +256,8 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: 'bold',
     color: 'black',
-    
   },
   camHead: {
-    
     fontSize: 14,
     fontWeight: '400',
   },
