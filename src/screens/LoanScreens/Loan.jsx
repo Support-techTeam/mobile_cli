@@ -367,8 +367,9 @@ const Loanscreen = () => {
                                 ? require('../../../assets/images/approvedbox.png')
                                 : loan.approvalStatus === 'paid'
                                 ? require('../../../assets/images/unapprovedBox.png')
-                                : loan.approvalStatus === 'pending' &&
-                                  require('../../../assets/images/unapprovedBox.png')
+                                : loan.approvalStatus === 'pending'
+                                ? require('../../../assets/images/unapprovedBox.png')
+                                : require('../../../assets/images/unapprovedBox.png')
                             }
                           />
                         </View>
