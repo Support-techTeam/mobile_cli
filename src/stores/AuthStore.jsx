@@ -197,7 +197,7 @@ const forgotPassword = async email => {
         handleCodeInApp: true,
       };
       await sendPasswordResetEmail(auth, email.trim(), actionCodeSettings);
-      DdLogs.info(`User | Login | ${email}`, {
+      DdLogs.info(`User | Password Reset | ${email}`, {
         context: JSON.stringify(auth.currentUser),
       });
       return {
@@ -207,7 +207,7 @@ const forgotPassword = async email => {
         message: 'Password reset link sent to email.',
       };
     } catch (err) {
-      DdLogs.error(`User | Login | ${email}`, {
+      DdLogs.error(`User | Password Reset | ${email}`, {
         errorMessage: JSON.stringify(err),
       });
       return {
@@ -218,7 +218,7 @@ const forgotPassword = async email => {
       };
     }
   } else {
-    DdLogs.warn(`User | Login | ${email}`, {
+    DdLogs.warn(`User | Password Reset | ${email}`, {
       errorMessage: 'No Internet Connection',
     });
     return {
