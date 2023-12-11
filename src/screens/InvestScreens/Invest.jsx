@@ -429,10 +429,8 @@ const Investscreen = () => {
                                 style: 'decimal',
                                 minimumFractionDigits: 2,
                                 maximumFractionDigits: 2,
-                              }).format(
-                                Number(investment?.investmentAmount) +
-                                  Number(investment?.topUpAmount),
-                              ) ?? '0.00'}
+                              }).format(Number(investment?.investmentAmount)) ??
+                                '0.00'}
                             </Text>
                           </View>
                           <View
