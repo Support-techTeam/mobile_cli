@@ -1908,7 +1908,7 @@ const Homescreen = () => {
                       color: COLORS.highwayRed,
                     },
                   ]}>
-                  ARM Funding
+                  Save with ARM
                 </Text>
               </View>
             </Pressable>
