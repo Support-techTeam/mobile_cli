@@ -1,5 +1,6 @@
 import Realm from 'realm';
 import CryptoJS from 'crypto-js';
+import {DdLogs} from '@datadog/mobile-react-native';
 const LockSchema = {
   name: 'AppLock',
   properties: {
@@ -28,6 +29,9 @@ const createLockPin = async details => {
           createdAt: new Date().toLocaleDateString(),
         });
       });
+      DdLogs.info(`Security | Create Pin | ${details?.userId}`, {
+        context: JSON.stringify(details),
+      });
       return {
         error: false,
         title: 'Create Pin',
@@ -35,6 +39,9 @@ const createLockPin = async details => {
         message: 'Created Successfully',
       };
     } else {
+      DdLogs.warn(`Security | Create Pin | ${details?.userId}`, {
+        context: JSON.stringify(details),
+      });
       return {
         error: true,
         title: 'Create Pin',
@@ -43,6 +50,10 @@ const createLockPin = async details => {
       };
     }
   } catch (e) {
+    DdLogs.error(`Security | Create Pin | ${details?.userId}`, {
+      context: JSON.stringify(details),
+      errorMessage: JSON.stringify(e),
+    });
     return {
       error: true,
       title: 'Create Pin',
@@ -56,6 +67,9 @@ const getAllPin = async () => {
   try {
     const allData = realm.objects('AppLock');
     if (allData.length > 0) {
+      DdLogs.info(`Security | Get All Pin |`, {
+        context: JSON.stringify(allData),
+      });
       return {
         error: false,
         title: 'Get All Pin',
@@ -63,6 +77,9 @@ const getAllPin = async () => {
         message: 'Retrieved Successfully',
       };
     } else {
+      DdLogs.warn(`Security | Check Pin |`, {
+        context: JSON.stringify(allData),
+      });
       return {
         error: true,
         title: 'Check Pin',
@@ -71,6 +88,9 @@ const getAllPin = async () => {
       };
     }
   } catch (e) {
+    DdLogs.error(`Security | Check Pin |`, {
+      errorMessage: JSON.stringify(e),
+    });
     return {
       error: true,
       title: 'Check Pin',
@@ -88,6 +108,9 @@ const validatePin = async pin => {
       .filtered(`hashedPin == $0`, md5Hash);
 
     if (userData.length > 0) {
+      DdLogs.info(`Security | Check Pin | ${md5Hash}`, {
+        context: JSON.stringify(userData),
+      });
       return {
         error: false,
         title: 'Check Pin',
@@ -95,6 +118,9 @@ const validatePin = async pin => {
         message: 'Verified Successfully',
       };
     } else {
+      DdLogs.warn(`Security | Check Pin | ${md5Hash}`, {
+        context: JSON.stringify(userData),
+      });
       return {
         error: true,
         title: 'Check Pin',
@@ -103,7 +129,9 @@ const validatePin = async pin => {
       };
     }
   } catch (error) {
-    // console.error('Error validating PIN: ', error);
+    DdLogs.error(`Security | Check Pin |`, {
+      errorMessage: JSON.stringify(error),
+    });
     return {
       error: true,
       title: 'Check Pin',
@@ -124,6 +152,9 @@ const changeCurrentPin = async (userId, oldPin, newPin) => {
     realm.write(() => {
       dataUpdate[0].hashedPin = hashedNewPin;
     });
+    DdLogs.info(`Security | Update Pin | ${userId}`, {
+      context: JSON.stringify(dataUpdate),
+    });
     return {
       error: false,
       title: 'Update Pin',
@@ -131,6 +162,9 @@ const changeCurrentPin = async (userId, oldPin, newPin) => {
       message: 'Updated Successfully',
     };
   } else {
+    DdLogs.warn(`Security | Update Pin | ${userId}`, {
+      context: JSON.stringify(dataUpdate),
+    });
     return {
       error: true,
       title: 'Update Pin',
@@ -149,6 +183,9 @@ const resetPin = async mobileNumber => {
       if (dataToDelete.length > 0) {
         realm.delete(dataToDelete);
       } else {
+        DdLogs.warn(`Security | Reset Pin | ${mobileNumber}`, {
+          errorMessage: JSON.stringify(dataToDelete),
+        });
         return {
           error: true,
           title: 'Reset Pin',
@@ -157,6 +194,9 @@ const resetPin = async mobileNumber => {
         };
       }
     });
+    DdLogs.info(`Security | Reset Pin | ${mobileNumber}`, {
+      context: JSON.stringify(dataToDelete),
+    });
     return {
       error: false,
       title: 'Reset Pin',
@@ -164,6 +204,9 @@ const resetPin = async mobileNumber => {
       message: 'Reset Successfully',
     };
   } catch (e) {
+    DdLogs.info(`Security | Reset Pin | ${mobileNumber}`, {
+      errorMessage: JSON.stringify(e),
+    });
     return {
       error: true,
       title: 'Reset Pin',
