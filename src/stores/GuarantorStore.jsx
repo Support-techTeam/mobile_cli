@@ -5,6 +5,7 @@ import {useSelector, useDispatch} from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {auth} from '../util/firebase/firebaseConfig';
 import {store} from '../util/redux/store';
+import {DdLogs} from '@datadog/mobile-react-native';
 
 //get login token
 const reduxStore = store.getState().userAuth;
@@ -35,6 +36,12 @@ const createGuarantor = async data => {
         const response = await axiosInstance.post(`/sureties/create`, data, {
           headers,
         });
+        DdLogs.info(
+          `Guarantors | Create Guarantor | ${auth?.currentUser?.email}`,
+          {
+            context: JSON.stringify(response?.data),
+          },
+        );
         return {
           title: 'Create Guarantor',
           error: false,
@@ -43,6 +50,12 @@ const createGuarantor = async data => {
             'Guarantor added successfully. Please notify your guarantor to check their mail!',
         };
       } catch (error) {
+        DdLogs.error(
+          `Guarantors | Create Guarantor | ${auth?.currentUser?.email}`,
+          {
+            errorMessage: JSON.stringify(error),
+          },
+        );
         return {
           title: 'Create Guarantor',
           error: true,
@@ -52,6 +65,9 @@ const createGuarantor = async data => {
       }
     }
   } else {
+    DdLogs.warn(`Guarantors | Create Guarantor | ${auth?.currentUser?.email}`, {
+      errorMessage: 'No Internet Connection',
+    });
     return {
       error: true,
       data: null,
@@ -76,6 +92,12 @@ const getGuarantors = async () => {
         const response = await axiosInstance.get(`sureties`, {
           headers,
         });
+        DdLogs.info(
+          `Guarantors | Get Guarantors | ${auth?.currentUser?.email}`,
+          {
+            context: JSON.stringify(response?.data),
+          },
+        );
         return {
           title: 'Get Guarantors',
           error: false,
@@ -83,6 +105,12 @@ const getGuarantors = async () => {
           message: 'success',
         };
       } catch (error) {
+        DdLogs.error(
+          `Guarantors | Get Guarantors | ${auth?.currentUser?.email}`,
+          {
+            errorMessage: JSON.stringify(error),
+          },
+        );
         return {
           title: 'Get Guarantors',
           error: true,
@@ -92,6 +120,9 @@ const getGuarantors = async () => {
       }
     }
   } else {
+    DdLogs.warn(`Guarantors | Get Guarantors | ${auth?.currentUser?.email}`, {
+      errorMessage: 'No Internet Connection',
+    });
     return {
       error: true,
       data: null,
@@ -116,6 +147,12 @@ const getGuarantor = async id => {
         const response = await axiosInstance.get(`/sureties/get/${id}`, {
           headers,
         });
+        DdLogs.info(
+          `Guarantors | Get Guarantor | ${auth?.currentUser?.email}`,
+          {
+            context: JSON.stringify(response?.data),
+          },
+        );
         return {
           title: 'Get Guarantor',
           error: false,
@@ -123,6 +160,12 @@ const getGuarantor = async id => {
           message: 'success',
         };
       } catch (error) {
+        DdLogs.error(
+          `Guarantors | Get Guarantor | ${auth?.currentUser?.email}`,
+          {
+            errorMessage: JSON.stringify(error),
+          },
+        );
         return {
           title: 'Get Guarantor',
           error: true,
@@ -132,6 +175,9 @@ const getGuarantor = async id => {
       }
     }
   } else {
+    DdLogs.warn(`Guarantors | Get Guarantor | ${auth?.currentUser?.email}`, {
+      errorMessage: 'No Internet Connection',
+    });
     return {
       error: true,
       data: null,
@@ -160,6 +206,9 @@ const sendOtp = async data => {
             headers,
           },
         );
+        DdLogs.info(`Guarantors | Send Otp | ${auth?.currentUser?.email}`, {
+          context: JSON.stringify(response?.data),
+        });
         return {
           title: 'Send Otp',
           error: false,
@@ -168,6 +217,9 @@ const sendOtp = async data => {
             'We have sent your guarantor a mail. You will be navigated shortly!',
         };
       } catch (error) {
+        DdLogs.error(`Guarantors | Send Otp | ${auth?.currentUser?.email}`, {
+          errorMessage: JSON.stringify(error),
+        });
         return {
           title: 'Send Otp',
           error: true,
@@ -177,6 +229,9 @@ const sendOtp = async data => {
       }
     }
   } else {
+    DdLogs.warn(`Guarantors | Send Otp | ${auth?.currentUser?.email}`, {
+      errorMessage: 'No Internet Connection',
+    });
     return {
       error: true,
       data: null,
