@@ -5,6 +5,7 @@ import {useSelector, useDispatch} from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {auth} from '../util/firebase/firebaseConfig';
 import {store} from '../util/redux/store';
+import {DdLogs} from '@datadog/mobile-react-native';
 
 //get login token
 const reduxStore = store.getState().userAuth;
@@ -35,6 +36,12 @@ const getAccountWallet = async () => {
         const response = await axiosInstance.get(`/loan-wallet/get-wallet`, {
           headers,
         });
+        DdLogs.info(
+          `Wallet | Get Account Wallet | ${auth?.currentUser?.email}`,
+          {
+            context: JSON.stringify(response?.data),
+          },
+        );
         return {
           title: 'Get Account Wallet',
           error: false,
@@ -42,6 +49,12 @@ const getAccountWallet = async () => {
           message: 'success',
         };
       } catch (error) {
+        DdLogs.error(
+          `Wallet | Get Account Wallet | ${auth?.currentUser?.email}`,
+          {
+            errorMessage: JSON.stringify(error),
+          },
+        );
         return {
           title: 'Get Account Wallet',
           error: true,
@@ -51,6 +64,9 @@ const getAccountWallet = async () => {
       }
     }
   } else {
+    DdLogs.warn(`Wallet | Get Account Wallet | ${auth?.currentUser?.email}`, {
+      errorMessage: 'No internet Connection',
+    });
     return {
       error: true,
       data: null,
@@ -78,6 +94,12 @@ const getAccountTransactions = async (page, limit) => {
           {headers},
         );
 
+        DdLogs.info(
+          `Wallet | Get Wallet Transactions | ${auth?.currentUser?.email}`,
+          {
+            context: JSON.stringify(response?.data),
+          },
+        );
         return {
           title: 'Get Wallet Transactions',
           error: false,
@@ -85,6 +107,12 @@ const getAccountTransactions = async (page, limit) => {
           message: 'success',
         };
       } catch (error) {
+        DdLogs.error(
+          `Wallet | Get Wallet Transactions | ${auth?.currentUser?.email}`,
+          {
+            errorMessage: JSON.stringify(error),
+          },
+        );
         return {
           title: 'Get Wallet Transactions',
           error: true,
@@ -94,6 +122,12 @@ const getAccountTransactions = async (page, limit) => {
       }
     }
   } else {
+    DdLogs.warn(
+      `Wallet | Get Wallet Transactions | ${auth?.currentUser?.email}`,
+      {
+        errorMessage: 'No internet Connection',
+      },
+    );
     return {
       error: true,
       data: null,
@@ -119,6 +153,12 @@ const verifyNIPAccountInfo = async (accountNumber, bankName) => {
           `/loan-wallet/NIP-account-verification/{accountNumber}?accountNumber=${accountNumber}&bankName=${bankName}`,
           {headers},
         );
+        DdLogs.info(
+          `Wallet | Verify NIP Account Info | ${auth?.currentUser?.email}`,
+          {
+            context: JSON.stringify(response?.data),
+          },
+        );
         return {
           title: 'Verify NIP Account Info',
           error: false,
@@ -126,6 +166,12 @@ const verifyNIPAccountInfo = async (accountNumber, bankName) => {
           message: 'success',
         };
       } catch (error) {
+        DdLogs.error(
+          `Wallet | Verify NIP Account Info | ${auth?.currentUser?.email}`,
+          {
+            errorMessage: JSON.stringify(error),
+          },
+        );
         return {
           title: 'Verify NIP Account Info',
           error: true,
@@ -135,6 +181,12 @@ const verifyNIPAccountInfo = async (accountNumber, bankName) => {
       }
     }
   } else {
+    DdLogs.warn(
+      `Wallet | Verify NIP Account Info | ${auth?.currentUser?.email}`,
+      {
+        errorMessage: 'No internet Connection',
+      },
+    );
     return {
       error: true,
       data: null,
@@ -162,6 +214,12 @@ const verifyBeneficiaryInfo = async accountNumber => {
           )}`,
           {headers},
         );
+        DdLogs.info(
+          `Wallet | Verify Beneficiary Info | ${auth?.currentUser?.email}`,
+          {
+            context: JSON.stringify(response?.data),
+          },
+        );
         return {
           title: 'Verify Beneficiary Info',
           error: false,
@@ -169,6 +227,12 @@ const verifyBeneficiaryInfo = async accountNumber => {
           message: 'success',
         };
       } catch (error) {
+        DdLogs.error(
+          `Wallet | Verify Beneficiary Info | ${auth?.currentUser?.email}`,
+          {
+            errorMessage: JSON.stringify(error),
+          },
+        );
         return {
           title: 'Verify Beneficiary Info',
           error: true,
@@ -178,6 +242,12 @@ const verifyBeneficiaryInfo = async accountNumber => {
       }
     }
   } else {
+    DdLogs.warn(
+      `Wallet | Verify Beneficiary Info | ${auth?.currentUser?.email}`,
+      {
+        errorMessage: 'No internet Connection',
+      },
+    );
     return {
       error: true,
       data: null,
@@ -205,6 +275,12 @@ const createInternalTransfer = async details => {
           {headers},
         );
         if (response?.data?.error) {
+          DdLogs.warn(
+            `Wallet | Internal Transfer | ${auth?.currentUser?.email}`,
+            {
+              errorMessage: JSON.stringify(response?.data),
+            },
+          );
           return {
             title: 'Internal Transfer',
             error: true,
@@ -212,6 +288,12 @@ const createInternalTransfer = async details => {
             message: response?.data?.message,
           };
         } else {
+          DdLogs.info(
+            `Wallet | Internal Transfer | ${auth?.currentUser?.email}`,
+            {
+              context: 'No internet Connection',
+            },
+          );
           return {
             title: 'Internal Transfer',
             error: false,
@@ -220,6 +302,12 @@ const createInternalTransfer = async details => {
           };
         }
       } catch (error) {
+        DdLogs.error(
+          `Wallet | Internal Transfer | ${auth?.currentUser?.email}`,
+          {
+            errorMessage: JSON.stringify(error),
+          },
+        );
         return {
           title: 'Internal Transfer',
           error: true,
@@ -229,6 +317,9 @@ const createInternalTransfer = async details => {
       }
     }
   } else {
+    DdLogs.warn(`Wallet | Internal Transfer | ${auth?.currentUser?.email}`, {
+      errorMessage: 'No internet Connection',
+    });
     return {
       error: true,
       data: null,
@@ -256,6 +347,9 @@ const createNIPTransfer = async details => {
           {headers},
         );
         if (response?.data?.error) {
+          DdLogs.error(`Wallet | NIP Transfer | ${auth?.currentUser?.email}`, {
+            errorMessage: JSON.stringify(response?.data),
+          });
           return {
             title: 'NIP Transfer',
             error: true,
@@ -263,6 +357,9 @@ const createNIPTransfer = async details => {
             message: response?.data?.message,
           };
         } else {
+          DdLogs.info(`Wallet | NIP Transfer | ${auth?.currentUser?.email}`, {
+            context: JSON.stringify(response?.data),
+          });
           return {
             title: 'NIP Transfer',
             error: false,
@@ -271,6 +368,9 @@ const createNIPTransfer = async details => {
           };
         }
       } catch (error) {
+        DdLogs.error(`Wallet | NIP Transfer | ${auth?.currentUser?.email}`, {
+          errorMessage: JSON.stringify(error),
+        });
         return {
           title: 'NIP Transfer',
           error: true,
@@ -280,6 +380,9 @@ const createNIPTransfer = async details => {
       }
     }
   } else {
+    DdLogs.warn(`Wallet | NIP Transfer | ${auth?.currentUser?.email}`, {
+      errorMessage: 'No internet Connection',
+    });
     return {
       error: true,
       data: null,
@@ -305,6 +408,9 @@ const getAllBankDetails = async () => {
           `/loan-wallet/get-all-NIP-banks`,
           {headers},
         );
+        DdLogs.info(`Wallet | Get All Banks | ${auth?.currentUser?.email}`, {
+          context: JSON.stringify(response?.data),
+        });
         return {
           title: 'Get All Banks',
           error: false,
@@ -312,6 +418,9 @@ const getAllBankDetails = async () => {
           message: 'success',
         };
       } catch (error) {
+        DdLogs.error(`Wallet | Get All Banks | ${auth?.currentUser?.email}`, {
+          errorMessage: JSON.stringify(error),
+        });
         return {
           title: 'Get All Banks',
           error: true,
@@ -321,6 +430,9 @@ const getAllBankDetails = async () => {
       }
     }
   } else {
+    DdLogs.warn(`Wallet | Get All Banks | ${auth?.currentUser?.email}`, {
+      errorMessage: 'No internet Connection',
+    });
     return {
       error: true,
       data: null,
