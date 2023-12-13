@@ -11,6 +11,7 @@ import {
 import {BASE_URL} from '../../app.json';
 import {store} from '../util/redux/store';
 import {DdLogs} from '@datadog/mobile-react-native';
+
 const userLogin = async (email, password) => {
   if (
     store.getState().networkState &&
@@ -51,9 +52,6 @@ const userLogin = async (email, password) => {
       };
     }
   } else {
-    DdLogs.warn(`User | Login | ${email}`, {
-      errorMessage: 'No Internet Connection',
-    });
     return {
       error: true,
       data: null,
@@ -134,9 +132,6 @@ const userSignUp = async details => {
       };
     }
   } else {
-    DdLogs.warn(`User | Account Signup | ${details.email.trim()}`, {
-      errorMessage: 'No Internet Connection',
-    });
     return {
       error: true,
       data: null,
@@ -174,9 +169,6 @@ const resendVerificationEmail = async () => {
       };
     }
   } else {
-    DdLogs.warn(`User | Resend Verification Email |`, {
-      errorMessage: 'No Internet Connection',
-    });
     return {
       error: true,
       data: null,
@@ -218,9 +210,6 @@ const forgotPassword = async email => {
       };
     }
   } else {
-    DdLogs.warn(`User | Password Reset | ${email}`, {
-      errorMessage: 'No Internet Connection',
-    });
     return {
       error: true,
       data: null,
