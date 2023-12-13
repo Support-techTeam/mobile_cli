@@ -66,12 +66,6 @@ const getAllLendaProduct = async () => {
       }
     }
   } else {
-    DdLogs.warn(
-      `Investment | Lenda Investment Plans | ${auth?.currentUser?.email}`,
-      {
-        errorMessage: 'No Internet Connection',
-      },
-    );
     return {
       error: true,
       data: null,
@@ -124,9 +118,6 @@ const getAllArmProduct = async () => {
       }
     }
   } else {
-    DdLogs.warn(`Investment | ARM Investment | ${auth?.currentUser?.email}`, {
-      errorMessage: 'No Internet Connection',
-    });
     return {
       error: true,
       data: null,
@@ -182,12 +173,6 @@ const getArmProductYield = async productCode => {
       }
     }
   } else {
-    DdLogs.warn(
-      `Investment | ARM Investment Yield | ${auth?.currentUser?.email}`,
-      {
-        errorMessage: 'No Internet Connection',
-      },
-    );
     return {
       error: true,
       data: null,
@@ -243,12 +228,6 @@ const getAllLendaInvestment = async () => {
       }
     }
   } else {
-    DdLogs.warn(
-      `Investment | Get All Investment | ${auth?.currentUser?.email}`,
-      {
-        errorMessage: 'No Internet Connection',
-      },
-    );
     return {
       error: true,
       data: null,
@@ -304,12 +283,6 @@ const getAllArmInvestment = async () => {
       }
     }
   } else {
-    DdLogs.warn(
-      `Investment | Get All Investment | ${auth?.currentUser?.email}`,
-      {
-        errorMessage: 'No Internet Connection',
-      },
-    );
     return {
       error: true,
       data: null,
@@ -365,12 +338,6 @@ const getSingleArmInvestment = async (membershipId, productCode) => {
       }
     }
   } else {
-    DdLogs.warn(
-      `Investment | Get Single Investment | ${auth?.currentUser?.email}`,
-      {
-        errorMessage: 'No Internet Connection',
-      },
-    );
     return {
       error: true,
       data: null,
@@ -441,12 +408,6 @@ const createLendaInvestment = async details => {
       }
     }
   } else {
-    DdLogs.warn(
-      `Investment | Create Lenda Investment | ${auth?.currentUser?.email}`,
-      {
-        errorMessage: 'No Internet Connection',
-      },
-    );
     return {
       error: true,
       data: null,
@@ -518,12 +479,6 @@ const createArmInvestment = async details => {
       }
     }
   } else {
-    DdLogs.warn(
-      `Investment | Create ARM Investment | ${auth?.currentUser?.email}`,
-      {
-        errorMessage: 'No Internet Connection',
-      },
-    );
     return {
       error: true,
       data: null,
@@ -594,12 +549,6 @@ const topUpArmInvestment = async details => {
       }
     }
   } else {
-    DdLogs.warn(
-      `Investment | Top-Up Investment | ${auth?.currentUser?.email}`,
-      {
-        errorMessage: 'No Internet Connection',
-      },
-    );
     return {
       error: true,
       data: null,
@@ -670,12 +619,6 @@ const topUpLendaInvestment = async details => {
       }
     }
   } else {
-    DdLogs.warn(
-      `Investment | Top-Up Investment | ${auth?.currentUser?.email}`,
-      {
-        errorMessage: 'No Internet Connection',
-      },
-    );
     return {
       error: true,
       data: null,
@@ -746,12 +689,6 @@ const redeemArmInvestment = async details => {
       }
     }
   } else {
-    DdLogs.warn(
-      `Investment | Redeem Investment | ${auth?.currentUser?.email}`,
-      {
-        errorMessage: 'No Internet Connection',
-      },
-    );
     return {
       error: true,
       data: null,
@@ -807,12 +744,6 @@ const getArmOTP = async membershipId => {
       }
     }
   } else {
-    DdLogs.warn(
-      `Investment | Get Investment OTP | ${auth?.currentUser?.email}`,
-      {
-        errorMessage: 'No Internet Connection',
-      },
-    );
     return {
       error: true,
       data: null,
@@ -883,12 +814,6 @@ const redeemLendaInvestment = async details => {
       }
     }
   } else {
-    DdLogs.warn(
-      `Investment | Redeem Investment | ${auth?.currentUser?.email}`,
-      {
-        errorMessage: 'No Internet Connection',
-      },
-    );
     return {
       error: true,
       data: null,
@@ -959,12 +884,6 @@ const getLendaOTP = async data => {
       }
     }
   } else {
-    DdLogs.warn(
-      `Investment | Get Investment OTP | ${auth?.currentUser?.email}`,
-      {
-        errorMessage: 'No Internet Connection',
-      },
-    );
     return {
       error: true,
       data: null,
