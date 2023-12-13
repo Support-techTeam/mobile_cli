@@ -63,12 +63,6 @@ const getNetworkProvider = async () => {
       }
     }
   } else {
-    DdLogs.warn(
-      `Bill Payment | Get Network Provider | ${auth?.currentUser?.email}`,
-      {
-        errorMessage: 'No Internet Connection',
-      },
-    );
     return {
       error: true,
       data: null,
@@ -125,12 +119,6 @@ const purchaseAirtime = async data => {
       }
     }
   } else {
-    DdLogs.warn(
-      `Bill Payment | Purchase Airtime | ${auth?.currentUser?.email}`,
-      {
-        errorMessage: 'No Internet Connection',
-      },
-    );
     return {
       error: true,
       data: null,
@@ -186,12 +174,6 @@ const getDataProvider = async () => {
       }
     }
   } else {
-    DdLogs.warn(
-      `Bill Payment | Get Network Provider | ${auth?.currentUser?.email}`,
-      {
-        errorMessage: 'No Internet Connection',
-      },
-    );
     return {
       error: true,
       data: null,
@@ -247,9 +229,6 @@ const getDataPlanByProvider = async provider => {
       }
     }
   } else {
-    DdLogs.warn(`Bill Payment | Get Data Plan | ${auth?.currentUser?.email}`, {
-      errorMessage: 'No Internet Connection',
-    });
     return {
       error: true,
       data: null,
@@ -306,9 +285,6 @@ const purchaseDataPlan = async data => {
       }
     }
   } else {
-    DdLogs.warn(`Bill Payment | Purchase Data | ${auth?.currentUser?.email}`, {
-      errorMessage: 'No Internet Connection',
-    });
     return {
       error: true,
       data: null,
@@ -364,12 +340,6 @@ const getElectricityProviders = async () => {
       }
     }
   } else {
-    DdLogs.warn(
-      `Bill Payment | Get Electricity Provider | ${auth?.currentUser?.email}`,
-      {
-        errorMessage: 'No Internet Connection',
-      },
-    );
     return {
       error: true,
       data: null,
@@ -426,9 +396,6 @@ const verifyMeter = async data => {
       }
     }
   } else {
-    DdLogs.warn(`Bill Payment | Verify Meter | ${auth?.currentUser?.email}`, {
-      errorMessage: 'No Internet Connection',
-    });
     return {
       error: true,
       data: null,
@@ -485,9 +452,6 @@ const purchaseElectricity = async data => {
       }
     }
   } else {
-    DdLogs.warn(`Bill Payment | Purchase Power | ${auth?.currentUser?.email}`, {
-      errorMessage: 'No Internet Connection',
-    });
     return {
       error: true,
       data: null,
@@ -543,12 +507,6 @@ const getCableTvProvider = async provider => {
       }
     }
   } else {
-    DdLogs.warn(
-      `Bill Payment | Get CableTv Provider | ${auth?.currentUser?.email}`,
-      {
-        errorMessage: 'No Internet Connection',
-      },
-    );
     return {
       error: true,
       data: null,
@@ -602,9 +560,6 @@ const verifyIUC = async data => {
       }
     }
   } else {
-    DdLogs.warn(`Bill Payment | Verify IUC | ${auth?.currentUser?.email}`, {
-      errorMessage: 'No Internet Connection',
-    });
     return {
       error: true,
       data: null,
@@ -661,12 +616,6 @@ const renewSubscription = async data => {
       }
     }
   } else {
-    DdLogs.warn(
-      `Bill Payment | Renew Subscription | ${auth?.currentUser?.email}`,
-      {
-        errorMessage: 'No Internet Connection',
-      },
-    );
     return {
       error: true,
       data: null,
@@ -723,12 +672,6 @@ const updateSubscription = async data => {
       }
     }
   } else {
-    DdLogs.warn(
-      `Bill Payment | Update Subscription | ${auth?.currentUser?.email}`,
-      {
-        errorMessage: 'No Internet Connection',
-      },
-    );
     return {
       error: true,
       data: null,
@@ -784,12 +727,6 @@ const getAllTransaction = async () => {
       }
     }
   } else {
-    DdLogs.warn(
-      `Bill Payment | Get All Transaction | ${auth?.currentUser?.email}`,
-      {
-        errorMessage: 'No Internet Connection',
-      },
-    );
     return {
       error: true,
       data: null,
