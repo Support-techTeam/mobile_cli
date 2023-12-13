@@ -1,7 +1,6 @@
 import React from 'react';
 import axios from 'axios';
 import {BASE_API_URL} from '../../app.json';
-import {useSelector, useDispatch} from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {auth} from '../util/firebase/firebaseConfig';
 import {store} from '../util/redux/store';
@@ -62,9 +61,6 @@ const getAllLoans = async () => {
       }
     }
   } else {
-    DdLogs.warn(`Loans | Get All Loans | ${auth?.currentUser?.email}`, {
-      errorMessage: 'No Internet Connection',
-    });
     return {
       error: true,
       data: null,
@@ -116,9 +112,6 @@ const getApprovedLoans = async () => {
       }
     }
   } else {
-    DdLogs.warn(`Loans | Get Approved Loans | ${auth?.currentUser?.email}`, {
-      errorMessage: 'No Internet Connection',
-    });
     return {
       error: true,
       data: null,
@@ -164,9 +157,6 @@ const getPaidLoans = async () => {
       }
     }
   } else {
-    DdLogs.warn(`Loans | Get Paid Loans | ${auth?.currentUser?.email}`, {
-      errorMessage: 'No Internet Connection',
-    });
     return {
       error: true,
       data: null,
@@ -215,9 +205,6 @@ const getPendingLoans = async () => {
       }
     }
   } else {
-    DdLogs.warn(`Loans | Get Pending Loans | ${auth?.currentUser?.email}`, {
-      errorMessage: 'No Internet Connection',
-    });
     return {
       error: true,
       data: null,
@@ -267,9 +254,6 @@ const getLoansAmount = async () => {
       }
     }
   } else {
-    DdLogs.warn(`Loans | Get Loans Amount | ${auth?.currentUser?.email}`, {
-      errorMessage: 'No Internet Connection',
-    });
     return {
       error: true,
       data: null,
@@ -322,9 +306,6 @@ const getDuration = async () => {
       }
     }
   } else {
-    DdLogs.warn(`Loans | Get Loans Duration | ${auth?.currentUser?.email}`, {
-      errorMessage: 'No Internet Connection',
-    });
     return {
       error: true,
       data: null,
@@ -377,9 +358,6 @@ const getLoanUserDetails = async () => {
       }
     }
   } else {
-    DdLogs.warn(`Loans | Get User Loan Details | ${auth?.currentUser?.email}`, {
-      errorMessage: 'No Internet Connection',
-    });
     return {
       error: true,
       data: null,
@@ -426,9 +404,6 @@ const getLoanById = async id => {
       }
     }
   } else {
-    DdLogs.warn(`Loans | Get Single Loan | ${auth?.currentUser?.email}`, {
-      errorMessage: 'No Internet Connection',
-    });
     return {
       error: true,
       data: null,
@@ -478,9 +453,6 @@ const getLoanDetails = async (amount, tenor) => {
       }
     }
   } else {
-    DdLogs.warn(`Loans | Get Loan Details | ${auth?.currentUser?.email}`, {
-      errorMessage: 'No Internet Connection',
-    });
     return {
       error: true,
       data: null,
@@ -531,9 +503,6 @@ const createLoan = async details => {
       }
     }
   } else {
-    DdLogs.warn(`Loans | Create Loan | ${auth?.currentUser?.email}`, {
-      errorMessage: 'No Internet Connection',
-    });
     return {
       error: true,
       data: null,
@@ -585,9 +554,6 @@ const createUserProfile = async details => {
       }
     }
   } else {
-    DdLogs.warn(`Loans | Create Profile | ${auth?.currentUser?.email}`, {
-      errorMessage: 'No Internet Connection',
-    });
     return {
       error: true,
       data: null,
@@ -644,12 +610,6 @@ const createBusinessDetails = async details => {
       }
     }
   } else {
-    DdLogs.warn(
-      `Loans | Create Business Details | ${auth?.currentUser?.email}`,
-      {
-        errorMessage: 'No Internet Connection',
-      },
-    );
     return {
       error: true,
       data: null,
@@ -707,9 +667,6 @@ const createNextOfKin = async details => {
       }
     }
   } else {
-    DdLogs.warn(`Loans | Create Next Of Kin | ${auth?.currentUser?.email}`, {
-      errorMessage: 'No Internet Connection',
-    });
     return {
       error: true,
       data: null,
@@ -767,9 +724,6 @@ const createBankDetails = async details => {
       }
     }
   } else {
-    DdLogs.warn(`Loans | Create Bank Details | ${auth?.currentUser?.email}`, {
-      errorMessage: 'No Internet Connection',
-    });
     return {
       error: true,
       data: null,
@@ -826,12 +780,6 @@ const createDocumentsDetails = async details => {
       }
     }
   } else {
-    DdLogs.warn(
-      `Loans | Create Document Details | ${auth?.currentUser?.email}`,
-      {
-        errorMessage: 'No Internet Connection',
-      },
-    );
     return {
       error: true,
       data: null,
@@ -895,9 +843,6 @@ const createUploadDocument = async (details, documentName) => {
       }
     }
   } else {
-    DdLogs.warn(`Loans | Document Upload | ${auth?.currentUser?.email}`, {
-      errorMessage: 'No Internet Connection',
-    });
     return {
       error: true,
       data: null,
@@ -949,9 +894,6 @@ const updatePersonalDetails = async details => {
       }
     }
   } else {
-    DdLogs.warn(`Loans | Update Profile | ${auth?.currentUser?.email}`, {
-      errorMessage: 'No Internet Connection',
-    });
     return {
       error: true,
       data: null,
@@ -1011,12 +953,6 @@ const updateBusinessDetails = async details => {
       }
     }
   } else {
-    DdLogs.warn(
-      `Loans | Update Business Details | ${auth?.currentUser?.email}`,
-      {
-        errorMessage: 'No Internet Connection',
-      },
-    );
     return {
       error: true,
       data: null,
@@ -1077,9 +1013,6 @@ const updateNokDetails = async details => {
       }
     }
   } else {
-    DdLogs.warn(`Loans | Update Next Of Kin | ${auth?.currentUser?.email}`, {
-      errorMessage: 'No Internet Connection',
-    });
     return {
       error: true,
       data: null,
@@ -1140,9 +1073,6 @@ const updateBankDetails = async details => {
       }
     }
   } else {
-    DdLogs.warn(`Loans | Update Bank Details | ${auth?.currentUser?.email}`, {
-      errorMessage: 'No Internet Connection',
-    });
     return {
       error: true,
       data: null,
@@ -1199,12 +1129,6 @@ const updateDocumentsDetails = async details => {
       }
     }
   } else {
-    DdLogs.warn(
-      `Loans | Update Document Details | ${auth?.currentUser?.email}`,
-      {
-        errorMessage: 'No Internet Connection',
-      },
-    );
     return {
       error: true,
       data: null,
@@ -1262,9 +1186,6 @@ const createArmDetails = async details => {
       }
     }
   } else {
-    DdLogs.warn(`Loans | Create ARM Details | ${auth?.currentUser?.email}`, {
-      errorMessage: 'No Internet Connection',
-    });
     return {
       error: true,
       data: null,
