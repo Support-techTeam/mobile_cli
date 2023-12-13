@@ -65,9 +65,6 @@ const createGuarantor = async data => {
       }
     }
   } else {
-    DdLogs.warn(`Guarantors | Create Guarantor | ${auth?.currentUser?.email}`, {
-      errorMessage: 'No Internet Connection',
-    });
     return {
       error: true,
       data: null,
@@ -120,9 +117,6 @@ const getGuarantors = async () => {
       }
     }
   } else {
-    DdLogs.warn(`Guarantors | Get Guarantors | ${auth?.currentUser?.email}`, {
-      errorMessage: 'No Internet Connection',
-    });
     return {
       error: true,
       data: null,
@@ -175,9 +169,6 @@ const getGuarantor = async id => {
       }
     }
   } else {
-    DdLogs.warn(`Guarantors | Get Guarantor | ${auth?.currentUser?.email}`, {
-      errorMessage: 'No Internet Connection',
-    });
     return {
       error: true,
       data: null,
@@ -229,9 +220,6 @@ const sendOtp = async data => {
       }
     }
   } else {
-    DdLogs.warn(`Guarantors | Send Otp | ${auth?.currentUser?.email}`, {
-      errorMessage: 'No Internet Connection',
-    });
     return {
       error: true,
       data: null,
