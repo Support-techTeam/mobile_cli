@@ -1,7 +1,6 @@
 import React from 'react';
 import axios from 'axios';
 import {BASE_API_URL} from '../../app.json';
-import {useSelector, useDispatch} from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {auth} from '../util/firebase/firebaseConfig';
 import {store} from '../util/redux/store';
@@ -44,9 +43,6 @@ const getState = async () => {
       };
     }
   } else {
-    DdLogs.warn(`Profile | Get State | ${auth?.currentUser?.email}`, {
-      errorMessage: 'No Internet Connection',
-    });
     return {
       error: true,
       data: null,
@@ -84,9 +80,6 @@ const getCity = async cityByState => {
       };
     }
   } else {
-    DdLogs.warn(`Profile | Get City | ${auth?.currentUser?.email}`, {
-      errorMessage: 'No Internet Connection',
-    });
     return {
       error: true,
       data: null,
@@ -138,9 +131,6 @@ const getProfileDetails = async () => {
       }
     }
   } else {
-    DdLogs.warn(`Profile | Get Profile Detail | ${auth?.currentUser?.email}`, {
-      errorMessage: 'No Internet Connection',
-    });
     return {
       error: true,
       data: null,
@@ -196,9 +186,6 @@ const createUserProfile = async details => {
       }
     }
   } else {
-    DdLogs.warn(`Profile | Create user Profile | ${auth?.currentUser?.email}`, {
-      errorMessage: 'No Internet Connection',
-    });
     return {
       error: true,
       data: null,
@@ -245,9 +232,6 @@ const checkPin = async () => {
       }
     }
   } else {
-    DdLogs.warn(`Profile | Check Pin | ${auth?.currentUser?.email}`, {
-      errorMessage: 'No Internet Connection',
-    });
     return {
       error: true,
       data: null,
@@ -319,9 +303,6 @@ const createTransactionPin = async details => {
       }
     }
   } else {
-    DdLogs.warn(`Profile | Get | ${auth?.currentUser?.email}`, {
-      errorMessage: 'No Internet Connection',
-    });
     return {
       error: true,
       data: null,
@@ -392,12 +373,6 @@ const changePin = async details => {
       }
     }
   } else {
-    DdLogs.warn(
-      `Profile | Change Transaction Pin | ${auth?.currentUser?.email}`,
-      {
-        errorMessage: 'No Internet Connection',
-      },
-    );
     return {
       error: true,
       data: null,
