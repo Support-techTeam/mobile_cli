@@ -1,8 +1,6 @@
 import React from 'react';
 import axios from 'axios';
 import {BASE_API_URL} from '../../app.json';
-import {useSelector, useDispatch} from 'react-redux';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import {auth} from '../util/firebase/firebaseConfig';
 import {store} from '../util/redux/store';
 import {DdLogs} from '@datadog/mobile-react-native';
@@ -64,9 +62,6 @@ const getAccountWallet = async () => {
       }
     }
   } else {
-    DdLogs.warn(`Wallet | Get Account Wallet | ${auth?.currentUser?.email}`, {
-      errorMessage: 'No internet Connection',
-    });
     return {
       error: true,
       data: null,
@@ -122,12 +117,6 @@ const getAccountTransactions = async (page, limit) => {
       }
     }
   } else {
-    DdLogs.warn(
-      `Wallet | Get Wallet Transactions | ${auth?.currentUser?.email}`,
-      {
-        errorMessage: 'No internet Connection',
-      },
-    );
     return {
       error: true,
       data: null,
@@ -181,12 +170,6 @@ const verifyNIPAccountInfo = async (accountNumber, bankName) => {
       }
     }
   } else {
-    DdLogs.warn(
-      `Wallet | Verify NIP Account Info | ${auth?.currentUser?.email}`,
-      {
-        errorMessage: 'No internet Connection',
-      },
-    );
     return {
       error: true,
       data: null,
@@ -242,12 +225,6 @@ const verifyBeneficiaryInfo = async accountNumber => {
       }
     }
   } else {
-    DdLogs.warn(
-      `Wallet | Verify Beneficiary Info | ${auth?.currentUser?.email}`,
-      {
-        errorMessage: 'No internet Connection',
-      },
-    );
     return {
       error: true,
       data: null,
@@ -317,9 +294,6 @@ const createInternalTransfer = async details => {
       }
     }
   } else {
-    DdLogs.warn(`Wallet | Internal Transfer | ${auth?.currentUser?.email}`, {
-      errorMessage: 'No internet Connection',
-    });
     return {
       error: true,
       data: null,
@@ -380,9 +354,6 @@ const createNIPTransfer = async details => {
       }
     }
   } else {
-    DdLogs.warn(`Wallet | NIP Transfer | ${auth?.currentUser?.email}`, {
-      errorMessage: 'No internet Connection',
-    });
     return {
       error: true,
       data: null,
@@ -430,9 +401,6 @@ const getAllBankDetails = async () => {
       }
     }
   } else {
-    DdLogs.warn(`Wallet | Get All Banks | ${auth?.currentUser?.email}`, {
-      errorMessage: 'No internet Connection',
-    });
     return {
       error: true,
       data: null,
