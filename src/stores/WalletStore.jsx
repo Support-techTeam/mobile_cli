@@ -409,6 +409,60 @@ const getAllBankDetails = async () => {
   }
 };
 
+const getTransactionsStatement = async (startDate, endDate) => {
+  if (
+    store.getState().networkState &&
+    store.getState().networkState.network.isConnected &&
+    store.getState().networkState.network.isInternetReachable
+  ) {
+    if (auth?.currentUser?.stsTokenManager?.accessToken) {
+      headers = {
+        accept: 'application/json',
+        Authorization: `Bearer ${auth.currentUser?.stsTokenManager?.accessToken}`,
+        'Content-Type': 'application/json',
+      };
+      try {
+        const response = await axiosInstance.get(
+          `/loan-wallet/generate-transaction-statement?startDate=${startDate}&endDate=${endDate}`,
+          {headers},
+        );
+
+        DdLogs.info(
+          `Wallet | Get Transactions Statement | ${auth?.currentUser?.email}`,
+          {
+            context: JSON.stringify(response?.data),
+          },
+        );
+        return {
+          title: 'Get Transactions Statement',
+          error: false,
+          data: response?.data,
+          message: 'E-Statement sent to email.',
+        };
+      } catch (error) {
+        DdLogs.error(
+          `Wallet | Get Transactions Statement | ${auth?.currentUser?.email}`,
+          {
+            errorMessage: JSON.stringify(error),
+          },
+        );
+        return {
+          title: 'Get Transactions Statement',
+          error: true,
+          data: null,
+          message: `Failed | ${error}`,
+        };
+      }
+    }
+  } else {
+    return {
+      error: true,
+      data: null,
+      message: 'No Internet Connection',
+    };
+  }
+};
+
 export {
   getAccountWallet,
   getAccountTransactions,
@@ -417,4 +471,5 @@ export {
   createInternalTransfer,
   createNIPTransfer,
   getAllBankDetails,
+  getTransactionsStatement,
 };

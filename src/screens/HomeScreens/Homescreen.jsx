@@ -15,7 +15,7 @@ import {
   RefreshControl,
 } from 'react-native';
 import React, {useEffect, useRef, useState} from 'react';
-import {Actionsheet} from 'native-base';
+import {Actionsheet, Modal, Center, Button as Btn} from 'native-base';
 import {Button} from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import OctaIcon from 'react-native-vector-icons/Octicons';
@@ -52,7 +52,9 @@ import {
   getAllArmInvestment,
   getAllLendaInvestment,
 } from '../../stores/InvestStore';
-// import * as All from '../../../assets/images/';
+import DateTimePickerModal from 'react-native-modal-datetime-picker';
+import Input from '../../component/inputField/input.component';
+import {getTransactionsStatement} from '../../stores/WalletStore';
 
 const {width} = Dimensions.get('window');
 const Homescreen = () => {
@@ -62,6 +64,7 @@ const Homescreen = () => {
   const [isFundWalletVisible, setIsFundWalletVisible] = useState(false);
   const [isAllTransactionVisible, setIsAllTransactionVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isSending, setIsSending] = useState(false);
   const [isLoadingWallet, setIsLoadingWallet] = useState(false);
   const [isLoadingTransaction, setIsLoadingTransaction] = useState(false);
   const [isLoadingLoanData, setIsLoadingLoanData] = useState(false);
@@ -92,6 +95,15 @@ const Homescreen = () => {
   const dispatch = useDispatch();
   const [allArmData, setAllArmData] = useState([]);
   const [allILendaData, setAllLendaData] = useState([]);
+  const [showWalletStatementModal, setShowWalletStatementModal] =
+    useState(false);
+
+  const [showStartWallet, setShowStartWallet] = useState(false);
+  const [showEndWallet, setShowEndWallet] = useState(false);
+  const [walletStatementDetails, setWalletStatementDetails] = useState({
+    startDate: new Date().toISOString().split('T')[0],
+    endDate: new Date().toISOString().split('T')[0],
+  });
 
   const toggleMakeTransfer = () => {
     setIsMakeTransferVisible(!isMakeTransferVisible);
@@ -767,6 +779,75 @@ const Homescreen = () => {
     );
   };
 
+  // Wallet Statement Functions
+  const showDatePickerStartWallet = () => {
+    setShowStartWallet(true);
+  };
+
+  const hideDatePickerStartWallet = () => {
+    setShowStartWallet(false);
+  };
+
+  const showDatePickerEndWallet = () => {
+    setShowEndWallet(true);
+  };
+
+  const hideDatePickerEndWallet = () => {
+    setShowEndWallet(false);
+  };
+
+  const handleWalletStatement = async () => {
+    setIsSending(true);
+    getTransactionsStatement(
+      walletStatementDetails?.startDate,
+      walletStatementDetails?.endDate,
+    )
+      .then(res => {
+        if (res) {
+          if (!res?.error) {
+            Toast.show({
+              type: 'success',
+              position: 'top',
+              topOffset: 50,
+              text1: res?.title,
+              text2: res?.message,
+              visibilityTime: 3000,
+              autoHide: true,
+              onPress: () => Toast.hide(),
+            });
+          } else {
+            Toast.show({
+              type: 'error',
+              position: 'top',
+              topOffset: 50,
+              text1: res?.title,
+              text2: res?.message,
+              visibilityTime: 5000,
+              autoHide: true,
+              onPress: () => Toast.hide(),
+            });
+          }
+        }
+      })
+      .catch(e => {
+        Toast.show({
+          type: 'error',
+          position: 'top',
+          topOffset: 50,
+          text1: 'Get Transactions Statement',
+          text2: 'Error fetching statement',
+          visibilityTime: 5000,
+          autoHide: true,
+          onPress: () => Toast.hide(),
+        });
+      })
+      .finally(() => {
+        setTimeout(() => {
+          setIsSending(false);
+        }, 1000);
+      });
+  };
+
   return !timeOut ? (
     <Splashscreen text="Getting Profile Details..." />
   ) : timeOut &&
@@ -797,6 +878,16 @@ const Homescreen = () => {
         isLoadingLoanAmount ? (
           <Spinner
             textContent={'Getting Profile Details...'}
+            textStyle={{color: 'white'}}
+            visible={true}
+            overlayColor="rgba(78, 75, 102, 0.7)"
+            animation="slide"
+          />
+        ) : null}
+
+        {isSending ? (
+          <Spinner
+            textContent={'Processing Transaction Statement...'}
             textStyle={{color: 'white'}}
             visible={true}
             overlayColor="rgba(78, 75, 102, 0.7)"
@@ -1754,7 +1845,7 @@ const Homescreen = () => {
               </View>
             </TouchableOpacity>
           ) : null}
-          {/* Third Section */}
+          {/* Third Section Wallet and Bill*/}
           <View
             style={[
               styles.container,
@@ -1868,7 +1959,7 @@ const Homescreen = () => {
               </View>
             </Pressable>
           </View>
-          {/* Forth Section */}
+          {/* Forth Section  Investment and Loans*/}
           <View style={[styles.container, styles.transView]}>
             <Pressable
               onPress={() => navigation.navigate('Invest')}
@@ -1950,7 +2041,7 @@ const Homescreen = () => {
                       color: COLORS.lendaGreen,
                     },
                   ]}>
-                  Lenda Funding
+                  Earn With Us
                 </Text>
               </View>
             </Pressable>
@@ -2019,7 +2110,226 @@ const Homescreen = () => {
               </View>
             </Pressable>
           </View>
-          {/* Fifth Section */}
+          {/* Fifth Section  E-Statement*/}
+          <View style={[styles.container, styles.transView]}>
+            <Pressable
+              onPress={() => navigation.navigate('Invest')}
+              style={({pressed}) => [
+                {
+                  // backgroundColor: pressed ? '#D9DBE9' : '#FFFFFF',
+                  backgroundColor: pressed ? '#D9DBE9' : COLORS.white,
+                  transform: [
+                    {
+                      scale: pressed ? 0.96 : 1,
+                    },
+                  ],
+                },
+                styles.transButtons,
+              ]}>
+              <View
+                style={{
+                  alignSelf: 'center',
+                  justifyContent: 'center',
+                }}>
+                <Icon
+                  name="file-document-outline"
+                  size={29}
+                  color={COLORS.highwayRed}
+                />
+              </View>
+              <View style={{alignSelf: 'center', marginTop: 5}}>
+                <Text
+                  style={[
+                    styles.transText,
+                    {
+                      color: COLORS.highwayRed,
+                    },
+                  ]}>
+                  ARM E-Statement
+                </Text>
+              </View>
+            </Pressable>
+
+            <Pressable
+              onPress={() => navigation.navigate('Invest')}
+              style={({pressed}) => [
+                {
+                  backgroundColor: pressed ? '#D9DBE9' : COLORS.white,
+                  transform: [
+                    {
+                      scale: pressed ? 0.96 : 1,
+                    },
+                  ],
+                },
+                styles.transButtons,
+              ]}>
+              <View
+                style={{
+                  alignSelf: 'center',
+                  justifyContent: 'center',
+                }}>
+                <Icon
+                  name="file-document-outline"
+                  size={29}
+                  color={COLORS.lendaGreen}
+                />
+              </View>
+              <View style={{alignSelf: 'center', marginTop: 5}}>
+                <Text
+                  style={[
+                    styles.transText,
+                    {
+                      color: COLORS.lendaGreen,
+                    },
+                  ]}>
+                  Lenda E-Statement
+                </Text>
+              </View>
+            </Pressable>
+
+            <Pressable
+              onPress={() => {
+                setShowWalletStatementModal(true);
+              }}
+              style={({pressed}) => [
+                {
+                  backgroundColor: pressed ? '#D9DBE9' : COLORS.white,
+                  transform: [
+                    {
+                      scale: pressed ? 0.96 : 1,
+                    },
+                  ],
+                },
+                styles.transButtons,
+              ]}>
+              <View
+                style={{
+                  alignSelf: 'center',
+                  justifyContent: 'center',
+                }}>
+                <Icon
+                  name="file-document-outline"
+                  size={29}
+                  color={COLORS.lendaBlue}
+                />
+              </View>
+              <View style={{alignSelf: 'center', marginTop: 5}}>
+                <Text
+                  style={[
+                    styles.transText,
+                    {
+                      color: COLORS.lendaBlue,
+                    },
+                  ]}>
+                  Wallet E-Statement
+                </Text>
+              </View>
+            </Pressable>
+          </View>
+
+          {/* E-Statements Modal */}
+          {/* Wallet Statement Modal */}
+          <Center>
+            <Modal
+              isOpen={showWalletStatementModal}
+              onClose={() => {
+                setShowWalletStatementModal(false);
+              }}
+              closeOnOverlayClick={false}>
+              <Modal.Content width={wp(90)} height={hp(50)}>
+                <Modal.CloseButton />
+                <Modal.Header>Generate Wallet E-Statement</Modal.Header>
+                <Modal.Body>
+                  <Pressable onPress={showDatePickerStartWallet}>
+                    <Input
+                      label="Start Date"
+                      iconName="calendar-month-outline"
+                      placeholder="2000 - 01 - 01"
+                      defaultValue={walletStatementDetails?.startDate}
+                      isDate={true}
+                      editable={false}
+                      showDatePicker={showDatePickerStartWallet}
+                      isNeeded={true}
+                    />
+                  </Pressable>
+
+                  <DateTimePickerModal
+                    isVisible={showStartWallet}
+                    testID="dateTimePicker"
+                    defaultValue={walletStatementDetails?.startDate}
+                    mode="date"
+                    is24Hour={true}
+                    onConfirm={text => {
+                      const formattedDate = new Date(text)
+                        .toISOString()
+                        .split('T')[0];
+                      setWalletStatementDetails({
+                        ...walletStatementDetails,
+                        startDate: formattedDate,
+                      });
+                      setShowStartWallet(false);
+                    }}
+                    onCancel={hideDatePickerStartWallet}
+                    textColor="#054B99"
+                  />
+
+                  <Pressable onPress={showDatePickerEndWallet}>
+                    <Input
+                      label="Stop Date"
+                      iconName="calendar-month-outline"
+                      placeholder="2000 - 01 - 01"
+                      defaultValue={walletStatementDetails?.endDate}
+                      isDate={true}
+                      editable={false}
+                      showDatePicker={showDatePickerEndWallet}
+                      isNeeded={true}
+                    />
+                  </Pressable>
+
+                  <DateTimePickerModal
+                    isVisible={showEndWallet}
+                    testID="dateTimePicker"
+                    defaultValue={walletStatementDetails?.endDate}
+                    mode="date"
+                    is24Hour={true}
+                    onConfirm={text => {
+                      const formattedDate = new Date(text)
+                        .toISOString()
+                        .split('T')[0];
+                      setWalletStatementDetails({
+                        ...walletStatementDetails,
+                        endDate: formattedDate,
+                      });
+                      setShowEndWallet(false);
+                    }}
+                    onCancel={hideDatePickerEndWallet}
+                    textColor="#054B99"
+                  />
+                </Modal.Body>
+                <Modal.Footer>
+                  <Btn.Group space={2}>
+                    <Btn
+                      variant="ghost"
+                      colorScheme="blueGray"
+                      onPress={() => {
+                        setShowWalletStatementModal(false);
+                      }}>
+                      Cancel
+                    </Btn>
+                    <Btn
+                      onPress={() => {
+                        handleWalletStatement();
+                        setShowWalletStatementModal(false);
+                      }}>
+                      Send Statement
+                    </Btn>
+                  </Btn.Group>
+                </Modal.Footer>
+              </Modal.Content>
+            </Modal>
+          </Center>
+
+          {/* Sixth Section */}
           <View
             style={{
               flex: 1,
@@ -2027,7 +2337,7 @@ const Homescreen = () => {
               width: wp('90%'),
               height: hp(
                 userTransactionsData && userTransactionsData.length > 0
-                  ? '25%'
+                  ? '15%'
                   : '40%',
               ),
               borderRadius: 5,
@@ -2112,7 +2422,7 @@ const Homescreen = () => {
                 </View>
               ) : (
                 userTransactionsData &&
-                userTransactionsData.slice(0, 2).map((item, i) => {
+                userTransactionsData.slice(0, 1).map((item, i) => {
                   const dateObj = new Date(item.createdAt);
                   const hours = dateObj.getHours();
                   const minutes = dateObj.getMinutes();
