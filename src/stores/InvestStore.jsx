@@ -892,7 +892,7 @@ const getLendaOTP = async data => {
   }
 };
 
-const getArmTransactionsStatement = async (startDate, endDate) => {
+const getArmTransactionsStatement = async (membershipId, startDate, endDate) => {
   if (
     store.getState().networkState &&
     store.getState().networkState.network.isConnected &&
@@ -906,7 +906,7 @@ const getArmTransactionsStatement = async (startDate, endDate) => {
       };
       try {
         const response = await axiosInstance.get(
-          `/investment/generate-transaction-statement?startDate=${startDate}&endDate=${endDate}`,
+          `/investment/generate-transaction-statement?membershipId=${membershipId}&startDate=${startDate}&endDate=${endDate}`,
           {headers},
         );
 
