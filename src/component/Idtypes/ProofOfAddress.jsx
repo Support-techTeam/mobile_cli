@@ -224,9 +224,21 @@ const ProofofAdd = ({
               handleImageSelection(result);
               setUserDocs({...userDocs, utilityBill: result});
               setFile({
-                uri: result?.assets[0]?.uri ?? result?.uri,
-                name: result?.assets[0]?.fileName ?? result?.fileName,
-                type: result?.assets[0]?.type ?? result?.type,
+                uri: result?.assets[0]?.uri
+                  ? result?.assets[0]?.uri
+                  : result?.assets?.uri
+                  ? result?.assets?.uri
+                  : result?.uri,
+                name: result?.assets[0]?.fileName
+                  ? result?.assets[0]?.fileName
+                  : result?.assets?.fileName
+                  ? result?.assets?.fileName
+                  : result?.fileName,
+                type: result?.assets[0]?.type
+                  ? result?.assets[0]?.type
+                  : result?.assets?.type
+                  ? result?.assets?.type
+                  : result?.type,
               });
             }
             setDocumentName('utilityBill');
@@ -234,33 +246,6 @@ const ProofofAdd = ({
           }
         })
         .catch(error => {});
-      // await launchCamera(
-      //   {
-      //     mediaType: 'photo', // Specify 'photo' to capture images
-      //     maxWidth: 800, // Maximum width for the captured image
-      //     maxHeight: 600, // Maximum height for the captured image
-      //     quality: 1,
-      //   },
-      //   result => {
-      //     if (result?.didCancel) {
-      //     } else if (result?.error) {
-      //     } else {
-      //       if(result !== null && result !== undefined){
-      //         handleImageSelection(result);
-      //         setUserDocs({...userDocs, utilityBill: result});
-      //         console.log('res', result)
-      //         setFile({
-      //           uri: result?.assets[0]?.uri ?? result?.uri,
-      //           name: result?.assets[0]?.fileName ?? result?.fileName,
-      //           type: result?.assets[0]?.type ?? result?.type,
-      //         });
-      //       }
-
-      //       setDocumentName('utilityBill');
-      //       setNextRoute('PersonalPhoto');
-      //     }
-      //   },
-      // );
     } else {
       Alert.alert(
         'Permission Required',
@@ -298,9 +283,21 @@ const ProofofAdd = ({
               handleImageSelection(result);
               setUserDocs({...userDocs, utilityBill: result});
               setFile({
-                uri: result?.assets[0]?.uri ?? result?.uri,
-                name: result?.assets[0]?.fileName ?? result?.fileName,
-                type: result?.assets[0]?.type ?? result?.type,
+                uri: result?.assets[0]?.uri
+                  ? result?.assets[0]?.uri
+                  : result?.assets?.uri
+                  ? result?.assets?.uri
+                  : result?.uri,
+                name: result?.assets[0]?.fileName
+                  ? result?.assets[0]?.fileName
+                  : result?.assets?.fileName
+                  ? result?.assets?.fileName
+                  : result?.fileName,
+                type: result?.assets[0]?.type
+                  ? result?.assets[0]?.type
+                  : result?.assets?.type
+                  ? result?.assets?.type
+                  : result?.type,
               });
             }
             setDocumentName('bankStatement');
@@ -308,30 +305,6 @@ const ProofofAdd = ({
           }
         })
         .catch(error => {});
-
-      // await launchCamera(
-      //   {
-      //     mediaType: 'photo', // Specify 'photo' to capture images
-      //     maxWidth: 800, // Maximum width for the captured image
-      //     maxHeight: 600, // Maximum height for the captured image
-      //     quality: 1,
-      //   },
-      //   result => {
-      //     if (result.didCancel) {
-      //     } else if (result.error) {
-      //     } else {
-      //       handleImageSelection(result);
-      //       setUserDocs({...userDocs, bankStatement: result});
-      //       setFile({
-      //         uri: result?.assets[0]?.uri,
-      //         name: result?.assets[0]?.fileName,
-      //         type: result?.assets[0]?.type,
-      //       });
-      //       setDocumentName('bankStatement');
-      //       setNextRoute('Passport');
-      //     }
-      //   },
-      // );
     } else {
       Alert.alert(
         'Permission Required',
@@ -369,9 +342,21 @@ const ProofofAdd = ({
               handleImageSelection(result);
               setUserDocs({...userDocs, utilityBill: result});
               setFile({
-                uri: result?.assets[0]?.uri ?? result?.uri,
-                name: result?.assets[0]?.fileName ?? result?.fileName,
-                type: result?.assets[0]?.type ?? result?.type,
+                uri: result?.assets[0]?.uri
+                  ? result?.assets[0]?.uri
+                  : result?.assets?.uri
+                  ? result?.assets?.uri
+                  : result?.uri,
+                name: result?.assets[0]?.fileName
+                  ? result?.assets[0]?.fileName
+                  : result?.assets?.fileName
+                  ? result?.assets?.fileName
+                  : result?.fileName,
+                type: result?.assets[0]?.type
+                  ? result?.assets[0]?.type
+                  : result?.assets?.type
+                  ? result?.assets?.type
+                  : result?.type,
               });
             }
             setDocumentName('passport');
@@ -379,29 +364,6 @@ const ProofofAdd = ({
           }
         })
         .catch(error => {});
-      // await launchCamera(
-      //   {
-      //     mediaType: 'photo', // Specify 'photo' to capture images
-      //     maxWidth: 800, // Maximum width for the captured image
-      //     maxHeight: 600, // Maximum height for the captured image
-      //     quality: 1,
-      //   },
-      //   result => {
-      //     if (result.didCancel) {
-      //     } else if (result.error) {
-      //     } else {
-      //       handleImageSelection(result);
-      //       setUserDocs({...userDocs, passport: result});
-      //       setFile({
-      //         uri: result?.assets[0]?.uri,
-      //         name: result?.assets[0]?.fileName,
-      //         type: result?.assets[0]?.type,
-      //       });
-      //       setDocumentName('passport');
-      //       setNextRoute('Signature');
-      //     }
-      //   },
-      // );
     } else {
       Alert.alert(
         'Permission Required',
@@ -439,9 +401,21 @@ const ProofofAdd = ({
               handleImageSelection(result);
               setUserDocs({...userDocs, utilityBill: result});
               setFile({
-                uri: result?.assets[0]?.uri ?? result?.uri,
-                name: result?.assets[0]?.fileName ?? result?.fileName,
-                type: result?.assets[0]?.type ?? result?.type,
+                uri: result?.assets[0]?.uri
+                  ? result?.assets[0]?.uri
+                  : result?.assets?.uri
+                  ? result?.assets?.uri
+                  : result?.uri,
+                name: result?.assets[0]?.fileName
+                  ? result?.assets[0]?.fileName
+                  : result?.assets?.fileName
+                  ? result?.assets?.fileName
+                  : result?.fileName,
+                type: result?.assets[0]?.type
+                  ? result?.assets[0]?.type
+                  : result?.assets?.type
+                  ? result?.assets?.type
+                  : result?.type,
               });
             }
             setDocumentName('seal');
@@ -449,29 +423,6 @@ const ProofofAdd = ({
           }
         })
         .catch(error => {});
-      // await launchCamera(
-      //   {
-      //     mediaType: 'photo', // Specify 'photo' to capture images
-      //     maxWidth: 800, // Maximum width for the captured image
-      //     maxHeight: 600, // Maximum height for the captured image
-      //     quality: 1,
-      //   },
-      //   result => {
-      //     if (result.didCancel) {
-      //     } else if (result.error) {
-      //     } else {
-      //       handleImageSelection(result);
-      //       setUserDocs({...userDocs, seal: result});
-      //       setFile({
-      //         uri: result?.assets[0]?.uri,
-      //         name: result?.assets[0]?.fileName,
-      //         type: result?.assets[0]?.type,
-      //       });
-      //       setDocumentName('seal');
-      //       setNextRoute('CAC');
-      //     }
-      //   },
-      // );
     } else {
       Alert.alert(
         'Permission Required',
@@ -509,9 +460,21 @@ const ProofofAdd = ({
               handleImageSelection(result);
               setUserDocs({...userDocs, utilityBill: result});
               setFile({
-                uri: result?.assets[0]?.uri ?? result?.uri,
-                name: result?.assets[0]?.fileName ?? result?.fileName,
-                type: result?.assets[0]?.type ?? result?.type,
+                uri: result?.assets[0]?.uri
+                  ? result?.assets[0]?.uri
+                  : result?.assets?.uri
+                  ? result?.assets?.uri
+                  : result?.uri,
+                name: result?.assets[0]?.fileName
+                  ? result?.assets[0]?.fileName
+                  : result?.assets?.fileName
+                  ? result?.assets?.fileName
+                  : result?.fileName,
+                type: result?.assets[0]?.type
+                  ? result?.assets[0]?.type
+                  : result?.assets?.type
+                  ? result?.assets?.type
+                  : result?.type,
               });
             }
             setDocumentName('cacCertificate');
@@ -519,29 +482,6 @@ const ProofofAdd = ({
           }
         })
         .catch(error => {});
-      // await launchCamera(
-      //   {
-      //     mediaType: 'photo', // Specify 'photo' to capture images
-      //     maxWidth: 800, // Maximum width for the captured image
-      //     maxHeight: 600, // Maximum height for the captured image
-      //     quality: 1,
-      //   },
-      //   result => {
-      //     if (result.didCancel) {
-      //     } else if (result.error) {
-      //     } else {
-      //       handleImageSelection(result);
-      //       setUserDocs({...userDocs, cacCertificate: result});
-      //       setFile({
-      //         uri: result?.assets[0]?.uri,
-      //         name: result?.assets[0]?.fileName,
-      //         type: result?.assets[0]?.type,
-      //       });
-      //       setDocumentName('cacCertificate');
-      //       setNextRoute('Others');
-      //     }
-      //   },
-      // );
     } else {
       Alert.alert(
         'Permission Required',
@@ -579,9 +519,21 @@ const ProofofAdd = ({
               handleImageSelection(result);
               setUserDocs({...userDocs, utilityBill: result});
               setFile({
-                uri: result?.assets[0]?.uri ?? result?.uri,
-                name: result?.assets[0]?.fileName ?? result?.fileName,
-                type: result?.assets[0]?.type ?? result?.type,
+                uri: result?.assets[0]?.uri
+                  ? result?.assets[0]?.uri
+                  : result?.assets?.uri
+                  ? result?.assets?.uri
+                  : result?.uri,
+                name: result?.assets[0]?.fileName
+                  ? result?.assets[0]?.fileName
+                  : result?.assets?.fileName
+                  ? result?.assets?.fileName
+                  : result?.fileName,
+                type: result?.assets[0]?.type
+                  ? result?.assets[0]?.type
+                  : result?.assets?.type
+                  ? result?.assets?.type
+                  : result?.type,
               });
             }
 
@@ -590,29 +542,6 @@ const ProofofAdd = ({
           }
         })
         .catch(error => {});
-      // await launchCamera(
-      //   {
-      //     mediaType: 'photo', // Specify 'photo' to capture images
-      //     maxWidth: 800, // Maximum width for the captured image
-      //     maxHeight: 600, // Maximum height for the captured image
-      //     quality: 1,
-      //   },
-      //   result => {
-      //     if (result.didCancel) {
-      //     } else if (result.error) {
-      //     } else {
-      //       handleImageSelection(result);
-      //       setUserDocs({...userDocs, personalPhoto: result});
-      //       setFile({
-      //         uri: result?.assets[0]?.uri,
-      //         name: result?.assets[0]?.fileName,
-      //         type: result?.assets[0]?.type,
-      //       });
-      //       setDocumentName('personalPhoto');
-      //       setNextRoute('IdentityCard');
-      //     }
-      //   },
-      // );
     } else {
       Alert.alert(
         'Permission Required',
@@ -650,9 +579,21 @@ const ProofofAdd = ({
               handleImageSelection(result);
               setUserDocs({...userDocs, utilityBill: result});
               setFile({
-                uri: result?.assets[0]?.uri ?? result?.uri,
-                name: result?.assets[0]?.fileName ?? result?.fileName,
-                type: result?.assets[0]?.type ?? result?.type,
+                uri: result?.assets[0]?.uri
+                  ? result?.assets[0]?.uri
+                  : result?.assets?.uri
+                  ? result?.assets?.uri
+                  : result?.uri,
+                name: result?.assets[0]?.fileName
+                  ? result?.assets[0]?.fileName
+                  : result?.assets?.fileName
+                  ? result?.assets?.fileName
+                  : result?.fileName,
+                type: result?.assets[0]?.type
+                  ? result?.assets[0]?.type
+                  : result?.assets?.type
+                  ? result?.assets?.type
+                  : result?.type,
               });
             }
             setDocumentName('identityCard');
@@ -660,29 +601,6 @@ const ProofofAdd = ({
           }
         })
         .catch(error => {});
-      // await launchCamera(
-      //   {
-      //     mediaType: 'photo', // Specify 'photo' to capture images
-      //     maxWidth: 800, // Maximum width for the captured image
-      //     maxHeight: 600, // Maximum height for the captured image
-      //     quality: 1,
-      //   },
-      //   result => {
-      //     if (result.didCancel) {
-      //     } else if (result.error) {
-      //     } else {
-      //       handleImageSelection(result);
-      //       setUserDocs({...userDocs, identityCard: result});
-      //       setFile({
-      //         uri: result?.assets[0]?.uri,
-      //         name: result?.assets[0]?.fileName,
-      //         type: result?.assets[0]?.type,
-      //       });
-      //       setDocumentName('identityCard');
-      //       setNextRoute('BankStatement');
-      //     }
-      //   },
-      // );
     } else {
       Alert.alert(
         'Permission Required',
@@ -953,7 +871,13 @@ const ProofofAdd = ({
   const handleImageSelection = async result => {
     if (!result.canceled) {
       if (result) {
-        setImage(result?.assets[0]?.uri ?? result?.uri);
+        setImage(
+          result?.assets[0]?.uri
+            ? result?.assets[0]?.uri
+            : result?.assets?.uri
+            ? result?.assets?.uri
+            : result?.uri,
+        );
         setShowConfirmModal(true);
       }
     }
@@ -981,71 +905,68 @@ const ProofofAdd = ({
 
   const s3UploadFunction = async () => {
     setIsUpdating(true);
-
-    createUploadDocument(fileUri, documentName)
-      .then(res => {
-        if (res?.error) {
-          Toast.show({
-            type: 'error',
-            position: 'top',
-            topOffset: 50,
-            text1: res?.title,
-            text2: res?.message,
-            visibilityTime: 5000,
-            autoHide: true,
-            onPress: () => Toast.hide(),
-          });
-        } else {
-          Toast.show({
-            type: 'success',
-            position: 'top',
-            topOffset: 50,
-            text1: res?.title,
-            text2: res?.message,
-            visibilityTime: 3000,
-            autoHide: true,
-            onPress: () => Toast.hide(),
-          });
-
-          setUserDocs(deetss => {
-            return {
-              ...deetss,
-              [documentName]: `${res?.data?.data?.url}`,
-            };
-          });
-
-          setTimeout(() => {
-            navigation.navigate(`${nextRoute}`, {
-              paramKey: {
-                ...paramKey,
-                [documentName]: `${res?.data?.data?.url}`,
-              },
-            });
-          }, 500);
-          setTimeout(() => {
-            setNextRoute('');
-          }, 2000);
-        }
-      })
-      .catch(err => {
+    try {
+      const res = await createUploadDocument(fileUri, documentName);
+      if (res?.error) {
         Toast.show({
           type: 'error',
           position: 'top',
           topOffset: 50,
-          text1: 'Uploading Documents',
-          text2: err?.message,
+          text1: res?.title,
+          text2: res?.message,
           visibilityTime: 5000,
           autoHide: true,
           onPress: () => Toast.hide(),
         });
-      })
-      .finally(() => {
-        setTimeout(() => {
-          setDocumentName('');
-        }, 3000);
+      } else {
+        Toast.show({
+          type: 'success',
+          position: 'top',
+          topOffset: 50,
+          text1: res?.title,
+          text2: res?.message,
+          visibilityTime: 3000,
+          autoHide: true,
+          onPress: () => Toast.hide(),
+        });
 
-        setIsUpdating(false);
+        setUserDocs(deetss => {
+          return {
+            ...deetss,
+            [documentName]: `${res?.data?.data?.url}`,
+          };
+        });
+
+        setTimeout(() => {
+          navigation.navigate(`${nextRoute}`, {
+            paramKey: {
+              ...paramKey,
+              [documentName]: `${res?.data?.data?.url}`,
+            },
+          });
+        }, 500);
+        setTimeout(() => {
+          setNextRoute('');
+        }, 2000);
+      }
+    } catch (err) {
+      Toast.show({
+        type: 'error',
+        position: 'top',
+        topOffset: 50,
+        text1: 'Uploading Documents',
+        text2: err?.message,
+        visibilityTime: 5000,
+        autoHide: true,
+        onPress: () => Toast.hide(),
       });
+    } finally {
+      setTimeout(() => {
+        setDocumentName('');
+      }, 3000);
+
+      setIsUpdating(false);
+    }
   };
 
   return (
