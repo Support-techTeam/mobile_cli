@@ -51,6 +51,7 @@ import {getGuarantors} from '../../stores/GuarantorStore';
 import {
   getAllArmInvestment,
   getAllLendaInvestment,
+  getSingleArmInvestment,
 } from '../../stores/InvestStore';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import Input from '../../component/inputField/input.component';
@@ -78,7 +79,6 @@ const Homescreen = () => {
   //Redux Calls
   const userProfileData = useSelector(state => state.userProfile.profile);
   const userWalletData = useSelector(state => state.userProfile.wallet);
-  // const userAccountData = useSelector(state => state.userProfile.account);
   const [userTransactionsData, setUserTransactionsData] = useState([]);
   const [allUserTransactionsData, setAllUserTransactionsData] = useState([]);
   const [userTransactionsPages, setUserTransactionsPages] = useState([]);
@@ -95,16 +95,34 @@ const Homescreen = () => {
   const dispatch = useDispatch();
   const [allArmData, setAllArmData] = useState([]);
   const [allILendaData, setAllLendaData] = useState([]);
+  // const [investmentDetail, setInvestmentDetail] = useState([]);
+  const [portfolioDetail, setPortfolioDetail] = useState(0);
+  // Modal Codes
+  // Wallet
   const [showWalletStatementModal, setShowWalletStatementModal] =
     useState(false);
-
   const [showStartWallet, setShowStartWallet] = useState(false);
   const [showEndWallet, setShowEndWallet] = useState(false);
   const [walletStatementDetails, setWalletStatementDetails] = useState({
     startDate: new Date().toISOString().split('T')[0],
     endDate: new Date().toISOString().split('T')[0],
   });
-
+  // ARM
+  const [showArmStatementModal, setShowArmStatementModal] = useState(false);
+  const [showStartArm, setShowStartArm] = useState(false);
+  const [showEndArm, setShowEndArm] = useState(false);
+  const [armStatementDetails, setArmStatementDetails] = useState({
+    startDate: new Date().toISOString().split('T')[0],
+    endDate: new Date().toISOString().split('T')[0],
+  });
+  // Lenda
+  const [showLendaStatementModal, setShowLendaStatementModal] = useState(false);
+  const [showStartLenda, setShowStartLenda] = useState(false);
+  const [showEndLenda, setShowEndLenda] = useState(false);
+  const [lendaStatementDetails, setLendaStatementDetails] = useState({
+    startDate: new Date().toISOString().split('T')[0],
+    endDate: new Date().toISOString().split('T')[0],
+  });
   const toggleMakeTransfer = () => {
     setIsMakeTransferVisible(!isMakeTransferVisible);
   };
@@ -154,10 +172,12 @@ const Homescreen = () => {
     allArmData &&
     allArmData?.reduce(
       (accumulator, currentValue) =>
-        accumulator +
-        (currentValue?.investmentAmount - currentValue?.redemptionAmount),
+        Number(accumulator) + Number(currentValue?.investmentAmount),
       0,
     );
+  // let totalArmAmount = portfolioDetail?.accountBalance
+  //   ? portfolioDetail?.accountBalance
+  //   : 0;
 
   //total Lenda Investment
   let totalLendaAmount =
@@ -206,11 +226,6 @@ const Homescreen = () => {
   // Timed useEffect
   useEffect(() => {
     const interval = setInterval(async () => {
-      // const res = await getAccountWallet();
-      // if (res?.error == false) {
-      //   dispatch(setWallet(res?.data?.data?.wallet));
-      //   dispatch(setAccount(res?.data?.data?.accountDetails));
-      // }
       getAccountWallet()
         .then(res => {
           if (res) {
@@ -399,18 +414,27 @@ const Homescreen = () => {
         setIsLoadingLenda(false);
       });
   };
-
+  // get all ARM investments
   const getAllArmInvestments = async () => {
     setIsLoadingArm(true);
     getAllArmInvestment()
-      .then(res => {
+      .then(async res => {
         if (res) {
           if (!res?.error) {
             setAllArmData(res?.data?.data);
+            getSingleArmInvestment(
+              res?.data?.data[0]?.membershipId,
+              res?.data?.data[0]?.productCode,
+            ).then(res => {
+              if (!res?.error) {
+                setPortfolioDetail(res?.data?.portfolio[0]?.accountBalance);
+              }
+            });
           }
         }
       })
-      .catch(e => {})
+      .catch(e => {
+      })
       .finally(() => {
         setIsLoadingArm(false);
       });
@@ -534,11 +558,17 @@ const Homescreen = () => {
       id: '3',
       title: 'My investment',
       balance:
-        new Intl.NumberFormat('en-US', {
-          style: 'decimal',
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        }).format(totalArmAmount + totalLendaAmount) ?? '0.00',
+        Number(portfolioDetail) !== 0
+          ? new Intl.NumberFormat('en-US', {
+              style: 'decimal',
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            }).format(Number(portfolioDetail) + totalLendaAmount)
+          : new Intl.NumberFormat('en-US', {
+              style: 'decimal',
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            }).format(totalArmAmount + totalLendaAmount),
       button: 'View investment',
       extra: '',
       image: require('../../../assets/icons/wallet_background.png'),
@@ -2229,6 +2259,208 @@ const Homescreen = () => {
 
           {/* E-Statements Modal */}
           {/* Wallet Statement Modal */}
+          <Center>
+            <Modal
+              isOpen={showWalletStatementModal}
+              onClose={() => {
+                setShowWalletStatementModal(false);
+              }}
+              closeOnOverlayClick={false}>
+              <Modal.Content width={wp(90)} height={hp(50)}>
+                <Modal.CloseButton />
+                <Modal.Header>Generate Wallet E-Statement</Modal.Header>
+                <Modal.Body>
+                  <Pressable onPress={showDatePickerStartWallet}>
+                    <Input
+                      label="Start Date"
+                      iconName="calendar-month-outline"
+                      placeholder="2000 - 01 - 01"
+                      defaultValue={walletStatementDetails?.startDate}
+                      isDate={true}
+                      editable={false}
+                      showDatePicker={showDatePickerStartWallet}
+                      isNeeded={true}
+                    />
+                  </Pressable>
+
+                  <DateTimePickerModal
+                    isVisible={showStartWallet}
+                    testID="dateTimePicker"
+                    defaultValue={walletStatementDetails?.startDate}
+                    mode="date"
+                    is24Hour={true}
+                    onConfirm={text => {
+                      const formattedDate = new Date(text)
+                        .toISOString()
+                        .split('T')[0];
+                      setWalletStatementDetails({
+                        ...walletStatementDetails,
+                        startDate: formattedDate,
+                      });
+                      setShowStartWallet(false);
+                    }}
+                    onCancel={hideDatePickerStartWallet}
+                    textColor="#054B99"
+                  />
+
+                  <Pressable onPress={showDatePickerEndWallet}>
+                    <Input
+                      label="Stop Date"
+                      iconName="calendar-month-outline"
+                      placeholder="2000 - 01 - 01"
+                      defaultValue={walletStatementDetails?.endDate}
+                      isDate={true}
+                      editable={false}
+                      showDatePicker={showDatePickerEndWallet}
+                      isNeeded={true}
+                    />
+                  </Pressable>
+
+                  <DateTimePickerModal
+                    isVisible={showEndWallet}
+                    testID="dateTimePicker"
+                    defaultValue={walletStatementDetails?.endDate}
+                    mode="date"
+                    is24Hour={true}
+                    onConfirm={text => {
+                      const formattedDate = new Date(text)
+                        .toISOString()
+                        .split('T')[0];
+                      setWalletStatementDetails({
+                        ...walletStatementDetails,
+                        endDate: formattedDate,
+                      });
+                      setShowEndWallet(false);
+                    }}
+                    onCancel={hideDatePickerEndWallet}
+                    textColor="#054B99"
+                  />
+                </Modal.Body>
+                <Modal.Footer>
+                  <Btn.Group space={2}>
+                    <Btn
+                      variant="ghost"
+                      colorScheme="blueGray"
+                      onPress={() => {
+                        setShowWalletStatementModal(false);
+                      }}>
+                      Cancel
+                    </Btn>
+                    <Btn
+                      onPress={() => {
+                        handleWalletStatement();
+                        setShowWalletStatementModal(false);
+                      }}>
+                      Send Statement
+                    </Btn>
+                  </Btn.Group>
+                </Modal.Footer>
+              </Modal.Content>
+            </Modal>
+          </Center>
+
+          {/* ARM Statement Modal */}
+          <Center>
+            <Modal
+              isOpen={showWalletStatementModal}
+              onClose={() => {
+                setShowWalletStatementModal(false);
+              }}
+              closeOnOverlayClick={false}>
+              <Modal.Content width={wp(90)} height={hp(50)}>
+                <Modal.CloseButton />
+                <Modal.Header>Generate Wallet E-Statement</Modal.Header>
+                <Modal.Body>
+                  <Pressable onPress={showDatePickerStartWallet}>
+                    <Input
+                      label="Start Date"
+                      iconName="calendar-month-outline"
+                      placeholder="2000 - 01 - 01"
+                      defaultValue={walletStatementDetails?.startDate}
+                      isDate={true}
+                      editable={false}
+                      showDatePicker={showDatePickerStartWallet}
+                      isNeeded={true}
+                    />
+                  </Pressable>
+
+                  <DateTimePickerModal
+                    isVisible={showStartWallet}
+                    testID="dateTimePicker"
+                    defaultValue={walletStatementDetails?.startDate}
+                    mode="date"
+                    is24Hour={true}
+                    onConfirm={text => {
+                      const formattedDate = new Date(text)
+                        .toISOString()
+                        .split('T')[0];
+                      setWalletStatementDetails({
+                        ...walletStatementDetails,
+                        startDate: formattedDate,
+                      });
+                      setShowStartWallet(false);
+                    }}
+                    onCancel={hideDatePickerStartWallet}
+                    textColor="#054B99"
+                  />
+
+                  <Pressable onPress={showDatePickerEndWallet}>
+                    <Input
+                      label="Stop Date"
+                      iconName="calendar-month-outline"
+                      placeholder="2000 - 01 - 01"
+                      defaultValue={walletStatementDetails?.endDate}
+                      isDate={true}
+                      editable={false}
+                      showDatePicker={showDatePickerEndWallet}
+                      isNeeded={true}
+                    />
+                  </Pressable>
+
+                  <DateTimePickerModal
+                    isVisible={showEndWallet}
+                    testID="dateTimePicker"
+                    defaultValue={walletStatementDetails?.endDate}
+                    mode="date"
+                    is24Hour={true}
+                    onConfirm={text => {
+                      const formattedDate = new Date(text)
+                        .toISOString()
+                        .split('T')[0];
+                      setWalletStatementDetails({
+                        ...walletStatementDetails,
+                        endDate: formattedDate,
+                      });
+                      setShowEndWallet(false);
+                    }}
+                    onCancel={hideDatePickerEndWallet}
+                    textColor="#054B99"
+                  />
+                </Modal.Body>
+                <Modal.Footer>
+                  <Btn.Group space={2}>
+                    <Btn
+                      variant="ghost"
+                      colorScheme="blueGray"
+                      onPress={() => {
+                        setShowWalletStatementModal(false);
+                      }}>
+                      Cancel
+                    </Btn>
+                    <Btn
+                      onPress={() => {
+                        handleWalletStatement();
+                        setShowWalletStatementModal(false);
+                      }}>
+                      Send Statement
+                    </Btn>
+                  </Btn.Group>
+                </Modal.Footer>
+              </Modal.Content>
+            </Modal>
+          </Center>
+
+          {/* Lenda Statement Modal */}
           <Center>
             <Modal
               isOpen={showWalletStatementModal}
