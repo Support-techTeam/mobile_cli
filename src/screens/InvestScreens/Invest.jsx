@@ -46,7 +46,7 @@ const Investscreen = () => {
     allArmData?.reduce(
       (accumulator, currentValue) =>
         accumulator +
-        (currentValue.investmentAmount - currentValue?.redemptionAmount),
+        (currentValue.investmentAmount),
       0,
     );
 

@@ -823,6 +823,15 @@ const createUploadDocument = async (details, documentName) => {
         DdLogs.info(`Loans | Document Upload | ${auth?.currentUser?.email}`, {
           context: JSON.stringify(response?.data),
         });
+
+        if(response?.data?.error){
+          return {
+            title: 'Document Upload ',
+            error: true,
+            data: null,
+            message: `Failed | ${response?.data?.message}`,
+          };
+        }
         return {
           title: 'Document Upload ',
           error: false,

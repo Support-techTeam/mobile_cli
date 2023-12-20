@@ -25,9 +25,14 @@ import {createUploadDocument} from '../../stores/LoanStore';
 import Toast from 'react-native-toast-message';
 import Spinner from 'react-native-loading-spinner-overlay/lib';
 import {uploadProgress} from '../../stores/LoanStore';
+import {DdLogs} from '@datadog/mobile-react-native';
 
 const statusBarHeight = getStatusBarHeight();
-// const uploadProgress = 0;
+let fileUrl = '';
+let fileName = '';
+let fileType = '';
+let document = '';
+let nextScreen = '';
 const ProofofAdd = ({
   isCam,
   isProof,
@@ -46,7 +51,13 @@ const ProofofAdd = ({
   const [isUpdating, setIsUpdating] = useState(false);
   const navigation = useNavigation();
   const route = useRoute();
-
+  const [fileUri, setFileUri] = useState({
+    uri: '',
+    name: '',
+    type: '',
+  });
+  const [filePath, setFilePath] = useState({});
+  const [documentName, setDocumentName] = useState('');
   const {params} = route;
   const {paramKey} = params;
   const {
@@ -133,8 +144,6 @@ const ProofofAdd = ({
 
   const [nextRoute, setNextRoute] = useState('');
 
-  const [documentName, setDocumentName] = useState('');
-
   const requestCameraPermission = async () => {
     const status = await request(
       Platform.OS === 'ios'
@@ -198,16 +207,17 @@ const ProofofAdd = ({
 
   const launchCameraAsync1 = async () => {
     const permissopnResult = await requestCameraPermission();
-    if (permissopnResult) {
+    const isStoragePermitted = await requestStoragePermission();
+    if (permissopnResult && isStoragePermitted) {
       await launchCamera({
         mediaType: 'photo', // Specify 'photo' to capture images
         maxWidth: 800, // Maximum width for the captured image
         maxHeight: 600, // Maximum height for the captured image
         quality: 1,
+        saveToPhotos: true,
       })
         .then(result => {
           if (result.didCancel) {
-          } else if (result.error) {
           } else if (result?.errorCode) {
             Toast.show({
               type: 'error',
@@ -220,29 +230,21 @@ const ProofofAdd = ({
               onPress: () => Toast.hide(),
             });
           } else {
-            if (result !== null && result !== undefined) {
-              handleImageSelection(result);
-              setUserDocs({...userDocs, utilityBill: result});
-              setFile({
-                uri: result?.assets[0]?.uri
-                  ? result?.assets[0]?.uri
-                  : result?.assets?.uri
-                  ? result?.assets?.uri
-                  : result?.uri,
-                name: result?.assets[0]?.fileName
-                  ? result?.assets[0]?.fileName
-                  : result?.assets?.fileName
-                  ? result?.assets?.fileName
-                  : result?.fileName,
-                type: result?.assets[0]?.type
-                  ? result?.assets[0]?.type
-                  : result?.assets?.type
-                  ? result?.assets?.type
-                  : result?.type,
-              });
-            }
-            setDocumentName('utilityBill');
-            setNextRoute('PersonalPhoto');
+            setUserDocs({...userDocs, utilityBill: result});
+            fileUrl = result?.uri || result?.assets[0]?.uri;
+            fileName = result?.fileName || result?.assets[0]?.fileName;
+            fileType = result?.type || result?.assets[0]?.type;
+            document = 'utilityBill';
+            nextScreen = 'PersonalPhoto';
+            handleImageSelection(result);
+            DdLogs.info(`Loans | Document Upload Set Files utilityBill|`, {
+              context: {
+                fileUrl,
+                fileName,
+                fileType,
+                document,
+              },
+            });
           }
         })
         .catch(error => {});
@@ -257,7 +259,8 @@ const ProofofAdd = ({
 
   const launchCameraAsync2 = async () => {
     const permissopnResult = await requestCameraPermission();
-    if (permissopnResult) {
+    const isStoragePermitted = await requestStoragePermission();
+    if (permissopnResult && isStoragePermitted) {
       await launchCamera({
         mediaType: 'photo', // Specify 'photo' to capture images
         maxWidth: 800, // Maximum width for the captured image
@@ -279,29 +282,21 @@ const ProofofAdd = ({
               onPress: () => Toast.hide(),
             });
           } else {
-            if (result !== null && result !== undefined) {
-              handleImageSelection(result);
-              setUserDocs({...userDocs, utilityBill: result});
-              setFile({
-                uri: result?.assets[0]?.uri
-                  ? result?.assets[0]?.uri
-                  : result?.assets?.uri
-                  ? result?.assets?.uri
-                  : result?.uri,
-                name: result?.assets[0]?.fileName
-                  ? result?.assets[0]?.fileName
-                  : result?.assets?.fileName
-                  ? result?.assets?.fileName
-                  : result?.fileName,
-                type: result?.assets[0]?.type
-                  ? result?.assets[0]?.type
-                  : result?.assets?.type
-                  ? result?.assets?.type
-                  : result?.type,
-              });
-            }
-            setDocumentName('bankStatement');
-            setNextRoute('Passport');
+            setUserDocs({...userDocs, bankStatement: result});
+            fileUrl = result?.uri || result?.assets[0]?.uri;
+            fileName = result?.fileName || result?.assets[0]?.fileName;
+            fileType = result?.type || result?.assets[0]?.type;
+            document = 'bankStatement';
+            nextScreen = 'Passport';
+            handleImageSelection(result);
+            DdLogs.info(`Loans | Document Upload Set Files bankStatement|`, {
+              context: {
+                fileUrl,
+                fileName,
+                fileType,
+                document,
+              },
+            });
           }
         })
         .catch(error => {});
@@ -316,7 +311,8 @@ const ProofofAdd = ({
 
   const launchCameraAsync3 = async () => {
     const permissopnResult = await requestCameraPermission();
-    if (permissopnResult) {
+    const isStoragePermitted = await requestStoragePermission();
+    if (permissopnResult && isStoragePermitted) {
       await launchCamera({
         mediaType: 'photo', // Specify 'photo' to capture images
         maxWidth: 800, // Maximum width for the captured image
@@ -338,29 +334,21 @@ const ProofofAdd = ({
               onPress: () => Toast.hide(),
             });
           } else {
-            if (result !== null && result !== undefined) {
-              handleImageSelection(result);
-              setUserDocs({...userDocs, utilityBill: result});
-              setFile({
-                uri: result?.assets[0]?.uri
-                  ? result?.assets[0]?.uri
-                  : result?.assets?.uri
-                  ? result?.assets?.uri
-                  : result?.uri,
-                name: result?.assets[0]?.fileName
-                  ? result?.assets[0]?.fileName
-                  : result?.assets?.fileName
-                  ? result?.assets?.fileName
-                  : result?.fileName,
-                type: result?.assets[0]?.type
-                  ? result?.assets[0]?.type
-                  : result?.assets?.type
-                  ? result?.assets?.type
-                  : result?.type,
-              });
-            }
-            setDocumentName('passport');
-            setNextRoute('Signature');
+            setUserDocs({...userDocs, passport: result});
+            fileUrl = result?.uri || result?.assets[0]?.uri;
+            fileName = result?.fileName || result?.assets[0]?.fileName;
+            fileType = result?.type || result?.assets[0]?.type;
+            document = 'passport';
+            nextScreen = 'Signature';
+            handleImageSelection(result);
+            DdLogs.info(`Loans | Document Upload Set Files passport|`, {
+              context: {
+                fileUrl,
+                fileName,
+                fileType,
+                document,
+              },
+            });
           }
         })
         .catch(error => {});
@@ -375,7 +363,8 @@ const ProofofAdd = ({
 
   const launchCameraAsync4 = async () => {
     const permissopnResult = await requestCameraPermission();
-    if (permissopnResult) {
+    const isStoragePermitted = await requestStoragePermission();
+    if (permissopnResult && isStoragePermitted) {
       await launchCamera({
         mediaType: 'photo', // Specify 'photo' to capture images
         maxWidth: 800, // Maximum width for the captured image
@@ -397,29 +386,21 @@ const ProofofAdd = ({
               onPress: () => Toast.hide(),
             });
           } else {
-            if (result !== null && result !== undefined) {
-              handleImageSelection(result);
-              setUserDocs({...userDocs, utilityBill: result});
-              setFile({
-                uri: result?.assets[0]?.uri
-                  ? result?.assets[0]?.uri
-                  : result?.assets?.uri
-                  ? result?.assets?.uri
-                  : result?.uri,
-                name: result?.assets[0]?.fileName
-                  ? result?.assets[0]?.fileName
-                  : result?.assets?.fileName
-                  ? result?.assets?.fileName
-                  : result?.fileName,
-                type: result?.assets[0]?.type
-                  ? result?.assets[0]?.type
-                  : result?.assets?.type
-                  ? result?.assets?.type
-                  : result?.type,
-              });
-            }
-            setDocumentName('seal');
-            setNextRoute('CAC');
+            setUserDocs({...userDocs, seal: result});
+            fileUrl = result?.uri || result?.assets[0]?.uri;
+            fileName = result?.fileName || result?.assets[0]?.fileName;
+            fileType = result?.type || result?.assets[0]?.type;
+            document = 'seal';
+            nextScreen = 'CAC';
+            handleImageSelection(result);
+            DdLogs.info(`Loans | Document Upload Set Files seal|`, {
+              context: {
+                fileUrl,
+                fileName,
+                fileType,
+                document,
+              },
+            });
           }
         })
         .catch(error => {});
@@ -434,7 +415,8 @@ const ProofofAdd = ({
 
   const launchCameraAsync5 = async () => {
     const permissopnResult = await requestCameraPermission();
-    if (permissopnResult) {
+    const isStoragePermitted = await requestStoragePermission();
+    if (permissopnResult && isStoragePermitted) {
       await launchCamera({
         mediaType: 'photo', // Specify 'photo' to capture images
         maxWidth: 800, // Maximum width for the captured image
@@ -456,29 +438,21 @@ const ProofofAdd = ({
               onPress: () => Toast.hide(),
             });
           } else {
-            if (result !== null && result !== undefined) {
-              handleImageSelection(result);
-              setUserDocs({...userDocs, utilityBill: result});
-              setFile({
-                uri: result?.assets[0]?.uri
-                  ? result?.assets[0]?.uri
-                  : result?.assets?.uri
-                  ? result?.assets?.uri
-                  : result?.uri,
-                name: result?.assets[0]?.fileName
-                  ? result?.assets[0]?.fileName
-                  : result?.assets?.fileName
-                  ? result?.assets?.fileName
-                  : result?.fileName,
-                type: result?.assets[0]?.type
-                  ? result?.assets[0]?.type
-                  : result?.assets?.type
-                  ? result?.assets?.type
-                  : result?.type,
-              });
-            }
-            setDocumentName('cacCertificate');
-            setNextRoute('Others');
+            setUserDocs({...userDocs, cacCertificate: result});
+            fileUrl = result?.uri || result?.assets[0]?.uri;
+            fileName = result?.fileName || result?.assets[0]?.fileName;
+            fileType = result?.type || result?.assets[0]?.type;
+            document = 'cacCertificate';
+            nextScreen = 'Others';
+            handleImageSelection(result);
+            DdLogs.info(`Loans | Document Upload Set Files cacCertificate|`, {
+              context: {
+                fileUrl,
+                fileName,
+                fileType,
+                document,
+              },
+            });
           }
         })
         .catch(error => {});
@@ -493,7 +467,8 @@ const ProofofAdd = ({
 
   const launchCameraAsync6 = async () => {
     const permissopnResult = await requestCameraPermission();
-    if (permissopnResult) {
+    const isStoragePermitted = await requestStoragePermission();
+    if (permissopnResult && isStoragePermitted) {
       await launchCamera({
         mediaType: 'photo', // Specify 'photo' to capture images
         maxWidth: 800, // Maximum width for the captured image
@@ -515,30 +490,21 @@ const ProofofAdd = ({
               onPress: () => Toast.hide(),
             });
           } else {
-            if (result !== null && result !== undefined) {
-              handleImageSelection(result);
-              setUserDocs({...userDocs, utilityBill: result});
-              setFile({
-                uri: result?.assets[0]?.uri
-                  ? result?.assets[0]?.uri
-                  : result?.assets?.uri
-                  ? result?.assets?.uri
-                  : result?.uri,
-                name: result?.assets[0]?.fileName
-                  ? result?.assets[0]?.fileName
-                  : result?.assets?.fileName
-                  ? result?.assets?.fileName
-                  : result?.fileName,
-                type: result?.assets[0]?.type
-                  ? result?.assets[0]?.type
-                  : result?.assets?.type
-                  ? result?.assets?.type
-                  : result?.type,
-              });
-            }
-
-            setDocumentName('personalPhoto');
-            setNextRoute('IdentityCard');
+            setUserDocs({...userDocs, personalPhoto: result});
+            fileUrl = result?.uri || result?.assets[0]?.uri;
+            fileName = result?.fileName || result?.assets[0]?.fileName;
+            fileType = result?.type || result?.assets[0]?.type;
+            document = 'personalPhoto';
+            nextScreen = 'IdentityCard';
+            handleImageSelection(result);
+            DdLogs.info(`Loans | Document Upload Set Files personalPhoto|`, {
+              context: {
+                fileUrl,
+                fileName,
+                fileType,
+                document,
+              },
+            });
           }
         })
         .catch(error => {});
@@ -553,7 +519,8 @@ const ProofofAdd = ({
 
   const launchCameraAsync7 = async () => {
     const permissopnResult = await requestCameraPermission();
-    if (permissopnResult) {
+    const isStoragePermitted = await requestStoragePermission();
+    if (permissopnResult && isStoragePermitted) {
       await launchCamera({
         mediaType: 'photo', // Specify 'photo' to capture images
         maxWidth: 800, // Maximum width for the captured image
@@ -575,29 +542,21 @@ const ProofofAdd = ({
               onPress: () => Toast.hide(),
             });
           } else {
-            if (result !== null && result !== undefined) {
-              handleImageSelection(result);
-              setUserDocs({...userDocs, utilityBill: result});
-              setFile({
-                uri: result?.assets[0]?.uri
-                  ? result?.assets[0]?.uri
-                  : result?.assets?.uri
-                  ? result?.assets?.uri
-                  : result?.uri,
-                name: result?.assets[0]?.fileName
-                  ? result?.assets[0]?.fileName
-                  : result?.assets?.fileName
-                  ? result?.assets?.fileName
-                  : result?.fileName,
-                type: result?.assets[0]?.type
-                  ? result?.assets[0]?.type
-                  : result?.assets?.type
-                  ? result?.assets?.type
-                  : result?.type,
-              });
-            }
-            setDocumentName('identityCard');
-            setNextRoute('BankStatement');
+            setUserDocs({...userDocs, identityCard: result});
+            fileUrl = result?.uri || result?.assets[0]?.uri;
+            fileName = result?.fileName || result?.assets[0]?.fileName;
+            fileType = result?.type || result?.assets[0]?.type;
+            document = 'identityCard';
+            nextScreen = 'BankStatement';
+            handleImageSelection(result);
+            DdLogs.info(`Loans | Document Upload Set Files identityCard|`, {
+              context: {
+                fileUrl,
+                fileName,
+                fileType,
+                document,
+              },
+            });
           }
         })
         .catch(error => {});
@@ -617,184 +576,22 @@ const ProofofAdd = ({
         const result = await launchImageLibrary({
           presentationStyle: 'fullScreen',
         });
-        setImage(result.assets[0].uri);
+        setImage(result?.uri || result?.assets[0]?.uri);
         setDocsName({...docsName, utilityBill: result});
-        setFile({
-          uri: result?.assets[0]?.uri,
-          name: result?.assets[0]?.fileName,
-          type: result?.assets[0]?.type,
+        fileUrl = result?.uri || result?.assets[0]?.uri;
+        fileName = result?.fileName || result?.assets[0]?.fileName;
+        fileType = result?.type || result?.assets[0]?.type;
+        document = 'utilityBill';
+        nextScreen = 'PersonalPhoto';
+        handleImageSelection(result);
+        DdLogs.info(`Loans | Document Picker Set Files utilityBill|`, {
+          context: {
+            fileUrl,
+            fileName,
+            fileType,
+            document,
+          },
         });
-        setDocumentName('utilityBill');
-        setNextRoute('PersonalPhoto');
-      } catch (err) {
-        // console.warn(err);
-      }
-    } else {
-      Alert.alert(
-        'Permission Required',
-        'Permission to access storage is required.',
-      );
-      return;
-    }
-  }, []);
-
-  const pickDocumentS = async () => {
-    const permissopnResult = await requestStoragePermission();
-    if (permissopnResult) {
-      try {
-        const result = await launchImageLibrary({
-          presentationStyle: 'fullScreen',
-        });
-
-        setImage(result.assets[0].uri);
-        setDocsName({...docsName, signature: result});
-        setFile({
-          uri: result?.assets[0]?.uri,
-          name: result?.assets[0]?.fileName,
-          type: result?.assets[0]?.type,
-        });
-        setDocumentName('signature');
-        setNextRoute('CompanySeals');
-      } catch (err) {
-        // console.warn(err);
-      }
-    } else {
-      Alert.alert(
-        'Permission Required',
-        'Permission to access storage is required.',
-      );
-      return;
-    }
-  };
-
-  const pickDocument2 = useCallback(async () => {
-    const permissopnResult = await requestStoragePermission();
-    if (permissopnResult) {
-      try {
-        const result = await launchImageLibrary({
-          presentationStyle: 'fullScreen',
-        });
-        setImage(result.assets[0].uri);
-        setDocsName({...docsName, bankStatement: result});
-        setFile({
-          uri: result?.assets[0]?.uri,
-          name: result?.assets[0]?.fileName,
-          type: result?.assets[0]?.type,
-        });
-        setDocumentName('bankStatement');
-        setNextRoute('Passport');
-      } catch (err) {
-        // console.warn(err);
-      }
-    } else {
-      Alert.alert(
-        'Permission Required',
-        'Permission to access storage is required.',
-      );
-      return;
-    }
-  }, []);
-
-  const pickDocument3 = useCallback(async () => {
-    const permissopnResult = await requestStoragePermission();
-    if (permissopnResult) {
-      try {
-        const result = await launchImageLibrary({
-          presentationStyle: 'fullScreen',
-        });
-        setImage(result.assets[0].uri);
-        setDocsName({...docsName, passport: result});
-        setFile({
-          uri: result?.assets[0]?.uri,
-          name: result?.assets[0]?.fileName,
-          type: result?.assets[0]?.type,
-        });
-        setDocumentName('passport');
-        setNextRoute('Signature');
-      } catch (err) {
-        // console.warn(err);
-      }
-    } else {
-      Alert.alert(
-        'Permission Required',
-        'Permission to access storage is required.',
-      );
-      return;
-    }
-  }, []);
-
-  const pickDocument4 = useCallback(async () => {
-    const permissopnResult = await requestStoragePermission();
-    if (permissopnResult) {
-      try {
-        const result = await launchImageLibrary({
-          presentationStyle: 'fullScreen',
-        });
-        setImage(result.assets[0].uri);
-        setDocsName({...docsName, signature: result});
-        setFile({
-          uri: result?.assets[0]?.uri,
-          name: result?.assets[0]?.fileName,
-          type: result?.assets[0]?.type,
-        });
-        setDocumentName('signature');
-        setNextRoute('CompanySeals');
-      } catch (err) {
-        // console.warn(err);
-      }
-    } else {
-      Alert.alert(
-        'Permission Required',
-        'Permission to access storage is required.',
-      );
-      return;
-    }
-  }, []);
-
-  const pickDocument5 = useCallback(async () => {
-    const permissopnResult = await requestStoragePermission();
-    if (permissopnResult) {
-      try {
-        const result = await launchImageLibrary({
-          presentationStyle: 'fullScreen',
-        });
-        setImage(result.assets[0].uri);
-        setDocsName({...docsName, seal: result});
-        setFile({
-          uri: result?.assets[0]?.uri,
-          name: result?.assets[0]?.fileName,
-          type: result?.assets[0]?.type,
-        });
-        setDocumentName('seal');
-        setNextRoute('CAC');
-      } catch (err) {
-        // console.warn(err);
-      }
-    } else {
-      Alert.alert(
-        'Permission Required',
-        'Permission to access storage is required.',
-      );
-      return;
-    }
-  }, []);
-
-  const pickDocument6 = useCallback(async () => {
-    const permissopnResult = await requestStoragePermission();
-    if (permissopnResult) {
-      try {
-        const result = await launchImageLibrary({
-          presentationStyle: 'fullScreen',
-        });
-        setImage(result.assets[0].uri);
-        setDocsName({...docsName, cacCertificate: result});
-        setFile({
-          name: result?.assets[0]?.fileName,
-          type: result?.assets[0]?.type,
-          uri: result?.assets[0]?.uri,
-        });
-        setDocumentName('cacCertificate');
-        setNextRoute('Others');
       } catch (err) {
         // console.warn(err);
       }
@@ -814,15 +611,22 @@ const ProofofAdd = ({
         const result = await launchImageLibrary({
           presentationStyle: 'fullScreen',
         });
-        setImage(result.assets[0].uri);
+        setImage(result?.uri || result?.assets[0]?.uri);
         setDocsName({...docsName, personalPhoto: result});
-        setFile({
-          name: result?.assets[0]?.fileName,
-          type: result?.assets[0]?.type,
-          uri: result?.assets[0]?.uri,
+        fileUrl = result?.uri || result?.assets[0]?.uri;
+        fileName = result?.fileName || result?.assets[0]?.fileName;
+        fileType = result?.type || result?.assets[0]?.type;
+        document = 'personalPhoto';
+        nextScreen = 'IdentityCard';
+        handleImageSelection(result);
+        DdLogs.info(`Loans | Document Picker Set Files utilityBill|`, {
+          context: {
+            fileUrl,
+            fileName,
+            fileType,
+            document,
+          },
         });
-        setDocumentName('personalPhoto');
-        setNextRoute('IdentityCard');
       } catch (err) {
         // console.warn(err);
       }
@@ -842,15 +646,22 @@ const ProofofAdd = ({
         const result = await launchImageLibrary({
           presentationStyle: 'fullScreen',
         });
-        setImage(result.assets[0].uri);
+        setImage(result?.uri || result?.assets[0]?.uri);
         setDocsName({...docsName, identityCard: result});
-        setFile({
-          name: result?.assets[0]?.fileName,
-          type: result?.assets[0]?.type,
-          uri: result?.assets[0]?.uri,
+        fileUrl = result?.uri || result?.assets[0]?.uri;
+        fileName = result?.fileName || result?.assets[0]?.fileName;
+        fileType = result?.type || result?.assets[0]?.type;
+        document = 'identityCard';
+        nextScreen = 'BankStatement';
+        handleImageSelection(result);
+        DdLogs.info(`Loans | Document Picker Set Files utilityBill|`, {
+          context: {
+            fileUrl,
+            fileName,
+            fileType,
+            document,
+          },
         });
-        setDocumentName('identityCard');
-        setNextRoute('BankStatement');
       } catch (err) {
         // console.warn(err);
       }
@@ -863,6 +674,221 @@ const ProofofAdd = ({
     }
   }, []);
 
+  const pickDocument2 = useCallback(async () => {
+    const permissopnResult = await requestStoragePermission();
+    if (permissopnResult) {
+      try {
+        const result = await launchImageLibrary({
+          presentationStyle: 'fullScreen',
+        });
+
+        setImage(result?.uri || result?.assets[0]?.uri);
+        setDocsName({...docsName, bankStatement: result});
+        fileUrl = result?.uri || result?.assets[0]?.uri;
+        fileName = result?.fileName || result?.assets[0]?.fileName;
+        fileType = result?.type || result?.assets[0]?.type;
+        document = 'bankStatement';
+        nextScreen = 'Passport';
+        handleImageSelection(result);
+        DdLogs.info(`Loans | Document Picker Set Files utilityBill|`, {
+          context: {
+            fileUrl,
+            fileName,
+            fileType,
+            document,
+          },
+        });
+      } catch (err) {
+        // console.warn(err);
+      }
+    } else {
+      Alert.alert(
+        'Permission Required',
+        'Permission to access storage is required.',
+      );
+      return;
+    }
+  }, []);
+
+  const pickDocument3 = useCallback(async () => {
+    const permissopnResult = await requestStoragePermission();
+    if (permissopnResult) {
+      try {
+        const result = await launchImageLibrary({
+          presentationStyle: 'fullScreen',
+        });
+        setImage(result?.uri || result?.assets[0]?.uri);
+        setDocsName({...docsName, passport: result});
+        fileUrl = result?.uri || result?.assets[0]?.uri;
+        fileName = result?.fileName || result?.assets[0]?.fileName;
+        fileType = result?.type || result?.assets[0]?.type;
+        document = 'passport';
+        nextScreen = 'Signature';
+        handleImageSelection(result);
+        DdLogs.info(`Loans | Document Picker Set Files utilityBill|`, {
+          context: {
+            fileUrl,
+            fileName,
+            fileType,
+            document,
+          },
+        });
+      } catch (err) {
+        // console.warn(err);
+      }
+    } else {
+      Alert.alert(
+        'Permission Required',
+        'Permission to access storage is required.',
+      );
+      return;
+    }
+  }, []);
+
+  const pickDocumentS = async () => {
+    const permissopnResult = await requestStoragePermission();
+    if (permissopnResult) {
+      try {
+        const result = await launchImageLibrary({
+          presentationStyle: 'fullScreen',
+        });
+        setImage(result?.uri || result?.assets[0]?.uri);
+        setDocsName({...docsName, signature: result});
+        fileUrl = result?.uri || result?.assets[0]?.uri;
+        fileName = result?.fileName || result?.assets[0]?.fileName;
+        fileType = result?.type || result?.assets[0]?.type;
+        document = 'signature';
+        nextScreen = 'CompanySeals';
+        handleImageSelection(result);
+        DdLogs.info(`Loans | Document Picker Set Files utilityBill|`, {
+          context: {
+            fileUrl,
+            fileName,
+            fileType,
+            document,
+          },
+        });
+       
+      } catch (err) {
+        // console.warn(err);
+      }
+    } else {
+      Alert.alert(
+        'Permission Required',
+        'Permission to access storage is required.',
+      );
+      return;
+    }
+  };
+
+
+  const pickDocument4 = useCallback(async () => {
+    const permissopnResult = await requestStoragePermission();
+    if (permissopnResult) {
+      try {
+        const result = await launchImageLibrary({
+          presentationStyle: 'fullScreen',
+        });
+        setImage(result?.uri || result?.assets[0]?.uri);
+        setDocsName({...docsName, signature: result});
+        fileUrl = result?.uri || result?.assets[0]?.uri;
+        fileName = result?.fileName || result?.assets[0]?.fileName;
+        fileType = result?.type || result?.assets[0]?.type;
+        document = 'signature';
+        nextScreen = 'CompanySeals';
+        handleImageSelection(result);
+        DdLogs.info(`Loans | Document Picker Set Files utilityBill|`, {
+          context: {
+            fileUrl,
+            fileName,
+            fileType,
+            document,
+          },
+        });
+      } catch (err) {
+        // console.warn(err);
+      }
+    } else {
+      Alert.alert(
+        'Permission Required',
+        'Permission to access storage is required.',
+      );
+      return;
+    }
+  }, []);
+
+  const pickDocument5 = useCallback(async () => {
+    const permissopnResult = await requestStoragePermission();
+    if (permissopnResult) {
+      try {
+        const result = await launchImageLibrary({
+          presentationStyle: 'fullScreen',
+        });
+        setImage(result?.uri || result?.assets[0]?.uri);
+        setDocsName({...docsName, seal: result});
+        fileUrl = result?.uri || result?.assets[0]?.uri;
+        fileName = result?.fileName || result?.assets[0]?.fileName;
+        fileType = result?.type || result?.assets[0]?.type;
+        document = 'seal';
+        nextScreen = 'CAC';
+        handleImageSelection(result);
+        DdLogs.info(`Loans | Document Picker Set Files utilityBill|`, {
+          context: {
+            fileUrl,
+            fileName,
+            fileType,
+            document,
+          },
+        });
+      } catch (err) {
+        // console.warn(err);
+      }
+    } else {
+      Alert.alert(
+        'Permission Required',
+        'Permission to access storage is required.',
+      );
+      return;
+    }
+  }, []);
+
+  const pickDocument6 = useCallback(async () => {
+    const permissopnResult = await requestStoragePermission();
+    if (permissopnResult) {
+      try {
+        const result = await launchImageLibrary({
+          presentationStyle: 'fullScreen',
+        });
+        setImage(result?.uri || result?.assets[0]?.uri);
+        setDocsName({...docsName, cacCertificate: result});
+        fileUrl = result?.uri || result?.assets[0]?.uri;
+        fileName = result?.fileName || result?.assets[0]?.fileName;
+        fileType = result?.type || result?.assets[0]?.type;
+        document = 'cacCertificate';
+        nextScreen = 'Others';
+        handleImageSelection(result);
+        DdLogs.info(`Loans | Document Picker Set Files utilityBill|`, {
+          context: {
+            fileUrl,
+            fileName,
+            fileType,
+            document,
+          },
+        });
+      } catch (err) {
+        // console.warn(err);
+      }
+    } else {
+      Alert.alert(
+        'Permission Required',
+        'Permission to access storage is required.',
+      );
+      return;
+    }
+  }, []);
+
+
+
   const clearDocument = () => {
     setSelectedDocument(null);
     setImage(null);
@@ -871,13 +897,10 @@ const ProofofAdd = ({
   const handleImageSelection = async result => {
     if (!result.canceled) {
       if (result) {
-        setImage(
-          result?.assets[0]?.uri
-            ? result?.assets[0]?.uri
-            : result?.assets?.uri
-            ? result?.assets?.uri
-            : result?.uri,
-        );
+        DdLogs.info(`Loans | Document Upload Handle Image Selection|`, {
+          context: result,
+        });
+        setImage(result?.uri || result?.assets[0]?.uri);
         setShowConfirmModal(true);
       }
     }
@@ -897,57 +920,99 @@ const ProofofAdd = ({
     setShowConfirmModal(false);
   };
 
-  const [fileUri, setFile] = useState({
-    name: '',
-    type: '',
-    uri: '',
-  });
-
   const s3UploadFunction = async () => {
     setIsUpdating(true);
+    DdLogs.info(`Loans | Document Upload s3Upload Init|`, {
+      context: {
+        fileUrl,
+        fileType,
+        fileName,
+        document,
+      },
+    });
+
     try {
-      const res = await createUploadDocument(fileUri, documentName);
-      if (res?.error) {
+      if (
+        fileUrl === '' ||
+        fileType === '' ||
+        fileName === '' ||
+        document === ''
+      ) {
+        DdLogs.error(`Loans | Document Upload s3Upload |`, {
+          context: {
+            fileUrl,
+            fileType,
+            fileName,
+            document,
+          },
+        });
         Toast.show({
           type: 'error',
           position: 'top',
           topOffset: 50,
-          text1: res?.title,
-          text2: res?.message,
+          text1: 'Check Files',
+          text2: 'Empty file data',
           visibilityTime: 5000,
           autoHide: true,
           onPress: () => Toast.hide(),
         });
       } else {
-        Toast.show({
-          type: 'success',
-          position: 'top',
-          topOffset: 50,
-          text1: res?.title,
-          text2: res?.message,
-          visibilityTime: 3000,
-          autoHide: true,
-          onPress: () => Toast.hide(),
-        });
-
-        setUserDocs(deetss => {
-          return {
-            ...deetss,
-            [documentName]: `${res?.data?.data?.url}`,
-          };
-        });
-
-        setTimeout(() => {
-          navigation.navigate(`${nextRoute}`, {
-            paramKey: {
-              ...paramKey,
-              [documentName]: `${res?.data?.data?.url}`,
-            },
+        const param = {
+          uri: fileUrl,
+          name: fileName,
+          type: fileType,
+        };
+        const res = await createUploadDocument(param, document);
+        if (res?.error) {
+          Toast.show({
+            type: 'error',
+            position: 'top',
+            topOffset: 50,
+            text1: res?.title,
+            text2: res?.message,
+            visibilityTime: 5000,
+            autoHide: true,
+            onPress: () => Toast.hide(),
           });
-        }, 500);
-        setTimeout(() => {
-          setNextRoute('');
-        }, 2000);
+          setIsUpdating(false);
+        } else {
+          Toast.show({
+            type: 'success',
+            position: 'top',
+            topOffset: 50,
+            text1: res?.title,
+            text2: res?.message,
+            visibilityTime: 3000,
+            autoHide: true,
+            onPress: () => Toast.hide(),
+          });
+
+          setUserDocs(deetss => {
+            return {
+              ...deetss,
+              [documentName]: `${res?.data?.data?.url}`,
+            };
+          });
+
+          setTimeout(() => {
+            navigation.navigate(`${nextScreen}`, {
+              paramKey: {
+                ...paramKey,
+                [documentName]: `${res?.data?.data?.url}`,
+              },
+            });
+          }, 500);
+
+          setTimeout(() => {
+            fileUrl = '';
+            fileName = '';
+            fileType = '';
+            document = '';
+            nextScreen = '';
+          }, 3000);
+
+          setIsUpdating(false);
+        }
       }
     } catch (err) {
       Toast.show({
@@ -960,10 +1025,6 @@ const ProofofAdd = ({
         autoHide: true,
         onPress: () => Toast.hide(),
       });
-    } finally {
-      setTimeout(() => {
-        setDocumentName('');
-      }, 3000);
 
       setIsUpdating(false);
     }
@@ -1053,9 +1114,9 @@ const ProofofAdd = ({
                     <View>
                       <Text>{docsName.utilityBill.name}</Text>
                     </View>
-                    {image !== null && (
+                    {fileUrl !== '' && (
                       <Image
-                        source={{uri: image}}
+                        source={{uri: fileUrl}}
                         style={{
                           width: '100%',
                           height: '100%',
@@ -1124,9 +1185,9 @@ const ProofofAdd = ({
                 not be more than 3month before registration
               </Text>
               <View style={styles.reqField}>
-                {image ? (
+                {fileUrl !== '' ? (
                   <Image
-                    source={{uri: image}}
+                    source={{uri: fileUrl}}
                     style={{
                       width: '100%',
                       height: '100%',
@@ -1181,9 +1242,9 @@ const ProofofAdd = ({
                     <View>
                       <Text>{docsName.seal.name}</Text>
                     </View>
-                    {image !== null && (
+                    {fileUrl !== '' && (
                       <Image
-                        source={{uri: image}}
+                        source={{uri: fileUrl}}
                         style={{
                           width: '100%',
                           height: '100%',
@@ -1249,9 +1310,9 @@ const ProofofAdd = ({
                 not be more than 3month before registration
               </Text>
               <View style={styles.reqField}>
-                {image ? (
+                {fileUrl !== '' ? (
                   <Image
-                    source={{uri: image}}
+                    source={{uri: fileUrl}}
                     style={{
                       width: '100%',
                       height: '100%',
@@ -1304,9 +1365,9 @@ const ProofofAdd = ({
                     <View>
                       <Text>{docsName.cacCertificate.name}</Text>
                     </View>
-                    {image !== null && (
+                    {fileUrl !== '' && (
                       <Image
-                        source={{uri: image}}
+                        source={{uri: fileUrl}}
                         style={{
                           width: '100%',
                           height: '100%',
@@ -1375,9 +1436,9 @@ const ProofofAdd = ({
                 not be more than 3month before registration
               </Text>
               <View style={styles.reqField}>
-                {image ? (
+                {fileUrl !== '' ? (
                   <Image
-                    source={{uri: image}}
+                    source={{uri: fileUrl}}
                     style={{
                       width: '100%',
                       height: '100%',
@@ -1434,9 +1495,9 @@ const ProofofAdd = ({
                     <View>
                       <Text>{docsName.bankStatement.name}</Text>
                     </View>
-                    {image !== null && (
+                    {fileUrl !== '' && (
                       <Image
-                        source={{uri: image}}
+                        source={{uri: fileUrl}}
                         style={{
                           width: '100%',
                           height: '100%',
@@ -1505,9 +1566,9 @@ const ProofofAdd = ({
                 not be more than 3month before registration
               </Text>
               <View style={styles.reqField}>
-                {image ? (
+                {fileUrl !== '' ? (
                   <Image
-                    source={{uri: image}}
+                    source={{uri: fileUrl}}
                     style={{
                       width: '100%',
                       height: '100%',
@@ -1563,9 +1624,9 @@ const ProofofAdd = ({
                     <View>
                       <Text>{docsName.passport.name}</Text>
                     </View>
-                    {image !== null && (
+                    {fileUrl !== '' && (
                       <Image
-                        source={{uri: image}}
+                        source={{uri: fileUrl}}
                         style={{
                           width: '100%',
                           height: '100%',
@@ -1632,9 +1693,9 @@ const ProofofAdd = ({
                 not be more than 3month before registration
               </Text>
               <View style={styles.reqField}>
-                {image ? (
+                {fileUrl !== '' ? (
                   <Image
-                    source={{uri: image}}
+                    source={{uri: fileUrl}}
                     style={{
                       width: '100%',
                       height: '100%',
@@ -1687,9 +1748,9 @@ const ProofofAdd = ({
                     <View>
                       <Text>{docsName.signature.name}</Text>
                     </View>
-                    {image !== null && (
+                    {fileUrl !== '' && (
                       <Image
-                        source={{uri: image}}
+                        source={{uri: fileUrl}}
                         style={{
                           width: '100%',
                           height: '100%',
@@ -1764,9 +1825,9 @@ const ProofofAdd = ({
                     <View>
                       <Text>{docsName.personalPhoto.name}</Text>
                     </View>
-                    {image !== null && (
+                    {fileUrl !== '' && (
                       <Image
-                        source={{uri: image}}
+                        source={{uri: fileUrl}}
                         style={{
                           width: '100%',
                           height: '100%',
@@ -1834,9 +1895,9 @@ const ProofofAdd = ({
                 Take a clear picture or upload a Personal Photo
               </Text>
               <View style={styles.reqField}>
-                {image ? (
+                {fileUrl !== '' ? (
                   <Image
-                    source={{uri: image}}
+                    source={{uri: fileUrl}}
                     style={{
                       width: '100%',
                       height: '100%',
@@ -1893,9 +1954,9 @@ const ProofofAdd = ({
                     <View>
                       <Text>{docsName.identityCard.name}</Text>
                     </View>
-                    {image !== null && (
+                    {fileUrl !== '' && (
                       <Image
-                        source={{uri: image}}
+                        source={{uri: fileUrl}}
                         style={{
                           width: '100%',
                           height: '100%',
@@ -1964,9 +2025,9 @@ const ProofofAdd = ({
                 Take a clear picture or upload an Id Card
               </Text>
               <View style={styles.reqField}>
-                {image ? (
+                {fileUrl !== '' ? (
                   <Image
-                    source={{uri: image}}
+                    source={{uri: fileUrl}}
                     style={{
                       width: '100%',
                       height: '100%',
