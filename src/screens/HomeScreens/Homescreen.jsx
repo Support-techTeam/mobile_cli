@@ -573,7 +573,6 @@ const Homescreen = () => {
       extra: '',
       image: require('../../../assets/icons/wallet_background.png'),
     },
-
     {
       id: '2',
       title: 'Loan balance',
@@ -583,9 +582,11 @@ const Homescreen = () => {
           : `${
               userLoanAmount?.totalLoanAmount === 0
                 ? '0.00'
-                : userLoanAmount?.totalLoanAmount
-                    ?.toString()
-                    ?.replace(/\B(?=(\d{3})+\b)/g, ',')
+                : new Intl.NumberFormat('en-US', {
+                    style: 'decimal',
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  }).format(userLoanAmount?.totalLoanAmount)
             }`
       }`,
       button: 'Get loan',
@@ -595,10 +596,15 @@ const Homescreen = () => {
       id: '1',
       title: 'Wallet balance',
       balance:
-        userWalletData && userWalletData?.availableBalance
-          ? Number(userWalletData?.availableBalance)
-              ?.toString()
-              ?.replace(/\B(?=(\d{3})+\b)/g, ',')
+        userWalletData &&
+        userWalletData?.availableBalance &&
+        userWalletData?.availableBalance !== null &&
+        userWalletData?.availableBalance !== undefined
+          ? new Intl.NumberFormat('en-US', {
+              style: 'decimal',
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            }).format(userWalletData?.availableBalance)
           : '0.00',
       accountName:
         userWalletData && userWalletData?.walletIdAccountNumber
@@ -775,19 +781,36 @@ const Homescreen = () => {
                         }}>
                         Providus Bank
                       </Text>
-                      <TouchableWithoutFeedback
-                        onLongPress={() => handleLongPress(item.accountName)}>
-                        <Text
-                          style={{
-                            color: '#14142A',
-                            marginTop: 5,
-                            fontFamily: 'Montserat',
-                            fontWeight: '400',
-                            textAlign: 'right',
-                          }}>
-                          {item.accountName}
-                        </Text>
-                      </TouchableWithoutFeedback>
+                      <View
+                        style={{
+                          flex: 1,
+                          flexDirection: 'row',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                        }}>
+                        <TouchableWithoutFeedback>
+                          <Text
+                            style={{
+                              color: '#14142A',
+                              marginTop: 5,
+                              fontFamily: 'Montserat',
+                              fontWeight: '400',
+                              textAlign: 'right',
+                            }}>
+                            {item.accountName}
+                          </Text>
+                        </TouchableWithoutFeedback>
+                        <TouchableWithoutFeedback
+                          >
+                          <FontIcon
+                            size={17}
+                            color={COLORS.lendaBlue}
+                            name="copy"
+                            style={{marginLeft: 4}}
+                            onPress={() => handleLongPress(item.accountName)}
+                          />
+                        </TouchableWithoutFeedback>
+                      </View>
                     </View>
                   )}
                 </View>
@@ -1280,6 +1303,17 @@ const Homescreen = () => {
                           Account Number:
                         </Text>
                       </View>
+                      <View style={{flex:1, flexDirection: 'row', justifyContent: "flex-end"}}>
+                      <TouchableWithoutFeedback
+                          >
+                          <FontIcon
+                            size={17}
+                            color={COLORS.lendaBlue}
+                            name="copy"
+                            style={{marginRight: 4}}
+                            onPress={() => handleLongPress(userWalletData?.walletIdAccountNumber)}
+                          />
+                        </TouchableWithoutFeedback>
                       <TouchableWithoutFeedback
                         onLongPress={() =>
                           handleLongPress(userWalletData?.walletIdAccountNumber)
@@ -1294,6 +1328,7 @@ const Homescreen = () => {
                             : 'N/A'}
                         </Text>
                       </TouchableWithoutFeedback>
+                      </View>
                     </View>
                   </View>
                 </View>
@@ -1719,7 +1754,9 @@ const Homescreen = () => {
                                   }}>
                                   {item.credit != null ||
                                   item.credit > 0 ||
-                                  item.credit != undefined || item?.fromWalletAccountNumber != userWalletData?.walletIdAccountNumber ? (
+                                  item.credit != undefined ||
+                                  item?.fromWalletAccountNumber !=
+                                    userWalletData?.walletIdAccountNumber ? (
                                     <Icon
                                       name="plus"
                                       size={16}
@@ -1738,7 +1775,9 @@ const Homescreen = () => {
                                       color:
                                         item.credit != null ||
                                         item.credit > 0 ||
-                                        item.credit != undefined || item?.fromWalletAccountNumber != userWalletData?.walletIdAccountNumber
+                                        item.credit != undefined ||
+                                        item?.fromWalletAccountNumber !=
+                                          userWalletData?.walletIdAccountNumber
                                           ? COLORS.googleGreen
                                           : COLORS.googleRed,
                                       alignSelf: 'flex-end',
@@ -2950,7 +2989,9 @@ const Homescreen = () => {
                           }}>
                           {item.credit != null ||
                           item.credit > 0 ||
-                          item.credit != undefined || item?.fromWalletAccountNumber != userWalletData?.walletIdAccountNumber ? (
+                          item.credit != undefined ||
+                          item?.fromWalletAccountNumber !=
+                            userWalletData?.walletIdAccountNumber ? (
                             <Icon
                               name="plus"
                               size={16}
@@ -2969,7 +3010,9 @@ const Homescreen = () => {
                               color:
                                 item.credit != null ||
                                 item.credit > 0 ||
-                                item.credit != undefined || item?.fromWalletAccountNumber != userWalletData?.walletIdAccountNumber
+                                item.credit != undefined ||
+                                item?.fromWalletAccountNumber !=
+                                  userWalletData?.walletIdAccountNumber
                                   ? COLORS.googleGreen
                                   : COLORS.googleRed,
                               alignSelf: 'flex-end',
