@@ -1,11 +1,3 @@
-diff --git a/node_modules/native-base/.DS_Store b/node_modules/native-base/.DS_Store
-new file mode 100644
-index 0000000..e09cab3
-Binary files /dev/null and b/node_modules/native-base/.DS_Store differ
-diff --git a/node_modules/native-base/lib/.DS_Store b/node_modules/native-base/lib/.DS_Store
-new file mode 100644
-index 0000000..c543dfb
-Binary files /dev/null and b/node_modules/native-base/lib/.DS_Store differ
 diff --git a/node_modules/native-base/src/core/NativeBaseProvider.tsx b/node_modules/native-base/src/core/NativeBaseProvider.tsx
 index 43b4bd1..dd1329c 100644
 --- a/node_modules/native-base/src/core/NativeBaseProvider.tsx
