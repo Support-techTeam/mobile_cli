@@ -426,7 +426,9 @@ const Homescreen = () => {
               res?.data?.data[0]?.productCode,
             ).then(res => {
               if (!res?.error) {
-                setPortfolioDetail(res?.data?.portfolio[0]?.accountBalance);
+                if (res?.data?.length > 0) {
+                  setPortfolioDetail(res?.data?.portfolio[0]?.accountBalance);
+                }
               }
             });
           }
@@ -896,7 +898,6 @@ const Homescreen = () => {
   const hideDatePickerEndArm = () => {
     setShowEndArm(false);
   };
-
 
   const handleArmStatement = async () => {
     setIsSending(true);
@@ -1523,13 +1524,6 @@ const Homescreen = () => {
                       bounces={false}
                       showsHorizontalScrollIndicator={false}
                       showsVerticalScrollIndicator={true}
-                      // onScroll={() => setIsScrolling(true)}
-                      // onMomentumScrollEnd={() =>
-                      //   setTimeout(() => {
-                      //     setIsScrolling(false);
-                      //   }, 500)
-                      // }
-                      // centerContent={true}
                       style={[styles.scrollView]}
                       contentContainerStyle={styles.contentContainer}
                       alwaysBounceVertical={false}>
@@ -1638,8 +1632,9 @@ const Homescreen = () => {
                                       ))}
                                     {item.transactionType ===
                                       'Tradelenda Internal Wallet' &&
-                                      (item.credit != null &&
-                                      item.credit > 0 ? (
+                                      (item.credit != null ||
+                                      item.credit > 0 ||
+                                      item.credit != undefined ? (
                                         <>
                                           <Image
                                             style={[
@@ -1722,7 +1717,9 @@ const Homescreen = () => {
                                     alignItems: 'center',
                                     justifyContent: 'center',
                                   }}>
-                                  {item.credit ? (
+                                  {item.credit != null ||
+                                  item.credit > 0 ||
+                                  item.credit != undefined || item?.fromWalletAccountNumber != userWalletData?.walletIdAccountNumber ? (
                                     <Icon
                                       name="plus"
                                       size={16}
@@ -1738,9 +1735,12 @@ const Homescreen = () => {
                                   <Text
                                     style={{
                                       fontSize: hp(2),
-                                      color: item.credit
-                                        ? COLORS.googleGreen
-                                        : COLORS.googleRed,
+                                      color:
+                                        item.credit != null ||
+                                        item.credit > 0 ||
+                                        item.credit != undefined || item?.fromWalletAccountNumber != userWalletData?.walletIdAccountNumber
+                                          ? COLORS.googleGreen
+                                          : COLORS.googleRed,
                                       alignSelf: 'flex-end',
                                     }}>
                                     {item.credit === null ? (
@@ -2025,6 +2025,7 @@ const Homescreen = () => {
               </View>
             </TouchableOpacity>
           ) : null}
+
           {/* Third Section Wallet and Bill*/}
           <View
             style={[
@@ -2139,6 +2140,7 @@ const Homescreen = () => {
               </View>
             </Pressable>
           </View>
+
           {/* Forth Section  Investment and Loans*/}
           <View style={[styles.container, styles.transView]}>
             <Pressable
@@ -2290,6 +2292,7 @@ const Homescreen = () => {
               </View>
             </Pressable>
           </View>
+
           {/* Fifth Section  E-Statement*/}
           <View style={[styles.container, styles.transView]}>
             <Pressable
@@ -2602,7 +2605,7 @@ const Homescreen = () => {
                       Cancel
                     </Btn>
                     <Btn
-                    disabled={!allArmData[0]?.membershipId}
+                      disabled={!allArmData[0]?.membershipId}
                       onPress={() => {
                         handleArmStatement();
                         setShowArmStatementModal(false);
@@ -2945,7 +2948,9 @@ const Homescreen = () => {
                             alignItems: 'center',
                             justifyContent: 'center',
                           }}>
-                          {item.credit ? (
+                          {item.credit != null ||
+                          item.credit > 0 ||
+                          item.credit != undefined || item?.fromWalletAccountNumber != userWalletData?.walletIdAccountNumber ? (
                             <Icon
                               name="plus"
                               size={16}
@@ -2961,9 +2966,12 @@ const Homescreen = () => {
                           <Text
                             style={{
                               fontSize: hp(2),
-                              color: item.credit
-                                ? COLORS.googleGreen
-                                : COLORS.googleRed,
+                              color:
+                                item.credit != null ||
+                                item.credit > 0 ||
+                                item.credit != undefined || item?.fromWalletAccountNumber != userWalletData?.walletIdAccountNumber
+                                  ? COLORS.googleGreen
+                                  : COLORS.googleRed,
                               alignSelf: 'flex-end',
                             }}>
                             {item.credit === null ? (
@@ -3073,8 +3081,8 @@ const styles = StyleSheet.create({
   },
   transText: {
     fontWeight: 400,
-    paddingLeft: wp(2),
-    fontSize: hp(1.5),
+    paddingLeft: wp(1),
+    fontSize: hp(1.4),
   },
   personIcon: {
     borderWidth: 1,

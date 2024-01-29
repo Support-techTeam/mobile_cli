@@ -11,27 +11,27 @@ const NetworkStatus = () => {
     if (state?.isConnected && state?.isInternetReachable) {
       // console.log
     } else if (state?.isConnected && !state?.isInternetReachable) {
-      Toast.show({
-        type: 'warning',
-        position: 'top',
-        topOffset: 50,
-        text1: 'NETWORK INFORMATION',
-        text2: `Internet Not Reachable!`,
-        visibilityTime: 3000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
+      // Toast.show({
+      //   type: 'warning',
+      //   position: 'top',
+      //   topOffset: 50,
+      //   text1: 'NETWORK INFORMATION',
+      //   text2: `Internet Not Reachable!`,
+      //   visibilityTime: 3000,
+      //   autoHide: true,
+      //   onPress: () => Toast.hide(),
+      // });
     } else {
-      Toast.show({
-        type: 'error',
-        position: 'top',
-        topOffset: 50,
-        text1: 'NETWORK INFORMATION',
-        text2: `No Network connected!`,
-        visibilityTime: 5000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
+      // Toast.show({
+      //   type: 'error',
+      //   position: 'top',
+      //   topOffset: 50,
+      //   text1: 'NETWORK INFORMATION',
+      //   text2: `No Network connected!`,
+      //   visibilityTime: 5000,
+      //   autoHide: true,
+      //   onPress: () => Toast.hide(),
+      // });
     }
   };
 

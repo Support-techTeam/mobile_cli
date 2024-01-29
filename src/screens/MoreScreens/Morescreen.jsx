@@ -16,6 +16,7 @@ import {userLogOut} from '../../stores/AuthStore';
 import Toast from 'react-native-toast-message';
 import {resetStore} from '../../util/redux/store';
 import {useSelector} from 'react-redux';
+import {version as appVersion} from '../../../app.json';
 
 const Morescreen = () => {
   const navigation = useNavigation();
@@ -107,6 +108,16 @@ const Morescreen = () => {
                 {profile?.personalReferalCode}
               </Text>
             </View>
+            <View style={{alignItems: 'center'}}>
+          <Text
+                style={{
+                  color: '#000',
+                  fontSize: 14,
+                  marginTop: 8,
+                }}>
+                V {appVersion}
+              </Text>
+          </View>
           </View>
 
           <View>
@@ -149,6 +160,7 @@ const Morescreen = () => {
               style={{width: 83, height: 32}}
             />
           </View>
+
         </View>
       </ScrollView>
     </SafeAreaView>

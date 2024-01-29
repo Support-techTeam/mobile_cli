@@ -113,8 +113,9 @@ const Investscreen = () => {
         res?.data?.data[0]?.productCode,
       ).then(res => {
         if (!res?.error) {
-          setPortfolioDetail(res?.data?.portfolio[0]?.accountBalance);
-         
+          if (res?.data?.length > 0){
+            setPortfolioDetail(res?.data?.portfolio[0]?.accountBalance);
+          }
         }
       });
     }

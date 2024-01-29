@@ -51,8 +51,10 @@ const InvestmentDetails = () => {
     );
     if (res?.error) {
     } else {
-      setInvestmentDetail(res?.data?.getArmUserInvestment[0]);
-      setPortfolioDetail(res?.data?.portfolio[0]);
+      if (res?.data?.length > 0){
+        setInvestmentDetail(res?.data?.getArmUserInvestment[0]);
+        setPortfolioDetail(res?.data?.portfolio[0]?.accountBalance);
+      }
     }
     setIsLoading(false);
   };
