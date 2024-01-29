@@ -25,6 +25,7 @@ import COLORS from '../../constants/colors';
 import {
   getAllArmInvestment,
   getAllLendaInvestment,
+  getSingleArmInvestment,
 } from '../../stores/InvestStore';
 
 const Investscreen = () => {
@@ -37,6 +38,7 @@ const Investscreen = () => {
   const [loanUserDetails, setLoanUserDetails] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const route = useRoute();
+  const [portfolioDetail, setPortfolioDetail] = useState(0);
 
   //total ARM Investment
   let totalArmAmount =
@@ -44,7 +46,7 @@ const Investscreen = () => {
     allArmData?.reduce(
       (accumulator, currentValue) =>
         accumulator +
-        (currentValue.investmentAmount - currentValue?.redemptionAmount),
+        (currentValue.investmentAmount),
       0,
     );
 
@@ -106,10 +108,18 @@ const Investscreen = () => {
     if (res?.error) {
     } else {
       setAllArmData(res?.data?.data);
+      getSingleArmInvestment(
+        res?.data?.data[0]?.membershipId,
+        res?.data?.data[0]?.productCode,
+      ).then(res => {
+        if (!res?.error) {
+          setPortfolioDetail(res?.data?.portfolio[0]?.accountBalance);
+         
+        }
+      });
     }
     setIsLoading(false);
   };
-
   const isReadyToInvest =
     loanUserDetails?.armUserBankDetails &&
     loanUserDetails?.nextOfKinDetails &&
@@ -188,13 +198,11 @@ const Investscreen = () => {
       id: 2,
       state: 'Save with ARM',
       amount: `₦${
-        totalArmAmount === undefined
-          ? '0.00'
-          : `${
-              totalArmAmount === 0
-                ? '0.00'
-                : totalArmAmount?.toString()?.replace(/\B(?=(\d{3})+\b)/g, ',')
-            }`
+        portfolioDetail !== 0
+          ? portfolioDetail?.toString()?.replace(/\B(?=(\d{3})+\b)/g, ',')
+          : totalArmAmount !== undefined
+          ? totalArmAmount?.toString()?.replace(/\B(?=(\d{3})+\b)/g, ',')
+          : '0.00'
       }`,
       icon: require('../../../assets/images/arm.png'),
       bottomIcon: require('../../../assets/images/armCoin.png'),
@@ -429,10 +437,8 @@ const Investscreen = () => {
                                 style: 'decimal',
                                 minimumFractionDigits: 2,
                                 maximumFractionDigits: 2,
-                              }).format(
-                                Number(investment?.investmentAmount) +
-                                  Number(investment?.topUpAmount),
-                              ) ?? '0.00'}
+                              }).format(Number(investment?.investmentAmount)) ??
+                                '0.00'}
                             </Text>
                           </View>
                           <View

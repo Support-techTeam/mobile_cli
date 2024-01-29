@@ -125,31 +125,39 @@ function App() {
 
   //update check
   useEffect(() => {
-    inAppUpdates.checkNeedsUpdate({curVersion: version}).then(result => {
-      if (result.shouldUpdate) {
-        const updateOptions = Platform.select({
-          ios: {
-            title: 'Update available',
-            message:
-              'There is a new version of the app available on the App Store, do you want to update it?',
-            buttonUpgradeText: 'Update',
-            buttonCancelText: 'Cancel',
-          },
-          android: {
-            updateType: IAUUpdateKind.FLEXIBLE,
-          },
-        });
+    try {
+      inAppUpdates.checkNeedsUpdate({curVersion: version}).then(result => {
+        if (result.shouldUpdate) {
+          const updateOptions = Platform.select({
+            ios: {
+              title: 'Update available',
+              message:
+                'There is a new version of the app available on the App Store, do you want to update it?',
+              buttonUpgradeText: 'Update',
+              buttonCancelText: 'Cancel',
+            },
+            android: {
+              updateType: IAUUpdateKind.FLEXIBLE,
+            },
+          });
 
-        inAppUpdates.startUpdate(updateOptions);
-      }
-    });
+          inAppUpdates.startUpdate(updateOptions);
+        }
+      });
+    } catch (err) {
+      console.log('Update Err: ', err);
+    }
   }, []);
 
   useEffect(() => {
-    inAppUpdates.addStatusUpdateListener(onStatusUpdate);
-    return () => {
-      inAppUpdates.removeStatusUpdateListener(onStatusUpdate);
-    };
+    try {
+      inAppUpdates.addStatusUpdateListener(onStatusUpdate);
+      return () => {
+        inAppUpdates.removeStatusUpdateListener(onStatusUpdate);
+      };
+    } catch (err) {
+      console.log('Status Update Err: ', err);
+    }
   }, [onStatusUpdate]);
 
   const onStatusUpdate = status => {
@@ -216,6 +224,10 @@ function App() {
   const theme = {
     ...LightTheme,
   };
+
+  useEffect(() => {
+    LogBox.ignoreLogs(['In React 18, SSRProvider is not necessary and is a noop. You can remove it from your app.']);
+  }, []);
 
   return (
     <SafeAreaProvider style={styles.rootContainer}>

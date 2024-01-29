@@ -1004,7 +1004,7 @@ const BusinessDetails = () => {
               <Input
                 label="MAMERT"
                 placeholder="Enter mamert"
-                keyboardType="numeric"
+                // keyboardType="numeric"
                 defaultValue={businessDetails?.MAMERT}
                 onChangeText={text =>
                   setBusinessDetails({...businessDetails, MAMERT: text})
@@ -1014,7 +1014,7 @@ const BusinessDetails = () => {
               <Input
                 label="TIN"
                 placeholder="Enter Tax Id Number"
-                keyboardType="numeric"
+                // keyboardType="numeric"
                 defaultValue={businessDetails?.tin}
                 onChangeText={text =>
                   setBusinessDetails({...businessDetails, tin: text})

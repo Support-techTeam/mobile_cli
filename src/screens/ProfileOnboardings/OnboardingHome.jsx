@@ -255,7 +255,7 @@ const OnboardingHome = () => {
             </TouchableOpacity>
 
             <TouchableOpacity
-              disabled={true}
+              // disabled={true}
               onPress={() => navigation.navigate('ValidIdentity')}>
               <CustomView label="Add Documents" status="[0/7]Pending" />
             </TouchableOpacity>

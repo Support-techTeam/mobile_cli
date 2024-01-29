@@ -23,6 +23,10 @@ import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import {getLoanUserDetails, createArmDetails} from '../../stores/LoanStore';
 import data from '../../constants/data.json';
 import KeyboardAvoidingWrapper from '../../component/KeyBoardAvoiding/keyBoardAvoiding';
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from 'react-native-responsive-screen';
 
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
@@ -267,288 +271,304 @@ const ArmDetails = () => {
         </Text>
       </View>
       <KeyboardAvoidingWrapper>
-      <ImageBackground
-        source={require('../../../assets/signup.png')}
-        resizeMode="cover"
-        style={styles.image}>
-        <ScrollView
-          bounces={false}
-          showsHorizontalScrollIndicator={false}
-          showsVerticalScrollIndicator={false}
-          style={{
-            paddingHorizontal: 10,
-            marginTop: 10,
-            marginBottom: insets.top + 116,
-          }}>
-          <View
+        <ImageBackground
+          source={require('../../../assets/signup.png')}
+          resizeMode="cover"
+          style={styles.image}>
+          <ScrollView
+            bounces={false}
+            showsHorizontalScrollIndicator={false}
+            showsVerticalScrollIndicator={false}
             style={{
-              paddingTop: 25,
-              backgroundColor: '#FFFFFF',
-              borderRadius: 15,
-              paddingHorizontal: 15,
-              paddingVertical: 15,
-              opacity: 0.86,
-              borderColor: '#D9DBE9',
-              borderWidth: 2,
+              paddingHorizontal: 10,
+              marginTop: 10,
+              marginBottom: insets.top + 116,
             }}>
-            <View style={{marginVertical: 0}}>
-              {armDetails?.kycLevel == 'Tier-1' && (
-                <View
-                  style={{
-                    backgroundColor: 'aliceblue',
-                    padding: 10,
-                    borderRadius: 10,
-                  }}>
-                  <View>
-                    <Text style={{fontSize: 12}}>
-                      {armDetails?.kycLevel} Investment Conditions
-                    </Text>
-                    <Text style={{fontSize: 12}}>
-                      maximumSingleInvestmentAmount:{' '}
-                      {data.kycLevel.map((item, key) => {
-                        if (item.level === armDetails?.kycLevel) {
-                          return (
-                            <Text key={key}>
-                              {item.maximumSingleInvestmentAmount}
-                            </Text>
-                          );
-                        }
-                      })}{' '}
-                      | maximumSingleRedemptionAmount:{' '}
-                      {data?.kycLevel.map((item, key) => {
-                        if (item.level === armDetails?.kycLevel) {
-                          return (
-                            <Text key={key}>
-                              {item?.maximumSingleRedemptionAmount}
-                            </Text>
-                          );
-                        }
-                      })}{' '}
-                      | maximumCumulativeInvestmentAmount:{' '}
-                      {data?.kycLevel.map((item, key) => {
-                        if (item?.level === armDetails?.kycLevel) {
-                          return (
-                            <Text key={key}>
-                              {item?.maximumCumulativeInvestmentAmount}
-                            </Text>
-                          );
-                        }
-                      })}
-                    </Text>
-                  </View>
-                </View>
-              )}
-              <CustomDropdown
-                label="KYC Level"
-                isNeeded={true}
-                placeholder="Select Option"
-                data={data.kycLevel}
-                maxHeight={300}
-                labelField="label"
-                valueField="value"
-                value={armDetails?.kycLevel}
-                onChange={option => {
-                  setArmDetails({
-                    ...armDetails,
-                    kycLevel: option.value,
-                  });
-                }}
-              />
-            </View>
-            <View style={{marginVertical: 0}}>
-              <CustomDropdown
-                label="Employment Status"
-                isNeeded={true}
-                placeholder="Select Option"
-                search
-                data={data.employmentStatuses}
-                maxHeight={300}
-                labelField="label"
-                valueField="value"
-                value={armDetails?.employmentStatus}
-                onChange={option => {
-                  setArmDetails({
-                    ...armDetails,
-                    employmentStatus: option.value,
-                  });
-                }}
-              />
-            </View>
-            <View style={{marginVertical: 0}}>
-              <CustomDropdown
-                label="Annual Expected Income Range"
-                isNeeded={true}
-                placeholder="Select Option"
-                search
-                data={data.incomeRanges}
-                maxHeight={300}
-                labelField="label"
-                valueField="value"
-                value={armDetails?.annualExpectedAnnualIncomeRange}
-                onChange={option => {
-                  setArmDetails({
-                    ...armDetails,
-                    annualExpectedAnnualIncomeRange: option.value,
-                  });
-                }}
-              />
-            </View>
-
-            <View style={{marginVertical: 0}}>
-              <CustomDropdown
-                label="Politically Exposed Person"
-                isNeeded={true}
-                placeholder="Select Option"
-                data={politicalViewData}
-                maxHeight={300}
-                labelField="label"
-                valueField="value"
-                value={armDetails?.politicallyExposedPersons}
-                onChange={option => {
-                  setArmDetails({
-                    ...armDetails,
-                    politicallyExposedPersons: option.value,
-                  });
-                }}
-              />
-            </View>
-
-            {armDetails?.politicallyExposedPersons === 'Yes' && (
+            <View
+              style={{
+                paddingTop: 25,
+                backgroundColor: '#FFFFFF',
+                borderRadius: 15,
+                paddingHorizontal: 15,
+                paddingVertical: 15,
+                opacity: 0.86,
+                borderColor: '#D9DBE9',
+                borderWidth: 2,
+              }}>
               <View style={{marginVertical: 0}}>
+                {armDetails?.kycLevel == 'Tier-1' && (
+                  <View
+                    style={{
+                      backgroundColor: 'aliceblue',
+                      padding: 10,
+                      borderRadius: 10,
+                    }}>
+                    <View>
+                      <Text style={{fontSize: 12}}>
+                        {armDetails?.kycLevel} Investment Conditions
+                      </Text>
+                      <Text style={{fontSize: 12}}>
+                        maximumSingleInvestmentAmount:{' '}
+                        {data.kycLevel.map((item, key) => {
+                          if (item.level === armDetails?.kycLevel) {
+                            return (
+                              <Text key={key}>
+                                {item.maximumSingleInvestmentAmount}
+                              </Text>
+                            );
+                          }
+                        })}{' '}
+                        | maximumSingleRedemptionAmount:{' '}
+                        {data?.kycLevel.map((item, key) => {
+                          if (item.level === armDetails?.kycLevel) {
+                            return (
+                              <Text key={key}>
+                                {item?.maximumSingleRedemptionAmount}
+                              </Text>
+                            );
+                          }
+                        })}{' '}
+                        | maximumCumulativeInvestmentAmount:{' '}
+                        {data?.kycLevel.map((item, key) => {
+                          if (item?.level === armDetails?.kycLevel) {
+                            return (
+                              <Text key={key}>
+                                {item?.maximumCumulativeInvestmentAmount}
+                              </Text>
+                            );
+                          }
+                        })}
+                      </Text>
+                    </View>
+                  </View>
+                )}
                 <CustomDropdown
-                  label="Politically Exposed Persons Category"
+                  label="KYC Level"
+                  isNeeded={true}
                   placeholder="Select Option"
-                  search
-                  data={data?.politicallyExposedPersonsCategory}
+                  data={data.kycLevel}
                   maxHeight={300}
                   labelField="label"
                   valueField="value"
-                  value={armDetails?.politicallyExposedPersonsCategory}
+                  value={armDetails?.kycLevel}
                   onChange={option => {
                     setArmDetails({
                       ...armDetails,
-                      politicallyExposedPersonsCategory: option.value,
+                      kycLevel: option.value,
                     });
                   }}
                 />
               </View>
-            )}
-
-            <View style={{marginVertical: 0}}>
-              <CustomDropdown
-                label="Identity Type"
-                isNeeded={true}
-                placeholder="Select Option"
-                data={data?.idTypes}
-                maxHeight={300}
-                labelField="label"
-                valueField="value"
-                value={armDetails?.idType}
-                onChange={option => {
-                  setArmDetails({
-                    ...armDetails,
-                    idType: option.value,
-                  });
-                }}
-              />
-            </View>
-
-            <Pressable onPress={showDatePicker}>
-              <Input
-                label="Date Of Issue"
-                iconName="calendar-month-outline"
-                placeholder="2000-01-01"
-                defaultValue={
-                  armDetails.issueDateOfId
-                    ? armDetails.issueDateOfId.toString()
-                    : ''
-                }
-                isDate={true}
-                editable={false}
-                showDatePicker={showDatePicker}
-                onChangeValue={text =>
-                  setArmDetails({...armDetails, issueDateOfId: text})
-                }
-                isNeeded={true}
-              />
-            </Pressable>
-
-            <DateTimePickerModal
-              isVisible={show}
-              testID="dateTimePicker"
-              defaultValue={armDetails.issueDateOfId}
-              mode="date"
-              is24Hour={true}
-              onConfirm={handleConfirm}
-              onCancel={hideDatePicker}
-              textColor="#054B99"
-            />
-
-            <Pressable onPress={showDatePicker1}>
-              <Input
-                label="Date Of Expiry"
-                iconName="calendar-month-outline"
-                placeholder="2000-01-01"
-                defaultValue={
-                  armDetails.expiryDateOfId
-                    ? armDetails.expiryDateOfId.toString()
-                    : ''
-                }
-                isDate={true}
-                editable={false}
-                showDatePicker={showDatePicker1}
-                onChangeValue={text =>
-                  setArmDetails({...armDetails, expiryDateOfId: text})
-                }
-                isNeeded={true}
-              />
-            </Pressable>
-
-            <DateTimePickerModal
-              isVisible={showOne}
-              testID="dateTimePicker"
-              defaultValue={armDetails.expiryDateOfId}
-              mode="date"
-              is24Hour={true}
-              onConfirm={handleConfirm2}
-              onCancel={hideDatePicker1}
-              textColor="#054B99"
-            />
-
-            <View style={{marginVertical: 0}}>
-              <CustomDropdown
-                label="Type Of Utility Bill"
-                isNeeded={true}
-                placeholder="Select Option"
-                data={data?.utilityBillTypes}
-                maxHeight={300}
-                labelField="label"
-                valueField="value"
-                value={armDetails?.utilityBillIdType}
-                onChange={option => {
-                  setArmDetails({
-                    ...armDetails,
-                    utilityBillIdType: option.value,
-                  });
-                }}
-              />
-            </View>
-
-            <TouchableOpacity
-              onPress={
-                handleCreateArmDetails
-                // armDeets?.email === undefined
-                //   ? handleCreateBankDetails
-                //   : handleUpdateBankDetails
-              }
-              disabled={disableit}>
-              <View style={{marginBottom: 40, marginTop: 20}}>
-                <Buttons label="Save & Continue" disabled={disableit} />
+              <View style={{marginVertical: 0}}>
+                <CustomDropdown
+                  label="Employment Status"
+                  isNeeded={true}
+                  placeholder="Select Option"
+                  search
+                  data={data.employmentStatuses}
+                  maxHeight={300}
+                  labelField="label"
+                  valueField="value"
+                  value={armDetails?.employmentStatus}
+                  onChange={option => {
+                    setArmDetails({
+                      ...armDetails,
+                      employmentStatus: option.value,
+                    });
+                  }}
+                />
               </View>
-            </TouchableOpacity>
-          </View>
-        </ScrollView>
-      </ImageBackground>
+              <View style={{marginVertical: 0}}>
+                <CustomDropdown
+                  label="Annual Expected Income Range"
+                  isNeeded={true}
+                  placeholder="Select Option"
+                  search
+                  data={data.incomeRanges}
+                  maxHeight={300}
+                  labelField="label"
+                  valueField="value"
+                  value={armDetails?.annualExpectedAnnualIncomeRange}
+                  onChange={option => {
+                    setArmDetails({
+                      ...armDetails,
+                      annualExpectedAnnualIncomeRange: option.value,
+                    });
+                  }}
+                />
+              </View>
+
+              <View style={{marginVertical: 0}}>
+                <CustomDropdown
+                  label="Politically Exposed Person"
+                  isNeeded={true}
+                  placeholder="Select Option"
+                  data={politicalViewData}
+                  maxHeight={300}
+                  labelField="label"
+                  valueField="value"
+                  value={armDetails?.politicallyExposedPersons}
+                  onChange={option => {
+                    setArmDetails({
+                      ...armDetails,
+                      politicallyExposedPersons: option.value,
+                    });
+                  }}
+                />
+              </View>
+
+              {armDetails?.politicallyExposedPersons === 'Yes' && (
+                <View style={{marginVertical: 0}}>
+                  <CustomDropdown
+                    label="Politically Exposed Persons Category"
+                    placeholder="Select Option"
+                    search
+                    data={data?.politicallyExposedPersonsCategory}
+                    maxHeight={300}
+                    labelField="label"
+                    valueField="value"
+                    value={armDetails?.politicallyExposedPersonsCategory}
+                    onChange={option => {
+                      setArmDetails({
+                        ...armDetails,
+                        politicallyExposedPersonsCategory: option.value,
+                      });
+                    }}
+                  />
+                </View>
+              )}
+
+              <View style={{marginVertical: 0}}>
+                <CustomDropdown
+                  label="Identity Type"
+                  isNeeded={true}
+                  placeholder="Select Option"
+                  data={data?.idTypes}
+                  maxHeight={300}
+                  labelField="label"
+                  valueField="value"
+                  value={armDetails?.idType}
+                  onChange={option => {
+                    setArmDetails({
+                      ...armDetails,
+                      idType: option.value,
+                    });
+                  }}
+                />
+              </View>
+
+              <Pressable onPress={showDatePicker}>
+                <Input
+                  label="Date Of Issue"
+                  iconName="calendar-month-outline"
+                  placeholder="2000-01-01"
+                  defaultValue={
+                    armDetails.issueDateOfId
+                      ? armDetails.issueDateOfId.toString()
+                      : ''
+                  }
+                  isDate={true}
+                  editable={false}
+                  showDatePicker={showDatePicker}
+                  onChangeValue={text =>
+                    setArmDetails({...armDetails, issueDateOfId: text})
+                  }
+                  isNeeded={true}
+                />
+              </Pressable>
+
+              <DateTimePickerModal
+                isVisible={show}
+                testID="dateTimePicker"
+                defaultValue={armDetails.issueDateOfId}
+                mode="date"
+                is24Hour={true}
+                onConfirm={handleConfirm}
+                onCancel={hideDatePicker}
+                textColor="#054B99"
+              />
+
+              <Pressable onPress={showDatePicker1}>
+                <Input
+                  label="Date Of Expiry"
+                  iconName="calendar-month-outline"
+                  placeholder="2000-01-01"
+                  defaultValue={
+                    armDetails.expiryDateOfId
+                      ? armDetails.expiryDateOfId.toString()
+                      : ''
+                  }
+                  isDate={true}
+                  editable={false}
+                  showDatePicker={showDatePicker1}
+                  onChangeValue={text =>
+                    setArmDetails({...armDetails, expiryDateOfId: text})
+                  }
+                  isNeeded={true}
+                />
+              </Pressable>
+
+              <DateTimePickerModal
+                isVisible={showOne}
+                testID="dateTimePicker"
+                defaultValue={armDetails.expiryDateOfId}
+                mode="date"
+                is24Hour={true}
+                onConfirm={handleConfirm2}
+                onCancel={hideDatePicker1}
+                textColor="#054B99"
+              />
+
+              <View style={{marginVertical: 0}}>
+                <CustomDropdown
+                  label="Type Of Utility Bill"
+                  isNeeded={true}
+                  placeholder="Select Option"
+                  data={data?.utilityBillTypes}
+                  maxHeight={300}
+                  labelField="label"
+                  valueField="value"
+                  value={armDetails?.utilityBillIdType}
+                  onChange={option => {
+                    setArmDetails({
+                      ...armDetails,
+                      utilityBillIdType: option.value,
+                    });
+                  }}
+                />
+              </View>
+
+              <View
+                style={{
+                  marginBottom: 40,
+                  marginTop: 20,
+                  flexDirection: 'row',
+                  justifyContent: 'space-evenly',
+                }}>
+                <TouchableOpacity
+                  onPress={() => {
+                    if (previousRoute !== 'MyAccount') {
+                      navigation.navigate('ValidIdentity');
+                    } else {
+                      navigation.navigate('MyAccount');
+                    }
+                  }}
+                  disabled={disableit}>
+                  <View style={{width: wp(20)}}>
+                    <Buttons label="Skip" />
+                  </View>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={handleCreateArmDetails}
+                  disabled={disableit}>
+                  <View style={{width: wp(60)}}>
+                    <Buttons label="Save & Continue" disabled={disableit} />
+                  </View>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </ScrollView>
+        </ImageBackground>
       </KeyboardAvoidingWrapper>
     </SafeAreaView>
   );

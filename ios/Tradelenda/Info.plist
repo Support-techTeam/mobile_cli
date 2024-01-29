@@ -64,6 +64,8 @@
 			</dict>
 		</dict>
 	</dict>
+	<key>NSAppleMusicUsageDescription</key>
+	<string>$(PRODUCT_NAME) needs permission to save and select media documents to complete forms and applications.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>$(PRODUCT_NAME) needs access to your camera to capture images of documents for uploading to complete forms and applications.</string>
 	<key>NSMicrophoneUsageDescription</key>
@@ -72,8 +74,6 @@
 	<string>$(PRODUCT_NAME) needs permission to save and select photos of documents to complete forms and applications.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>$(PRODUCT_NAME) needs permission to save and select photos of documents to complete forms and applications.</string>
-	<key>NSAppleMusicUsageDescription</key>
-	<string>$(PRODUCT_NAME) needs permission to save and select media documents to complete forms and applications.</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>AntDesign.ttf</string>

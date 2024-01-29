@@ -3,6 +3,7 @@ import axios from 'axios';
 import {BASE_API_URL} from '../../app.json';
 import {auth} from '../util/firebase/firebaseConfig';
 import {store} from '../util/redux/store';
+import {DdLogs} from '@datadog/mobile-react-native';
 
 //get login token
 const reduxStore = store.getState().userAuth;
@@ -37,6 +38,12 @@ const getAllLendaProduct = async () => {
             headers,
           },
         );
+        DdLogs.info(
+          `Investment | Lenda Investment Plans | ${auth?.currentUser?.email}`,
+          {
+            context: JSON.stringify(response?.data),
+          },
+        );
         return {
           title: 'Lenda Investment Plans',
           error: false,
@@ -44,6 +51,12 @@ const getAllLendaProduct = async () => {
           message: 'success',
         };
       } catch (error) {
+        DdLogs.error(
+          `Investment | Lenda Investment Plans | ${auth?.currentUser?.email}`,
+          {
+            errorMessage: JSON.stringify(error),
+          },
+        );
         return {
           title: 'Lenda Investment Plans',
           error: true,
@@ -77,6 +90,12 @@ const getAllArmProduct = async () => {
         const response = await axiosInstance.get(`/investment/arm-products`, {
           headers,
         });
+        DdLogs.info(
+          `Investment | ARM Investment | ${auth?.currentUser?.email}`,
+          {
+            context: JSON.stringify(response?.data),
+          },
+        );
         return {
           title: 'ARM Investment',
           error: false,
@@ -84,6 +103,12 @@ const getAllArmProduct = async () => {
           message: 'success',
         };
       } catch (error) {
+        DdLogs.error(
+          `Investment | ARM Investment | ${auth?.currentUser?.email}`,
+          {
+            errorMessage: JSON.stringify(error),
+          },
+        );
         return {
           title: 'ARM Investment',
           error: true,
@@ -120,6 +145,12 @@ const getArmProductYield = async productCode => {
             headers,
           },
         );
+        DdLogs.info(
+          `Investment | ARM Investment Yield | ${auth?.currentUser?.email}`,
+          {
+            context: JSON.stringify(response?.data),
+          },
+        );
         return {
           title: 'ARM Investment Yield',
           error: false,
@@ -127,6 +158,12 @@ const getArmProductYield = async productCode => {
           message: 'success',
         };
       } catch (error) {
+        DdLogs.error(
+          `Investment | ARM Investment Yield | ${auth?.currentUser?.email}`,
+          {
+            errorMessage: JSON.stringify(error),
+          },
+        );
         return {
           title: 'ARM Investment',
           error: true,
@@ -163,6 +200,12 @@ const getAllLendaInvestment = async () => {
             headers,
           },
         );
+        DdLogs.info(
+          `Investment | Get All Investment | ${auth?.currentUser?.email}`,
+          {
+            context: JSON.stringify(response?.data),
+          },
+        );
         return {
           title: 'Get All Investment',
           error: false,
@@ -170,6 +213,12 @@ const getAllLendaInvestment = async () => {
           message: 'success',
         };
       } catch (error) {
+        DdLogs.error(
+          `Investment | Get All Investment | ${auth?.currentUser?.email}`,
+          {
+            errorMessage: JSON.stringify(error),
+          },
+        );
         return {
           title: 'Get All Investment',
           error: true,
@@ -206,6 +255,12 @@ const getAllArmInvestment = async () => {
             headers,
           },
         );
+        DdLogs.info(
+          `Investment | Get All Investment | ${auth?.currentUser?.email}`,
+          {
+            context: JSON.stringify(response?.data),
+          },
+        );
         return {
           title: 'Get All Investment',
           error: false,
@@ -213,6 +268,12 @@ const getAllArmInvestment = async () => {
           message: 'success',
         };
       } catch (error) {
+        DdLogs.error(
+          `Investment | Get All Investment | ${auth?.currentUser?.email}`,
+          {
+            errorMessage: JSON.stringify(error),
+          },
+        );
         return {
           title: 'Get All Investment',
           error: true,
@@ -249,6 +310,12 @@ const getSingleArmInvestment = async (membershipId, productCode) => {
             headers,
           },
         );
+        DdLogs.info(
+          `Investment | Get Single Investment | ${auth?.currentUser?.email}`,
+          {
+            context: JSON.stringify(response?.data),
+          },
+        );
         return {
           title: 'Get Single Investment ',
           error: false,
@@ -256,6 +323,12 @@ const getSingleArmInvestment = async (membershipId, productCode) => {
           message: 'success',
         };
       } catch (error) {
+        DdLogs.error(
+          `Investment | Get Single Investment | ${auth?.currentUser?.email}`,
+          {
+            errorMessage: JSON.stringify(error),
+          },
+        );
         return {
           title: 'Get Single Investment ',
           error: true,
@@ -294,6 +367,12 @@ const createLendaInvestment = async details => {
           },
         );
         if (response?.data?.error) {
+          DdLogs.error(
+            `Investment | Create Lenda Investment | ${auth?.currentUser?.email}`,
+            {
+              errorMessage: JSON.stringify(response?.data),
+            },
+          );
           return {
             title: 'Create Lenda Investment ',
             error: true,
@@ -301,6 +380,12 @@ const createLendaInvestment = async details => {
             message: response?.data?.message,
           };
         }
+        DdLogs.info(
+          `Investment | Create Lenda Investment | ${auth?.currentUser?.email}`,
+          {
+            context: JSON.stringify(response?.data),
+          },
+        );
         return {
           title: 'Create Lenda Investment',
           error: false,
@@ -308,6 +393,12 @@ const createLendaInvestment = async details => {
           message: 'Investment Created successfully',
         };
       } catch (error) {
+        DdLogs.error(
+          `Investment | Create Lenda Investment | ${auth?.currentUser?.email}`,
+          {
+            errorMessage: JSON.stringify(error),
+          },
+        );
         return {
           title: 'Create Lenda Investment',
           error: true,
@@ -346,6 +437,12 @@ const createArmInvestment = async details => {
           },
         );
         if (response?.data?.data?.error) {
+          DdLogs.error(
+            `Investment | Create ARM Investment | ${auth?.currentUser?.email}`,
+            {
+              errorMessage: JSON.stringify(response?.data),
+            },
+          );
           return {
             title: 'Create ARM Investment ',
             error: true,
@@ -353,6 +450,12 @@ const createArmInvestment = async details => {
             message: response?.data?.data?.message,
           };
         }
+        DdLogs.info(
+          `Investment | Create ARM Investment | ${auth?.currentUser?.email}`,
+          {
+            context: JSON.stringify(response?.data),
+          },
+        );
         return {
           title: 'Create ARM Investment ',
           error: false,
@@ -361,6 +464,12 @@ const createArmInvestment = async details => {
             'Investment successful, you will be notified once it is active.',
         };
       } catch (error) {
+        DdLogs.error(
+          `Investment | Create ARM Investment | ${auth?.currentUser?.email}`,
+          {
+            errorMessage: JSON.stringify(error),
+          },
+        );
         return {
           title: 'Create ARM Investment ',
           error: true,
@@ -399,6 +508,12 @@ const topUpArmInvestment = async details => {
           },
         );
         if (response?.data?.data?.error) {
+          DdLogs.error(
+            `Investment | Top-Up Investment | ${auth?.currentUser?.email}`,
+            {
+              errorMessage: JSON.stringify(response?.data),
+            },
+          );
           return {
             title: 'Top-Up Investment',
             error: true,
@@ -406,6 +521,12 @@ const topUpArmInvestment = async details => {
             message: response?.data?.data?.message,
           };
         }
+        DdLogs.info(
+          `Investment | Top-Up Investment | ${auth?.currentUser?.email}`,
+          {
+            context: JSON.stringify(response?.data),
+          },
+        );
         return {
           title: 'Top-Up Investment',
           error: false,
@@ -413,6 +534,12 @@ const topUpArmInvestment = async details => {
           message: 'Investment Top-Up successful',
         };
       } catch (error) {
+        DdLogs.error(
+          `Investment | Top-Up Investment | ${auth?.currentUser?.email}`,
+          {
+            errorMessage: JSON.stringify(error),
+          },
+        );
         return {
           title: 'Top-Up Investment',
           error: true,
@@ -451,6 +578,12 @@ const topUpLendaInvestment = async details => {
           },
         );
         if (response?.data?.error) {
+          DdLogs.error(
+            `Investment | Top-Up Investment | ${auth?.currentUser?.email}`,
+            {
+              errorMessage: JSON.stringify(response?.data),
+            },
+          );
           return {
             title: 'Top-Up Investment',
             error: true,
@@ -458,6 +591,12 @@ const topUpLendaInvestment = async details => {
             message: response?.data?.message,
           };
         }
+        DdLogs.info(
+          `Investment | Top-Up Investment | ${auth?.currentUser?.email}`,
+          {
+            context: JSON.stringify(response?.data),
+          },
+        );
         return {
           title: 'Top-Up Investment',
           error: false,
@@ -465,6 +604,12 @@ const topUpLendaInvestment = async details => {
           message: 'Investment Top-Up successful',
         };
       } catch (error) {
+        DdLogs.error(
+          `Investment | Top-Up Investment | ${auth?.currentUser?.email}`,
+          {
+            errorMessage: JSON.stringify(error),
+          },
+        );
         return {
           title: 'Top-Up Investment',
           error: true,
@@ -503,6 +648,12 @@ const redeemArmInvestment = async details => {
           },
         );
         if (response?.data?.error) {
+          DdLogs.error(
+            `Investment | Redeem Investment | ${auth?.currentUser?.email}`,
+            {
+              errorMessage: JSON.stringify(response?.data),
+            },
+          );
           return {
             title: 'Redeem Investment',
             error: true,
@@ -510,6 +661,12 @@ const redeemArmInvestment = async details => {
             message: response?.data?.message,
           };
         }
+        DdLogs.info(
+          `Investment | Redeem Investment | ${auth?.currentUser?.email}`,
+          {
+            context: JSON.stringify(response?.data),
+          },
+        );
         return {
           title: 'Redeem Investment',
           error: false,
@@ -517,6 +674,12 @@ const redeemArmInvestment = async details => {
           message: 'Investment redeemption successful.',
         };
       } catch (error) {
+        DdLogs.error(
+          `Investment | Redeem Investment | ${auth?.currentUser?.email}`,
+          {
+            errorMessage: JSON.stringify(error),
+          },
+        );
         return {
           title: 'Redeem Investment',
           error: true,
@@ -553,6 +716,12 @@ const getArmOTP = async membershipId => {
             headers,
           },
         );
+        DdLogs.info(
+          `Investment | Get Investment OTP | ${auth?.currentUser?.email}`,
+          {
+            context: JSON.stringify(response?.data),
+          },
+        );
         return {
           title: 'Get Investment OTP',
           error: false,
@@ -560,6 +729,12 @@ const getArmOTP = async membershipId => {
           message: response?.data?.message,
         };
       } catch (error) {
+        DdLogs.error(
+          `Investment | Get Investment OTP | ${auth?.currentUser?.email}`,
+          {
+            errorMessage: JSON.stringify(error),
+          },
+        );
         return {
           title: 'Get Investment OTP',
           error: true,
@@ -598,6 +773,12 @@ const redeemLendaInvestment = async details => {
           },
         );
         if (response?.data?.error) {
+          DdLogs.error(
+            `Investment | Redeem Investment | ${auth?.currentUser?.email}`,
+            {
+              errorMessage: JSON.stringify(response?.data),
+            },
+          );
           return {
             title: 'Redeem Investment',
             error: true,
@@ -605,6 +786,12 @@ const redeemLendaInvestment = async details => {
             message: response?.data?.message,
           };
         }
+        DdLogs.info(
+          `Investment | Redeem Investment | ${auth?.currentUser?.email}`,
+          {
+            context: JSON.stringify(response?.data),
+          },
+        );
         return {
           title: 'Redeem Investment',
           error: false,
@@ -612,6 +799,12 @@ const redeemLendaInvestment = async details => {
           message: 'Investment redeemption successful',
         };
       } catch (error) {
+        DdLogs.error(
+          `Investment | Redeem Investment | ${auth?.currentUser?.email}`,
+          {
+            errorMessage: JSON.stringify(error),
+          },
+        );
         return {
           title: 'Redeem Investment',
           error: true,
@@ -650,6 +843,12 @@ const getLendaOTP = async data => {
           },
         );
         if (response?.data?.error) {
+          DdLogs.error(
+            `Investment | Get Investment OTP | ${auth?.currentUser?.email}`,
+            {
+              errorMessage: JSON.stringify(response?.data),
+            },
+          );
           return {
             title: 'Get Investment OTP',
             error: true,
@@ -657,6 +856,12 @@ const getLendaOTP = async data => {
             message: response?.data?.message,
           };
         }
+        DdLogs.info(
+          `Investment | Get Investment OTP | ${auth?.currentUser?.email}`,
+          {
+            context: JSON.stringify(response?.data),
+          },
+        );
         return {
           title: 'Get Investment OTP',
           error: false,
@@ -664,11 +869,125 @@ const getLendaOTP = async data => {
           message: response?.data?.message,
         };
       } catch (error) {
+        DdLogs.error(
+          `Investment | Get Investment OTP | ${auth?.currentUser?.email}`,
+          {
+            errorMessage: JSON.stringify(error),
+          },
+        );
         return {
           title: 'Top-Up Investment',
           error: true,
           data: null,
           message: 'Get investment OTP failed',
+        };
+      }
+    }
+  } else {
+    return {
+      error: true,
+      data: null,
+      message: 'No Internet Connection',
+    };
+  }
+};
+
+const getArmTransactionsStatement = async (membershipId, startDate, endDate) => {
+  if (
+    store.getState().networkState &&
+    store.getState().networkState.network.isConnected &&
+    store.getState().networkState.network.isInternetReachable
+  ) {
+    if (auth?.currentUser?.stsTokenManager?.accessToken) {
+      headers = {
+        accept: 'application/json',
+        Authorization: `Bearer ${auth.currentUser?.stsTokenManager?.accessToken}`,
+        'Content-Type': 'application/json',
+      };
+      try {
+        const response = await axiosInstance.get(
+          `/investment/generate-transaction-statement?membershipId=${membershipId}&startDate=${startDate}&endDate=${endDate}`,
+          {headers},
+        );
+
+        DdLogs.info(
+          `Investment | Get Transactions Statement | ${auth?.currentUser?.email}`,
+          {
+            context: JSON.stringify(response?.data),
+          },
+        );
+        return {
+          title: 'Get Transactions Statement',
+          error: false,
+          data: response?.data,
+          message: 'E-Statement sent to email.',
+        };
+      } catch (error) {
+        DdLogs.error(
+          `Investment | Get Transactions Statement | ${auth?.currentUser?.email}`,
+          {
+            errorMessage: JSON.stringify(error),
+          },
+        );
+        return {
+          title: 'Get Transactions Statement',
+          error: true,
+          data: null,
+          message: `Failed | ${error}`,
+        };
+      }
+    }
+  } else {
+    return {
+      error: true,
+      data: null,
+      message: 'No Internet Connection',
+    };
+  }
+};
+
+const getLendaTransactionsStatement = async (startDate, endDate) => {
+  if (
+    store.getState().networkState &&
+    store.getState().networkState.network.isConnected &&
+    store.getState().networkState.network.isInternetReachable
+  ) {
+    if (auth?.currentUser?.stsTokenManager?.accessToken) {
+      headers = {
+        accept: 'application/json',
+        Authorization: `Bearer ${auth.currentUser?.stsTokenManager?.accessToken}`,
+        'Content-Type': 'application/json',
+      };
+      try {
+        const response = await axiosInstance.get(
+          `/lenda-investment/generate-transaction-statement?startDate=${startDate}&endDate=${endDate}`,
+          {headers},
+        );
+
+        DdLogs.info(
+          `Investment | Get Transactions Statement | ${auth?.currentUser?.email}`,
+          {
+            context: JSON.stringify(response?.data),
+          },
+        );
+        return {
+          title: 'Get Transactions Statement',
+          error: false,
+          data: response?.data,
+          message: 'E-Statement sent to email.',
+        };
+      } catch (error) {
+        DdLogs.error(
+          `Investment | Get Transactions Statement | ${auth?.currentUser?.email}`,
+          {
+            errorMessage: JSON.stringify(error),
+          },
+        );
+        return {
+          title: 'Get Transactions Statement',
+          error: true,
+          data: null,
+          message: `Failed | ${error}`,
         };
       }
     }
@@ -696,4 +1015,6 @@ export {
   redeemLendaInvestment,
   getArmOTP,
   getLendaOTP,
+  getArmTransactionsStatement,
+  getLendaTransactionsStatement,
 };

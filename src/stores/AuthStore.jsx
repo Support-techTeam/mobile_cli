@@ -10,6 +10,7 @@ import {
 } from 'firebase/auth';
 import {BASE_URL} from '../../app.json';
 import {store} from '../util/redux/store';
+import {DdLogs} from '@datadog/mobile-react-native';
 
 const userLogin = async (email, password) => {
   if (
@@ -26,6 +27,7 @@ const userLogin = async (email, password) => {
       const user = userCredential.user;
       await AsyncStorage.setItem('hasUser', 'true');
       await AsyncStorage.setItem('userEmail', email);
+      DdLogs.info(`User | Login | ${email}`, {context: JSON.stringify(user)});
       return {
         user: user,
         title: 'Account Login',
@@ -33,7 +35,9 @@ const userLogin = async (email, password) => {
         message: 'Login Successful',
       };
     } catch (err) {
-      console.log(err.code);
+      DdLogs.error(`User | Login | ${email}`, {
+        errorMessage: JSON.stringify(err?.code),
+      });
       const errorMsg =
         err.code === 'auth/user-not-found'
           ? 'User not found. Please check your email.'
@@ -107,7 +111,9 @@ const userSignUp = async details => {
         });
       }
       await sendEmailVerification(newUser);
-
+      DdLogs.info(`User | Account Signup | ${details.email.trim()}`, {
+        context: JSON.stringify(newUser),
+      });
       return {
         user: newUser,
         title: 'Account Signup',
@@ -115,6 +121,9 @@ const userSignUp = async details => {
         message: 'Signup Successful',
       };
     } catch (err) {
+      DdLogs.error(`User | Account Signup | ${details.email.trim()}`, {
+        errorMessage: JSON.stringify(err),
+      });
       return {
         user: null,
         title: 'Account Signup',
@@ -139,6 +148,9 @@ const resendVerificationEmail = async () => {
   ) {
     try {
       await sendEmailVerification(auth.currentUser);
+      DdLogs.info(`User | Resend Verification Email |`, {
+        context: JSON.stringify(auth.currentUser),
+      });
       return {
         user: auth.currentUser,
         title: 'Resend Verification Email',
@@ -146,6 +158,9 @@ const resendVerificationEmail = async () => {
         message: 'Resend Verification Email Successful',
       };
     } catch (err) {
+      DdLogs.error(`User | Resend Verification Email |`, {
+        errorMessage: JSON.stringify(err),
+      });
       return {
         user: auth.currentUser,
         title: 'Resend Verification Email',
@@ -174,6 +189,9 @@ const forgotPassword = async email => {
         handleCodeInApp: true,
       };
       await sendPasswordResetEmail(auth, email.trim(), actionCodeSettings);
+      DdLogs.info(`User | Password Reset | ${email}`, {
+        context: JSON.stringify(auth.currentUser),
+      });
       return {
         user: auth.currentUser,
         title: 'Password Reset',
@@ -181,6 +199,9 @@ const forgotPassword = async email => {
         message: 'Password reset link sent to email.',
       };
     } catch (err) {
+      DdLogs.error(`User | Password Reset | ${email}`, {
+        errorMessage: JSON.stringify(err),
+      });
       return {
         user: auth.currentUser,
         title: 'Password Reset',
