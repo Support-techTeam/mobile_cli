@@ -758,6 +758,9 @@ const createDocumentsDetails = async details => {
             context: JSON.stringify(response?.data),
           },
         );
+        console.log("response", response?.data);
+            console.log("response", response?.data?.message);
+            console.log("response", response?.data?.error);
         return {
           title: 'Create Document Details ',
           error: false,
@@ -1116,6 +1119,7 @@ const updateDocumentsDetails = async details => {
             context: JSON.stringify(response?.data),
           },
         );
+        console.log("response", response);
         return {
           title: 'Update Document Details ',
           error: false,

@@ -78,7 +78,6 @@ const Investscreen = () => {
 
   useEffect(() => {
     const mergedData = [...allArmData, ...allILendaData];
-    // const mergedData = Array.from(allArmData).concat(allILendaData);
     setAllInvestmentData(mergedData);
   }, [allArmData, allILendaData]);
 
@@ -156,9 +155,6 @@ const Investscreen = () => {
     loanUserDetails?.armUserBankDetails?.maximumSingleRedemptionAmount !=
       undefined &&
     loanUserDetails?.armUserBankDetails?.maximumSingleRedemptionAmount != '' &&
-    loanUserDetails?.armUserBankDetails?.politicallyExposedPersons !=
-      undefined &&
-    loanUserDetails?.armUserBankDetails?.politicallyExposedPersons != '' &&
     loanUserDetails?.armUserBankDetails?.reInvestDividends != undefined &&
     loanUserDetails?.armUserBankDetails?.reInvestDividends != '' &&
     loanUserDetails?.armUserBankDetails?.utilityBillIdType != undefined &&
@@ -185,9 +181,11 @@ const Investscreen = () => {
           : `${
               totalLendaAmount === 0
                 ? '0.00'
-                : totalLendaAmount
-                    ?.toString()
-                    ?.replace(/\B(?=(\d{3})+\b)/g, ',')
+                : new Intl.NumberFormat('en-US', {
+                  style: 'decimal',
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2
+                }).format(Number(totalLendaAmount))
             }`
       }`,
       icon: require('../../../assets/images/lenda.png'),
@@ -200,9 +198,17 @@ const Investscreen = () => {
       state: 'Save with ARM',
       amount: `₦${
         portfolioDetail !== 0
-          ? portfolioDetail?.toString()?.replace(/\B(?=(\d{3})+\b)/g, ',')
+          ? new Intl.NumberFormat('en-US', {
+            style: 'decimal',
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+          }).format(Number(portfolioDetail))
           : totalArmAmount !== undefined
-          ? totalArmAmount?.toString()?.replace(/\B(?=(\d{3})+\b)/g, ',')
+          ? new Intl.NumberFormat('en-US', {
+            style: 'decimal',
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+          }).format(Number(totalArmAmount))
           : '0.00'
       }`,
       icon: require('../../../assets/images/arm.png'),
@@ -696,7 +702,7 @@ const styles = StyleSheet.create({
   amount: {
     marginTop: hp(0.5),
     fontFamily: 'serif',
-    fontSize: hp(2.5),
+    fontSize: hp(2.2),
     marginVertical: hp(2.2),
   },
 });

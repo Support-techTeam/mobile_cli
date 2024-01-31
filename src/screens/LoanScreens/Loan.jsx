@@ -42,140 +42,109 @@ const Loanscreen = () => {
   const [guarantor, setGuarantor] = useState([]);
   const route = useRoute();
   //total approvedLoans
-  let totalApprovedLoanAmount = 0;
-
-  for (const loan of approvedLoansData) {
-    totalApprovedLoanAmount += loan.amount;
-  }
+  let totalApprovedLoanAmount = approvedLoansData?.reduce(
+    (total, loan) => total + (loan?.amount || 0),
+    0
+  );
 
   //total Pending
-  let totalPendingLoanAmount = 0;
-
-  for (const loan of pendingLoansData) {
-    totalPendingLoanAmount += loan.amount;
-  }
+  let totalPendingLoanAmount = pendingLoansData?.reduce(
+    (total, loan) => total + (loan?.amount || 0),
+    0
+  );
 
   //total Paid
-  let totalPaidLoanAmount = 0;
-
-  for (const loan of paidLoansData) {
-    totalPaidLoanAmount += loan.amount;
-  }
+  let totalPaidLoanAmount = paidLoansData?.reduce(
+    (total, loan) => total + (loan?.amount || 0),
+    0
+  );
 
   useEffect(() => {
     if (route.name === 'LoanHome') {
       const unsubscribe = navigation.addListener('focus', async () => {
-        getLoanuserData();
-        getApprovedLoansData();
-        getPendingLoansData();
-        getAllLoansData();
-        getPaidLoansData();
-        getGuarantorData();
+        Promise.all([
+          fetchLoanUserData(),
+          fetchApprovedLoansData(),
+          fetchPendingLoansData(),
+          fetchAllLoansData(),
+          fetchPaidLoansData(),
+          fetchGuarantorData(),
+        ]);
       });
       return unsubscribe;
     }
   }, [navigation]);
 
-  const getLoanuserData = async () => {
-    setIsLoading(true);
-    const res = await getLoanUserDetails();
-    if (res?.error) {
-      // Toast.show({
-      //   type: 'error',
-      //   position: 'top',
-      //   topOffset: 50,
-      //   text1: res?.title,
-      //   text2: res?.message,
-      //   visibilityTime: 5000,
-      //   autoHide: true,
-      //   onPress: () => Toast.hide(),
-      // });
-    } else {
-      setLoanUserDetails(res?.data);
+  const fetchLoanUserData = async () => {
+    try {
+      setIsLoading(true);
+      const response = await getLoanUserDetails();
+      if (!response.error) {
+        setLoanUserDetails(response.data);
+      }
+    } catch (error) {
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
-  const getApprovedLoansData = async () => {
-    setIsLoading(true);
-    const res = await getApprovedLoans();
-    if (res?.error) {
-      // Toast.show({
-      //   type: 'error',
-      //   position: 'top',
-      //   topOffset: 50,
-      //   text1: res?.title,
-      //   text2: res?.message,
-      //   visibilityTime: 5000,
-      //   autoHide: true,
-      //   onPress: () => Toast.hide(),
-      // });
-    } else {
-      setApprovedLoansData(res?.data);
+
+  const fetchApprovedLoansData = async () => {
+    try {
+      setIsLoading(true);
+      const response = await getApprovedLoans();
+      if (!response.error) {
+        setApprovedLoansData(response.data);
+      }
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
-  const getPendingLoansData = async () => {
-    setIsLoading(true);
-    const res = await getPendingLoans();
-    if (res?.error) {
-      // Toast.show({
-      //   type: 'error',
-      //   position: 'top',
-      //   topOffset: 50,
-      //   text1: res?.title,
-      //   text2: res?.message,
-      //   visibilityTime: 5000,
-      //   autoHide: true,
-      //   onPress: () => Toast.hide(),
-      // });
-    } else {
-      setPendingLoansData(res?.data);
+
+  const fetchPendingLoansData = async () => {
+    try {
+      setIsLoading(true);
+      const response = await getPendingLoans();
+      setPendingLoansData(response?.data);
+    } catch (error) {
+      // Handle error here
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
-  const getAllLoansData = async () => {
-    setIsLoading(true);
-    const res = await getAllLoans();
-    if (res?.error) {
-      // Toast.show({
-      //   type: 'error',
-      //   position: 'top',
-      //   topOffset: 50,
-      //   text1: res?.title,
-      //   text2: res?.message,
-      //   visibilityTime: 5000,
-      //   autoHide: true,
-      //   onPress: () => Toast.hide(),
-      // });
-    } else {
-      setAllLoansData(res?.data);
+  const fetchAllLoansData = async () => {
+    try {
+      setIsLoading(true);
+      const response = await getAllLoans();
+      if (!response?.error) {
+        setAllLoansData(response?.data);
+      }
+    } catch (error) {
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
-  const getPaidLoansData = async () => {
-    setIsLoading(true);
-    const res = await getPaidLoans();
-    if (res?.error) {
-      // Toast.show({
-      //   type: 'error',
-      //   position: 'top',
-      //   topOffset: 50,
-      //   text1: res?.title,
-      //   text2: res?.message,
-      //   visibilityTime: 5000,
-      //   autoHide: true,
-      //   onPress: () => Toast.hide(),
-      // });
-    } else {
-      setPaidLoansData(res?.data);
+
+  const fetchPaidLoansData = async () => {
+    try {
+      setIsLoading(true);
+      const response = await getPaidLoans();
+      if (!response?.error) {
+        setPaidLoansData(response?.data);
+      }
+    } catch (error) {
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
-  const getGuarantorData = async () => {
-    const res = await getGuarantors();
-    if (res?.error) {
-    } else {
-      setGuarantor(res?.data);
+
+  const fetchGuarantorData = async () => {
+    try {
+      const response = await getGuarantors();
+      if (!response?.error) {
+        setGuarantor(response?.data);
+      }
+    } catch (error) {
+      // Handle error
     }
   };
 
@@ -684,9 +653,11 @@ const Loanscreen = () => {
                             <Text style={styles.title}>{loan?.loanType}</Text>
                             <Text style={styles.price}>
                               ₦
-                              {loan?.amount
-                                ?.toString()
-                                ?.replace(/\B(?=(\d{3})+\b)/g, ',')}
+                              {loan?.amount ? new Intl.NumberFormat('en-US', {
+                                style:'decimal',
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              }).format(loan?.amount) : '0.00'}
                             </Text>
                           </View>
                           <View

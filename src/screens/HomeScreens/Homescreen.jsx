@@ -2096,9 +2096,6 @@ const Homescreen = () => {
                   size={29}
                   color={COLORS.white}
                 />
-                {/* <Image
-                  source={require('../../../assets/images/fundVector.png')}
-                /> */}
               </View>
               <View style={{alignSelf: 'center', marginTop: 5}}>
                 <Text
@@ -2758,7 +2755,7 @@ const Homescreen = () => {
             </Modal>
           </Center>
 
-          {/* Sixth Section */}
+          {/* Sixth Section Single Transaction History*/}
           <View
             style={{
               flex: 1,

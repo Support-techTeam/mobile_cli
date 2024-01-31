@@ -62,13 +62,13 @@ const ownedOrRentedData = [
 
 const womanLedData = [
   {value: '', label: 'Select Option'},
-  {value: false, label: 'Yes'},
+  {value: true, label: 'Yes'},
   {value: false, label: 'No'},
 ];
 
 const sharComData = [
   {value: '', label: 'Select Option'},
-  {value: false, label: 'Yes'},
+  {value: true, label: 'Yes'},
   {value: false, label: 'No'},
 ];
 
@@ -141,6 +141,8 @@ const monthlyExpData = [
 
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
+
+let fetchedCity = [];
 
 const BusinessDetails = () => {
   const navigation = useNavigation();
@@ -480,14 +482,18 @@ const BusinessDetails = () => {
   }, [stateCity]);
 
   useEffect(() => {
-    const cityData =
-      city &&
-      city.map((item, index) => {
-        return {value: item, label: item, key: index};
+    if(businessDetails.state !== ''){
+     const getStateData = getCity(businessDetails.state).then((res) => {
+      fetchedCity = [];
+      res?.data && res?.data.map((item, index) => {
+        fetchedCity.push({value: item, label: item, key: index});
       });
+    }).catch(err => {
+    
+    })
+  }
 
-    setCurrentCity(cityData);
-  }, [city]);
+}, [businessDetails.state]);
 
   useEffect(() => {
     setIsLoading(true);
@@ -786,6 +792,14 @@ const BusinessDetails = () => {
                         ...businessDetails,
                         state: option.value,
                       });
+                      const getStateData = getCity(option.value).then((res) => {
+                        fetchedCity = [];
+                        res?.data && res?.data.map((item, index) => {
+                          fetchedCity.push({value: item, label: item, key: index});
+                        });
+                      }).catch(err => {
+                                                // console.log(err);
+                      })
                     }}
                   />
                 </View>
@@ -797,8 +811,8 @@ const BusinessDetails = () => {
                     placeholder="Select LGA"
                     placeholderStyle={styles.placeholderStyle}
                     selectedTextStyle={styles.selectedTextStyle}
-                    data={currentCity ? currentCity : cityData}
-                    // data={cityData}
+                    data={fetchedCity.length > 0 ? fetchedCity : cityData}
+                    disabled={!businessDetails.state}
                     maxHeight={300}
                     labelField="label"
                     valueField="value"
@@ -823,7 +837,7 @@ const BusinessDetails = () => {
                   maxHeight={300}
                   labelField="label"
                   valueField="value"
-                  value={businessDetails.residentialStatus}
+                  value={businessDetails?.ownedOrRented}
                   onChange={option => {
                     setBusinessDetails({
                       ...businessDetails,
@@ -858,7 +872,7 @@ const BusinessDetails = () => {
                   maxHeight={300}
                   labelField="label"
                   valueField="value"
-                  value={businessDetails.womenLed}
+                  value={businessDetails?.womenLed}
                   onChange={option => {
                     setBusinessDetails({
                       ...businessDetails,

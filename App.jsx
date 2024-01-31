@@ -7,6 +7,8 @@ import {
   View,
   AppState,
   LogBox,
+  ouchableOpacity,
+  TouchableWithoutFeedback,
   Text,
   Button,
 } from 'react-native';
@@ -27,13 +29,15 @@ import {Provider as PaperProvider, Portal} from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {Provider} from 'react-redux';
 import {PersistGate} from 'redux-persist/integration/react';
-import {persistor, store} from './src/util/redux/store';
+import {persistor, resetStore, store} from './src/util/redux/store';
 import {LightTheme} from './src/constants/lightTheme';
 import EnterPin from './src/screens/SecurityScreens/EnterPinScreen';
 import {getAllPin} from './src/stores/SecurityStore';
 import NetworkStatus from './src/util/NetworkService';
 import RNRestart from 'react-native-restart';
 import COLORS from './src/constants/colors';
+import {userLogOut} from './src/stores/AuthStore';
+import {auth} from './src/util/firebase/firebaseConfig';
 
 const inAppUpdates = new SpInAppUpdates(false);
 LogBox.ignoreAllLogs();
@@ -63,6 +67,7 @@ const TRANSITIONS = ['fade', 'slide', 'none'];
 function App() {
   const appMainState = useRef(AppState.currentState);
   const [appState, setAppState] = useState(appMainState.current);
+  const [appStateVisible, setAppStateVisible] = useState(appState.current);
   const [isLocked, setIsLocked] = useState('');
   const [hasPin, setHasPin] = useState(false);
   const {getItem, setItem} = useAsyncStorage('@lockState');
@@ -76,26 +81,8 @@ function App() {
   const [statusBarTransition, setStatusBarTransition] = useState(
     TRANSITIONS[0],
   );
-
-  // const changeStatusBarVisibility = () => setHidden(!hidden);
-
-  // const changeStatusBarStyle = () => {
-  //   const styleId = STYLES.indexOf(statusBarStyle) + 1;
-  //   if (styleId === STYLES.length) {
-  //     setStatusBarStyle(STYLES[0]);
-  //   } else {
-  //     setStatusBarStyle(STYLES[styleId]);
-  //   }
-  // };
-
-  // const changeStatusBarTransition = () => {
-  //   const transition = TRANSITIONS.indexOf(statusBarTransition) + 1;
-  //   if (transition === TRANSITIONS.length) {
-  //     setStatusBarTransition(TRANSITIONS[0]);
-  //   } else {
-  //     setStatusBarTransition(TRANSITIONS[transition]);
-  //   }
-  // };
+  const [inactivityTimer, setInactivityTimer] = useState(null);
+  const [backgroundTimer, setBackgroundTimer] = useState(null);
 
   const writeItemToStorage = async newValue => {
     await setItem(newValue);
@@ -145,7 +132,7 @@ function App() {
         }
       });
     } catch (err) {
-      console.log('Update Err: ', err);
+      // console.log('Update Err: ', err);
     }
   }, []);
 
@@ -156,7 +143,7 @@ function App() {
         inAppUpdates.removeStatusUpdateListener(onStatusUpdate);
       };
     } catch (err) {
-      console.log('Status Update Err: ', err);
+      // console.log('Status Update Err: ', err);
     }
   }, [onStatusUpdate]);
 
@@ -184,36 +171,47 @@ function App() {
   };
 
   // App State Monitor
-  useEffect(() => {
-    const handleAppStateChange = async nextAppState => {
-      if (appState === 'active' && nextAppState.match(/inactive|background/)) {
-        // App becomes inactive or goes to background
-        const lockTimer = setTimeout(async () => {
-          setIsLocked(true);
-          writeItemToStorage('true');
-        }, 5000); // Lock after 30 seconds of inactivity
-
-        return () => clearTimeout(lockTimer);
-      } else if (
-        appState.match(/inactive|background/) &&
-        nextAppState === 'active'
-      ) {
-        // App resumes from background or inactive state
-        setIsLocked(true);
-        writeItemToStorage('true');
+  const logout = async () => {
+    console.log(auth.currentUser);
+    if (auth.currentUser) {
+      const logoutResult = await userLogOut();
+      if (!logoutResult?.error) {
+        await resetStore();
       }
-      setAppState(nextAppState);
-    };
+    }
+  };
 
-    const appStateListener = AppState.addEventListener(
-      'change',
-      handleAppStateChange,
-    );
 
-    return () => {
-      appStateListener.remove();
-    };
-  }, [appState]);
+  // useEffect(() => {
+  //   const handleAppStateChange = async nextAppState => {
+  //     if (appState === 'active' && nextAppState.match(/inactive|background/)) {
+  //       // App becomes inactive or goes to background
+  //       const lockTimer = setTimeout(async () => {
+  //         setIsLocked(true);
+  //         writeItemToStorage('true');
+  //       }, 5000); // Lock after 30 seconds of inactivity
+
+  //       return () => clearTimeout(lockTimer);
+  //     } else if (
+  //       appState.match(/inactive|background/) &&
+  //       nextAppState === 'active'
+  //     ) {
+  //       // App resumes from background or inactive state
+  //       setIsLocked(true);
+  //       writeItemToStorage('true');
+  //     }
+  //     setAppState(nextAppState);
+  //   };
+
+  //   const appStateListener = AppState.addEventListener(
+  //     'change',
+  //     handleAppStateChange,
+  //   );
+
+  //   return () => {
+  //     appStateListener.remove();
+  //   };
+  // }, [appState]);
 
   // Toggle lock state
   const toggleVisibility = () => {
@@ -224,10 +222,6 @@ function App() {
   const theme = {
     ...LightTheme,
   };
-
-  useEffect(() => {
-    LogBox.ignoreLogs(['In React 18, SSRProvider is not necessary and is a noop. You can remove it from your app.']);
-  }, []);
 
   return (
     <SafeAreaProvider style={styles.rootContainer}>
@@ -245,14 +239,14 @@ function App() {
             {isLocked && isLocked === 'true' && hasPin ? (
               <EnterPin toggleVisibility={() => toggleVisibility()} />
             ) : (
-              <View style={styles.container}>
-                <Provider store={store}>
-                  <PersistGate persistor={persistor} loading={null}>
-                    <NetworkStatus />
-                    <AppNavigationContainer />
-                  </PersistGate>
-                </Provider>
-              </View>
+                <View style={styles.container}>
+                  <Provider store={store}>
+                    <PersistGate persistor={persistor} loading={null}>
+                      <NetworkStatus />
+                      <AppNavigationContainer />
+                    </PersistGate>
+                  </Provider>
+                </View>
             )}
           </DatadogProvider>
         </Portal>

@@ -127,7 +127,7 @@ const IdentityCard = () => {
       </View>
 
       <View style={styles.form}>
-        <Text style={styles.header}>Upload Bank Statement</Text>
+        <Text style={styles.header}>Upload Identity Card</Text>
       </View>
       <View style={styles.innercontainer}>
         <FlatList

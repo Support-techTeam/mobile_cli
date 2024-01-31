@@ -138,6 +138,8 @@ const ValidIdentity = () => {
   const renderItem = ({item}) => {
     const isActive = item.key === activeTab;
 
+    console.log('formDetails', formDetails);
+
     return (
       <View>
         <View style={[styles.tobTab, isActive && styles.activeTab]}>
