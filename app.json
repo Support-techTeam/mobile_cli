@@ -6,6 +6,8 @@
   "orientation": "portrait",
   "BASE_URL": "https://tradelenda.com",
   "BASE_API_URL": "https://prime.tradelenda.com/api/v1",
+  "SCREELOCK_CODE": "screellockcode",
+  "SCREENLOCK_STATUS": "screellockstatus",
   "firebase_config": {
     "apiKey": "AIzaSyA-FQQY9cImFEd3BFkoqbNquoOEO8hnvhg",
     "authDomain": "tradelenda-app.firebaseapp.com",

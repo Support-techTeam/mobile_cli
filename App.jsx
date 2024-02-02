@@ -7,10 +7,6 @@ import {
   View,
   AppState,
   LogBox,
-  ouchableOpacity,
-  TouchableWithoutFeedback,
-  Text,
-  Button,
 } from 'react-native';
 import SpInAppUpdates, {IAUUpdateKind} from 'sp-react-native-in-app-updates';
 import {version} from './app.json';
@@ -26,20 +22,20 @@ import {
 import AppNavigationContainer from './src/navigation';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {Provider as PaperProvider, Portal} from 'react-native-paper';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import {Provider} from 'react-redux';
 import {PersistGate} from 'redux-persist/integration/react';
 import {persistor, resetStore, store} from './src/util/redux/store';
 import {LightTheme} from './src/constants/lightTheme';
-import EnterPin from './src/screens/SecurityScreens/EnterPinScreen';
-import {getAllPin} from './src/stores/SecurityStore';
+import InputPin from './src/screens/SecurityScreens/PinInput';
 import NetworkStatus from './src/util/NetworkService';
 import RNRestart from 'react-native-restart';
 import COLORS from './src/constants/colors';
 import {userLogOut} from './src/stores/AuthStore';
 import {auth} from './src/util/firebase/firebaseConfig';
-
+import SInfo from 'react-native-sensitive-info';
+import BackgroundTimer from 'react-native-background-timer';
 const inAppUpdates = new SpInAppUpdates(false);
+
 LogBox.ignoreAllLogs();
 
 AppCenter.setLogLevel(AppCenter.LogLevel.VERBOSE);
@@ -60,55 +56,16 @@ datadogConfiguration.site = 'US';
 datadogConfiguration.nativeCrashReportEnabled = true;
 // Optional: sample RUM sessions (here, 80% of session will be sent to Datadog. Default = 100%)
 datadogConfiguration.sampleRate = 80;
-
-const STYLES = ['default', 'dark-content', 'light-content'];
 const TRANSITIONS = ['fade', 'slide', 'none'];
 
+let inactiveTime = 0;
+const defaultWaitTime = 30;
 function App() {
-  const appMainState = useRef(AppState.currentState);
-  const [appState, setAppState] = useState(appMainState.current);
-  const [appStateVisible, setAppStateVisible] = useState(appState.current);
-  const [isLocked, setIsLocked] = useState('');
-  const [hasPin, setHasPin] = useState(false);
-  const {getItem, setItem} = useAsyncStorage('@lockState');
-  const readItemFromStorage = async () => {
-    const item = await getItem();
-    setIsLocked(item);
-  };
-
+  const [appState, setAppState] = useState(AppState.currentState);
   const [hidden, setHidden] = useState(false);
-  const [statusBarStyle, setStatusBarStyle] = useState(STYLES[0]);
   const [statusBarTransition, setStatusBarTransition] = useState(
     TRANSITIONS[0],
   );
-  const [inactivityTimer, setInactivityTimer] = useState(null);
-  const [backgroundTimer, setBackgroundTimer] = useState(null);
-
-  const writeItemToStorage = async newValue => {
-    await setItem(newValue);
-    setIsLocked(newValue);
-  };
-
-  useEffect(() => {
-    readItemFromStorage();
-  });
-
-  useEffect(() => {
-    checkIfPinIsSet();
-  }, []);
-
-  const checkIfPinIsSet = async () => {
-    const res = await getAllPin();
-    if (res?.data?.length > 0) {
-      setHasPin(true);
-    } else if (res?.data == null) {
-      toggleVisibility();
-      setHasPin(false);
-    } else {
-      toggleVisibility();
-      setHasPin(false);
-    }
-  };
 
   //update check
   useEffect(() => {
@@ -172,7 +129,7 @@ function App() {
 
   // App State Monitor
   const logout = async () => {
-    console.log(auth.currentUser);
+    // console.log(auth.currentUser);
     if (auth.currentUser) {
       const logoutResult = await userLogOut();
       if (!logoutResult?.error) {
@@ -181,42 +138,81 @@ function App() {
     }
   };
 
+  useEffect(() => {
+    const handleAppStateChange = nextAppState => {
+      if (appState.match(/inactive|background/) && nextAppState === 'active') {
+        // App became active, stop tracking inactivity
+        inactiveTime = 0;
+        BackgroundTimer?.stopBackgroundTimer();
+      } else if (nextAppState === 'background' || nextAppState === 'inactive') {
+        // App became inactive, start tracking inactivity
+        BackgroundTimer?.runBackgroundTimer(() => {
+          //code that will be called every 1 seconds
+          console.log('Running background timer', inactiveTime);
+          if (inactiveTime < defaultWaitTime) {
+            inactiveTimerCallback();
+          }
+        }, 1000);
+      }
+      setAppState(nextAppState);
+    };
 
-  // useEffect(() => {
-  //   const handleAppStateChange = async nextAppState => {
-  //     if (appState === 'active' && nextAppState.match(/inactive|background/)) {
-  //       // App becomes inactive or goes to background
-  //       const lockTimer = setTimeout(async () => {
-  //         setIsLocked(true);
-  //         writeItemToStorage('true');
-  //       }, 5000); // Lock after 30 seconds of inactivity
+    const inactiveTimerCallback = () => {
+      inactiveTime += 1;
 
-  //       return () => clearTimeout(lockTimer);
-  //     } else if (
-  //       appState.match(/inactive|background/) &&
-  //       nextAppState === 'active'
-  //     ) {
-  //       // App resumes from background or inactive state
-  //       setIsLocked(true);
-  //       writeItemToStorage('true');
-  //     }
-  //     setAppState(nextAppState);
-  //   };
+      if (inactiveTime >= defaultWaitTime) {
+        performAction();
+        BackgroundTimer.stopBackgroundTimer(); // Stop the background timer once the action is performed
+      }
+    };
+    const performAction = () => {
+      // logout();
+      // Your action to be performed after 30 seconds of inactivity
+      console.log('Performing action after 30 seconds of inactivity');
+      // Add your code here
+    };
 
-  //   const appStateListener = AppState.addEventListener(
-  //     'change',
-  //     handleAppStateChange,
-  //   );
+    const appStateListener = AppState?.addEventListener(
+      'change',
+      handleAppStateChange,
+    );
 
-  //   return () => {
-  //     appStateListener.remove();
-  //   };
-  // }, [appState]);
+    return () => {
+      appStateListener?.remove();
+    };
+  }, [appState, inactiveTime]);
 
-  // Toggle lock state
-  const toggleVisibility = () => {
-    setIsLocked(false);
-    writeItemToStorage('false');
+  const retrieveAllSecureInfoData = async () => {
+    const allData = await SInfo.getAllItems({
+      sharedPreferencesName: 'tradeLendaSharedPrefs',
+      keychainService: 'tradeLendaKeychain',
+    });
+    console.log('NORMAL GETTING ALL', allData);
+  };
+
+  // Set Passcode to blank
+  const setSecureInfoData = async (option, code) => {
+    const responseData = await SInfo.setItem(option, code, {
+      sharedPreferencesName: 'tradeLendaSharedPrefs',
+      keychainService: 'tradeLendaKeychain',
+    });
+    console.log('NORMAL SETTING', responseData);
+  };
+
+  const getSecureInfoData = async option => {
+    const responseData = await SInfo.getItem(option, {
+      sharedPreferencesName: 'tradeLendaSharedPrefs',
+      keychainService: 'tradeLendaKeychain',
+    });
+    console.log('NORMAL GETTING', responseData);
+  };
+
+  const deleteSecureInfoData = async option => {
+    const responseData = await SInfo.deleteItem(option, {
+      sharedPreferencesName: 'tradeLendaSharedPrefs',
+      keychainService: 'tradeLendaKeychain',
+    });
+    console.log('NORMAL DELETING', responseData);
   };
 
   const theme = {
@@ -228,7 +224,6 @@ function App() {
       <PaperProvider theme={theme}>
         <Portal>
           <DatadogProvider configuration={datadogConfiguration}>
-            {/* <StatusBar translucent={true} /> */}
             <StatusBar
               animated={true}
               backgroundColor={COLORS.lendaBlue}
@@ -236,17 +231,18 @@ function App() {
               showHideTransition={statusBarTransition}
               hidden={hidden}
             />
-            {isLocked && isLocked === 'true' && hasPin ? (
-              <EnterPin toggleVisibility={() => toggleVisibility()} />
+            {/*  {isLocked && isLocked === 'true' && hasPin ? (*/}
+            {false ? (
+              <InputPin />
             ) : (
-                <View style={styles.container}>
-                  <Provider store={store}>
-                    <PersistGate persistor={persistor} loading={null}>
-                      <NetworkStatus />
-                      <AppNavigationContainer />
-                    </PersistGate>
-                  </Provider>
-                </View>
+              <View style={styles.container}>
+                <Provider store={store}>
+                  <PersistGate persistor={persistor} loading={null}>
+                    <NetworkStatus />
+                    <AppNavigationContainer />
+                  </PersistGate>
+                </Provider>
+              </View>
             )}
           </DatadogProvider>
         </Portal>

@@ -455,7 +455,16 @@ const Homescreen = () => {
   const handleLongPress = async evt => {
     try {
       setString(evt);
-      ToastAndroid.show('Text copied to clipboard', ToastAndroid.SHORT);
+      Toast.show({
+        type: 'info',
+        position: 'top',
+        topOffset: 50,
+        text1: "Copy Action",
+        text2: "Account number copied to clipboard",
+        visibilityTime: 3000,
+        autoHide: true,
+        onPress: () => Toast.hide(),
+      });
     } catch (error) {
       // console.error('Error copying to clipboard:', error);
     }
@@ -800,8 +809,7 @@ const Homescreen = () => {
                             {item.accountName}
                           </Text>
                         </TouchableWithoutFeedback>
-                        <TouchableWithoutFeedback
-                          >
+                        <TouchableWithoutFeedback>
                           <FontIcon
                             size={17}
                             color={COLORS.lendaBlue}
@@ -1303,31 +1311,41 @@ const Homescreen = () => {
                           Account Number:
                         </Text>
                       </View>
-                      <View style={{flex:1, flexDirection: 'row', justifyContent: "flex-end"}}>
-                      <TouchableWithoutFeedback
-                          >
+                      <View
+                        style={{
+                          flex: 1,
+                          flexDirection: 'row',
+                          justifyContent: 'flex-end',
+                        }}>
+                        <TouchableWithoutFeedback>
                           <FontIcon
                             size={17}
                             color={COLORS.lendaBlue}
                             name="copy"
                             style={{marginRight: 4}}
-                            onPress={() => handleLongPress(userWalletData?.walletIdAccountNumber)}
+                            onPress={() =>
+                              handleLongPress(
+                                userWalletData?.walletIdAccountNumber,
+                              )
+                            }
                           />
                         </TouchableWithoutFeedback>
-                      <TouchableWithoutFeedback
-                        onLongPress={() =>
-                          handleLongPress(userWalletData?.walletIdAccountNumber)
-                        }>
-                        <Text
-                          selectable={true}
-                          selectionColor={'#CED4DA'}
-                          style={styles.TextHead}>
-                          {userWalletData &&
-                          userWalletData?.walletIdAccountNumber
-                            ? userWalletData?.walletIdAccountNumber
-                            : 'N/A'}
-                        </Text>
-                      </TouchableWithoutFeedback>
+                        <TouchableWithoutFeedback
+                          onLongPress={() =>
+                            handleLongPress(
+                              userWalletData?.walletIdAccountNumber,
+                            )
+                          }>
+                          <Text
+                            selectable={true}
+                            selectionColor={'#CED4DA'}
+                            style={styles.TextHead}>
+                            {userWalletData &&
+                            userWalletData?.walletIdAccountNumber
+                              ? userWalletData?.walletIdAccountNumber
+                              : 'N/A'}
+                          </Text>
+                        </TouchableWithoutFeedback>
                       </View>
                     </View>
                   </View>

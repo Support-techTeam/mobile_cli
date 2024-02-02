@@ -7,6 +7,7 @@ import Toast, {BaseToast, ErrorToast} from 'react-native-toast-message';
 import {NativeBaseProvider, extendTheme} from 'native-base';
 import networkService from './src/util/NetworkService';
 
+
 // Initialize network service
 // const network = new networkService();
 const newColorTheme = {
@@ -34,7 +35,8 @@ const toastConfig = {
         flexWrap: 'wrap',
       }}
       contentContainerStyle={{
-        paddingHorizontal: 15,
+        paddingHorizontal: 5,
+        paddingVertical: 5,
         backgroundColor: '#28a745',
         flexWrap: 'wrap',
       }}
@@ -44,11 +46,13 @@ const toastConfig = {
         color: 'white',
         flexWrap: 'wrap',
       }}
+      text1NumberOfLines={2}
       text2Style={{
         fontSize: 14,
         color: 'white',
         flexWrap: 'wrap',
       }}
+      text2NumberOfLines={4}
     />
   ),
 
@@ -56,7 +60,6 @@ const toastConfig = {
     <ErrorToast
       {...props}
       style={{
-        flexWrap: 'wrap',
         flex: 1,
         borderLeftColor: '#dc3545',
         borderRightColor: '#dc3545',
@@ -64,22 +67,21 @@ const toastConfig = {
         backgroundColor: '#dc3545',
       }}
       contentContainerStyle={{
-        paddingHorizontal: 15,
+        paddingHorizontal: 5,
+        paddingVertical: 5,
         backgroundColor: '#dc3545',
-        flexWrap: 'wrap',
-        flex: 1,
       }}
       text1Style={{
-        fontSize: 15,
+        fontSize: 13,
         fontWeight: '400',
         color: 'white',
-        flexWrap: 'wrap',
       }}
+      text1NumberOfLines={2}
       text2Style={{
-        fontSize: 14,
+        fontSize: 12,
         color: 'white',
-        flexWrap: 'wrap',
       }}
+      text2NumberOfLines={4}
     />
   ),
 
@@ -93,7 +95,8 @@ const toastConfig = {
         backgroundColor: '#17a2b8',
       }}
       contentContainerStyle={{
-        paddingHorizontal: 15,
+        paddingHorizontal: 5,
+        paddingVertical: 5,
         backgroundColor: '#17a2b8',
       }}
       text1Style={{
@@ -101,10 +104,12 @@ const toastConfig = {
         fontWeight: '400',
         color: 'white',
       }}
+      text1NumberOfLines={2}
       text2Style={{
         fontSize: 14,
         color: 'white',
       }}
+      text2NumberOfLines={4}
     />
   ),
 
@@ -118,7 +123,8 @@ const toastConfig = {
         backgroundColor: '#ffc107',
       }}
       contentContainerStyle={{
-        paddingHorizontal: 15,
+        paddingHorizontal: 5,
+        paddingVertical: 5,
         backgroundColor: '#ffc107',
       }}
       text1Style={{
@@ -126,10 +132,12 @@ const toastConfig = {
         fontWeight: '400',
         color: 'white',
       }}
+      text1NumberOfLines={2}
       text2Style={{
         fontSize: 14,
         color: 'white',
       }}
+      text2NumberOfLines={4}
     />
   ),
 
