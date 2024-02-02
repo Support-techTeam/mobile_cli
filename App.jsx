@@ -7,11 +7,11 @@ import {
   View,
   AppState,
   LogBox,
+  TouchableWithoutFeedback,
 } from 'react-native';
 import SpInAppUpdates, {IAUUpdateKind} from 'sp-react-native-in-app-updates';
-import {version} from './app.json';
+import {version, SCREELOCK_CODE, SCREENLOCK_STATUS} from './app.json';
 import Toast from 'react-native-toast-message';
-import {useAsyncStorage} from '@react-native-async-storage/async-storage';
 import AppCenter from 'appcenter';
 import Analytics from 'appcenter-analytics';
 import Crashes from 'appcenter-crashes';
@@ -34,6 +34,11 @@ import {userLogOut} from './src/stores/AuthStore';
 import {auth} from './src/util/firebase/firebaseConfig';
 import SInfo from 'react-native-sensitive-info';
 import BackgroundTimer from 'react-native-background-timer';
+
+
+
+
+
 const inAppUpdates = new SpInAppUpdates(false);
 
 LogBox.ignoreAllLogs();
@@ -59,7 +64,9 @@ datadogConfiguration.sampleRate = 80;
 const TRANSITIONS = ['fade', 'slide', 'none'];
 
 let inactiveTime = 0;
-const defaultWaitTime = 30;
+const defaultWaitTime = Platform.select({ios: 30, android: 30});
+let hasLockKey = false;
+let screelLockStatus = false;
 function App() {
   const [appState, setAppState] = useState(AppState.currentState);
   const [hidden, setHidden] = useState(false);
@@ -144,11 +151,11 @@ function App() {
         // App became active, stop tracking inactivity
         inactiveTime = 0;
         BackgroundTimer?.stopBackgroundTimer();
-      } else if (nextAppState === 'background' || nextAppState === 'inactive') {
+      } else if (nextAppState === 'background') {
         // App became inactive, start tracking inactivity
         BackgroundTimer?.runBackgroundTimer(() => {
           //code that will be called every 1 seconds
-          console.log('Running background timer', inactiveTime);
+          // console.log('Running background timer', inactiveTime);
           if (inactiveTime < defaultWaitTime) {
             inactiveTimerCallback();
           }
@@ -158,17 +165,15 @@ function App() {
     };
 
     const inactiveTimerCallback = () => {
-      inactiveTime += 1;
-
+      inactiveTime = inactiveTime + 1;
       if (inactiveTime >= defaultWaitTime) {
         performAction();
         BackgroundTimer.stopBackgroundTimer(); // Stop the background timer once the action is performed
       }
     };
-    const performAction = () => {
-      // logout();
-      // Your action to be performed after 30 seconds of inactivity
-      console.log('Performing action after 30 seconds of inactivity');
+    const performAction = async () => {
+      // console.log('Performing action after 30 seconds of inactivity');
+      await logout();
       // Add your code here
     };
 
@@ -196,7 +201,7 @@ function App() {
       sharedPreferencesName: 'tradeLendaSharedPrefs',
       keychainService: 'tradeLendaKeychain',
     });
-    console.log('NORMAL SETTING', responseData);
+    // console.log('NORMAL SETTING', responseData);
   };
 
   const getSecureInfoData = async option => {
@@ -204,7 +209,29 @@ function App() {
       sharedPreferencesName: 'tradeLendaSharedPrefs',
       keychainService: 'tradeLendaKeychain',
     });
+    // console.log('NORMAL GETTING', responseData);
+    if (responseData === null || responseData === undefined) {
+      hasLockKey = false;
+    } else {
+      hasLockKey = true;
+    }
+  };
+
+  const getSecureInfoStatus = async option => {
+    const responseData = await SInfo.getItem(option, {
+      sharedPreferencesName: 'tradeLendaSharedPrefs',
+      keychainService: 'tradeLendaKeychain',
+    });
     console.log('NORMAL GETTING', responseData);
+    if (responseData === null || responseData === undefined) {
+      screelLockStatus = false;
+    } else {
+      if (responseData === 'true') {
+        screelLockStatus = true;
+      } else {
+        screelLockStatus = false;
+      }
+    }
   };
 
   const deleteSecureInfoData = async option => {
@@ -218,6 +245,7 @@ function App() {
   const theme = {
     ...LightTheme,
   };
+
 
   return (
     <SafeAreaProvider style={styles.rootContainer}>
@@ -235,7 +263,12 @@ function App() {
             {false ? (
               <InputPin />
             ) : (
-              <View style={styles.container}>
+              <View
+                style={styles.container}
+                onTouchStart={() => {
+                  inactiveTime = 0;
+                  BackgroundTimer.stopBackgroundTimer();
+                }}>
                 <Provider store={store}>
                   <PersistGate persistor={persistor} loading={null}>
                     <NetworkStatus />
