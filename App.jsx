@@ -27,6 +27,7 @@ import {PersistGate} from 'redux-persist/integration/react';
 import {persistor, resetStore, store} from './src/util/redux/store';
 import {LightTheme} from './src/constants/lightTheme';
 import {DarkTheme} from './src/constants/darkTheme';
+import { DefaultTheme } from 'react-native-paper';
 import InputPin from './src/screens/SecurityScreens/PinInput';
 import NetworkStatus from './src/util/NetworkService';
 import RNRestart from 'react-native-restart';
@@ -61,7 +62,7 @@ datadogConfiguration.sampleRate = 80;
 const TRANSITIONS = ['fade', 'slide', 'none'];
 
 let inactiveTime = 0;
-const defaultWaitTime = Platform.select({ios: 20, android: 30});
+const defaultWaitTime = Platform.select({ios: 120, android: 120});
 let hasLockKey = false;
 let screelLockStatus = false;
 function App() {
@@ -265,7 +266,8 @@ function App() {
   // };
 
   const colorScheme = useColorScheme();
-  const theme = colorScheme === 'dark' ? {...DarkTheme} : {...LightTheme};
+  // const theme = colorScheme === 'dark' ? {...DefaultTheme} : {...LightTheme};
+  const theme = {...DefaultTheme}; 
   return (
     <SafeAreaProvider style={styles.rootContainer}>
       <PaperProvider theme={theme}>
