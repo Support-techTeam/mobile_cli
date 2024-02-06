@@ -148,6 +148,15 @@ const verifyNIPAccountInfo = async (accountNumber, bankName) => {
             context: JSON.stringify(response?.data),
           },
         );
+
+        if (response?.data?.error) {
+          return {
+            title: 'Verify NIP Account Info',
+            error: true,
+            data: response?.data,
+            message: response?.data?.message,
+          };
+        }
         return {
           title: 'Verify NIP Account Info',
           error: false,

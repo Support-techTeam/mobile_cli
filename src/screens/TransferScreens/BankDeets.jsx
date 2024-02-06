@@ -9,7 +9,7 @@ import React, {useState, useContext, useEffect} from 'react';
 import ToggleSwitch from 'toggle-switch-react-native';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-// import SearchableDropdown from 'react-native-searchable-dropdown';
+import { SelectList } from 'react-native-dropdown-select-list'
 import Spinner from 'react-native-loading-spinner-overlay/lib';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 
@@ -25,6 +25,7 @@ import {
   verifyNIPAccountInfo,
 } from '../../stores/WalletStore';
 import Toast from 'react-native-toast-message';
+import COLORS from '../../constants/colors';
 
 const defaultData = [
   {value: '', label: 'Select Option'},
@@ -40,6 +41,7 @@ const BankDeets = ({route}) => {
   const [isFetching, setIsFetching] = useState(false);
   const [currentBanks, setCurrentBanks] = useState(undefined);
   const [numComplete, setNumComplete] = useState(false);
+  const [isFocus, setIsFocus] = useState(false);
   // const route = useRoute();
   const [bankDetails, setBankDetails] = useState({
     receiverAccountFirstName: '',
@@ -149,7 +151,7 @@ const BankDeets = ({route}) => {
   };
 
   useEffect(() => {
-    if (bankDetails?.receiverAccountNumber?.length === 10) {
+    if (bankDetails?.receiverAccountNumber?.length === 10 && bankDetails?.receiverBankName !== '') {
       setBankDetails({
         ...bankDetails,
         receiverAccountFirstName: '',
@@ -407,28 +409,22 @@ const BankDeets = ({route}) => {
           ) : (
             <>
               <View style={{marginTop: 10}}>
-                <CustomDropdown
-                  label={`Bank Name ${isFetching ? '...' : ''}`}
-                  isNeeded={true}
-                  iconName="bank-outline"
-                  placeholder="Select Bank"
-                  placeholderStyle={styles.placeholderStyle}
-                  selectedTextStyle={styles.selectedTextStyle}
-                  inputSearchStyle={styles.inputSearchStyle}
-                  search
-                  disabled={isFetching}
-                  data={currentBanks ? currentBanks : defaultData}
-                  maxHeight={300}
-                  labelField="label"
-                  valueField="value"
-                  value={bankDetails?.receiverBankName}
-                  onChange={option => {
-                    setBankDetails({
+                    <View style={{flexDirection: 'row'}}>
+                      <Text style={styles.droplabel}>Bank Name</Text>
+                      <Text style={{color: 'red', marginRight: 10}}>*</Text>
+                    </View>
+                  <SelectList 
+                      setSelected={(val) => setBankDetails({
                       ...bankDetails,
-                      receiverBankName: option.value,
-                    });
-                  }}
-                />
+                      receiverBankName: val,
+                    })} 
+                      data={currentBanks ? currentBanks : defaultData} 
+                      save="value"
+                      placeholder="Select Bank"
+                      boxStyles={styles.inputContainer}
+                      // inputStyles={}
+                  />
+      
               </View>
 
               {bankDetails?.receiverBankName !== '' && (
@@ -643,5 +639,30 @@ const styles = StyleSheet.create({
     borderColor: 'gray',
     height: 40,
     fontSize: 16,
+  },
+    droplabel: {
+    marginVertical: 5,
+    fontSize: 14,
+    color: COLORS.labelColor,
+    
+  },
+    inputContainer: {
+    height: 55,
+    alignItems: 'center',
+    backgroundColor: COLORS.light,
+    paddingHorizontal: 15,
+    width: '100%',
+    borderWidth: 0.5,
+    borderRadius: 8,
+    borderColor: COLORS.lendaBlue,
+    padding: 12,
+    borderBottomWidth: 0.8,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 1.41,
   },
 });
