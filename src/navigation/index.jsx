@@ -1,4 +1,4 @@
-import React, {useLayoutEffect, useRef, useState} from 'react';
+import React, {useLayoutEffect, useRef, useState, useEffect} from 'react';
 import {
   NavigationContainer,
   DefaultTheme,
@@ -41,6 +41,22 @@ const AppNavigationContainer = () => {
     });
 
     return subscriber;
+  }, []);
+
+  useEffect(() => {
+    const checkAndRenewToken = async () => {
+      const currentUser = auth.currentUser;
+      if (currentUser) {
+        try {
+          const idToken = await currentUser.getIdToken(true);
+        } catch (err) {
+          // Handle error
+        }
+      }
+    };
+    const intervalCheck = setInterval(checkAndRenewToken, 600000);
+
+    return () => clearInterval(intervalCheck);
   }, []);
   return (
     <TabContextProvider>

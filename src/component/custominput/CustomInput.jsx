@@ -10,6 +10,7 @@ import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faEyeSlash} from '@fortawesome/free-solid-svg-icons/faEyeSlash';
 import {faEye} from '@fortawesome/free-solid-svg-icons/faEye';
 import {faCalendar} from '@fortawesome/free-solid-svg-icons/faCalendar';
+import COLORS from '../../constants/colors';
 
 const CustomInput = ({
   label,
@@ -90,6 +91,7 @@ const styles = StyleSheet.create({
     
   },
   textFeild: {
+    color: COLORS.black,
     backgroundColor: '#fffff',
     width: '100%',
     borderWidth: 1,

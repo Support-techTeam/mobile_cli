@@ -1,10 +1,12 @@
 {
   "name": "Tradelenda",
   "displayName": "Tradelenda",
-  "version": "3.0.2",
+  "version": "3.0.5",
   "orientation": "portrait",
   "BASE_URL": "https://sjrg8dpghv.us-east-1.awsapprunner.com",
   "BASE_API_URL": "https://eywxitmij3.us-east-1.awsapprunner.com/api/v1",
+  "SCREELOCK_CODE": "screellockcode",
+  "SCREENLOCK_STATUS": "screellockstatus",
   "firebase_config": {
     "apiKey": "AIzaSyCjf2yeQk6DkOLiPbigFK1oi1slcmmFJQo",
     "authDomain": "tradelenda-staging.firebaseapp.com",

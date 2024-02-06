@@ -6,7 +6,7 @@ import CustomView from './AccountView/CustomView';
 import Buttons from '../buttons/Buttons';
 import {getLoanUserDetails} from '../../stores/LoanStore';
 
-const Finance = () => {
+const ARM = () => {
   const navigation = useNavigation();
   const [bankDeets, setBankDeets] = useState([]);
   const route = useRoute();
@@ -29,85 +29,70 @@ const Finance = () => {
     if (res?.error) {
       // TODO: handle error
     } else {
-      setBankDeets(res?.data?.bankDetails);
+      setBankDeets(res?.data?.armUserBankDetails);
     }
   };
   return (
     <View style={styles.container}>
       <TouchableOpacity
         onPress={() =>
-          navigation.navigate('BankDetails', {paramKey: 'myAccount'})
+          navigation.navigate('ArmDetails', {paramKey: 'myAccount'})
         }
         style={{marginBottom: 20}}>
-        <Buttons label={'Update Finance Details'} />
+        <Buttons label={'Update ARM Details'} />
       </TouchableOpacity>
       <ScrollView
         showsHorizontalScrollIndicator={false}
         showsVerticalScrollIndicator={false}>
-        {/* <CustomView
-          label={`${bankDeets?.email === undefined ? 'N/A' : bankDeets?.email}`}
-          subLabel="Email"
-        /> */}
-
         <CustomView
           label={`${
-            bankDeets?.bankName === undefined ? 'N/A' : bankDeets?.bankName
-          }`}
-          subLabel="Bank name"
-        />
-
-        <CustomView
-          label={`${
-            bankDeets?.bankAccountName === undefined
+            bankDeets?.annualExpectedAnnualIncomeRange === undefined
               ? 'N/A'
-              : bankDeets?.bankAccountName
+              : bankDeets?.annualExpectedAnnualIncomeRange
           }`}
-          subLabel="Bank account name"
+          subLabel="Annual Income Range
+          "
         />
 
         <CustomView
           label={`${
-            bankDeets?.bankAccountNumber === undefined
+            bankDeets?.employmentStatus === undefined
               ? 'N/A'
-              : bankDeets?.bankAccountNumber
+              : bankDeets?.employmentStatus
           }`}
-          subLabel="Bank account number"
+          subLabel="Employment Status"
         />
 
         <CustomView
           label={`${
-            bankDeets?.hasOnlineBanking === undefined
+            bankDeets?.issueDateOfId === undefined
               ? 'N/A'
-              : `${bankDeets?.hasOnlineBanking === true ? 'Yes' : 'No'}`
+              : bankDeets?.issueDateOfId
           }`}
-          subLabel="Do you use online banking?"
+          subLabel="Issue Date of ID"
         />
 
         <CustomView
           label={`${
-            bankDeets?.wasLoanTakenWithinTheLast12Months === undefined
+            bankDeets?.expiryDateOfId === undefined
               ? 'N/A'
-              : `${
-                  bankDeets?.wasLoanTakenWithinTheLast12Months === true
-                    ? 'Yes'
-                    : 'No'
-                }`
+              : bankDeets?.expiryDateOfId
           }`}
-          subLabel="Have you taken a loan in the past 12months?"
+          subLabel="Expiry Date of ID"
         />
 
         <CustomView
           label={`${
-            bankDeets?.loanAmount === undefined ? 'N/A' : bankDeets?.loanAmount
+            bankDeets?.kycLevel === undefined ? 'N/A' : bankDeets?.kycLevel
           }`}
-          subLabel="Loan amount"
+          subLabel="Kyc Level"
         />
       </ScrollView>
     </View>
   );
 };
 
-export default Finance;
+export default ARM;
 const styles = StyleSheet.create({
   container: {
     marginVertical: 28,

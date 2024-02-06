@@ -53,7 +53,6 @@ const InvestmentOptionScreen = () => {
     }
     if (name === 'Arm') {
       getArmProducts();
-      getSingleArmProductYield();
     }
   }, []);
 
@@ -64,53 +63,41 @@ const InvestmentOptionScreen = () => {
         if (res?.data?.length > 0) {
           setData(res?.data);
         }
+        setIsLoading(false);
       })
-      .catch(e => {});
-    // const res = await getAllLendaProduct();
-    // if (res?.error) {
-    // } else {
-    //   if(res?.data?.length > 0) {
-    //     setData(res?.data);
-    //   }
-    // }
-    setIsLoading(false);
+      .catch(e => {
+        setIsLoading(false);
+      });
   };
 
   const getArmProducts = async data => {
     setIsLoading(true);
     getAllArmProduct(data)
-    .then(res => {
-      if (res?.data?.length > 0) {
-        setData(res?.data);
-      }
-    })
-    .catch(e => {});
-    // const res = await getAllArmProduct(data);
-    // if (res?.error) {
-    // } else {
-    //   if (res?.data?.length > 0) {
-    //     setData(res?.data);
-    //   }
-    // }
-    setIsLoading(false);
+      .then(res => {
+        if (res?.data?.length > 0) {
+          setData(res?.data);
+        }
+        getSingleArmProductYield();
+      })
+      .catch(e => {
+        setIsLoading(false);
+      });
   };
 
   const getSingleArmProductYield = async () => {
     setIsLoading(true);
-    // const res = await getArmProductYield('ARMMMF');
     getArmProductYield('ARMMMF')
-    .then(res => {
-      if (res?.error) {
-      } else {
-        setYieldData(res?.data);
-      }
-    })
-    .catch(e => {});
-    // if (res?.error) {
-    // } else {
-    //   setYieldData(res?.data);
-    // }
-    setIsLoading(false);
+      .then(res => {
+        if (res?.error) {
+        } else {
+          setYieldData(res?.data);
+        }
+
+        setIsLoading(false);
+      })
+      .catch(e => {
+        setIsLoading(false);
+      });
   };
 
   return (
@@ -183,12 +170,6 @@ const InvestmentOptionScreen = () => {
             bounces={false}
             showsHorizontalScrollIndicator={false}
             showsVerticalScrollIndicator={true}
-            // onScroll={() => setIsScrolling(true)}
-            // onMomentumScrollEnd={() =>
-            //   setTimeout(() => {
-            //     setIsScrolling(false);
-            //   }, 500)
-            // }
             style={[styles.scrollView]}
             alwaysBounceVertical={false}>
             {(data && data?.length == 0) || (data && data == undefined) ? (

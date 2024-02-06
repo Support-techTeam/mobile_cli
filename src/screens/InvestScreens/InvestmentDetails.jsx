@@ -115,7 +115,7 @@ const InvestmentDetails = () => {
             </Text>
           </View>
 
-          {name === 'Arm' && (
+          {name === 'Arm' && investment?.membershipId && (
             <View style={styles.detailsView}>
               <Text style={styles.desc}>Membership ID</Text>
               <Text style={styles.amount}>
@@ -124,7 +124,7 @@ const InvestmentDetails = () => {
             </View>
           )}
 
-          {name === 'Arm' && (
+          {name === 'Arm' && portfolioDetail?.investmentId && (
             <View style={styles.detailsView}>
               <Text style={styles.desc}>Investment ID</Text>
               <Text style={styles.amount}>
@@ -133,7 +133,7 @@ const InvestmentDetails = () => {
             </View>
           )}
 
-          {name === 'Arm' && (
+          {name === 'Arm' && investment?.createdAt && (
             <View style={styles.detailsView}>
               <Text style={styles.desc}>Investment Commencement Date</Text>
               <Text style={styles.amount}>
@@ -142,7 +142,7 @@ const InvestmentDetails = () => {
             </View>
           )}
 
-          {name === 'Lenda' && (
+          {name === 'Lenda' && investment?.investmentStatus && (
             <View style={styles.detailsView}>
               <Text style={styles.desc}>investment Status</Text>
               <Text style={[styles.amount, {fontFamily: 'serif'}]}>
@@ -151,7 +151,7 @@ const InvestmentDetails = () => {
             </View>
           )}
 
-          {name === 'Lenda' && (
+          {name === 'Lenda' && investment?._id && (
             <View style={styles.detailsView}>
               <Text style={styles.desc}>Referrer ID</Text>
               <Text style={[styles.amount, {fontFamily: 'serif'}]}>
@@ -160,7 +160,7 @@ const InvestmentDetails = () => {
             </View>
           )}
 
-          {name === 'Lenda' && (
+          {name === 'Lenda' && investment?.created_at && (
             <View style={styles.detailsView}>
               <Text style={styles.desc}>Investment Commencement Date</Text>
               <Text style={[styles.amount, {fontFamily: 'serif'}]}>
@@ -177,29 +177,33 @@ const InvestmentDetails = () => {
             </Text>
             <Text style={styles.amount}>
               ₦
-              {Number(investment?.investmentAmount)
-                .toFixed(2)
-                ?.toString()
-                ?.replace(/\B(?=(\d{3})+\b)/g, ',') ?? '0.00'}
+              {investment?.investmentAmount
+                ? new Intl.NumberFormat('en-US', {
+                    style: 'decimal',
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  }).format(Number(investment?.investmentAmount))
+                : '0.00'}
             </Text>
           </View>
 
-          {name === 'Arm' && (
+          {name === 'Arm' && portfolioDetail?.accountBalance && (
             <View style={styles.detailsView}>
               <Text style={styles.desc}>Account Balance</Text>
               <Text style={styles.amount}>
                 ₦
                 {portfolioDetail?.accountBalance
-                  ? Number(portfolioDetail?.accountBalance)
-                      .toFixed(2)
-                      ?.toString()
-                      ?.replace(/\B(?=(\d{3})+\b)/g, ',')
+                  ? new Intl.NumberFormat('en-US', {
+                      style: 'decimal',
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    }).format(Number(portfolioDetail?.accountBalance))
                   : '0.00'}
               </Text>
             </View>
           )}
 
-          {name === 'Arm' && (
+          {name === 'Arm' && investment?.redemptionStatus && (
             <View style={styles.detailsView}>
               <Text style={styles.desc}>Investment Status</Text>
               <Text style={styles.amount}>
@@ -218,57 +222,64 @@ const InvestmentDetails = () => {
             </View>
           )}
 
-          {name === 'Arm' && (
+          {name === 'Arm' && investment?.topUpAmount !== 0 && (
             <View style={styles.detailsView}>
               <Text style={styles.desc}>Pending Top-Up</Text>
               <Text style={styles.amount}>
                 ₦
-                {Number(investment?.topUpAmount)
-                  .toFixed(2)
-                  ?.toString()
-                  ?.replace(/\B(?=(\d{3})+\b)/g, ',') ?? '0.00'}
-              </Text>
-            </View>
-          )}
-
-          {name === 'Arm' && (
-            <View style={styles.detailsView}>
-              <Text style={styles.desc}>Total Redeemed Amount</Text>
-              <Text style={styles.amount}>
-                ₦
-                {Number(investment?.redemptionAmount)
-                  .toFixed(2)
-                  ?.toString()
-                  ?.replace(/\B(?=(\d{3})+\b)/g, ',') ?? '0.00'}
-              </Text>
-            </View>
-          )}
-
-          {name === 'Arm' && (
-            <View style={styles.detailsView}>
-              <Text style={styles.desc}>Accrued Interest</Text>
-              <Text style={styles.amount}>
-                ₦
-                {portfolioDetail?.accruedInterest
-                  ? Number(portfolioDetail?.accruedInterest)
-                      .toFixed(2)
-                      ?.toString()
-                      ?.replace(/\B(?=(\d{3})+\b)/g, ',')
+                {investment?.topUpAmount
+                  ? new Intl.NumberFormat('en-US', {
+                      style: 'decimal',
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    }).format(Number(investment?.topUpAmount))
                   : '0.00'}
               </Text>
             </View>
           )}
 
-          {name === 'Arm' && (
+          {name === 'Arm' && investment?.redemptionAmount !== 0 && (
             <View style={styles.detailsView}>
-              <Text style={styles.desc}>Tracking ID</Text>
-              <Text style={[styles.amount, {fontFamily: 'serif'}]}>
-                {investment?.trackingId ?? 'NIL'}
+              <Text style={styles.desc}>Total Redeemed Amount</Text>
+              <Text style={styles.amount}>
+                ₦
+                {investment?.redemptionAmount
+                  ? new Intl.NumberFormat('en-US', {
+                      style: 'decimal',
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    }).format(Number(investment?.redemptionAmount))
+                  : '0.00'}
               </Text>
             </View>
           )}
 
-          {name === 'Lenda' && (
+          {name === 'Arm' && portfolioDetail?.accruedInterest && (
+            <View style={styles.detailsView}>
+              <Text style={styles.desc}>Accrued Interest</Text>
+              <Text style={styles.amount}>
+                ₦
+                {portfolioDetail?.accruedInterest
+                  ? new Intl.NumberFormat('en-US', {
+                      style: 'decimal',
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    }).format(Number(portfolioDetail?.accruedInterest))
+                  : '0.00'}
+              </Text>
+            </View>
+          )}
+
+          {name === 'Arm' && investment?.trackingId && (
+            <View style={styles.detailsView}>
+              <Text style={styles.desc}>Tracking ID</Text>
+              <Text style={[styles.amount, {fontFamily: 'serif'}]}>
+                {investment?.trackingId}
+              </Text>
+            </View>
+          )}
+
+          {name === 'Lenda' && investment?.investmentTenor && (
             <View style={styles.detailsView}>
               <Text style={styles.desc}>Investment Tenor</Text>
               <Text style={[styles.amount, {fontFamily: 'serif'}]}>
@@ -277,7 +288,7 @@ const InvestmentDetails = () => {
             </View>
           )}
 
-          {name === 'Lenda' && (
+          {name === 'Lenda' && investment?.interestRate && (
             <View style={styles.detailsView}>
               <Text style={styles.desc}>Investment Interest Rate</Text>
               <Text style={[styles.amount, {fontFamily: 'serif'}]}>
@@ -286,59 +297,71 @@ const InvestmentDetails = () => {
             </View>
           )}
 
-          {name === 'Lenda' && (
+          {name === 'Lenda' && investment?.monthlyReturn && (
             <View style={styles.detailsView}>
               <Text style={styles.desc}>Monthly Return</Text>
               <Text style={[styles.amount, {fontFamily: 'serif'}]}>
                 ₦
-                {Number(investment?.monthlyReturn)
-                  .toFixed(2)
-                  ?.toString()
-                  ?.replace(/\B(?=(\d{3})+\b)/g, ',') ?? '0.00'}
+                {investment?.monthlyReturn
+                  ? new Intl.NumberFormat('en-US', {
+                      style: 'decimal',
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    }).format(Number(investment?.monthlyReturn))
+                  : '0.00'}
               </Text>
             </View>
           )}
 
-          {name === 'Lenda' && (
+          {name === 'Lenda' && investment?.dailyReturn && (
             <View style={styles.detailsView}>
               <Text style={styles.desc}>Daily Return</Text>
               <Text style={[styles.amount, {fontFamily: 'serif'}]}>
                 ₦
-                {Number(investment?.dailyReturn)
-                  .toFixed(2)
-                  ?.toString()
-                  ?.replace(/\B(?=(\d{3})+\b)/g, ',') ?? '0.00'}
+                {investment?.dailyReturn
+                  ? new Intl.NumberFormat('en-US', {
+                      style: 'decimal',
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    }).format(Number(investment?.dailyReturn))
+                  : '0.00'}
               </Text>
             </View>
           )}
 
-          {name === 'Lenda' && (
+          {name === 'Lenda' && investment?.topUpAmount !== 0 && (
             <View style={styles.detailsView}>
               <Text style={styles.desc}>Top-Up Amount</Text>
               <Text style={[styles.amount, {fontFamily: 'serif'}]}>
                 ₦
-                {Number(investment?.topUpAmount)
-                  .toFixed(2)
-                  ?.toString()
-                  ?.replace(/\B(?=(\d{3})+\b)/g, ',') ?? '0.00'}
+                {investment?.topUpAmount
+                  ? new Intl.NumberFormat('en-US', {
+                      style: 'decimal',
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    }).format(Number(investment?.topUpAmount))
+                  : '0.00'}
               </Text>
             </View>
           )}
 
-          {name === 'Lenda' && (
+          {name === 'Lenda' && investment?.redemptionAmount !== 0 && (
             <View style={styles.detailsView}>
               <Text style={styles.desc}>Total Redeemed Amount</Text>
               <Text style={[styles.amount, {fontFamily: 'serif'}]}>
                 ₦
-                {Number(investment?.redemptionAmount)
-                  .toFixed(2)
-                  ?.toString()
-                  ?.replace(/\B(?=(\d{3})+\b)/g, ',') ?? '0.00'}
+                {investment?.redemptionAmount
+                  ? new Intl.NumberFormat('en-US', {
+                      style: 'decimal',
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    }).format(Number(investment?.redemptionAmount))
+                  : '0.00'}
               </Text>
             </View>
           )}
 
-          {name === 'Lenda' && (
+          {name === 'Lenda' && investment?.totalReturn && (
             <View style={styles.detailsView}>
               <Text style={styles.desc}>Total Expected Return</Text>
               <Text style={[styles.amount, {fontFamily: 'serif'}]}>
@@ -374,7 +397,7 @@ const InvestmentDetails = () => {
             </View>
           )}
 
-          {name === 'Lenda' && (
+          {name === 'Lenda' && investment?.expectedReturnDate && (
             <View style={styles.detailsView}>
               <Text style={styles.desc}>Investment Return Date</Text>
               <Text style={[styles.amount, {fontFamily: 'serif'}]}>
@@ -383,16 +406,17 @@ const InvestmentDetails = () => {
             </View>
           )}
 
-          {name === 'Lenda' && (
+          {name === 'Lenda' && investment?.serviceCharge !== 0 && (
             <View style={styles.detailsView}>
               <Text style={styles.desc}>Service Charge</Text>
               <Text style={[styles.amount, {fontFamily: 'serif'}]}>
                 ₦
                 {investment?.serviceCharge
-                  ? Number(investment?.serviceCharge)
-                      .toFixed(2)
-                      ?.toString()
-                      ?.replace(/\B(?=(\d{3})+\b)/g, ',')
+                  ? new Intl.NumberFormat('en-US', {
+                      style: 'decimal',
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    }).format(Number(investment?.serviceCharge))
                   : '0.00'}
               </Text>
             </View>

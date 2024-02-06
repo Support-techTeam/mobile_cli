@@ -22,6 +22,7 @@ import {createLoan, getDuration, getLoanDetails} from '../../stores/LoanStore';
 import {useRoute} from '@react-navigation/native';
 import {useSelector} from 'react-redux';
 import {getGuarantors} from '../../stores/GuarantorStore';
+import COLORS from '../../constants/colors';
 
 const durationData = [
   {value: '', label: 'Select Duration'},
@@ -851,6 +852,7 @@ const styles = StyleSheet.create({
     color: '#14142B',
   },
   textFeild: {
+    color: COLORS.black,
     backgroundColor: '#fffff',
     width: '100%',
     borderWidth: 0.5,

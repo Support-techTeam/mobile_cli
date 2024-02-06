@@ -103,7 +103,6 @@ const validatePin = async pin => {
       };
     }
   } catch (error) {
-    // console.error('Error validating PIN: ', error);
     return {
       error: true,
       title: 'Check Pin',

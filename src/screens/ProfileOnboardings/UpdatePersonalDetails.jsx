@@ -102,6 +102,8 @@ const referralOptionData = [
   {value: 'Others', label: 'Others'},
 ];
 
+let fetchedCity = [];
+
 const UpdatePersonalDetails = () => {
   const navigation = useNavigation();
   const [show, setShow] = useState(false);
@@ -387,14 +389,20 @@ const UpdatePersonalDetails = () => {
   }, [stateCity]);
 
   useEffect(() => {
-    const cityData =
-      city &&
-      city.map((item, index) => {
-        return {value: item, label: item, key: index};
-      });
-
-    setCurrentCity(cityData);
-  }, [city]);
+    if (userDetails.state !== '') {
+      const getStateData = getCity(userDetails.state)
+        .then(res => {
+          fetchedCity = [];
+          res?.data &&
+            res?.data.map((item, index) => {
+              fetchedCity.push({value: item, label: item, key: index});
+            });
+        })
+        .catch(err => {
+          // console.log(err);
+        });
+    }
+  }, [userDetails.state]);
 
   const disableit =
     !userDetails.phoneNumber ||
@@ -591,6 +599,7 @@ const UpdatePersonalDetails = () => {
 
               <Input
                 iconName="account-outline"
+                readOnly={true}
                 label="First Name"
                 placeholder="Enter your first name"
                 isNeeded={true}
@@ -604,6 +613,7 @@ const UpdatePersonalDetails = () => {
 
               <Input
                 iconName="account-outline"
+                readOnly={true}
                 label="Last Name"
                 placeholder="Enter your last name"
                 defaultValue={profileDetails?.lastName}
@@ -617,6 +627,7 @@ const UpdatePersonalDetails = () => {
 
               <Input
                 iconName="email-outline"
+                readOnly={true}
                 label="Email"
                 placeholder="Enter your email"
                 keyboardType="email-address"
@@ -629,18 +640,14 @@ const UpdatePersonalDetails = () => {
                 error={errors.email}
               />
 
-              <InputPhone
-                label="Phone number"
-                layout="first"
-                isNeeded={true}
-                defaultCode="NG"
-                codeTextStyle={{color: '#6E7191'}}
-                defaultValue={profileDetails?.phoneNumber}
-                onChangeFormattedText={text =>
-                  setUserDetails({...userDetails, phoneNumber: text})
-                }
+              <Input
                 onFocus={() => handleError(null, 'phoneNumber')}
                 error={errors.phoneNumber}
+                iconName="phone"
+                label="Phone number"
+                isNeeded={true}
+                defaultValue={profileDetails?.phoneNumber}
+                readOnly={true}
               />
 
               <View style={{marginVertical: 10}}>
@@ -666,9 +673,6 @@ const UpdatePersonalDetails = () => {
               </View>
 
               <Input
-                // onChangeText={text =>
-                //   setUserDetails({...userDetails, bvn: text.trim()})
-                // }
                 onFocus={() => handleError(null, 'bvn')}
                 iconName="shield-lock-outline"
                 label="BVN"
@@ -677,6 +681,7 @@ const UpdatePersonalDetails = () => {
                 keyboardType="numeric"
                 isNeeded={true}
                 defaultValue={userDetails.bvn}
+                readOnly={true}
               />
 
               <Pressable onPress={showDatePicker}>
@@ -713,14 +718,12 @@ const UpdatePersonalDetails = () => {
               <Input
                 label="Address"
                 defaultValue={userDetails.address}
-                onChangeText={text =>
-                  setUserDetails({...userDetails, address: text})
-                }
                 onFocus={() => handleError(null, 'address')}
                 iconName="map-marker-outline"
                 placeholder="Enter your address"
                 error={errors.address}
                 isNeeded={true}
+                readOnly={true}
               />
 
               <Input
@@ -740,43 +743,24 @@ const UpdatePersonalDetails = () => {
                 style={{flexDirection: 'row', justifyContent: 'space-between'}}>
                 <View
                   style={{marginVertical: 10, paddingRight: 5, width: '50%'}}>
-                  <CustomDropdown
+                  <Input
                     label="State"
                     onFocus={() => handleError(null, 'state')}
                     isNeeded={true}
                     placeholder="Select State"
-                    placeholderStyle={styles.placeholderStyle}
-                    selectedTextStyle={styles.selectedTextStyle}
-                    data={currentState ? currentState : stateData}
-                    // data={stateData}
-                    maxHeight={300}
-                    labelField="label"
-                    valueField="value"
                     value={userDetails.state}
-                    onChange={option => {
-                      setUserDetails({...userDetails, state: option.value});
-                    }}
                     error={errors.state}
                   />
                 </View>
                 <View
                   style={{marginVertical: 10, paddingLeft: 5, width: '50%'}}>
-                  <CustomDropdown
+                  <Input
                     label="City"
                     onFocus={() => handleError(null, 'city')}
                     isNeeded={true}
-                    placeholder="Select LGA"
-                    placeholderStyle={styles.placeholderStyle}
-                    selectedTextStyle={styles.selectedTextStyle}
-                    data={currentCity ? currentCity : cityData}
-                    // data={cityData}
-                    maxHeight={300}
-                    labelField="label"
-                    valueField="value"
                     value={userDetails.city}
-                    onChange={option => {
-                      setUserDetails({...userDetails, city: option.value});
-                    }}
+                    iconName="flag-outline"
+                    placeholder="Select LGA"
                     error={errors.city}
                   />
                 </View>

@@ -15,7 +15,7 @@ import {
   RefreshControl,
 } from 'react-native';
 import React, {useEffect, useRef, useState} from 'react';
-import {Actionsheet} from 'native-base';
+import {Actionsheet, Modal, Center, Button as Btn} from 'native-base';
 import {Button} from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import OctaIcon from 'react-native-vector-icons/Octicons';
@@ -51,8 +51,13 @@ import {getGuarantors} from '../../stores/GuarantorStore';
 import {
   getAllArmInvestment,
   getAllLendaInvestment,
+  getArmTransactionsStatement,
+  getLendaTransactionsStatement,
+  getSingleArmInvestment,
 } from '../../stores/InvestStore';
-// import * as All from '../../../assets/images/';
+import DateTimePickerModal from 'react-native-modal-datetime-picker';
+import Input from '../../component/inputField/input.component';
+import {getTransactionsStatement} from '../../stores/WalletStore';
 
 const {width} = Dimensions.get('window');
 const Homescreen = () => {
@@ -62,6 +67,7 @@ const Homescreen = () => {
   const [isFundWalletVisible, setIsFundWalletVisible] = useState(false);
   const [isAllTransactionVisible, setIsAllTransactionVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isSending, setIsSending] = useState(false);
   const [isLoadingWallet, setIsLoadingWallet] = useState(false);
   const [isLoadingTransaction, setIsLoadingTransaction] = useState(false);
   const [isLoadingLoanData, setIsLoadingLoanData] = useState(false);
@@ -75,7 +81,6 @@ const Homescreen = () => {
   //Redux Calls
   const userProfileData = useSelector(state => state.userProfile.profile);
   const userWalletData = useSelector(state => state.userProfile.wallet);
-  // const userAccountData = useSelector(state => state.userProfile.account);
   const [userTransactionsData, setUserTransactionsData] = useState([]);
   const [allUserTransactionsData, setAllUserTransactionsData] = useState([]);
   const [userTransactionsPages, setUserTransactionsPages] = useState([]);
@@ -92,7 +97,34 @@ const Homescreen = () => {
   const dispatch = useDispatch();
   const [allArmData, setAllArmData] = useState([]);
   const [allILendaData, setAllLendaData] = useState([]);
-
+  // const [investmentDetail, setInvestmentDetail] = useState([]);
+  const [portfolioDetail, setPortfolioDetail] = useState(0);
+  // Modal Codes
+  // Wallet
+  const [showWalletStatementModal, setShowWalletStatementModal] =
+    useState(false);
+  const [showStartWallet, setShowStartWallet] = useState(false);
+  const [showEndWallet, setShowEndWallet] = useState(false);
+  const [walletStatementDetails, setWalletStatementDetails] = useState({
+    startDate: new Date().toISOString().split('T')[0],
+    endDate: new Date().toISOString().split('T')[0],
+  });
+  // ARM
+  const [showArmStatementModal, setShowArmStatementModal] = useState(false);
+  const [showStartArm, setShowStartArm] = useState(false);
+  const [showEndArm, setShowEndArm] = useState(false);
+  const [armStatementDetails, setArmStatementDetails] = useState({
+    startDate: new Date().toISOString().split('T')[0],
+    endDate: new Date().toISOString().split('T')[0],
+  });
+  // Lenda
+  const [showLendaStatementModal, setShowLendaStatementModal] = useState(false);
+  const [showStartLenda, setShowStartLenda] = useState(false);
+  const [showEndLenda, setShowEndLenda] = useState(false);
+  const [lendaStatementDetails, setLendaStatementDetails] = useState({
+    startDate: new Date().toISOString().split('T')[0],
+    endDate: new Date().toISOString().split('T')[0],
+  });
   const toggleMakeTransfer = () => {
     setIsMakeTransferVisible(!isMakeTransferVisible);
   };
@@ -142,8 +174,7 @@ const Homescreen = () => {
     allArmData &&
     allArmData?.reduce(
       (accumulator, currentValue) =>
-        accumulator +
-        (currentValue?.investmentAmount - currentValue?.redemptionAmount),
+        Number(accumulator) + Number(currentValue?.investmentAmount),
       0,
     );
 
@@ -194,11 +225,6 @@ const Homescreen = () => {
   // Timed useEffect
   useEffect(() => {
     const interval = setInterval(async () => {
-      // const res = await getAccountWallet();
-      // if (res?.error == false) {
-      //   dispatch(setWallet(res?.data?.data?.wallet));
-      //   dispatch(setAccount(res?.data?.data?.accountDetails));
-      // }
       getAccountWallet()
         .then(res => {
           if (res) {
@@ -387,14 +413,24 @@ const Homescreen = () => {
         setIsLoadingLenda(false);
       });
   };
-
+  // get all ARM investments
   const getAllArmInvestments = async () => {
     setIsLoadingArm(true);
     getAllArmInvestment()
-      .then(res => {
+      .then(async res => {
         if (res) {
           if (!res?.error) {
             setAllArmData(res?.data?.data);
+            getSingleArmInvestment(
+              res?.data?.data[0]?.membershipId,
+              res?.data?.data[0]?.productCode,
+            ).then(res => {
+              if (!res?.error) {
+                if (res?.data?.length > 0) {
+                  setPortfolioDetail(res?.data?.portfolio[0]?.accountBalance);
+                }
+              }
+            });
           }
         }
       })
@@ -419,7 +455,16 @@ const Homescreen = () => {
   const handleLongPress = async evt => {
     try {
       setString(evt);
-      ToastAndroid.show('Text copied to clipboard', ToastAndroid.SHORT);
+      Toast.show({
+        type: 'info',
+        position: 'top',
+        topOffset: 50,
+        text1: "Copy Action",
+        text2: "Account number copied to clipboard",
+        visibilityTime: 3000,
+        autoHide: true,
+        onPress: () => Toast.hide(),
+      });
     } catch (error) {
       // console.error('Error copying to clipboard:', error);
     }
@@ -522,16 +567,21 @@ const Homescreen = () => {
       id: '3',
       title: 'My investment',
       balance:
-        new Intl.NumberFormat('en-US', {
-          style: 'decimal',
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        }).format(totalArmAmount + totalLendaAmount) ?? '0.00',
+        Number(portfolioDetail) !== 0
+          ? new Intl.NumberFormat('en-US', {
+              style: 'decimal',
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            }).format(Number(portfolioDetail) + totalLendaAmount)
+          : new Intl.NumberFormat('en-US', {
+              style: 'decimal',
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            }).format(totalArmAmount + totalLendaAmount),
       button: 'View investment',
       extra: '',
       image: require('../../../assets/icons/wallet_background.png'),
     },
-
     {
       id: '2',
       title: 'Loan balance',
@@ -541,9 +591,11 @@ const Homescreen = () => {
           : `${
               userLoanAmount?.totalLoanAmount === 0
                 ? '0.00'
-                : userLoanAmount?.totalLoanAmount
-                    ?.toString()
-                    ?.replace(/\B(?=(\d{3})+\b)/g, ',')
+                : new Intl.NumberFormat('en-US', {
+                    style: 'decimal',
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  }).format(userLoanAmount?.totalLoanAmount)
             }`
       }`,
       button: 'Get loan',
@@ -553,10 +605,15 @@ const Homescreen = () => {
       id: '1',
       title: 'Wallet balance',
       balance:
-        userWalletData && userWalletData?.availableBalance
-          ? Number(userWalletData?.availableBalance)
-              ?.toString()
-              ?.replace(/\B(?=(\d{3})+\b)/g, ',')
+        userWalletData &&
+        userWalletData?.availableBalance &&
+        userWalletData?.availableBalance !== null &&
+        userWalletData?.availableBalance !== undefined
+          ? new Intl.NumberFormat('en-US', {
+              style: 'decimal',
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            }).format(userWalletData?.availableBalance)
           : '0.00',
       accountName:
         userWalletData && userWalletData?.walletIdAccountNumber
@@ -733,19 +790,35 @@ const Homescreen = () => {
                         }}>
                         Providus Bank
                       </Text>
-                      <TouchableWithoutFeedback
-                        onLongPress={() => handleLongPress(item.accountName)}>
-                        <Text
-                          style={{
-                            color: '#14142A',
-                            marginTop: 5,
-                            fontFamily: 'Montserat',
-                            fontWeight: '400',
-                            textAlign: 'right',
-                          }}>
-                          {item.accountName}
-                        </Text>
-                      </TouchableWithoutFeedback>
+                      <View
+                        style={{
+                          flex: 1,
+                          flexDirection: 'row',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                        }}>
+                        <TouchableWithoutFeedback>
+                          <Text
+                            style={{
+                              color: '#14142A',
+                              marginTop: 5,
+                              fontFamily: 'Montserat',
+                              fontWeight: '400',
+                              textAlign: 'right',
+                            }}>
+                            {item.accountName}
+                          </Text>
+                        </TouchableWithoutFeedback>
+                        <TouchableWithoutFeedback>
+                          <FontIcon
+                            size={17}
+                            color={COLORS.lendaBlue}
+                            name="copy"
+                            style={{marginLeft: 4}}
+                            onPress={() => handleLongPress(item.accountName)}
+                          />
+                        </TouchableWithoutFeedback>
+                      </View>
                     </View>
                   )}
                 </View>
@@ -765,6 +838,226 @@ const Homescreen = () => {
         </ImageBackground>
       </LinearGradient>
     );
+  };
+
+  // Wallet Statement Functions
+  const showDatePickerStartWallet = () => {
+    setShowStartWallet(true);
+  };
+
+  const hideDatePickerStartWallet = () => {
+    setShowStartWallet(false);
+  };
+
+  const showDatePickerEndWallet = () => {
+    setShowEndWallet(true);
+  };
+
+  const hideDatePickerEndWallet = () => {
+    setShowEndWallet(false);
+  };
+
+  const handleWalletStatement = async () => {
+    setIsSending(true);
+    getTransactionsStatement(
+      walletStatementDetails?.startDate,
+      walletStatementDetails?.endDate,
+    )
+      .then(res => {
+        if (res) {
+          if (!res?.error) {
+            Toast.show({
+              type: 'success',
+              position: 'top',
+              topOffset: 50,
+              text1: res?.title,
+              text2: res?.message,
+              visibilityTime: 3000,
+              autoHide: true,
+              onPress: () => Toast.hide(),
+            });
+            setWalletStatementDetails({
+              startDate: new Date().toISOString().split('T')[0],
+              endDate: new Date().toISOString().split('T')[0],
+            });
+          } else {
+            Toast.show({
+              type: 'error',
+              position: 'top',
+              topOffset: 50,
+              text1: res?.title,
+              text2: res?.message,
+              visibilityTime: 5000,
+              autoHide: true,
+              onPress: () => Toast.hide(),
+            });
+          }
+        }
+      })
+      .catch(e => {
+        Toast.show({
+          type: 'error',
+          position: 'top',
+          topOffset: 50,
+          text1: 'Get Transactions Statement',
+          text2: 'Error fetching statement',
+          visibilityTime: 5000,
+          autoHide: true,
+          onPress: () => Toast.hide(),
+        });
+      })
+      .finally(() => {
+        setTimeout(() => {
+          setIsSending(false);
+        }, 1000);
+      });
+  };
+
+  // Arm Statement Functions
+  const showDatePickerStartArm = () => {
+    setShowStartArm(true);
+  };
+
+  const hideDatePickerStartArm = () => {
+    setShowStartArm(false);
+  };
+
+  const showDatePickerEndArm = () => {
+    setShowEndArm(true);
+  };
+
+  const hideDatePickerEndArm = () => {
+    setShowEndArm(false);
+  };
+
+  const handleArmStatement = async () => {
+    setIsSending(true);
+    getArmTransactionsStatement(
+      allArmData[0]?.membershipId,
+      armStatementDetails?.startDate,
+      armStatementDetails?.endDate,
+    )
+      .then(res => {
+        if (res) {
+          if (!res?.error) {
+            Toast.show({
+              type: 'success',
+              position: 'top',
+              topOffset: 50,
+              text1: res?.title,
+              text2: res?.message,
+              visibilityTime: 3000,
+              autoHide: true,
+              onPress: () => Toast.hide(),
+            });
+            setArmStatementDetails({
+              startDate: new Date().toISOString().split('T')[0],
+              endDate: new Date().toISOString().split('T')[0],
+            });
+          } else {
+            Toast.show({
+              type: 'error',
+              position: 'top',
+              topOffset: 50,
+              text1: res?.title,
+              text2: res?.message,
+              visibilityTime: 5000,
+              autoHide: true,
+              onPress: () => Toast.hide(),
+            });
+          }
+        }
+      })
+      .catch(e => {
+        Toast.show({
+          type: 'error',
+          position: 'top',
+          topOffset: 50,
+          text1: 'Get Transactions Statement',
+          text2: 'Error fetching statement',
+          visibilityTime: 5000,
+          autoHide: true,
+          onPress: () => Toast.hide(),
+        });
+      })
+      .finally(() => {
+        setTimeout(() => {
+          setIsSending(false);
+        }, 1000);
+      });
+  };
+
+  // Lenda Statement Functions
+  const showDatePickerStartLenda = () => {
+    setShowStartLenda(true);
+  };
+
+  const hideDatePickerStartLenda = () => {
+    setShowStartLenda(false);
+  };
+
+  const showDatePickerEndLenda = () => {
+    setShowEndLenda(true);
+  };
+
+  const hideDatePickerEndLenda = () => {
+    setShowEndLenda(false);
+  };
+
+  const handleLendaStatement = async () => {
+    setIsSending(true);
+    getLendaTransactionsStatement(
+      lendaStatementDetails?.startDate,
+      lendaStatementDetails?.endDate,
+    )
+      .then(res => {
+        if (res) {
+          if (!res?.error) {
+            Toast.show({
+              type: 'success',
+              position: 'top',
+              topOffset: 50,
+              text1: res?.title,
+              text2: res?.message,
+              visibilityTime: 3000,
+              autoHide: true,
+              onPress: () => Toast.hide(),
+            });
+            setLendaStatementDetails({
+              startDate: new Date().toISOString().split('T')[0],
+              endDate: new Date().toISOString().split('T')[0],
+            });
+          } else {
+            Toast.show({
+              type: 'error',
+              position: 'top',
+              topOffset: 50,
+              text1: res?.title,
+              text2: res?.message,
+              visibilityTime: 5000,
+              autoHide: true,
+              onPress: () => Toast.hide(),
+            });
+          }
+        }
+      })
+      .catch(e => {
+        Toast.show({
+          type: 'error',
+          position: 'top',
+          topOffset: 50,
+          text1: 'Get Transactions Statement',
+          text2: 'Error fetching statement',
+          visibilityTime: 5000,
+          autoHide: true,
+          onPress: () => Toast.hide(),
+        });
+      })
+      .finally(() => {
+        setTimeout(() => {
+          setIsSending(false);
+        }, 1000);
+      });
   };
 
   return !timeOut ? (
@@ -797,6 +1090,16 @@ const Homescreen = () => {
         isLoadingLoanAmount ? (
           <Spinner
             textContent={'Getting Profile Details...'}
+            textStyle={{color: 'white'}}
+            visible={true}
+            overlayColor="rgba(78, 75, 102, 0.7)"
+            animation="slide"
+          />
+        ) : null}
+
+        {isSending ? (
+          <Spinner
+            textContent={'Processing Transaction Statement...'}
             textStyle={{color: 'white'}}
             visible={true}
             overlayColor="rgba(78, 75, 102, 0.7)"
@@ -1008,20 +1311,42 @@ const Homescreen = () => {
                           Account Number:
                         </Text>
                       </View>
-                      <TouchableWithoutFeedback
-                        onLongPress={() =>
-                          handleLongPress(userWalletData?.walletIdAccountNumber)
-                        }>
-                        <Text
-                          selectable={true}
-                          selectionColor={'#CED4DA'}
-                          style={styles.TextHead}>
-                          {userWalletData &&
-                          userWalletData?.walletIdAccountNumber
-                            ? userWalletData?.walletIdAccountNumber
-                            : 'N/A'}
-                        </Text>
-                      </TouchableWithoutFeedback>
+                      <View
+                        style={{
+                          flex: 1,
+                          flexDirection: 'row',
+                          justifyContent: 'flex-end',
+                        }}>
+                        <TouchableWithoutFeedback>
+                          <FontIcon
+                            size={17}
+                            color={COLORS.lendaBlue}
+                            name="copy"
+                            style={{marginRight: 4}}
+                            onPress={() =>
+                              handleLongPress(
+                                userWalletData?.walletIdAccountNumber,
+                              )
+                            }
+                          />
+                        </TouchableWithoutFeedback>
+                        <TouchableWithoutFeedback
+                          onLongPress={() =>
+                            handleLongPress(
+                              userWalletData?.walletIdAccountNumber,
+                            )
+                          }>
+                          <Text
+                            selectable={true}
+                            selectionColor={'#CED4DA'}
+                            style={styles.TextHead}>
+                            {userWalletData &&
+                            userWalletData?.walletIdAccountNumber
+                              ? userWalletData?.walletIdAccountNumber
+                              : 'N/A'}
+                          </Text>
+                        </TouchableWithoutFeedback>
+                      </View>
                     </View>
                   </View>
                 </View>
@@ -1252,13 +1577,6 @@ const Homescreen = () => {
                       bounces={false}
                       showsHorizontalScrollIndicator={false}
                       showsVerticalScrollIndicator={true}
-                      // onScroll={() => setIsScrolling(true)}
-                      // onMomentumScrollEnd={() =>
-                      //   setTimeout(() => {
-                      //     setIsScrolling(false);
-                      //   }, 500)
-                      // }
-                      // centerContent={true}
                       style={[styles.scrollView]}
                       contentContainerStyle={styles.contentContainer}
                       alwaysBounceVertical={false}>
@@ -1367,8 +1685,9 @@ const Homescreen = () => {
                                       ))}
                                     {item.transactionType ===
                                       'Tradelenda Internal Wallet' &&
-                                      (item.credit != null &&
-                                      item.credit > 0 ? (
+                                      (item.credit != null ||
+                                      item.credit > 0 ||
+                                      item.credit != undefined ? (
                                         <>
                                           <Image
                                             style={[
@@ -1451,7 +1770,11 @@ const Homescreen = () => {
                                     alignItems: 'center',
                                     justifyContent: 'center',
                                   }}>
-                                  {item.credit ? (
+                                  {item.credit != null ||
+                                  item.credit > 0 ||
+                                  item.credit != undefined ||
+                                  item?.fromWalletAccountNumber !=
+                                    userWalletData?.walletIdAccountNumber ? (
                                     <Icon
                                       name="plus"
                                       size={16}
@@ -1467,9 +1790,14 @@ const Homescreen = () => {
                                   <Text
                                     style={{
                                       fontSize: hp(2),
-                                      color: item.credit
-                                        ? COLORS.googleGreen
-                                        : COLORS.googleRed,
+                                      color:
+                                        item.credit != null ||
+                                        item.credit > 0 ||
+                                        item.credit != undefined ||
+                                        item?.fromWalletAccountNumber !=
+                                          userWalletData?.walletIdAccountNumber
+                                          ? COLORS.googleGreen
+                                          : COLORS.googleRed,
                                       alignSelf: 'flex-end',
                                     }}>
                                     {item.credit === null ? (
@@ -1754,7 +2082,8 @@ const Homescreen = () => {
               </View>
             </TouchableOpacity>
           ) : null}
-          {/* Third Section */}
+
+          {/* Third Section Wallet and Bill*/}
           <View
             style={[
               styles.container,
@@ -1785,9 +2114,6 @@ const Homescreen = () => {
                   size={29}
                   color={COLORS.white}
                 />
-                {/* <Image
-                  source={require('../../../assets/images/fundVector.png')}
-                /> */}
               </View>
               <View style={{alignSelf: 'center', marginTop: 5}}>
                 <Text
@@ -1868,7 +2194,8 @@ const Homescreen = () => {
               </View>
             </Pressable>
           </View>
-          {/* Forth Section */}
+
+          {/* Forth Section  Investment and Loans*/}
           <View style={[styles.container, styles.transView]}>
             <Pressable
               onPress={() => navigation.navigate('Invest')}
@@ -1908,7 +2235,7 @@ const Homescreen = () => {
                       color: COLORS.highwayRed,
                     },
                   ]}>
-                  ARM Funding
+                  Save with ARM
                 </Text>
               </View>
             </Pressable>
@@ -1950,7 +2277,7 @@ const Homescreen = () => {
                       color: COLORS.lendaGreen,
                     },
                   ]}>
-                  Lenda Funding
+                  Earn With Us
                 </Text>
               </View>
             </Pressable>
@@ -2019,7 +2346,434 @@ const Homescreen = () => {
               </View>
             </Pressable>
           </View>
-          {/* Fifth Section */}
+
+          {/* Fifth Section  E-Statement*/}
+          <View style={[styles.container, styles.transView]}>
+            <Pressable
+              onPress={() => {
+                setShowArmStatementModal(true);
+              }}
+              style={({pressed}) => [
+                {
+                  // backgroundColor: pressed ? '#D9DBE9' : '#FFFFFF',
+                  backgroundColor: pressed ? '#D9DBE9' : COLORS.white,
+                  transform: [
+                    {
+                      scale: pressed ? 0.96 : 1,
+                    },
+                  ],
+                },
+                styles.transButtons,
+              ]}>
+              <View
+                style={{
+                  alignSelf: 'center',
+                  justifyContent: 'center',
+                }}>
+                <Icon
+                  name="file-document-outline"
+                  size={29}
+                  color={COLORS.highwayRed}
+                />
+              </View>
+              <View style={{alignSelf: 'center', marginTop: 5}}>
+                <Text
+                  style={[
+                    styles.transText,
+                    {
+                      color: COLORS.highwayRed,
+                    },
+                  ]}>
+                  ARM E-Statement
+                </Text>
+              </View>
+            </Pressable>
+
+            <Pressable
+              onPress={() => {
+                setShowLendaStatementModal(true);
+              }}
+              style={({pressed}) => [
+                {
+                  backgroundColor: pressed ? '#D9DBE9' : COLORS.white,
+                  transform: [
+                    {
+                      scale: pressed ? 0.96 : 1,
+                    },
+                  ],
+                },
+                styles.transButtons,
+              ]}>
+              <View
+                style={{
+                  alignSelf: 'center',
+                  justifyContent: 'center',
+                }}>
+                <Icon
+                  name="file-document-outline"
+                  size={29}
+                  color={COLORS.lendaGreen}
+                />
+              </View>
+              <View style={{alignSelf: 'center', marginTop: 5}}>
+                <Text
+                  style={[
+                    styles.transText,
+                    {
+                      color: COLORS.lendaGreen,
+                    },
+                  ]}>
+                  Lenda E-Statement
+                </Text>
+              </View>
+            </Pressable>
+
+            <Pressable
+              onPress={() => {
+                setShowWalletStatementModal(true);
+              }}
+              style={({pressed}) => [
+                {
+                  backgroundColor: pressed ? '#D9DBE9' : COLORS.white,
+                  transform: [
+                    {
+                      scale: pressed ? 0.96 : 1,
+                    },
+                  ],
+                },
+                styles.transButtons,
+              ]}>
+              <View
+                style={{
+                  alignSelf: 'center',
+                  justifyContent: 'center',
+                }}>
+                <Icon
+                  name="file-document-outline"
+                  size={29}
+                  color={COLORS.lendaBlue}
+                />
+              </View>
+              <View style={{alignSelf: 'center', marginTop: 5}}>
+                <Text
+                  style={[
+                    styles.transText,
+                    {
+                      color: COLORS.lendaBlue,
+                    },
+                  ]}>
+                  Wallet E-Statement
+                </Text>
+              </View>
+            </Pressable>
+          </View>
+
+          {/* E-Statements Modal */}
+          {/* Wallet Statement Modal */}
+          <Center>
+            <Modal
+              isOpen={showWalletStatementModal}
+              onClose={() => {
+                setShowWalletStatementModal(false);
+              }}
+              closeOnOverlayClick={false}>
+              <Modal.Content width={wp(90)} height={hp(50)}>
+                <Modal.CloseButton />
+                <Modal.Header>Generate Wallet E-Statement</Modal.Header>
+                <Modal.Body>
+                  <Pressable onPress={showDatePickerStartWallet}>
+                    <Input
+                      label="Start Date"
+                      iconName="calendar-month-outline"
+                      placeholder="2000 - 01 - 01"
+                      defaultValue={walletStatementDetails?.startDate}
+                      isDate={true}
+                      editable={false}
+                      showDatePicker={showDatePickerStartWallet}
+                      isNeeded={true}
+                    />
+                  </Pressable>
+
+                  <DateTimePickerModal
+                    isVisible={showStartWallet}
+                    testID="dateTimePicker"
+                    defaultValue={walletStatementDetails?.startDate}
+                    mode="date"
+                    is24Hour={true}
+                    onConfirm={text => {
+                      const formattedDate = new Date(text)
+                        .toISOString()
+                        .split('T')[0];
+                      setWalletStatementDetails({
+                        ...walletStatementDetails,
+                        startDate: formattedDate,
+                      });
+                      setShowStartWallet(false);
+                    }}
+                    onCancel={hideDatePickerStartWallet}
+                    textColor="#054B99"
+                  />
+
+                  <Pressable onPress={showDatePickerEndWallet}>
+                    <Input
+                      label="Stop Date"
+                      iconName="calendar-month-outline"
+                      placeholder="2000 - 01 - 01"
+                      defaultValue={walletStatementDetails?.endDate}
+                      isDate={true}
+                      editable={false}
+                      showDatePicker={showDatePickerEndWallet}
+                      isNeeded={true}
+                    />
+                  </Pressable>
+
+                  <DateTimePickerModal
+                    isVisible={showEndWallet}
+                    testID="dateTimePicker"
+                    defaultValue={walletStatementDetails?.endDate}
+                    mode="date"
+                    is24Hour={true}
+                    onConfirm={text => {
+                      const formattedDate = new Date(text)
+                        .toISOString()
+                        .split('T')[0];
+                      setWalletStatementDetails({
+                        ...walletStatementDetails,
+                        endDate: formattedDate,
+                      });
+                      setShowEndWallet(false);
+                    }}
+                    onCancel={hideDatePickerEndWallet}
+                    textColor="#054B99"
+                  />
+                </Modal.Body>
+                <Modal.Footer>
+                  <Btn.Group space={2}>
+                    <Btn
+                      variant="ghost"
+                      colorScheme="blueGray"
+                      onPress={() => {
+                        setShowWalletStatementModal(false);
+                      }}>
+                      Cancel
+                    </Btn>
+                    <Btn
+                      onPress={() => {
+                        handleWalletStatement();
+                        setShowWalletStatementModal(false);
+                      }}>
+                      Send Statement
+                    </Btn>
+                  </Btn.Group>
+                </Modal.Footer>
+              </Modal.Content>
+            </Modal>
+          </Center>
+
+          {/* ARM Statement Modal */}
+          <Center>
+            <Modal
+              isOpen={showArmStatementModal}
+              onClose={() => {
+                setShowArmStatementModal(false);
+              }}
+              closeOnOverlayClick={false}>
+              <Modal.Content width={wp(90)} height={hp(50)}>
+                <Modal.CloseButton />
+                <Modal.Header>Generate ARM E-Statement</Modal.Header>
+                <Modal.Body>
+                  <Pressable onPress={showDatePickerStartArm}>
+                    <Input
+                      label="Start Date"
+                      iconName="calendar-month-outline"
+                      placeholder="2000 - 01 - 01"
+                      defaultValue={armStatementDetails?.startDate}
+                      isDate={true}
+                      editable={false}
+                      showDatePicker={showDatePickerStartArm}
+                      isNeeded={true}
+                    />
+                  </Pressable>
+
+                  <DateTimePickerModal
+                    isVisible={showStartArm}
+                    testID="dateTimePicker"
+                    defaultValue={armStatementDetails?.startDate}
+                    mode="date"
+                    is24Hour={true}
+                    onConfirm={text => {
+                      const formattedDate = new Date(text)
+                        .toISOString()
+                        .split('T')[0];
+                      setArmStatementDetails({
+                        ...armStatementDetails,
+                        startDate: formattedDate,
+                      });
+                      setShowStartArm(false);
+                    }}
+                    onCancel={hideDatePickerStartArm}
+                    textColor="#054B99"
+                  />
+
+                  <Pressable onPress={showDatePickerEndArm}>
+                    <Input
+                      label="Stop Date"
+                      iconName="calendar-month-outline"
+                      placeholder="2000 - 01 - 01"
+                      defaultValue={armStatementDetails?.endDate}
+                      isDate={true}
+                      editable={false}
+                      showDatePicker={showDatePickerEndArm}
+                      isNeeded={true}
+                    />
+                  </Pressable>
+
+                  <DateTimePickerModal
+                    isVisible={showEndArm}
+                    testID="dateTimePicker"
+                    defaultValue={armStatementDetails?.endDate}
+                    mode="date"
+                    is24Hour={true}
+                    onConfirm={text => {
+                      const formattedDate = new Date(text)
+                        .toISOString()
+                        .split('T')[0];
+                      setArmStatementDetails({
+                        ...armStatementDetails,
+                        endDate: formattedDate,
+                      });
+                      setShowEndArm(false);
+                    }}
+                    onCancel={hideDatePickerEndArm}
+                    textColor="#054B99"
+                  />
+                </Modal.Body>
+                <Modal.Footer>
+                  <Btn.Group space={2}>
+                    <Btn
+                      variant="ghost"
+                      colorScheme="blueGray"
+                      onPress={() => {
+                        setShowArmStatementModal(false);
+                      }}>
+                      Cancel
+                    </Btn>
+                    <Btn
+                      disabled={!allArmData[0]?.membershipId}
+                      onPress={() => {
+                        handleArmStatement();
+                        setShowArmStatementModal(false);
+                      }}>
+                      Send Statement
+                    </Btn>
+                  </Btn.Group>
+                </Modal.Footer>
+              </Modal.Content>
+            </Modal>
+          </Center>
+
+          {/* Lenda Statement Modal */}
+          <Center>
+            <Modal
+              isOpen={showLendaStatementModal}
+              onClose={() => {
+                setShowLendaStatementModal(false);
+              }}
+              closeOnOverlayClick={false}>
+              <Modal.Content width={wp(90)} height={hp(50)}>
+                <Modal.CloseButton />
+                <Modal.Header>Generate Lenda E-Statement</Modal.Header>
+                <Modal.Body>
+                  <Pressable onPress={showDatePickerStartLenda}>
+                    <Input
+                      label="Start Date"
+                      iconName="calendar-month-outline"
+                      placeholder="2000 - 01 - 01"
+                      defaultValue={lendaStatementDetails?.startDate}
+                      isDate={true}
+                      editable={false}
+                      showDatePicker={showDatePickerStartLenda}
+                      isNeeded={true}
+                    />
+                  </Pressable>
+
+                  <DateTimePickerModal
+                    isVisible={showStartLenda}
+                    testID="dateTimePicker"
+                    defaultValue={lendaStatementDetails?.startDate}
+                    mode="date"
+                    is24Hour={true}
+                    onConfirm={text => {
+                      const formattedDate = new Date(text)
+                        .toISOString()
+                        .split('T')[0];
+                      setLendaStatementDetails({
+                        ...lendaStatementDetails,
+                        startDate: formattedDate,
+                      });
+                      setShowStartLenda(false);
+                    }}
+                    onCancel={hideDatePickerStartLenda}
+                    textColor="#054B99"
+                  />
+
+                  <Pressable onPress={showDatePickerEndLenda}>
+                    <Input
+                      label="Stop Date"
+                      iconName="calendar-month-outline"
+                      placeholder="2000 - 01 - 01"
+                      defaultValue={lendaStatementDetails?.endDate}
+                      isDate={true}
+                      editable={false}
+                      showDatePicker={showDatePickerEndLenda}
+                      isNeeded={true}
+                    />
+                  </Pressable>
+
+                  <DateTimePickerModal
+                    isVisible={showEndLenda}
+                    testID="dateTimePicker"
+                    defaultValue={lendaStatementDetails?.endDate}
+                    mode="date"
+                    is24Hour={true}
+                    onConfirm={text => {
+                      const formattedDate = new Date(text)
+                        .toISOString()
+                        .split('T')[0];
+                      setLendaStatementDetails({
+                        ...lendaStatementDetails,
+                        endDate: formattedDate,
+                      });
+                      setShowEndLenda(false);
+                    }}
+                    onCancel={hideDatePickerEndLenda}
+                    textColor="#054B99"
+                  />
+                </Modal.Body>
+                <Modal.Footer>
+                  <Btn.Group space={2}>
+                    <Btn
+                      variant="ghost"
+                      colorScheme="blueGray"
+                      onPress={() => {
+                        setShowLendaStatementModal(false);
+                      }}>
+                      Cancel
+                    </Btn>
+                    <Btn
+                      onPress={() => {
+                        handleLendaStatement();
+                        setShowLendaStatementModal(false);
+                      }}>
+                      Send Statement
+                    </Btn>
+                  </Btn.Group>
+                </Modal.Footer>
+              </Modal.Content>
+            </Modal>
+          </Center>
+
+          {/* Sixth Section Single Transaction History*/}
           <View
             style={{
               flex: 1,
@@ -2027,7 +2781,7 @@ const Homescreen = () => {
               width: wp('90%'),
               height: hp(
                 userTransactionsData && userTransactionsData.length > 0
-                  ? '25%'
+                  ? '15%'
                   : '40%',
               ),
               borderRadius: 5,
@@ -2112,7 +2866,7 @@ const Homescreen = () => {
                 </View>
               ) : (
                 userTransactionsData &&
-                userTransactionsData.slice(0, 2).map((item, i) => {
+                userTransactionsData.slice(0, 1).map((item, i) => {
                   const dateObj = new Date(item.createdAt);
                   const hours = dateObj.getHours();
                   const minutes = dateObj.getMinutes();
@@ -2248,7 +3002,11 @@ const Homescreen = () => {
                             alignItems: 'center',
                             justifyContent: 'center',
                           }}>
-                          {item.credit ? (
+                          {item.credit != null ||
+                          item.credit > 0 ||
+                          item.credit != undefined ||
+                          item?.fromWalletAccountNumber !=
+                            userWalletData?.walletIdAccountNumber ? (
                             <Icon
                               name="plus"
                               size={16}
@@ -2264,9 +3022,14 @@ const Homescreen = () => {
                           <Text
                             style={{
                               fontSize: hp(2),
-                              color: item.credit
-                                ? COLORS.googleGreen
-                                : COLORS.googleRed,
+                              color:
+                                item.credit != null ||
+                                item.credit > 0 ||
+                                item.credit != undefined ||
+                                item?.fromWalletAccountNumber !=
+                                  userWalletData?.walletIdAccountNumber
+                                  ? COLORS.googleGreen
+                                  : COLORS.googleRed,
                               alignSelf: 'flex-end',
                             }}>
                             {item.credit === null ? (
@@ -2376,8 +3139,8 @@ const styles = StyleSheet.create({
   },
   transText: {
     fontWeight: 400,
-    paddingLeft: wp(2),
-    fontSize: hp(1.5),
+    paddingLeft: wp(1),
+    fontSize: hp(1.4),
   },
   personIcon: {
     borderWidth: 1,

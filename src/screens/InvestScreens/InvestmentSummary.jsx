@@ -148,9 +148,29 @@ const InvestmentSummaryScreen = () => {
                     source={require('../../../assets/images/ArrowUp.png')}
                   />
                   <Text style={{color: COLORS.lendaGreen}}>
-                    {yieldValue ? Number(yieldValue).toFixed(2) : '0.00'}%
+                    {yieldValue
+                      ? new Intl.NumberFormat('en-US', {
+                          style: 'decimal',
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        }).format(Number(yieldValue))
+                      : '0.00'}
+                    %
                   </Text>
                 </Text>
+                <View
+                  style={{flex: 1, flexDirection: 'row', alignSelf: 'center', paddingHorizontal: 10}}>
+                  <Icon
+                    name="information-outline"
+                    style={{paddingRight: 3}}
+                    size={20}
+                    color={COLORS.microsoftBlue}
+                  />
+                  <Text style={styles.infoTrans}>
+                    New investment / top-up processing time is 24Hrs, and
+                    investment redemption is 48Hrs
+                  </Text>
+                </View>
               </View>
               <View
                 style={{
@@ -199,7 +219,9 @@ const InvestmentSummaryScreen = () => {
                       style={styles.InternalImage}
                       source={require('../../../assets/images/checkMark.png')}
                     />
-                    <Text style={[styles?.itemText, { fontSize: hp(1.6)}]}>{item?.text}</Text>
+                    <Text style={[styles?.itemText, {fontSize: hp(1.6)}]}>
+                      {item?.text}
+                    </Text>
                   </View>
                 ))}
               </View>
@@ -379,6 +401,13 @@ const styles = StyleSheet.create({
     fontSize: hp(2),
     textAlign: 'center',
     // lineHeight: 26,
+  },
+
+  infoTrans: {
+    fontFamily: 'MontSBold',
+    fontSize: hp(1.7),
+    textAlign: 'center',
+    color: COLORS.microsoftBlue,
   },
   transHistory: {
     padding: 14,

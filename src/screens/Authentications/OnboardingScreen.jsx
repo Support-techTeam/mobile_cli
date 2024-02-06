@@ -74,7 +74,7 @@ const OnboardingScreen = () => {
     return (
       <View
         style={{
-          height: hp(25),
+          height: hp(20),
           // height: height * 0.25,
           justifyContent: 'space-between',
         }}>
@@ -98,7 +98,7 @@ const OnboardingScreen = () => {
           ))}
         </View>
 
-        <View style={{marginBottom: 50}}>
+        <View style={{marginBottom: 30}}>
           <TouchableOpacity
             onPress={() => {
               handleCompleteOnboarding();

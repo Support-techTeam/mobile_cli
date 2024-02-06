@@ -25,6 +25,7 @@ import COLORS from '../../constants/colors';
 import {
   getAllArmInvestment,
   getAllLendaInvestment,
+  getSingleArmInvestment,
 } from '../../stores/InvestStore';
 
 const Investscreen = () => {
@@ -37,6 +38,7 @@ const Investscreen = () => {
   const [loanUserDetails, setLoanUserDetails] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const route = useRoute();
+  const [portfolioDetail, setPortfolioDetail] = useState(0);
 
   //total ARM Investment
   let totalArmAmount =
@@ -44,7 +46,7 @@ const Investscreen = () => {
     allArmData?.reduce(
       (accumulator, currentValue) =>
         accumulator +
-        (currentValue.investmentAmount - currentValue?.redemptionAmount),
+        (currentValue.investmentAmount),
       0,
     );
 
@@ -76,7 +78,6 @@ const Investscreen = () => {
 
   useEffect(() => {
     const mergedData = [...allArmData, ...allILendaData];
-    // const mergedData = Array.from(allArmData).concat(allILendaData);
     setAllInvestmentData(mergedData);
   }, [allArmData, allILendaData]);
 
@@ -106,10 +107,19 @@ const Investscreen = () => {
     if (res?.error) {
     } else {
       setAllArmData(res?.data?.data);
+      getSingleArmInvestment(
+        res?.data?.data[0]?.membershipId,
+        res?.data?.data[0]?.productCode,
+      ).then(res => {
+        if (!res?.error) {
+          if (res?.data?.length > 0){
+            setPortfolioDetail(res?.data?.portfolio[0]?.accountBalance);
+          }
+        }
+      });
     }
     setIsLoading(false);
   };
-
   const isReadyToInvest =
     loanUserDetails?.armUserBankDetails &&
     loanUserDetails?.nextOfKinDetails &&
@@ -145,9 +155,6 @@ const Investscreen = () => {
     loanUserDetails?.armUserBankDetails?.maximumSingleRedemptionAmount !=
       undefined &&
     loanUserDetails?.armUserBankDetails?.maximumSingleRedemptionAmount != '' &&
-    loanUserDetails?.armUserBankDetails?.politicallyExposedPersons !=
-      undefined &&
-    loanUserDetails?.armUserBankDetails?.politicallyExposedPersons != '' &&
     loanUserDetails?.armUserBankDetails?.reInvestDividends != undefined &&
     loanUserDetails?.armUserBankDetails?.reInvestDividends != '' &&
     loanUserDetails?.armUserBankDetails?.utilityBillIdType != undefined &&
@@ -174,9 +181,11 @@ const Investscreen = () => {
           : `${
               totalLendaAmount === 0
                 ? '0.00'
-                : totalLendaAmount
-                    ?.toString()
-                    ?.replace(/\B(?=(\d{3})+\b)/g, ',')
+                : new Intl.NumberFormat('en-US', {
+                  style: 'decimal',
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2
+                }).format(Number(totalLendaAmount))
             }`
       }`,
       icon: require('../../../assets/images/lenda.png'),
@@ -188,13 +197,19 @@ const Investscreen = () => {
       id: 2,
       state: 'Save with ARM',
       amount: `₦${
-        totalArmAmount === undefined
-          ? '0.00'
-          : `${
-              totalArmAmount === 0
-                ? '0.00'
-                : totalArmAmount?.toString()?.replace(/\B(?=(\d{3})+\b)/g, ',')
-            }`
+        portfolioDetail !== 0
+          ? new Intl.NumberFormat('en-US', {
+            style: 'decimal',
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+          }).format(Number(portfolioDetail))
+          : totalArmAmount !== undefined
+          ? new Intl.NumberFormat('en-US', {
+            style: 'decimal',
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+          }).format(Number(totalArmAmount))
+          : '0.00'
       }`,
       icon: require('../../../assets/images/arm.png'),
       bottomIcon: require('../../../assets/images/armCoin.png'),
@@ -376,6 +391,7 @@ const Investscreen = () => {
                   }}>
                   <View style={{marginTop: 0}}>
                     <TouchableOpacity
+                    disabled={investment?.productCode && investment?.membershipId ? false : true}
                       onPress={() =>
                         navigation.navigate('InvestmentDetails', {
                           paramKey: {
@@ -429,10 +445,8 @@ const Investscreen = () => {
                                 style: 'decimal',
                                 minimumFractionDigits: 2,
                                 maximumFractionDigits: 2,
-                              }).format(
-                                Number(investment?.investmentAmount) +
-                                  Number(investment?.topUpAmount),
-                              ) ?? '0.00'}
+                              }).format(Number(investment?.investmentAmount)) ??
+                                '0.00'}
                             </Text>
                           </View>
                           <View
@@ -442,7 +456,9 @@ const Investscreen = () => {
                             }}>
                             <Text style={styles.desc}>
                               {investment?.investmentType && 'Trade Lenda'}
+                              {investment?.productCode && !investment?.membershipId && "Processing "}
                               {investment?.productCode && 'ARM'}
+                              {investment?.productCode && !investment?.membershipId && " Investment... "}
                             </Text>
                             <View style={{flexDirection: 'row'}}>
                               <Text style={[styles.desc]}>
@@ -689,7 +705,7 @@ const styles = StyleSheet.create({
   amount: {
     marginTop: hp(0.5),
     fontFamily: 'serif',
-    fontSize: hp(2.5),
+    fontSize: hp(2.2),
     marginVertical: hp(2.2),
   },
 });

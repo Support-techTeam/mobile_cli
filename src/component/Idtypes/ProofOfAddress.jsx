@@ -21,13 +21,25 @@ import Buttons from '../buttons/Buttons';
 import {useNavigation, useRoute} from '@react-navigation/native';
 // you may also import just the functions or constants that you will use from this library
 import {request, PERMISSIONS, openSettings} from 'react-native-permissions';
-import {createUploadDocument} from '../../stores/LoanStore';
+import {
+  getLoanUserDetails,
+  createUploadDocument,
+  createDocumentsDetails,
+  updateDocumentsDetails,
+} from '../../stores/LoanStore';
 import Toast from 'react-native-toast-message';
 import Spinner from 'react-native-loading-spinner-overlay/lib';
 import {uploadProgress} from '../../stores/LoanStore';
+import {DdLogs} from '@datadog/mobile-react-native';
 
 const statusBarHeight = getStatusBarHeight();
-// const uploadProgress = 0;
+
+// let fileUrl = '';
+// let fileName = '';
+// let fileType = '';
+// let setDocument('';
+// let setNextScreen('';
+// let newUrl = '';
 const ProofofAdd = ({
   isCam,
   isProof,
@@ -47,78 +59,47 @@ const ProofofAdd = ({
   const navigation = useNavigation();
   const route = useRoute();
 
+  const [fileUrl, setFileUrl] = useState('');
+  const [fileName, setFileName] = useState('');
+  const [document, setDocument] = useState('');
+  const [fileType, setFileType] = useState('');
+  const [newUrl, setNewUrl] = useState('');
+  const [nextScreen, setNextScreen] = useState('');
+
+  // const [filePath, setFilePath] = useState({});
+  // const [documentName, setDocumentName] = useState('');
   const {params} = route;
   const {paramKey} = params;
-  const {
-    validIdentificationType,
-    validIdentification,
-    utilityBill,
-    bankStatement,
-    passport,
-    signature,
-    seal,
-    cacCertificate,
-    others,
-    identityCard,
-    personalPhoto,
-  } = paramKey;
+  // const {
+  //   validIdentificationType,
+  //   validIdentification,
+  //   utilityBill,
+  //   bankStatement,
+  //   passport,
+  //   signature,
+  //   seal,
+  //   cacCertificate,
+  //   others,
+  //   identityCard,
+  //   personalPhoto,
+  // } = paramKey;
 
-  const [userDocs, setUserDocs] = useState(
-    {
-      validIdentificationType:
-        validIdentificationType === undefined ||
-        validIdentificationType === null ||
-        validIdentificationType === ''
-          ? ''
-          : validIdentificationType,
-      validIdentification:
-        validIdentification === undefined ||
-        validIdentification === null ||
-        validIdentification === ''
-          ? ''
-          : validIdentification,
-      utilityBill:
-        utilityBill === undefined || utilityBill === null || utilityBill === ''
-          ? ''
-          : utilityBill,
-      bankStatement:
-        bankStatement === undefined ||
-        bankStatement === null ||
-        bankStatement === ''
-          ? ''
-          : bankStatement,
-      passport:
-        passport === undefined || passport === null || passport === ''
-          ? ''
-          : passport,
-      signature:
-        signature === undefined || signature === null || signature === ''
-          ? ''
-          : signature,
-      seal: seal === undefined || seal === null || seal === '' ? '' : seal,
-      cacCertificate:
-        cacCertificate === undefined ||
-        cacCertificate === null ||
-        cacCertificate === ''
-          ? ''
-          : cacCertificate,
-      others:
-        others === undefined || others === null || others === '' ? '' : others,
-      identityCard:
-        identityCard === undefined ||
-        identityCard === null ||
-        identityCard === ''
-          ? ''
-          : identityCard,
-      personalPhoto:
-        personalPhoto === undefined ||
-        personalPhoto === null ||
-        personalPhoto === ''
-          ? ''
-          : personalPhoto,
-    },
-    [navigation],
-  );
+  const [userDocs, setUserDocs] = useState({
+    validIdentificationType: '',
+    validIdentification: '',
+    utilityBill: '',
+    bankStatement: '',
+    passport: '',
+    signature: '',
+    seal: '',
+    cacCertificate: '',
+    othersName: '',
+    others: '',
+    identityCard: '',
+    personalPhoto: '',
+  });
+
+  const [orgDetails, setOrgDetails] = useState([]);
 
   const [docsName, setDocsName] = useState({
     utilityBill: '',
@@ -131,10 +112,91 @@ const ProofofAdd = ({
     personalPhoto: '',
   });
 
-  const [nextRoute, setNextRoute] = useState('');
 
-  const [documentName, setDocumentName] = useState('');
+  useEffect(() => {
+    setUserDocs({
+      validIdentificationType:
+        orgDetails && orgDetails?.validIdentificationType === undefined
+          ? ''
+          : orgDetails?.validIdentificationType,
+      validIdentification:
+        orgDetails && orgDetails?.validIdentification === undefined
+          ? ''
+          : orgDetails?.validIdentification,
+      utilityBill:
+        orgDetails && orgDetails?.utilityBill === undefined
+          ? ''
+          : orgDetails?.utilityBill,
+      bankStatement:
+        orgDetails && orgDetails?.bankStatement === undefined
+          ? ''
+          : orgDetails?.bankStatement,
+      passport:
+        orgDetails && orgDetails?.passport === undefined
+          ? ''
+          : orgDetails?.passport,
+      signature:
+        orgDetails && orgDetails?.signature === undefined
+          ? ''
+          : orgDetails?.signature,
+      seal:
+        orgDetails && orgDetails?.seal === undefined ? '' : orgDetails?.seal,
+      cacCertificate:
+        orgDetails && orgDetails?.cacCertificate === undefined
+          ? ''
+          : orgDetails?.cacCertificate,
+      othersName:
+        orgDetails && orgDetails?.othersName === undefined
+          ? ''
+          : orgDetails?.othersName,
+      others:
+        orgDetails && orgDetails?.others === undefined
+          ? ''
+          : orgDetails?.others,
+      identityCard:
+        orgDetails && orgDetails?.identityCard === undefined
+          ? ''
+          : orgDetails?.identityCard,
+      personalPhoto:
+        orgDetails && orgDetails?.personalPhoto === undefined
+          ? ''
+          : orgDetails?.personalPhoto,
+    });
+  }, [orgDetails, navigation]);
 
+  useEffect(() => {
+    // if (route.name !== '') {
+    const unsubscribe = navigation.addListener('focus', async () => {
+      unSubBusinessDetails();
+      setFileUrl('');
+      setFileName('');
+      setFileType('');
+      setDocument('');
+      setNextScreen('');
+    });
+    return unsubscribe;
+    // }
+  }, [navigation]);
+
+  useEffect(() => {
+    unSubBusinessDetails();
+    setFileUrl('');
+    setFileName('');
+    setFileType('');
+    setDocument('');
+    setNextScreen('');
+  }, []);
+
+  const unSubBusinessDetails = async () => {
+    setIsUpdating(true);
+    const res = await getLoanUserDetails();
+    if (res?.error) {
+      // TODO: handle error
+    } else {
+      setOrgDetails(res?.data?.loanDocumentDetails);
+    }
+    setIsUpdating(false);
+  };
   const requestCameraPermission = async () => {
     const status = await request(
       Platform.OS === 'ios'
@@ -198,16 +260,17 @@ const ProofofAdd = ({
 
   const launchCameraAsync1 = async () => {
     const permissopnResult = await requestCameraPermission();
-    if (permissopnResult) {
+    const isStoragePermitted = await requestStoragePermission();
+    if (permissopnResult && isStoragePermitted) {
       await launchCamera({
         mediaType: 'photo', // Specify 'photo' to capture images
         maxWidth: 800, // Maximum width for the captured image
         maxHeight: 600, // Maximum height for the captured image
         quality: 1,
+        saveToPhotos: true,
       })
         .then(result => {
           if (result.didCancel) {
-          } else if (result.error) {
           } else if (result?.errorCode) {
             Toast.show({
               type: 'error',
@@ -220,47 +283,24 @@ const ProofofAdd = ({
               onPress: () => Toast.hide(),
             });
           } else {
-            if (result !== null && result !== undefined) {
-              handleImageSelection(result);
-              setUserDocs({...userDocs, utilityBill: result});
-              setFile({
-                uri: result?.assets[0]?.uri ?? result?.uri,
-                name: result?.assets[0]?.fileName ?? result?.fileName,
-                type: result?.assets[0]?.type ?? result?.type,
-              });
-            }
-            setDocumentName('utilityBill');
-            setNextRoute('PersonalPhoto');
+            setUserDocs({...userDocs, utilityBill: result});
+            setFileUrl(result?.uri || result?.assets[0]?.uri);
+            setFileName(result?.fileName || result?.assets[0]?.fileName);
+            setFileType(result?.type || result?.assets[0]?.type);
+            setDocument('utilityBill');
+            setNextScreen('PersonalPhoto');
+            handleImageSelection(result);
+            DdLogs.info(`Loans | Document Upload Set Files utilityBill|`, {
+              context: {
+                fileUrl,
+                fileName,
+                fileType,
+                document,
+              },
+            });
           }
         })
         .catch(error => {});
-      // await launchCamera(
-      //   {
-      //     mediaType: 'photo', // Specify 'photo' to capture images
-      //     maxWidth: 800, // Maximum width for the captured image
-      //     maxHeight: 600, // Maximum height for the captured image
-      //     quality: 1,
-      //   },
-      //   result => {
-      //     if (result?.didCancel) {
-      //     } else if (result?.error) {
-      //     } else {
-      //       if(result !== null && result !== undefined){
-      //         handleImageSelection(result);
-      //         setUserDocs({...userDocs, utilityBill: result});
-      //         console.log('res', result)
-      //         setFile({
-      //           uri: result?.assets[0]?.uri ?? result?.uri,
-      //           name: result?.assets[0]?.fileName ?? result?.fileName,
-      //           type: result?.assets[0]?.type ?? result?.type,
-      //         });
-      //       }
-
-      //       setDocumentName('utilityBill');
-      //       setNextRoute('PersonalPhoto');
-      //     }
-      //   },
-      // );
     } else {
       Alert.alert(
         'Permission Required',
@@ -272,7 +312,8 @@ const ProofofAdd = ({
 
   const launchCameraAsync2 = async () => {
     const permissopnResult = await requestCameraPermission();
-    if (permissopnResult) {
+    const isStoragePermitted = await requestStoragePermission();
+    if (permissopnResult && isStoragePermitted) {
       await launchCamera({
         mediaType: 'photo', // Specify 'photo' to capture images
         maxWidth: 800, // Maximum width for the captured image
@@ -294,44 +335,24 @@ const ProofofAdd = ({
               onPress: () => Toast.hide(),
             });
           } else {
-            if (result !== null && result !== undefined) {
-              handleImageSelection(result);
-              setUserDocs({...userDocs, utilityBill: result});
-              setFile({
-                uri: result?.assets[0]?.uri ?? result?.uri,
-                name: result?.assets[0]?.fileName ?? result?.fileName,
-                type: result?.assets[0]?.type ?? result?.type,
-              });
-            }
-            setDocumentName('bankStatement');
-            setNextRoute('Passport');
+            setUserDocs({...userDocs, bankStatement: result});
+            setFileUrl(result?.uri || result?.assets[0]?.uri);
+            setFileName(result?.fileName || result?.assets[0]?.fileName);
+            setFileType(result?.type || result?.assets[0]?.type);
+            setDocument('bankStatement');
+            setNextScreen('Passport');
+            handleImageSelection(result);
+            DdLogs.info(`Loans | Document Upload Set Files bankStatement|`, {
+              context: {
+                fileUrl,
+                fileName,
+                fileType,
+                document,
+              },
+            });
           }
         })
         .catch(error => {});
-
-      // await launchCamera(
-      //   {
-      //     mediaType: 'photo', // Specify 'photo' to capture images
-      //     maxWidth: 800, // Maximum width for the captured image
-      //     maxHeight: 600, // Maximum height for the captured image
-      //     quality: 1,
-      //   },
-      //   result => {
-      //     if (result.didCancel) {
-      //     } else if (result.error) {
-      //     } else {
-      //       handleImageSelection(result);
-      //       setUserDocs({...userDocs, bankStatement: result});
-      //       setFile({
-      //         uri: result?.assets[0]?.uri,
-      //         name: result?.assets[0]?.fileName,
-      //         type: result?.assets[0]?.type,
-      //       });
-      //       setDocumentName('bankStatement');
-      //       setNextRoute('Passport');
-      //     }
-      //   },
-      // );
     } else {
       Alert.alert(
         'Permission Required',
@@ -343,7 +364,8 @@ const ProofofAdd = ({
 
   const launchCameraAsync3 = async () => {
     const permissopnResult = await requestCameraPermission();
-    if (permissopnResult) {
+    const isStoragePermitted = await requestStoragePermission();
+    if (permissopnResult && isStoragePermitted) {
       await launchCamera({
         mediaType: 'photo', // Specify 'photo' to capture images
         maxWidth: 800, // Maximum width for the captured image
@@ -365,43 +387,24 @@ const ProofofAdd = ({
               onPress: () => Toast.hide(),
             });
           } else {
-            if (result !== null && result !== undefined) {
-              handleImageSelection(result);
-              setUserDocs({...userDocs, utilityBill: result});
-              setFile({
-                uri: result?.assets[0]?.uri ?? result?.uri,
-                name: result?.assets[0]?.fileName ?? result?.fileName,
-                type: result?.assets[0]?.type ?? result?.type,
-              });
-            }
-            setDocumentName('passport');
-            setNextRoute('Signature');
+            setUserDocs({...userDocs, passport: result});
+            setFileUrl(result?.uri || result?.assets[0]?.uri);
+            setFileName(result?.fileName || result?.assets[0]?.fileName);
+            setFileType(result?.type || result?.assets[0]?.type);
+            setDocument('passport');
+            setNextScreen('Signature');
+            handleImageSelection(result);
+            DdLogs.info(`Loans | Document Upload Set Files passport|`, {
+              context: {
+                fileUrl,
+                fileName,
+                fileType,
+                document,
+              },
+            });
           }
         })
         .catch(error => {});
-      // await launchCamera(
-      //   {
-      //     mediaType: 'photo', // Specify 'photo' to capture images
-      //     maxWidth: 800, // Maximum width for the captured image
-      //     maxHeight: 600, // Maximum height for the captured image
-      //     quality: 1,
-      //   },
-      //   result => {
-      //     if (result.didCancel) {
-      //     } else if (result.error) {
-      //     } else {
-      //       handleImageSelection(result);
-      //       setUserDocs({...userDocs, passport: result});
-      //       setFile({
-      //         uri: result?.assets[0]?.uri,
-      //         name: result?.assets[0]?.fileName,
-      //         type: result?.assets[0]?.type,
-      //       });
-      //       setDocumentName('passport');
-      //       setNextRoute('Signature');
-      //     }
-      //   },
-      // );
     } else {
       Alert.alert(
         'Permission Required',
@@ -413,7 +416,8 @@ const ProofofAdd = ({
 
   const launchCameraAsync4 = async () => {
     const permissopnResult = await requestCameraPermission();
-    if (permissopnResult) {
+    const isStoragePermitted = await requestStoragePermission();
+    if (permissopnResult && isStoragePermitted) {
       await launchCamera({
         mediaType: 'photo', // Specify 'photo' to capture images
         maxWidth: 800, // Maximum width for the captured image
@@ -435,43 +439,24 @@ const ProofofAdd = ({
               onPress: () => Toast.hide(),
             });
           } else {
-            if (result !== null && result !== undefined) {
-              handleImageSelection(result);
-              setUserDocs({...userDocs, utilityBill: result});
-              setFile({
-                uri: result?.assets[0]?.uri ?? result?.uri,
-                name: result?.assets[0]?.fileName ?? result?.fileName,
-                type: result?.assets[0]?.type ?? result?.type,
-              });
-            }
-            setDocumentName('seal');
-            setNextRoute('CAC');
+            setUserDocs({...userDocs, seal: result});
+            setFileUrl(result?.uri || result?.assets[0]?.uri);
+            setFileName(result?.fileName || result?.assets[0]?.fileName);
+            setFileType(result?.type || result?.assets[0]?.type);
+            setDocument('seal');
+            setNextScreen('CAC');
+            handleImageSelection(result);
+            DdLogs.info(`Loans | Document Upload Set Files seal|`, {
+              context: {
+                fileUrl,
+                fileName,
+                fileType,
+                document,
+              },
+            });
           }
         })
         .catch(error => {});
-      // await launchCamera(
-      //   {
-      //     mediaType: 'photo', // Specify 'photo' to capture images
-      //     maxWidth: 800, // Maximum width for the captured image
-      //     maxHeight: 600, // Maximum height for the captured image
-      //     quality: 1,
-      //   },
-      //   result => {
-      //     if (result.didCancel) {
-      //     } else if (result.error) {
-      //     } else {
-      //       handleImageSelection(result);
-      //       setUserDocs({...userDocs, seal: result});
-      //       setFile({
-      //         uri: result?.assets[0]?.uri,
-      //         name: result?.assets[0]?.fileName,
-      //         type: result?.assets[0]?.type,
-      //       });
-      //       setDocumentName('seal');
-      //       setNextRoute('CAC');
-      //     }
-      //   },
-      // );
     } else {
       Alert.alert(
         'Permission Required',
@@ -483,7 +468,8 @@ const ProofofAdd = ({
 
   const launchCameraAsync5 = async () => {
     const permissopnResult = await requestCameraPermission();
-    if (permissopnResult) {
+    const isStoragePermitted = await requestStoragePermission();
+    if (permissopnResult && isStoragePermitted) {
       await launchCamera({
         mediaType: 'photo', // Specify 'photo' to capture images
         maxWidth: 800, // Maximum width for the captured image
@@ -505,43 +491,24 @@ const ProofofAdd = ({
               onPress: () => Toast.hide(),
             });
           } else {
-            if (result !== null && result !== undefined) {
-              handleImageSelection(result);
-              setUserDocs({...userDocs, utilityBill: result});
-              setFile({
-                uri: result?.assets[0]?.uri ?? result?.uri,
-                name: result?.assets[0]?.fileName ?? result?.fileName,
-                type: result?.assets[0]?.type ?? result?.type,
-              });
-            }
-            setDocumentName('cacCertificate');
-            setNextRoute('Others');
+            setUserDocs({...userDocs, cacCertificate: result});
+            setFileUrl(result?.uri || result?.assets[0]?.uri);
+            setFileName(result?.fileName || result?.assets[0]?.fileName);
+            setFileType(result?.type || result?.assets[0]?.type);
+            setDocument('cacCertificate');
+            setNextScreen('Others');
+            handleImageSelection(result);
+            DdLogs.info(`Loans | Document Upload Set Files cacCertificate|`, {
+              context: {
+                fileUrl,
+                fileName,
+                fileType,
+                document,
+              },
+            });
           }
         })
         .catch(error => {});
-      // await launchCamera(
-      //   {
-      //     mediaType: 'photo', // Specify 'photo' to capture images
-      //     maxWidth: 800, // Maximum width for the captured image
-      //     maxHeight: 600, // Maximum height for the captured image
-      //     quality: 1,
-      //   },
-      //   result => {
-      //     if (result.didCancel) {
-      //     } else if (result.error) {
-      //     } else {
-      //       handleImageSelection(result);
-      //       setUserDocs({...userDocs, cacCertificate: result});
-      //       setFile({
-      //         uri: result?.assets[0]?.uri,
-      //         name: result?.assets[0]?.fileName,
-      //         type: result?.assets[0]?.type,
-      //       });
-      //       setDocumentName('cacCertificate');
-      //       setNextRoute('Others');
-      //     }
-      //   },
-      // );
     } else {
       Alert.alert(
         'Permission Required',
@@ -553,7 +520,8 @@ const ProofofAdd = ({
 
   const launchCameraAsync6 = async () => {
     const permissopnResult = await requestCameraPermission();
-    if (permissopnResult) {
+    const isStoragePermitted = await requestStoragePermission();
+    if (permissopnResult && isStoragePermitted) {
       await launchCamera({
         mediaType: 'photo', // Specify 'photo' to capture images
         maxWidth: 800, // Maximum width for the captured image
@@ -575,44 +543,24 @@ const ProofofAdd = ({
               onPress: () => Toast.hide(),
             });
           } else {
-            if (result !== null && result !== undefined) {
-              handleImageSelection(result);
-              setUserDocs({...userDocs, utilityBill: result});
-              setFile({
-                uri: result?.assets[0]?.uri ?? result?.uri,
-                name: result?.assets[0]?.fileName ?? result?.fileName,
-                type: result?.assets[0]?.type ?? result?.type,
-              });
-            }
-
-            setDocumentName('personalPhoto');
-            setNextRoute('IdentityCard');
+            setUserDocs({...userDocs, personalPhoto: result});
+            setFileUrl(result?.uri || result?.assets[0]?.uri);
+            setFileName(result?.fileName || result?.assets[0]?.fileName);
+            setFileType(result?.type || result?.assets[0]?.type);
+            setDocument('personalPhoto');
+            setNextScreen('IdentityCard');
+            handleImageSelection(result);
+            DdLogs.info(`Loans | Document Upload Set Files personalPhoto|`, {
+              context: {
+                fileUrl,
+                fileName,
+                fileType,
+                document,
+              },
+            });
           }
         })
         .catch(error => {});
-      // await launchCamera(
-      //   {
-      //     mediaType: 'photo', // Specify 'photo' to capture images
-      //     maxWidth: 800, // Maximum width for the captured image
-      //     maxHeight: 600, // Maximum height for the captured image
-      //     quality: 1,
-      //   },
-      //   result => {
-      //     if (result.didCancel) {
-      //     } else if (result.error) {
-      //     } else {
-      //       handleImageSelection(result);
-      //       setUserDocs({...userDocs, personalPhoto: result});
-      //       setFile({
-      //         uri: result?.assets[0]?.uri,
-      //         name: result?.assets[0]?.fileName,
-      //         type: result?.assets[0]?.type,
-      //       });
-      //       setDocumentName('personalPhoto');
-      //       setNextRoute('IdentityCard');
-      //     }
-      //   },
-      // );
     } else {
       Alert.alert(
         'Permission Required',
@@ -624,7 +572,8 @@ const ProofofAdd = ({
 
   const launchCameraAsync7 = async () => {
     const permissopnResult = await requestCameraPermission();
-    if (permissopnResult) {
+    const isStoragePermitted = await requestStoragePermission();
+    if (permissopnResult && isStoragePermitted) {
       await launchCamera({
         mediaType: 'photo', // Specify 'photo' to capture images
         maxWidth: 800, // Maximum width for the captured image
@@ -646,43 +595,24 @@ const ProofofAdd = ({
               onPress: () => Toast.hide(),
             });
           } else {
-            if (result !== null && result !== undefined) {
-              handleImageSelection(result);
-              setUserDocs({...userDocs, utilityBill: result});
-              setFile({
-                uri: result?.assets[0]?.uri ?? result?.uri,
-                name: result?.assets[0]?.fileName ?? result?.fileName,
-                type: result?.assets[0]?.type ?? result?.type,
-              });
-            }
-            setDocumentName('identityCard');
-            setNextRoute('BankStatement');
+            setUserDocs({...userDocs, identityCard: result});
+            setFileUrl(result?.uri || result?.assets[0]?.uri);
+            setFileName(result?.fileName || result?.assets[0]?.fileName);
+            setFileType(result?.type || result?.assets[0]?.type);
+            setDocument('identityCard');
+            setNextScreen('BankStatement');
+            handleImageSelection(result);
+            DdLogs.info(`Loans | Document Upload Set Files identityCard|`, {
+              context: {
+                fileUrl,
+                fileName,
+                fileType,
+                document,
+              },
+            });
           }
         })
         .catch(error => {});
-      // await launchCamera(
-      //   {
-      //     mediaType: 'photo', // Specify 'photo' to capture images
-      //     maxWidth: 800, // Maximum width for the captured image
-      //     maxHeight: 600, // Maximum height for the captured image
-      //     quality: 1,
-      //   },
-      //   result => {
-      //     if (result.didCancel) {
-      //     } else if (result.error) {
-      //     } else {
-      //       handleImageSelection(result);
-      //       setUserDocs({...userDocs, identityCard: result});
-      //       setFile({
-      //         uri: result?.assets[0]?.uri,
-      //         name: result?.assets[0]?.fileName,
-      //         type: result?.assets[0]?.type,
-      //       });
-      //       setDocumentName('identityCard');
-      //       setNextRoute('BankStatement');
-      //     }
-      //   },
-      // );
     } else {
       Alert.alert(
         'Permission Required',
@@ -699,184 +629,22 @@ const ProofofAdd = ({
         const result = await launchImageLibrary({
           presentationStyle: 'fullScreen',
         });
-        setImage(result.assets[0].uri);
+        setImage(result?.uri || result?.assets[0]?.uri);
         setDocsName({...docsName, utilityBill: result});
-        setFile({
-          uri: result?.assets[0]?.uri,
-          name: result?.assets[0]?.fileName,
-          type: result?.assets[0]?.type,
+        setFileUrl(result?.uri || result?.assets[0]?.uri);
+        setFileName(result?.fileName || result?.assets[0]?.fileName);
+        setFileType(result?.type || result?.assets[0]?.type);
+        setDocument('utilityBill');
+        setNextScreen('PersonalPhoto');
+        handleImageSelection(result);
+        DdLogs.info(`Loans | Document Picker Set Files utilityBill|`, {
+          context: {
+            fileUrl,
+            fileName,
+            fileType,
+            document,
+          },
         });
-        setDocumentName('utilityBill');
-        setNextRoute('PersonalPhoto');
-      } catch (err) {
-        // console.warn(err);
-      }
-    } else {
-      Alert.alert(
-        'Permission Required',
-        'Permission to access storage is required.',
-      );
-      return;
-    }
-  }, []);
-
-  const pickDocumentS = async () => {
-    const permissopnResult = await requestStoragePermission();
-    if (permissopnResult) {
-      try {
-        const result = await launchImageLibrary({
-          presentationStyle: 'fullScreen',
-        });
-
-        setImage(result.assets[0].uri);
-        setDocsName({...docsName, signature: result});
-        setFile({
-          uri: result?.assets[0]?.uri,
-          name: result?.assets[0]?.fileName,
-          type: result?.assets[0]?.type,
-        });
-        setDocumentName('signature');
-        setNextRoute('CompanySeals');
-      } catch (err) {
-        // console.warn(err);
-      }
-    } else {
-      Alert.alert(
-        'Permission Required',
-        'Permission to access storage is required.',
-      );
-      return;
-    }
-  };
-
-  const pickDocument2 = useCallback(async () => {
-    const permissopnResult = await requestStoragePermission();
-    if (permissopnResult) {
-      try {
-        const result = await launchImageLibrary({
-          presentationStyle: 'fullScreen',
-        });
-        setImage(result.assets[0].uri);
-        setDocsName({...docsName, bankStatement: result});
-        setFile({
-          uri: result?.assets[0]?.uri,
-          name: result?.assets[0]?.fileName,
-          type: result?.assets[0]?.type,
-        });
-        setDocumentName('bankStatement');
-        setNextRoute('Passport');
-      } catch (err) {
-        // console.warn(err);
-      }
-    } else {
-      Alert.alert(
-        'Permission Required',
-        'Permission to access storage is required.',
-      );
-      return;
-    }
-  }, []);
-
-  const pickDocument3 = useCallback(async () => {
-    const permissopnResult = await requestStoragePermission();
-    if (permissopnResult) {
-      try {
-        const result = await launchImageLibrary({
-          presentationStyle: 'fullScreen',
-        });
-        setImage(result.assets[0].uri);
-        setDocsName({...docsName, passport: result});
-        setFile({
-          uri: result?.assets[0]?.uri,
-          name: result?.assets[0]?.fileName,
-          type: result?.assets[0]?.type,
-        });
-        setDocumentName('passport');
-        setNextRoute('Signature');
-      } catch (err) {
-        // console.warn(err);
-      }
-    } else {
-      Alert.alert(
-        'Permission Required',
-        'Permission to access storage is required.',
-      );
-      return;
-    }
-  }, []);
-
-  const pickDocument4 = useCallback(async () => {
-    const permissopnResult = await requestStoragePermission();
-    if (permissopnResult) {
-      try {
-        const result = await launchImageLibrary({
-          presentationStyle: 'fullScreen',
-        });
-        setImage(result.assets[0].uri);
-        setDocsName({...docsName, signature: result});
-        setFile({
-          uri: result?.assets[0]?.uri,
-          name: result?.assets[0]?.fileName,
-          type: result?.assets[0]?.type,
-        });
-        setDocumentName('signature');
-        setNextRoute('CompanySeals');
-      } catch (err) {
-        // console.warn(err);
-      }
-    } else {
-      Alert.alert(
-        'Permission Required',
-        'Permission to access storage is required.',
-      );
-      return;
-    }
-  }, []);
-
-  const pickDocument5 = useCallback(async () => {
-    const permissopnResult = await requestStoragePermission();
-    if (permissopnResult) {
-      try {
-        const result = await launchImageLibrary({
-          presentationStyle: 'fullScreen',
-        });
-        setImage(result.assets[0].uri);
-        setDocsName({...docsName, seal: result});
-        setFile({
-          uri: result?.assets[0]?.uri,
-          name: result?.assets[0]?.fileName,
-          type: result?.assets[0]?.type,
-        });
-        setDocumentName('seal');
-        setNextRoute('CAC');
-      } catch (err) {
-        // console.warn(err);
-      }
-    } else {
-      Alert.alert(
-        'Permission Required',
-        'Permission to access storage is required.',
-      );
-      return;
-    }
-  }, []);
-
-  const pickDocument6 = useCallback(async () => {
-    const permissopnResult = await requestStoragePermission();
-    if (permissopnResult) {
-      try {
-        const result = await launchImageLibrary({
-          presentationStyle: 'fullScreen',
-        });
-        setImage(result.assets[0].uri);
-        setDocsName({...docsName, cacCertificate: result});
-        setFile({
-          name: result?.assets[0]?.fileName,
-          type: result?.assets[0]?.type,
-          uri: result?.assets[0]?.uri,
-        });
-        setDocumentName('cacCertificate');
-        setNextRoute('Others');
       } catch (err) {
         // console.warn(err);
       }
@@ -896,15 +664,22 @@ const ProofofAdd = ({
         const result = await launchImageLibrary({
           presentationStyle: 'fullScreen',
         });
-        setImage(result.assets[0].uri);
+        setImage(result?.uri || result?.assets[0]?.uri);
         setDocsName({...docsName, personalPhoto: result});
-        setFile({
-          name: result?.assets[0]?.fileName,
-          type: result?.assets[0]?.type,
-          uri: result?.assets[0]?.uri,
+        setFileUrl(result?.uri || result?.assets[0]?.uri);
+        setFileName(result?.fileName || result?.assets[0]?.fileName);
+        setFileType(result?.type || result?.assets[0]?.type);
+        setDocument('personalPhoto');
+        setNextScreen('IdentityCard');
+        handleImageSelection(result);
+        DdLogs.info(`Loans | Document Picker Set Files utilityBill|`, {
+          context: {
+            fileUrl,
+            fileName,
+            fileType,
+            document,
+          },
         });
-        setDocumentName('personalPhoto');
-        setNextRoute('IdentityCard');
       } catch (err) {
         // console.warn(err);
       }
@@ -924,15 +699,233 @@ const ProofofAdd = ({
         const result = await launchImageLibrary({
           presentationStyle: 'fullScreen',
         });
-        setImage(result.assets[0].uri);
+        setImage(result?.uri || result?.assets[0]?.uri);
         setDocsName({...docsName, identityCard: result});
-        setFile({
-          name: result?.assets[0]?.fileName,
-          type: result?.assets[0]?.type,
-          uri: result?.assets[0]?.uri,
+        setFileUrl(result?.uri || result?.assets[0]?.uri);
+        setFileName(result?.fileName || result?.assets[0]?.fileName);
+        setFileType(result?.type || result?.assets[0]?.type);
+        setDocument('identityCard');
+        setNextScreen('BankStatement');
+        handleImageSelection(result);
+        DdLogs.info(`Loans | Document Picker Set Files utilityBill|`, {
+          context: {
+            fileUrl,
+            fileName,
+            fileType,
+            document,
+          },
         });
-        setDocumentName('identityCard');
-        setNextRoute('BankStatement');
+      } catch (err) {
+        // console.warn(err);
+      }
+    } else {
+      Alert.alert(
+        'Permission Required',
+        'Permission to access storage is required.',
+      );
+      return;
+    }
+  }, []);
+
+  const pickDocument2 = useCallback(async () => {
+    const permissopnResult = await requestStoragePermission();
+    if (permissopnResult) {
+      try {
+        const result = await launchImageLibrary({
+          presentationStyle: 'fullScreen',
+        });
+
+        setImage(result?.uri || result?.assets[0]?.uri);
+        setDocsName({...docsName, bankStatement: result});
+        setFileUrl(result?.uri || result?.assets[0]?.uri);
+        setFileName(result?.fileName || result?.assets[0]?.fileName);
+        setFileType(result?.type || result?.assets[0]?.type);
+        setDocument('bankStatement');
+        setNextScreen('Passport');
+        handleImageSelection(result);
+        DdLogs.info(`Loans | Document Picker Set Files utilityBill|`, {
+          context: {
+            fileUrl,
+            fileName,
+            fileType,
+            document,
+          },
+        });
+      } catch (err) {
+        // console.warn(err);
+      }
+    } else {
+      Alert.alert(
+        'Permission Required',
+        'Permission to access storage is required.',
+      );
+      return;
+    }
+  }, []);
+
+  const pickDocument3 = useCallback(async () => {
+    const permissopnResult = await requestStoragePermission();
+    if (permissopnResult) {
+      try {
+        const result = await launchImageLibrary({
+          presentationStyle: 'fullScreen',
+        });
+        setImage(result?.uri || result?.assets[0]?.uri);
+        setDocsName({...docsName, passport: result});
+        setFileUrl(result?.uri || result?.assets[0]?.uri);
+        setFileName(result?.fileName || result?.assets[0]?.fileName);
+        setFileType(result?.type || result?.assets[0]?.type);
+        setDocument('passport');
+        setNextScreen('Signature');
+        handleImageSelection(result);
+        DdLogs.info(`Loans | Document Picker Set Files utilityBill|`, {
+          context: {
+            fileUrl,
+            fileName,
+            fileType,
+            document,
+          },
+        });
+      } catch (err) {
+        // console.warn(err);
+      }
+    } else {
+      Alert.alert(
+        'Permission Required',
+        'Permission to access storage is required.',
+      );
+      return;
+    }
+  }, []);
+
+  const pickDocumentS = async () => {
+    const permissopnResult = await requestStoragePermission();
+    if (permissopnResult) {
+      try {
+        const result = await launchImageLibrary({
+          presentationStyle: 'fullScreen',
+        });
+        setImage(result?.uri || result?.assets[0]?.uri);
+        setDocsName({...docsName, signature: result});
+        setFileUrl(result?.uri || result?.assets[0]?.uri);
+        setFileName(result?.fileName || result?.assets[0]?.fileName);
+        setFileType(result?.type || result?.assets[0]?.type);
+        setDocument('signature');
+        setNextScreen('CompanySeals');
+        handleImageSelection(result);
+        DdLogs.info(`Loans | Document Picker Set Files utilityBill|`, {
+          context: {
+            fileUrl,
+            fileName,
+            fileType,
+            document,
+          },
+        });
+      } catch (err) {
+        // console.warn(err);
+      }
+    } else {
+      Alert.alert(
+        'Permission Required',
+        'Permission to access storage is required.',
+      );
+      return;
+    }
+  };
+
+  const pickDocument4 = useCallback(async () => {
+    const permissopnResult = await requestStoragePermission();
+    if (permissopnResult) {
+      try {
+        const result = await launchImageLibrary({
+          presentationStyle: 'fullScreen',
+        });
+        setImage(result?.uri || result?.assets[0]?.uri);
+        setDocsName({...docsName, signature: result});
+        setFileUrl(result?.uri || result?.assets[0]?.uri);
+        setFileName(result?.fileName || result?.assets[0]?.fileName);
+        setFileType(result?.type || result?.assets[0]?.type);
+        setDocument('signature');
+        setNextScreen('CompanySeals');
+        handleImageSelection(result);
+        DdLogs.info(`Loans | Document Picker Set Files utilityBill|`, {
+          context: {
+            fileUrl,
+            fileName,
+            fileType,
+            document,
+          },
+        });
+      } catch (err) {
+        // console.warn(err);
+      }
+    } else {
+      Alert.alert(
+        'Permission Required',
+        'Permission to access storage is required.',
+      );
+      return;
+    }
+  }, []);
+
+  const pickDocument5 = useCallback(async () => {
+    const permissopnResult = await requestStoragePermission();
+    if (permissopnResult) {
+      try {
+        const result = await launchImageLibrary({
+          presentationStyle: 'fullScreen',
+        });
+        setImage(result?.uri || result?.assets[0]?.uri);
+        setDocsName({...docsName, seal: result});
+        setFileUrl(result?.uri || result?.assets[0]?.uri);
+        setFileName(result?.fileName || result?.assets[0]?.fileName);
+        setFileType(result?.type || result?.assets[0]?.type);
+        setDocument('seal');
+        setNextScreen('CAC');
+        handleImageSelection(result);
+        DdLogs.info(`Loans | Document Picker Set Files utilityBill|`, {
+          context: {
+            fileUrl,
+            fileName,
+            fileType,
+            document,
+          },
+        });
+      } catch (err) {
+        // console.warn(err);
+      }
+    } else {
+      Alert.alert(
+        'Permission Required',
+        'Permission to access storage is required.',
+      );
+      return;
+    }
+  }, []);
+
+  const pickDocument6 = useCallback(async () => {
+    const permissopnResult = await requestStoragePermission();
+    if (permissopnResult) {
+      try {
+        const result = await launchImageLibrary({
+          presentationStyle: 'fullScreen',
+        });
+        setImage(result?.uri || result?.assets[0]?.uri);
+        setDocsName({...docsName, cacCertificate: result});
+        setFileUrl(result?.uri || result?.assets[0]?.uri);
+        setFileName(result?.fileName || result?.assets[0]?.fileName);
+        setFileType(result?.type || result?.assets[0]?.type);
+        setDocument('cacCertificate');
+        setNextScreen('Others');
+        handleImageSelection(result);
+        DdLogs.info(`Loans | Document Picker Set Files utilityBill|`, {
+          context: {
+            fileUrl,
+            fileName,
+            fileType,
+            document,
+          },
+        });
       } catch (err) {
         // console.warn(err);
       }
@@ -953,7 +946,10 @@ const ProofofAdd = ({
   const handleImageSelection = async result => {
     if (!result.canceled) {
       if (result) {
-        setImage(result?.assets[0]?.uri ?? result?.uri);
+        DdLogs.info(`Loans | Document Upload Handle Image Selection|`, {
+          context: result,
+        });
+        setImage(result?.uri || result?.assets[0]?.uri);
         setShowConfirmModal(true);
       }
     }
@@ -973,17 +969,171 @@ const ProofofAdd = ({
     setShowConfirmModal(false);
   };
 
-  const [fileUri, setFile] = useState({
-    name: '',
-    type: '',
-    uri: '',
-  });
+  //Instant Update
+
+  let formDetails = {
+    validIdentificationType:
+      userDocs?.validIdentificationType === undefined
+        ? ''
+        : userDocs?.validIdentificationType,
+    validIdentification:
+      userDocs?.validIdentification === undefined
+        ? ''
+        : userDocs?.validIdentification,
+    utilityBill:
+      userDocs?.utilityBill === undefined ? '' : userDocs?.utilityBill,
+    bankStatement:
+      userDocs?.bankStatement === undefined ? '' : userDocs?.bankStatement,
+    passport: userDocs?.passport === undefined ? '' : userDocs?.passport,
+    signature: userDocs?.signature === undefined ? '' : userDocs?.signature,
+    seal: userDocs?.seal === undefined ? '' : userDocs?.seal,
+    cacCertificate:
+      userDocs?.cacCertificate === undefined ? '' : userDocs?.cacCertificate,
+    othersName: userDocs?.othersName === undefined ? '' : userDocs?.othersName,
+    others: userDocs?.others === undefined ? '' : userDocs?.others,
+    identityCard:
+      userDocs?.identityCard === undefined ? '' : userDocs?.identityCard,
+    personalPhoto:
+      userDocs?.personalPhoto === undefined ? '' : userDocs?.personalPhoto,
+    cac7: '',
+    cac2: '',
+    lpoFile: '',
+    proformaFile: '',
+    MERMAT: '',
+  };
+
+  const handleCreateDocs = async () => {
+    setIsUpdating(true);
+    const res = await createDocumentsDetails(formDetails);
+    if (res?.error) {
+      Toast.show({
+        type: 'error',
+        position: 'top',
+        topOffset: 50,
+        text1: res?.title,
+        text2: res?.message,
+        visibilityTime: 5000,
+        autoHide: true,
+        onPress: () => Toast.hide(),
+      });
+    } else {
+      Toast.show({
+        type: 'success',
+        position: 'top',
+        topOffset: 50,
+        text1: res?.title,
+        text2: res?.message,
+        visibilityTime: 3000,
+        autoHide: true,
+        onPress: () => Toast.hide(),
+      });
+      setTimeout(() => {
+        navigation.navigate(`${nextScreen}`, {
+          paramKey: {
+            ...paramKey,
+            [document]: newUrl,
+          },
+        });
+      }, 500);
+
+      setTimeout(() => {
+        setFileUrl('');
+        setFileName('');
+        setFileType('');
+        setDocument('');
+        setNextScreen('');
+      }, 3000);
+    }
+    setIsUpdating(false);
+  };
+
+  const handleUpdateDocs = async () => {
+    setIsUpdating(true);
+    const res = await updateDocumentsDetails(formDetails);
+    if (res?.error) {
+      Toast.show({
+        type: 'error',
+        position: 'top',
+        topOffset: 50,
+        text1: res?.title,
+        text2: res?.message,
+        visibilityTime: 5000,
+        autoHide: true,
+        onPress: () => Toast.hide(),
+      });
+    } else {
+      Toast.show({
+        type: 'success',
+        position: 'top',
+        topOffset: 50,
+        text1: res?.title,
+        text2: res?.message,
+        visibilityTime: 3000,
+        autoHide: true,
+        onPress: () => Toast.hide(),
+      });
+      setTimeout(() => {
+        navigation.navigate(`${nextScreen}`, {
+          paramKey: {
+            ...formDetails,
+          },
+        });
+      }, 500);
+
+      setTimeout(() => {
+        setFileUrl('');
+        setFileName('');
+        setFileType('');
+        setDocument('');
+        setNextScreen('');
+      }, 3000);
+    }
+    setIsUpdating(false);
+  };
 
   const s3UploadFunction = async () => {
+    setNewUrl('');
     setIsUpdating(true);
-
-    createUploadDocument(fileUri, documentName)
-      .then(res => {
+    DdLogs.info(`Loans | Document Upload s3Upload Init|`, {
+      context: {
+        fileUrl,
+        fileType,
+        fileName,
+        document,
+      },
+    });
+    try {
+      if (
+        fileUrl === '' ||
+        fileType === '' ||
+        fileName === '' ||
+        document === ''
+      ) {
+        DdLogs.error(`Loans | Document Upload s3Upload |`, {
+          context: {
+            fileUrl,
+            fileType,
+            fileName,
+            document,
+          },
+        });
+        Toast.show({
+          type: 'error',
+          position: 'top',
+          topOffset: 50,
+          text1: 'Check Files',
+          text2: 'Empty file data',
+          visibilityTime: 5000,
+          autoHide: true,
+          onPress: () => Toast.hide(),
+        });
+      } else {
+        const param = {
+          uri: fileUrl,
+          name: fileName,
+          type: fileType,
+        };
+        const res = await createUploadDocument(param, document);
         if (res?.error) {
           Toast.show({
             type: 'error',
@@ -995,6 +1145,7 @@ const ProofofAdd = ({
             autoHide: true,
             onPress: () => Toast.hide(),
           });
+          setIsUpdating(false);
         } else {
           Toast.show({
             type: 'success',
@@ -1007,47 +1158,39 @@ const ProofofAdd = ({
             onPress: () => Toast.hide(),
           });
 
+          setNewUrl(res?.data?.data?.url);
           setUserDocs(deetss => {
+            formDetails = {
+              ...deetss,
+              [document]: `${res?.data?.data?.url}`,
+            };
             return {
               ...deetss,
-              [documentName]: `${res?.data?.data?.url}`,
+              [document]: `${res?.data?.data?.url}`,
             };
           });
 
-          setTimeout(() => {
-            navigation.navigate(`${nextRoute}`, {
-              paramKey: {
-                ...paramKey,
-                [documentName]: `${res?.data?.data?.url}`,
-              },
-            });
-          }, 500);
-          setTimeout(() => {
-            setNextRoute('');
-          }, 2000);
+          userDocs?.validIdentificationType === undefined
+            ? handleCreateDocs()
+            : handleUpdateDocs();
         }
-      })
-      .catch(err => {
-        Toast.show({
-          type: 'error',
-          position: 'top',
-          topOffset: 50,
-          text1: 'Uploading Documents',
-          text2: err?.message,
-          visibilityTime: 5000,
-          autoHide: true,
-          onPress: () => Toast.hide(),
-        });
-      })
-      .finally(() => {
-        setTimeout(() => {
-          setDocumentName('');
-        }, 3000);
-
-        setIsUpdating(false);
+      }
+    } catch (err) {
+      Toast.show({
+        type: 'error',
+        position: 'top',
+        topOffset: 50,
+        text1: 'Uploading Documents',
+        text2: err?.message,
+        visibilityTime: 5000,
+        autoHide: true,
+        onPress: () => Toast.hide(),
       });
-  };
 
+      setIsUpdating(false);
+    }
+  };
+  
   return (
     <ScrollView
       bounces={false}
@@ -1127,14 +1270,24 @@ const ProofofAdd = ({
                 not be more than 3month before registration
               </Text>
               <View style={styles.reqField}>
-                {docsName.utilityBill ? (
+                {docsName.utilityBill || userDocs.utilityBill ? (
                   <>
                     <View>
                       <Text>{docsName.utilityBill.name}</Text>
                     </View>
-                    {image !== null && (
+                    {fileUrl !== '' && (
                       <Image
-                        source={{uri: image}}
+                        source={{uri: fileUrl}}
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          resizeMode: 'contain',
+                        }}
+                      />
+                    )}
+                    {fileUrl == '' && userDocs.utilityBill != '' && (
+                      <Image
+                        source={{uri: userDocs.utilityBill}}
                         style={{
                           width: '100%',
                           height: '100%',
@@ -1166,21 +1319,17 @@ const ProofofAdd = ({
                 )}
               </View>
               <TouchableOpacity
-                disabled={docsName.utilityBill === ''}
                 style={{marginTop: 10}}
                 onPress={s3UploadFunction}>
                 <Buttons
                   label="Upload"
-                  disabled={docsName.utilityBill === ''}
+                  disabled={docsName.utilityBill === '' || fileUrl === ''}
                 />
               </TouchableOpacity>
-              <TouchableOpacity
-                disabled={docsName.utilityBill === ''}
-                style={{marginTop: 10}}
-                onPress={pickDocument1}>
+              <TouchableOpacity style={{marginTop: 10}} onPress={pickDocument1}>
                 <Buttons
                   label="Change Selection"
-                  disabled={docsName.utilityBill === ''}
+                  // disabled={docsName.utilityBill === ''}
                 />
               </TouchableOpacity>
               {uploadProgress && uploadProgress > 0 ? (
@@ -1203,9 +1352,9 @@ const ProofofAdd = ({
                 not be more than 3month before registration
               </Text>
               <View style={styles.reqField}>
-                {image ? (
+                {fileUrl !== '' ? (
                   <Image
-                    source={{uri: image}}
+                    source={{uri: fileUrl}}
                     style={{
                       width: '100%',
                       height: '100%',
@@ -1255,14 +1404,25 @@ const ProofofAdd = ({
                 See samples
               </Text>
               <View style={styles.reqField}>
-                {docsName.seal ? (
+                {docsName.seal || userDocs.seal ? (
                   <>
                     <View>
                       <Text>{docsName.seal.name}</Text>
                     </View>
-                    {image !== null && (
+                    {fileUrl !== '' && (
                       <Image
-                        source={{uri: image}}
+                        source={{uri: fileUrl}}
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          resizeMode: 'contain',
+                        }}
+                      />
+                    )}
+
+                    {userDocs.seal != '' && fileUrl == '' && (
+                      <Image
+                        source={{uri: userDocs.seal}}
                         style={{
                           width: '100%',
                           height: '100%',
@@ -1294,18 +1454,15 @@ const ProofofAdd = ({
                 )}
               </View>
               <TouchableOpacity
-                disabled={docsName.seal === ''}
+                disabled={docsName.seal === '' || fileUrl === ''}
                 style={{marginTop: 10}}
                 onPress={s3UploadFunction}>
-                <Buttons label="Upload" disabled={docsName.seal === ''} />
+                <Buttons label="Upload" disabled={docsName.seal === '' || fileUrl === ''} />
               </TouchableOpacity>
-              <TouchableOpacity
-                disabled={docsName.seal === ''}
-                style={{marginTop: 10}}
-                onPress={pickDocument1}>
+              <TouchableOpacity style={{marginTop: 10}} onPress={pickDocument5}>
                 <Buttons
                   label="Change Selection"
-                  disabled={docsName.seal === ''}
+                  // disabled={docsName.seal === ''}
                 />
               </TouchableOpacity>
               {uploadProgress && uploadProgress > 0 ? (
@@ -1328,9 +1485,9 @@ const ProofofAdd = ({
                 not be more than 3month before registration
               </Text>
               <View style={styles.reqField}>
-                {image ? (
+                {fileUrl !== '' ? (
                   <Image
-                    source={{uri: image}}
+                    source={{uri: fileUrl}}
                     style={{
                       width: '100%',
                       height: '100%',
@@ -1378,14 +1535,25 @@ const ProofofAdd = ({
                 See samples
               </Text>
               <View style={styles.reqField}>
-                {docsName.cacCertificate ? (
+                {docsName.cacCertificate || userDocs.cacCertificate ? (
                   <>
                     <View>
                       <Text>{docsName.cacCertificate.name}</Text>
                     </View>
-                    {image !== null && (
+                    {fileUrl !== '' && (
                       <Image
-                        source={{uri: image}}
+                        source={{uri: fileUrl}}
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          resizeMode: 'contain',
+                        }}
+                      />
+                    )}
+
+                    {userDocs.cacCertificate != '' && fileUrl == '' && (
+                      <Image
+                        source={{uri: userDocs.cacCertificate}}
                         style={{
                           width: '100%',
                           height: '100%',
@@ -1417,21 +1585,18 @@ const ProofofAdd = ({
                 )}
               </View>
               <TouchableOpacity
-                disabled={docsName.cacCertificate === ''}
+                disabled={docsName.cacCertificate === '' || fileUrl === ''}
                 style={{marginTop: 10}}
                 onPress={s3UploadFunction}>
                 <Buttons
+                  disabled={docsName.cacCertificate === '' || fileUrl === ''}
                   label="Upload"
-                  disabled={docsName.cacCertificate === ''}
                 />
               </TouchableOpacity>
-              <TouchableOpacity
-                disabled={docsName.cacCertificate === ''}
-                style={{marginTop: 10}}
-                onPress={pickDocument1}>
+              <TouchableOpacity style={{marginTop: 10}} onPress={pickDocument6}>
                 <Buttons
                   label="Change Selection"
-                  disabled={docsName.cacCertificate === ''}
+                  // disabled={docsName.cacCertificate === ''}
                 />
               </TouchableOpacity>
               {uploadProgress && uploadProgress > 0 ? (
@@ -1454,9 +1619,9 @@ const ProofofAdd = ({
                 not be more than 3month before registration
               </Text>
               <View style={styles.reqField}>
-                {image ? (
+                {fileUrl !== '' ? (
                   <Image
-                    source={{uri: image}}
+                    source={{uri: fileUrl}}
                     style={{
                       width: '100%',
                       height: '100%',
@@ -1508,14 +1673,24 @@ const ProofofAdd = ({
                 Statement of the last 12 month of account
               </Text>
               <View style={styles.reqField}>
-                {docsName.bankStatement ? (
+                {docsName.bankStatement || userDocs.bankStatement ? (
                   <>
                     <View>
                       <Text>{docsName.bankStatement.name}</Text>
                     </View>
-                    {image !== null && (
+                    {fileUrl !== '' && (
                       <Image
-                        source={{uri: image}}
+                        source={{uri: fileUrl}}
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          resizeMode: 'contain',
+                        }}
+                      />
+                    )}
+                    {userDocs.bankStatement != '' && fileUrl == '' && (
+                      <Image
+                        source={{uri: userDocs.bankStatement}}
                         style={{
                           width: '100%',
                           height: '100%',
@@ -1547,21 +1722,18 @@ const ProofofAdd = ({
                 )}
               </View>
               <TouchableOpacity
-                disabled={docsName.bankStatement === ''}
+                disabled={docsName.bankStatement === '' || fileUrl === ''}
                 style={{marginTop: 10}}
                 onPress={s3UploadFunction}>
                 <Buttons
+                  disabled={docsName.bankStatement === '' || fileUrl === ''}
                   label="Upload"
-                  disabled={docsName.bankStatement === ''}
                 />
               </TouchableOpacity>
-              <TouchableOpacity
-                disabled={docsName.bankStatement === ''}
-                style={{marginTop: 10}}
-                onPress={pickDocument1}>
+              <TouchableOpacity style={{marginTop: 10}} onPress={pickDocument2}>
                 <Buttons
                   label="Change Selection"
-                  disabled={docsName.bankStatement === ''}
+                  // disabled={docsName.bankStatement === ''}
                 />
               </TouchableOpacity>
               {uploadProgress && uploadProgress > 0 ? (
@@ -1584,9 +1756,9 @@ const ProofofAdd = ({
                 not be more than 3month before registration
               </Text>
               <View style={styles.reqField}>
-                {image ? (
+                {fileUrl !== '' ? (
                   <Image
-                    source={{uri: image}}
+                    source={{uri: fileUrl}}
                     style={{
                       width: '100%',
                       height: '100%',
@@ -1637,14 +1809,24 @@ const ProofofAdd = ({
                 Passport size not more than 3MB
               </Text>
               <View style={styles.reqField}>
-                {docsName.passport ? (
+                {docsName.passport || userDocs.passport ? (
                   <>
                     <View>
                       <Text>{docsName.passport.name}</Text>
                     </View>
-                    {image !== null && (
+                    {fileUrl !== '' && (
                       <Image
-                        source={{uri: image}}
+                        source={{uri: fileUrl}}
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          resizeMode: 'contain',
+                        }}
+                      />
+                    )}
+                    {userDocs.passport != '' && fileUrl == '' && (
+                      <Image
+                        source={{uri: userDocs.passport}}
                         style={{
                           width: '100%',
                           height: '100%',
@@ -1677,18 +1859,15 @@ const ProofofAdd = ({
               </View>
 
               <TouchableOpacity
-                disabled={docsName.passport === ''}
+                disabled={docsName.passport === '' || fileUrl === ''}
                 style={{marginTop: 10}}
                 onPress={s3UploadFunction}>
-                <Buttons label="Upload" disabled={docsName.passport === ''} />
+                <Buttons label="Upload" disabled={docsName.passport === '' || fileUrl === ''} />
               </TouchableOpacity>
-              <TouchableOpacity
-                disabled={docsName.passport === ''}
-                style={{marginTop: 10}}
-                onPress={pickDocument1}>
+              <TouchableOpacity style={{marginTop: 10}} onPress={pickDocument3}>
                 <Buttons
                   label="Change Selection"
-                  disabled={docsName.passport === ''}
+                  // disabled={docsName.passport === ''}
                 />
               </TouchableOpacity>
               {uploadProgress && uploadProgress > 0 ? (
@@ -1711,9 +1890,9 @@ const ProofofAdd = ({
                 not be more than 3month before registration
               </Text>
               <View style={styles.reqField}>
-                {image ? (
+                {fileUrl !== '' ? (
                   <Image
-                    source={{uri: image}}
+                    source={{uri: fileUrl}}
                     style={{
                       width: '100%',
                       height: '100%',
@@ -1761,14 +1940,24 @@ const ProofofAdd = ({
                 See samples
               </Text>
               <View style={styles.reqField}>
-                {docsName.signature ? (
+                {docsName.signature || userDocs.signature ? (
                   <>
                     <View>
                       <Text>{docsName.signature.name}</Text>
                     </View>
-                    {image !== null && (
+                    {fileUrl !== '' && (
                       <Image
-                        source={{uri: image}}
+                        source={{uri: fileUrl}}
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          resizeMode: 'contain',
+                        }}
+                      />
+                    )}
+                    {userDocs.signature != '' && fileUrl == '' && (
+                      <Image
+                        source={{uri: userDocs.signature}}
                         style={{
                           width: '100%',
                           height: '100%',
@@ -1800,18 +1989,15 @@ const ProofofAdd = ({
                 )}
               </View>
               <TouchableOpacity
-                disabled={docsName.signature === ''}
+                disabled={docsName.signature === '' || fileUrl === ''}
                 style={{marginTop: 10}}
                 onPress={s3UploadFunction}>
-                <Buttons label="Upload" disabled={docsName.signature === ''} />
+                <Buttons label="Upload" disabled={docsName.signature === '' || fileUrl === ''} />
               </TouchableOpacity>
-              <TouchableOpacity
-                disabled={docsName.signature === ''}
-                style={{marginTop: 10}}
-                onPress={pickDocumentS}>
+              <TouchableOpacity style={{marginTop: 10}} onPress={pickDocument4}>
                 <Buttons
                   label="Change Selection"
-                  disabled={docsName.signature === ''}
+                  // disabled={docsName.signature === ''}
                 />
               </TouchableOpacity>
               {uploadProgress && uploadProgress > 0 ? (
@@ -1838,14 +2024,24 @@ const ProofofAdd = ({
                 Personal Photo size not more than 3MB
               </Text>
               <View style={styles.reqField}>
-                {docsName.personalPhoto ? (
+                {docsName.personalPhoto || userDocs.personalPhoto ? (
                   <>
                     <View>
                       <Text>{docsName.personalPhoto.name}</Text>
                     </View>
-                    {image !== null && (
+                    {fileUrl !== '' && (
                       <Image
-                        source={{uri: image}}
+                        source={{uri: fileUrl}}
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          resizeMode: 'contain',
+                        }}
+                      />
+                    )}
+                    {fileUrl == '' && userDocs.personalPhoto != '' && (
+                      <Image
+                        source={{uri: userDocs.personalPhoto}}
                         style={{
                           width: '100%',
                           height: '100%',
@@ -1878,21 +2074,18 @@ const ProofofAdd = ({
               </View>
 
               <TouchableOpacity
-                disabled={docsName.personalPhoto === ''}
+                disabled={docsName.personalPhoto === '' || fileUrl === ''}
                 style={{marginTop: 10}}
                 onPress={s3UploadFunction}>
                 <Buttons
                   label="Upload"
-                  disabled={docsName.personalPhoto === ''}
+                  disabled={docsName.personalPhoto === '' || fileUrl === ''}
                 />
               </TouchableOpacity>
-              <TouchableOpacity
-                disabled={docsName.personalPhoto === ''}
-                style={{marginTop: 10}}
-                onPress={pickDocument1}>
+              <TouchableOpacity style={{marginTop: 10}} onPress={pickDocument7}>
                 <Buttons
                   label="Change Selection"
-                  disabled={docsName.personalPhoto === ''}
+                  // disabled={docsName.personalPhoto === ''}
                 />
               </TouchableOpacity>
               {uploadProgress && uploadProgress > 0 ? (
@@ -1913,9 +2106,9 @@ const ProofofAdd = ({
                 Take a clear picture or upload a Personal Photo
               </Text>
               <View style={styles.reqField}>
-                {image ? (
+                {fileUrl !== '' ? (
                   <Image
-                    source={{uri: image}}
+                    source={{uri: fileUrl}}
                     style={{
                       width: '100%',
                       height: '100%',
@@ -1967,14 +2160,24 @@ const ProofofAdd = ({
                 Id Card size not more than 3MB
               </Text>
               <View style={styles.reqField}>
-                {docsName.identityCard ? (
+                {docsName.identityCard || userDocs.identityCard ? (
                   <>
                     <View>
                       <Text>{docsName.identityCard.name}</Text>
                     </View>
-                    {image !== null && (
+                    {fileUrl !== '' && (
                       <Image
-                        source={{uri: image}}
+                        source={{uri: fileUrl}}
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          resizeMode: 'contain',
+                        }}
+                      />
+                    )}
+                    {fileUrl == '' && userDocs.identityCard != '' && (
+                      <Image
+                        source={{uri: userDocs.identityCard}}
                         style={{
                           width: '100%',
                           height: '100%',
@@ -2007,21 +2210,18 @@ const ProofofAdd = ({
               </View>
 
               <TouchableOpacity
-                disabled={docsName.identityCard === ''}
+                disabled={docsName.identityCard === '' || fileUrl === ''}
                 style={{marginTop: 10}}
                 onPress={s3UploadFunction}>
                 <Buttons
                   label="Upload"
-                  disabled={docsName.identityCard === ''}
+                  disabled={docsName.identityCard === '' || fileUrl === ''}
                 />
               </TouchableOpacity>
-              <TouchableOpacity
-                disabled={docsName.identityCard === ''}
-                style={{marginTop: 10}}
-                onPress={pickDocument1}>
+              <TouchableOpacity style={{marginTop: 10}} onPress={pickDocument8}>
                 <Buttons
                   label="Change Selection"
-                  disabled={docsName.identityCard === ''}
+                  // disabled={docsName.identityCard === ''}
                 />
               </TouchableOpacity>
               {uploadProgress && uploadProgress > 0 ? (
@@ -2043,9 +2243,9 @@ const ProofofAdd = ({
                 Take a clear picture or upload an Id Card
               </Text>
               <View style={styles.reqField}>
-                {image ? (
+                {fileUrl !== '' ? (
                   <Image
-                    source={{uri: image}}
+                    source={{uri: fileUrl}}
                     style={{
                       width: '100%',
                       height: '100%',

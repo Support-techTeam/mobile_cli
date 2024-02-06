@@ -7,13 +7,11 @@ import {
   View,
   AppState,
   LogBox,
-  Text,
-  Button,
+  useColorScheme,
 } from 'react-native';
 import SpInAppUpdates, {IAUUpdateKind} from 'sp-react-native-in-app-updates';
-import {version} from './app.json';
+import {version, SCREELOCK_CODE, SCREENLOCK_STATUS} from './app.json';
 import Toast from 'react-native-toast-message';
-import {useAsyncStorage} from '@react-native-async-storage/async-storage';
 import AppCenter from 'appcenter';
 import Analytics from 'appcenter-analytics';
 import Crashes from 'appcenter-crashes';
@@ -24,18 +22,23 @@ import {
 import AppNavigationContainer from './src/navigation';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {Provider as PaperProvider, Portal} from 'react-native-paper';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import {Provider} from 'react-redux';
 import {PersistGate} from 'redux-persist/integration/react';
-import {persistor, store} from './src/util/redux/store';
+import {persistor, resetStore, store} from './src/util/redux/store';
 import {LightTheme} from './src/constants/lightTheme';
-import EnterPin from './src/screens/SecurityScreens/EnterPinScreen';
-import {getAllPin} from './src/stores/SecurityStore';
+import {DarkTheme} from './src/constants/darkTheme';
+import { DefaultTheme } from 'react-native-paper';
+import InputPin from './src/screens/SecurityScreens/PinInput';
 import NetworkStatus from './src/util/NetworkService';
 import RNRestart from 'react-native-restart';
 import COLORS from './src/constants/colors';
+import {userLogOut} from './src/stores/AuthStore';
+import {auth} from './src/util/firebase/firebaseConfig';
+import BackgroundTimer from 'react-native-background-timer';
+import {TextColorProvider} from './src/component/TextColorContext';
 
 const inAppUpdates = new SpInAppUpdates(false);
+
 LogBox.ignoreAllLogs();
 
 AppCenter.setLogLevel(AppCenter.LogLevel.VERBOSE);
@@ -56,93 +59,44 @@ datadogConfiguration.site = 'US';
 datadogConfiguration.nativeCrashReportEnabled = true;
 // Optional: sample RUM sessions (here, 80% of session will be sent to Datadog. Default = 100%)
 datadogConfiguration.sampleRate = 80;
-
-const STYLES = ['default', 'dark-content', 'light-content'];
 const TRANSITIONS = ['fade', 'slide', 'none'];
 
+let inactiveTime = 0;
+const defaultWaitTime = Platform.select({ios: 120, android: 120});
+let hasLockKey = false;
+let screelLockStatus = false;
 function App() {
-  const appMainState = useRef(AppState.currentState);
-  const [appState, setAppState] = useState(appMainState.current);
-  const [isLocked, setIsLocked] = useState('');
-  const [hasPin, setHasPin] = useState(false);
-  const {getItem, setItem} = useAsyncStorage('@lockState');
-  const readItemFromStorage = async () => {
-    const item = await getItem();
-    setIsLocked(item);
-  };
-
+  const [appState, setAppState] = useState(AppState.currentState);
   const [hidden, setHidden] = useState(false);
-  const [statusBarStyle, setStatusBarStyle] = useState(STYLES[0]);
   const [statusBarTransition, setStatusBarTransition] = useState(
     TRANSITIONS[0],
   );
 
-  // const changeStatusBarVisibility = () => setHidden(!hidden);
-
-  // const changeStatusBarStyle = () => {
-  //   const styleId = STYLES.indexOf(statusBarStyle) + 1;
-  //   if (styleId === STYLES.length) {
-  //     setStatusBarStyle(STYLES[0]);
-  //   } else {
-  //     setStatusBarStyle(STYLES[styleId]);
-  //   }
-  // };
-
-  // const changeStatusBarTransition = () => {
-  //   const transition = TRANSITIONS.indexOf(statusBarTransition) + 1;
-  //   if (transition === TRANSITIONS.length) {
-  //     setStatusBarTransition(TRANSITIONS[0]);
-  //   } else {
-  //     setStatusBarTransition(TRANSITIONS[transition]);
-  //   }
-  // };
-
-  const writeItemToStorage = async newValue => {
-    await setItem(newValue);
-    setIsLocked(newValue);
-  };
-
-  useEffect(() => {
-    readItemFromStorage();
-  });
-
-  useEffect(() => {
-    checkIfPinIsSet();
-  }, []);
-
-  const checkIfPinIsSet = async () => {
-    const res = await getAllPin();
-    if (res?.data?.length > 0) {
-      setHasPin(true);
-    } else if (res?.data == null) {
-      toggleVisibility();
-      setHasPin(false);
-    } else {
-      toggleVisibility();
-      setHasPin(false);
-    }
-  };
-
   //update check
   useEffect(() => {
-    inAppUpdates.checkNeedsUpdate({curVersion: version}).then(result => {
-      if (result.shouldUpdate) {
-        const updateOptions = Platform.select({
-          ios: {
-            title: 'Update available',
-            message:
-              'There is a new version of the app available on the App Store, do you want to update it?',
-            buttonUpgradeText: 'Update',
-            buttonCancelText: 'Cancel',
-          },
-          android: {
-            updateType: IAUUpdateKind.FLEXIBLE,
-          },
-        });
+    inAppUpdates
+      .checkNeedsUpdate({curVersion: version})
+      .then(result => {
+        if (result.shouldUpdate) {
+          const updateOptions = Platform.select({
+            ios: {
+              title: 'Update available',
+              message:
+                'There is a new version of the app available on the App Store, do you want to update it?',
+              buttonUpgradeText: 'Update',
+              buttonCancelText: 'Cancel',
+            },
+            android: {
+              updateType: IAUUpdateKind.FLEXIBLE,
+            },
+          });
 
-        inAppUpdates.startUpdate(updateOptions);
-      }
-    });
+          inAppUpdates.startUpdate(updateOptions);
+        }
+      })
+      .catch(err => {
+        // console.log('Update Err: ', err);
+      });
   }, []);
 
   useEffect(() => {
@@ -176,53 +130,149 @@ function App() {
   };
 
   // App State Monitor
-  useEffect(() => {
-    const handleAppStateChange = async nextAppState => {
-      if (appState === 'active' && nextAppState.match(/inactive|background/)) {
-        // App becomes inactive or goes to background
-        const lockTimer = setTimeout(async () => {
-          setIsLocked(true);
-          writeItemToStorage('true');
-        }, 5000); // Lock after 30 seconds of inactivity
-
-        return () => clearTimeout(lockTimer);
-      } else if (
-        appState.match(/inactive|background/) &&
-        nextAppState === 'active'
-      ) {
-        // App resumes from background or inactive state
-        setIsLocked(true);
-        writeItemToStorage('true');
+  const logout = async () => {
+    if (auth.currentUser) {
+      try {
+        const logoutResult = await userLogOut();
+        if (!logoutResult?.error) {
+          await resetStore();
+        }
+      } catch (error) {
+        // :TODO
       }
-      setAppState(nextAppState);
+    }
+  };
+
+  let backgroundTaskInterval;
+  useEffect(() => {
+    // Function to handle background task
+    const runBackgroundTask = () => {
+      // console.log('Background task is running');
+      inactiveTimerCallback();
     };
 
-    const appStateListener = AppState.addEventListener(
+    // Start the background task
+    const startBackgroundTask = () => {
+      // console.log('Starting background task...');
+      backgroundTaskInterval = BackgroundTimer.setInterval(() => {
+        runBackgroundTask();
+      }, 5000);
+    };
+
+    // Stop the background task
+    const stopBackgroundTask = () => {
+      // console.log('Stopping background task...');
+      inactiveTime = 0;
+      BackgroundTimer.clearInterval(backgroundTaskInterval);
+    };
+
+    // Listen for changes in app state
+    const handleAppStateChange = nextAppState => {
+      // console.log('App state changed:', nextAppState);
+      if (nextAppState === 'active') {
+        // App is in the foreground
+        stopBackgroundTask();
+      } else if (nextAppState === 'background') {
+        // App is in the background
+        startBackgroundTask();
+      }
+    };
+
+    const inactiveTimerCallback = () => {
+      inactiveTime = inactiveTime + 5;
+      if (inactiveTime >= defaultWaitTime) {
+        performAction();
+      }
+    };
+    const performAction = async () => {
+      await logout();
+    };
+
+    // Subscribe to app state changes
+    const appListeener = AppState.addEventListener(
       'change',
       handleAppStateChange,
     );
 
+    // Initial setup based on the app's initial state
+    if (AppState.currentState === 'background') {
+      startBackgroundTask();
+    }
+
+    if (AppState.currentState === 'active') {
+      stopBackgroundTask();
+    }
+
+    // Clean up
     return () => {
-      appStateListener.remove();
+      appListeener.remove();
+      stopBackgroundTask();
     };
-  }, [appState]);
+  }, []);
 
-  // Toggle lock state
-  const toggleVisibility = () => {
-    setIsLocked(false);
-    writeItemToStorage('false');
-  };
+  // const retrieveAllSecureInfoData = async () => {
+  //   const allData = await SInfo.getAllItems({
+  //     sharedPreferencesName: 'tradeLendaSharedPrefs',
+  //     keychainService: 'tradeLendaKeychain',
+  //   });
+  //   console.log('NORMAL GETTING ALL', allData);
+  // };
 
-  const theme = {
-    ...LightTheme,
-  };
+  // Set Passcode to blank
+  // const setSecureInfoData = async (option, code) => {
+  //   const responseData = await SInfo.setItem(option, code, {
+  //     sharedPreferencesName: 'tradeLendaSharedPrefs',
+  //     keychainService: 'tradeLendaKeychain',
+  //   });
+  //   // console.log('NORMAL SETTING', responseData);
+  // };
 
+  // const getSecureInfoData = async option => {
+  //   const responseData = await SInfo.getItem(option, {
+  //     sharedPreferencesName: 'tradeLendaSharedPrefs',
+  //     keychainService: 'tradeLendaKeychain',
+  //   });
+  //   // console.log('NORMAL GETTING', responseData);
+  //   if (responseData === null || responseData === undefined) {
+  //     hasLockKey = false;
+  //   } else {
+  //     hasLockKey = true;
+  //   }
+  // };
+
+  // const getSecureInfoStatus = async option => {
+  //   const responseData = await SInfo.getItem(option, {
+  //     sharedPreferencesName: 'tradeLendaSharedPrefs',
+  //     keychainService: 'tradeLendaKeychain',
+  //   });
+  //   console.log('NORMAL GETTING', responseData);
+  //   if (responseData === null || responseData === undefined) {
+  //     screelLockStatus = false;
+  //   } else {
+  //     if (responseData === 'true') {
+  //       screelLockStatus = true;
+  //     } else {
+  //       screelLockStatus = false;
+  //     }
+  //   }
+  // };
+
+  // const deleteSecureInfoData = async option => {
+  //   const responseData = await SInfo.deleteItem(option, {
+  //     sharedPreferencesName: 'tradeLendaSharedPrefs',
+  //     keychainService: 'tradeLendaKeychain',
+  //   });
+  //   console.log('NORMAL DELETING', responseData);
+  // };
+
+  const colorScheme = useColorScheme();
+  // const theme = colorScheme === 'dark' ? {...DefaultTheme} : {...LightTheme};
+  const theme = {...DefaultTheme}; 
   return (
     <SafeAreaProvider style={styles.rootContainer}>
       <PaperProvider theme={theme}>
         <Portal>
           <DatadogProvider configuration={datadogConfiguration}>
-            {/* <StatusBar translucent={true} /> */}
             <StatusBar
               animated={true}
               backgroundColor={COLORS.lendaBlue}
@@ -230,14 +280,22 @@ function App() {
               showHideTransition={statusBarTransition}
               hidden={hidden}
             />
-            {isLocked && isLocked === 'true' && hasPin ? (
-              <EnterPin toggleVisibility={() => toggleVisibility()} />
+            {/*  {isLocked && isLocked === 'true' && hasPin ? (*/}
+            {false ? (
+              <InputPin />
             ) : (
-              <View style={styles.container}>
+              <View
+                style={styles.container}
+                onTouchStart={() => {
+                  inactiveTime = 0;
+                  BackgroundTimer.clearInterval(backgroundTaskInterval);
+                }}>
                 <Provider store={store}>
                   <PersistGate persistor={persistor} loading={null}>
-                    <NetworkStatus />
-                    <AppNavigationContainer />
+                    <TextColorProvider>
+                      <NetworkStatus />
+                      <AppNavigationContainer />
+                    </TextColorProvider>
                   </PersistGate>
                 </Provider>
               </View>

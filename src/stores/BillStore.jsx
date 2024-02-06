@@ -3,6 +3,7 @@ import axios from 'axios';
 import {BASE_API_URL} from '../../app.json';
 import {auth} from '../util/firebase/firebaseConfig';
 import {store} from '../util/redux/store';
+import {DdLogs} from '@datadog/mobile-react-native';
 
 //get login token
 const reduxStore = store.getState().userAuth;
@@ -36,6 +37,10 @@ const getNetworkProvider = async () => {
             headers,
           },
         );
+        DdLogs.info(
+          `Bill Payment | Get Network Provider | ${auth?.currentUser?.email}`,
+          {context: JSON.stringify(response?.data)},
+        );
         return {
           title: 'Get Network Provider',
           error: false,
@@ -43,6 +48,12 @@ const getNetworkProvider = async () => {
           message: 'success',
         };
       } catch (error) {
+        DdLogs.error(
+          `Bill Payment | Get Network Provider | ${auth?.currentUser?.email}`,
+          {
+            errorMessage: JSON.stringify(error),
+          },
+        );
         return {
           title: 'Get Network Provider',
           error: true,
@@ -80,6 +91,12 @@ const purchaseAirtime = async data => {
             headers,
           },
         );
+        DdLogs.info(
+          `Bill Payment | Purchase Airtime | ${auth?.currentUser?.email}`,
+          {
+            context: JSON.stringify(response?.data),
+          },
+        );
         return {
           title: 'Purchase Airtime',
           error: false,
@@ -87,6 +104,12 @@ const purchaseAirtime = async data => {
           message: 'Bill Purchase successful!',
         };
       } catch (error) {
+        DdLogs.error(
+          `Bill Payment | Purchase Airtime | ${auth?.currentUser?.email}`,
+          {
+            errorMessage: JSON.stringify(error),
+          },
+        );
         return {
           title: 'Purchase Airtime',
           error: true,
@@ -123,6 +146,12 @@ const getDataProvider = async () => {
             headers,
           },
         );
+        DdLogs.info(
+          `Bill Payment | Get Network Provider | ${auth?.currentUser?.email}`,
+          {
+            context: JSON.stringify(response?.data),
+          },
+        );
         return {
           title: 'Get Network Provider',
           error: false,
@@ -130,6 +159,12 @@ const getDataProvider = async () => {
           message: 'success',
         };
       } catch (error) {
+        DdLogs.error(
+          `Bill Payment | Get Network Provider | ${auth?.currentUser?.email}`,
+          {
+            errorMessage: JSON.stringify(error),
+          },
+        );
         return {
           title: 'Get Network Provider',
           error: true,
@@ -166,6 +201,12 @@ const getDataPlanByProvider = async provider => {
             headers,
           },
         );
+        DdLogs.info(
+          `Bill Payment | Get Data Plan | ${auth?.currentUser?.email}`,
+          {
+            context: JSON.stringify(response?.data),
+          },
+        );
         return {
           title: 'Get Data Plan',
           error: false,
@@ -173,6 +214,12 @@ const getDataPlanByProvider = async provider => {
           message: 'success',
         };
       } catch (error) {
+        DdLogs.error(
+          `Bill Payment | Get Data Plan | ${auth?.currentUser?.email}`,
+          {
+            errorMessage: JSON.stringify(error),
+          },
+        );
         return {
           title: 'Get Data Plan',
           error: true,
@@ -210,6 +257,12 @@ const purchaseDataPlan = async data => {
             headers,
           },
         );
+        DdLogs.info(
+          `Bill Payment | Purchase Data | ${auth?.currentUser?.email}`,
+          {
+            context: JSON.stringify(response?.data),
+          },
+        );
         return {
           title: 'Purchase Data',
           error: false,
@@ -217,6 +270,12 @@ const purchaseDataPlan = async data => {
           message: 'Bill Purchase successful!',
         };
       } catch (error) {
+        DdLogs.error(
+          `Bill Payment | Purchase Data | ${auth?.currentUser?.email}`,
+          {
+            errorMessage: JSON.stringify(error),
+          },
+        );
         return {
           title: 'Purchase Data',
           error: true,
@@ -253,6 +312,12 @@ const getElectricityProviders = async () => {
             headers,
           },
         );
+        DdLogs.info(
+          `Bill Payment | Get Electricity Provider | ${auth?.currentUser?.email}`,
+          {
+            context: JSON.stringify(response?.data),
+          },
+        );
         return {
           title: 'Get Electricity Provider',
           error: false,
@@ -260,6 +325,12 @@ const getElectricityProviders = async () => {
           message: 'success',
         };
       } catch (error) {
+        DdLogs.error(
+          `Bill Payment | Get Electricity Provider | ${auth?.currentUser?.email}`,
+          {
+            errorMessage: JSON.stringify(error),
+          },
+        );
         return {
           title: 'Get Electricity Provider',
           error: true,
@@ -297,6 +368,12 @@ const verifyMeter = async data => {
             headers,
           },
         );
+        DdLogs.info(
+          `Bill Payment | Verify Meter | ${auth?.currentUser?.email}`,
+          {
+            context: JSON.stringify(response?.data),
+          },
+        );
         return {
           title: 'Verify Meter',
           error: false,
@@ -304,6 +381,12 @@ const verifyMeter = async data => {
           message: 'successful!',
         };
       } catch (error) {
+        DdLogs.error(
+          `Bill Payment | Verify Meter | ${auth?.currentUser?.email}`,
+          {
+            errorMessage: JSON.stringify(error),
+          },
+        );
         return {
           title: 'Verify Meter',
           error: true,
@@ -341,6 +424,12 @@ const purchaseElectricity = async data => {
             headers,
           },
         );
+        DdLogs.info(
+          `Bill Payment | Purchase Power | ${auth?.currentUser?.email}`,
+          {
+            context: JSON.stringify(response?.data),
+          },
+        );
         return {
           title: 'Purchase Power',
           error: false,
@@ -348,6 +437,12 @@ const purchaseElectricity = async data => {
           message: 'Bill Purchase successful!',
         };
       } catch (error) {
+        DdLogs.error(
+          `Bill Payment | Purchase Power | ${auth?.currentUser?.email}`,
+          {
+            errorMessage: JSON.stringify(error),
+          },
+        );
         return {
           title: 'Purchase Power',
           error: true,
@@ -384,6 +479,12 @@ const getCableTvProvider = async provider => {
             headers,
           },
         );
+        DdLogs.info(
+          `Bill Payment | Get CableTv Provider | ${auth?.currentUser?.email}`,
+          {
+            context: JSON.stringify(response?.data),
+          },
+        );
         return {
           title: 'Get CableTv Provider',
           error: false,
@@ -391,6 +492,12 @@ const getCableTvProvider = async provider => {
           message: 'success',
         };
       } catch (error) {
+        DdLogs.error(
+          `Bill Payment | Get CableTv Provider | ${auth?.currentUser?.email}`,
+          {
+            errorMessage: JSON.stringify(error),
+          },
+        );
         return {
           title: 'Get CableTv Provider',
           error: true,
@@ -428,6 +535,9 @@ const verifyIUC = async data => {
             headers,
           },
         );
+        DdLogs.info(`Bill Payment | Verify IUC | ${auth?.currentUser?.email}`, {
+          context: JSON.stringify(response?.data),
+        });
         return {
           title: 'Verify IUC',
           error: false,
@@ -435,6 +545,12 @@ const verifyIUC = async data => {
           message: 'successful!',
         };
       } catch (error) {
+        DdLogs.error(
+          `Bill Payment | Verify IUC | ${auth?.currentUser?.email}`,
+          {
+            errorMessage: JSON.stringify(error),
+          },
+        );
         return {
           title: 'Verify IUC',
           error: true,
@@ -472,6 +588,12 @@ const renewSubscription = async data => {
             headers,
           },
         );
+        DdLogs.info(
+          `Bill Payment | Renew Subscription | ${auth?.currentUser?.email}`,
+          {
+            context: JSON.stringify(response?.data),
+          },
+        );
         return {
           title: 'Renew Subscription',
           error: false,
@@ -479,6 +601,12 @@ const renewSubscription = async data => {
           message: 'Bill Purchase successful!',
         };
       } catch (error) {
+        DdLogs.error(
+          `Bill Payment | Renew Subscription | ${auth?.currentUser?.email}`,
+          {
+            errorMessage: JSON.stringify(error),
+          },
+        );
         return {
           title: 'Renew Subscription',
           error: true,
@@ -516,6 +644,12 @@ const updateSubscription = async data => {
             headers,
           },
         );
+        DdLogs.info(
+          `Bill Payment | Update Subscription | ${auth?.currentUser?.email}`,
+          {
+            context: JSON.stringify(response?.data),
+          },
+        );
         return {
           title: 'Update Subscription',
           error: false,
@@ -523,6 +657,12 @@ const updateSubscription = async data => {
           message: 'Bill Purchase successful!',
         };
       } catch (error) {
+        DdLogs.error(
+          `Bill Payment | Update Subscription | ${auth?.currentUser?.email}`,
+          {
+            errorMessage: JSON.stringify(error),
+          },
+        );
         return {
           title: 'Update Subscription',
           error: true,
@@ -559,6 +699,12 @@ const getAllTransaction = async () => {
             headers,
           },
         );
+        DdLogs.info(
+          `Bill Payment | Get All Transaction | ${auth?.currentUser?.email}`,
+          {
+            context: JSON.stringify(response?.data),
+          },
+        );
         return {
           title: 'Get All Transaction',
           error: false,
@@ -566,6 +712,12 @@ const getAllTransaction = async () => {
           message: 'success',
         };
       } catch (error) {
+        DdLogs.error(
+          `Bill Payment | Get All Transaction | ${auth?.currentUser?.email}`,
+          {
+            errorMessage: JSON.stringify(error),
+          },
+        );
         return {
           title: 'Get All Transaction',
           error: true,
