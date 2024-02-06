@@ -162,7 +162,7 @@ const InvestmentSummaryScreen = () => {
                   style={{flex: 1, flexDirection: 'row', alignSelf: 'center', paddingHorizontal: 10}}>
                   <Icon
                     name="information-outline"
-                    style={{paddingRight: 3, alignSelf: 'top'}}
+                    style={{paddingRight: 3}}
                     size={20}
                     color={COLORS.microsoftBlue}
                   />
