@@ -7,8 +7,12 @@ import Input from '../../../component/inputField/input.component';
 import CustomDropdown from '../../../component/dropDown/dropdown.component';
 import Buttons from '../../../component/buttons/Buttons';
 import Spinner from 'react-native-loading-spinner-overlay';
-import {getLoanUserDetails} from '../../../stores/LoanStore';
-
+import {
+  getLoanUserDetails,
+  createDocumentsDetails,
+  updateDocumentsDetails,
+} from '../../../stores/LoanStore';
+import Toast from 'react-native-toast-message';
 const idTypeData = [
   {value: '', label: 'Select ID Type'},
   {value: 'National ID', label: 'National ID'},
@@ -138,8 +142,6 @@ const ValidIdentity = () => {
   const renderItem = ({item}) => {
     const isActive = item.key === activeTab;
 
-    console.log('formDetails', formDetails);
-
     return (
       <View>
         <View style={[styles.tobTab, isActive && styles.activeTab]}>
@@ -149,6 +151,71 @@ const ValidIdentity = () => {
         </View>
       </View>
     );
+  };
+
+  //Instant Update
+  const handleCreateDocs = async () => {
+    setIsLoading(true);
+    const res = await createDocumentsDetails(formDetails);
+    if (res?.error) {
+      Toast.show({
+        type: 'error',
+        position: 'top',
+        topOffset: 50,
+        text1: res?.title,
+        text2: res?.message,
+        visibilityTime: 5000,
+        autoHide: true,
+        onPress: () => Toast.hide(),
+      });
+    } else {
+      Toast.show({
+        type: 'success',
+        position: 'top',
+        topOffset: 50,
+        text1: res?.title,
+        text2: res?.message,
+        visibilityTime: 3000,
+        autoHide: true,
+        onPress: () => Toast.hide(),
+      });
+      setTimeout(() => {
+        navigation.navigate('ProofOfAddress', {paramKey: formDetails});
+      }, 1000);
+    }
+    setIsLoading(false);
+  };
+
+  const handleUpdateDocs = async () => {
+    setIsLoading(true);
+    const res = await updateDocumentsDetails(formDetails);
+    if (res?.error) {
+      Toast.show({
+        type: 'error',
+        position: 'top',
+        topOffset: 50,
+        text1: res?.title,
+        text2: res?.message,
+        visibilityTime: 5000,
+        autoHide: true,
+        onPress: () => Toast.hide(),
+      });
+    } else {
+      Toast.show({
+        type: 'success',
+        position: 'top',
+        topOffset: 50,
+        text1: res?.title,
+        text2: res?.message,
+        visibilityTime: 3000,
+        autoHide: true,
+        onPress: () => Toast.hide(),
+      });
+      setTimeout(() => {
+        navigation.navigate('ProofOfAddress', {paramKey: formDetails});
+      }, 1000);
+    }
+    setIsLoading(false);
   };
 
   return (
@@ -260,7 +327,9 @@ const ValidIdentity = () => {
         }}>
         <TouchableOpacity
           onPress={() => {
-            navigation.navigate('ProofOfAddress', {paramKey: formDetails});
+            formDetails?.validIdentificationType === undefined
+            ? handleCreateDocs()
+            : handleUpdateDocs();
           }}
           disabled={disableit}>
           <Buttons label={'Save & Continue'} disabled={disableit} />

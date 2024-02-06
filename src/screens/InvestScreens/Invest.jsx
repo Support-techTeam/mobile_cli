@@ -391,6 +391,7 @@ const Investscreen = () => {
                   }}>
                   <View style={{marginTop: 0}}>
                     <TouchableOpacity
+                    disabled={investment?.productCode && investment?.membershipId ? false : true}
                       onPress={() =>
                         navigation.navigate('InvestmentDetails', {
                           paramKey: {
@@ -455,7 +456,9 @@ const Investscreen = () => {
                             }}>
                             <Text style={styles.desc}>
                               {investment?.investmentType && 'Trade Lenda'}
+                              {investment?.productCode && !investment?.membershipId && "Processing "}
                               {investment?.productCode && 'ARM'}
+                              {investment?.productCode && !investment?.membershipId && " Investment... "}
                             </Text>
                             <View style={{flexDirection: 'row'}}>
                               <Text style={[styles.desc]}>

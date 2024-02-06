@@ -16,7 +16,13 @@ import DocumentPicker from 'react-native-document-picker';
 import Input from '../../../component/inputField/input.component';
 import CustomInput from '../../../component/custominput/CustomInput';
 import Buttons from '../../../component/buttons/Buttons';
-import {createUploadDocument, uploadProgress} from '../../../stores/LoanStore';
+import {
+  getLoanUserDetails,
+  createUploadDocument,
+  createDocumentsDetails,
+  updateDocumentsDetails,
+  uploadProgress,
+} from '../../../stores/LoanStore';
 import Toast from 'react-native-toast-message';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import {request, PERMISSIONS, openSettings} from 'react-native-permissions';
@@ -58,34 +64,7 @@ const Others = () => {
     personalPhoto: '',
   });
 
-  useEffect(() => {
-    setUserDocs({
-      validIdentificationType:
-        paramKey?.validIdentificationType === undefined
-          ? ''
-          : paramKey?.validIdentificationType,
-      validIdentification:
-        paramKey?.validIdentification === undefined
-          ? ''
-          : paramKey?.validIdentification,
-      utilityBill:
-        paramKey?.utilityBill === undefined ? '' : paramKey?.utilityBill,
-      bankStatement:
-        paramKey?.bankStatement === undefined ? '' : paramKey?.bankStatement,
-      passport: paramKey?.passport === undefined ? '' : paramKey?.passport,
-      signature: paramKey?.signature === undefined ? '' : paramKey?.signature,
-      seal: paramKey?.seal === undefined ? '' : paramKey?.seal,
-      cacCertificate:
-        paramKey?.cacCertificate === undefined ? '' : paramKey?.cacCertificate,
-      othersName:
-        paramKey?.othersName === undefined ? '' : paramKey?.othersName,
-      others: paramKey?.others === undefined ? '' : paramKey?.others,
-      identityCard:
-        paramKey?.identityCard === undefined ? '' : paramKey?.identityCard,
-      personalPhoto:
-        paramKey?.personalPhoto === undefined ? '' : paramKey?.personalPhoto,
-    });
-  }, [paramKey]);
+  const [orgDetails, setOrgDetails] = useState([]);
 
   const activeTab = 'Others';
   const navigation = useNavigation();
@@ -99,7 +78,114 @@ const Others = () => {
     uri: '',
   });
 
+  useEffect(() => {
+    setUserDocs({
+      validIdentificationType:
+        orgDetails && orgDetails?.validIdentificationType === undefined
+          ? ''
+          : orgDetails?.validIdentificationType,
+      validIdentification:
+        orgDetails && orgDetails?.validIdentification === undefined
+          ? ''
+          : orgDetails?.validIdentification,
+      utilityBill:
+        orgDetails && orgDetails?.utilityBill === undefined
+          ? ''
+          : orgDetails?.utilityBill,
+      bankStatement:
+        orgDetails && orgDetails?.bankStatement === undefined
+          ? ''
+          : orgDetails?.bankStatement,
+      passport:
+        orgDetails && orgDetails?.passport === undefined
+          ? ''
+          : orgDetails?.passport,
+      signature:
+        orgDetails && orgDetails?.signature === undefined
+          ? ''
+          : orgDetails?.signature,
+      seal:
+        orgDetails && orgDetails?.seal === undefined ? '' : orgDetails?.seal,
+      cacCertificate:
+        orgDetails && orgDetails?.cacCertificate === undefined
+          ? ''
+          : orgDetails?.cacCertificate,
+      othersName:
+        orgDetails && orgDetails?.othersName === undefined
+          ? ''
+          : orgDetails?.othersName,
+      others:
+        orgDetails && orgDetails?.others === undefined
+          ? ''
+          : orgDetails?.others,
+      identityCard:
+        orgDetails && orgDetails?.identityCard === undefined
+          ? ''
+          : orgDetails?.identityCard,
+      personalPhoto:
+        orgDetails && orgDetails?.personalPhoto === undefined
+          ? ''
+          : orgDetails?.personalPhoto,
+    });
+  }, [orgDetails, navigation]);
+
+  useEffect(() => {
+    // if (route.name !== '') {
+    const unsubscribe = navigation.addListener('focus', async () => {
+      unSubBusinessDetails();
+    });
+    return unsubscribe;
+    // }
+  }, [navigation]);
+
+  useEffect(() => {
+    unSubBusinessDetails();
+  }, []);
+
+  const unSubBusinessDetails = async () => {
+    setIsUpdating(true);
+    const res = await getLoanUserDetails();
+    if (res?.error) {
+      // TODO: handle error
+    } else {
+      setOrgDetails(res?.data?.loanDocumentDetails);
+    }
+    setIsUpdating(false);
+  };
   const disableit = !userDocs.othersName || !selectedDocument;
+
+  //Instant Update
+
+  let formDetails = {
+    validIdentificationType:
+      userDocs?.validIdentificationType === undefined
+        ? ''
+        : userDocs?.validIdentificationType,
+    validIdentification:
+      userDocs?.validIdentification === undefined
+        ? ''
+        : userDocs?.validIdentification,
+    utilityBill:
+      userDocs?.utilityBill === undefined ? '' : userDocs?.utilityBill,
+    bankStatement:
+      userDocs?.bankStatement === undefined ? '' : userDocs?.bankStatement,
+    passport: userDocs?.passport === undefined ? '' : userDocs?.passport,
+    signature: userDocs?.signature === undefined ? '' : userDocs?.signature,
+    seal: userDocs?.seal === undefined ? '' : userDocs?.seal,
+    cacCertificate:
+      userDocs?.cacCertificate === undefined ? '' : userDocs?.cacCertificate,
+    othersName: userDocs?.othersName === undefined ? '' : userDocs?.othersName,
+    others: userDocs?.others === undefined ? '' : userDocs?.others,
+    identityCard:
+      userDocs?.identityCard === undefined ? '' : userDocs?.identityCard,
+    personalPhoto:
+      userDocs?.personalPhoto === undefined ? '' : userDocs?.personalPhoto,
+    cac7: '',
+    cac2: '',
+    lpoFile: '',
+    proformaFile: '',
+    MERMAT: '',
+  };
 
   const requestStoragePermission = async () => {
     const status = await request(
@@ -158,6 +244,79 @@ const Others = () => {
     }
   }, []);
 
+  const handleCreateDocs = async () => {
+    setIsUpdating(true);
+    const res = await createDocumentsDetails(formDetails);
+    if (res?.error) {
+      Toast.show({
+        type: 'error',
+        position: 'top',
+        topOffset: 50,
+        text1: res?.title,
+        text2: res?.message,
+        visibilityTime: 5000,
+        autoHide: true,
+        onPress: () => Toast.hide(),
+      });
+    } else {
+      Toast.show({
+        type: 'success',
+        position: 'top',
+        topOffset: 50,
+        text1: res?.title,
+        text2: res?.message,
+        visibilityTime: 3000,
+        autoHide: true,
+        onPress: () => Toast.hide(),
+      });
+      setTimeout(() => {
+        navigation.navigate('SubmitDocs', {
+          paramKey: {
+            ...paramKey,
+            [document]: newUrl,
+          },
+        });
+      }, 500);
+    }
+    setIsUpdating(false);
+  };
+
+  const handleUpdateDocs = async () => {
+    setIsUpdating(true);
+    const res = await updateDocumentsDetails(formDetails);
+    if (res?.error) {
+      Toast.show({
+        type: 'error',
+        position: 'top',
+        topOffset: 50,
+        text1: res?.title,
+        text2: res?.message,
+        visibilityTime: 5000,
+        autoHide: true,
+        onPress: () => Toast.hide(),
+      });
+    } else {
+      Toast.show({
+        type: 'success',
+        position: 'top',
+        topOffset: 50,
+        text1: res?.title,
+        text2: res?.message,
+        visibilityTime: 3000,
+        autoHide: true,
+        onPress: () => Toast.hide(),
+      });
+      setTimeout(() => {
+        navigation.navigate('SubmitDocs', {
+          paramKey: {
+            ...formDetails,
+          },
+        });
+      }, 500);
+    }
+    setIsUpdating(false);
+  };
+
   const s3UploadFunction = async () => {
     setIsUpdating(true);
     const res = await createUploadDocument(fileUri, 'signature');
@@ -184,19 +343,21 @@ const Others = () => {
         onPress: () => Toast.hide(),
       });
       setUserDocs(deetss => {
+        formDetails = {
+          ...deetss,
+          others: `${res?.data?.data?.url}`,
+        };
         return {
           ...deetss,
           others: `${res?.data?.data?.url}`,
         };
       });
 
-      setTimeout(() => {
-        navigation.navigate('SubmitDocs', {
-          paramKey: {...userDocs, others: `${res?.data?.data?.url}`},
-        });
-      }, 1000);
+      userDocs?.validIdentificationType === undefined
+        ? handleCreateDocs()
+        : handleUpdateDocs();
     }
-    setIsUpdating(false);
+    // setIsUpdating(false);
   };
 
   const renderItem = ({item}) => {

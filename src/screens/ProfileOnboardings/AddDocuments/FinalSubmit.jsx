@@ -226,11 +226,11 @@ const FinalSubmit = ({route}) => {
 
           <View style={{marginTop: 40}}>
             <TouchableOpacity
-              onPress={
+              onPress={() => {
                 docsDetails?.validIdentificationType === undefined
-                  ? handleCreateDocs
-                  : handleUpdateDocs
-              }>
+                  ? navigation.navigate('GetLoan')
+                  : navigation.navigate('MyAccount');
+              }}>
               <Buttons label={'Submit & Finish'} />
             </TouchableOpacity>
           </View>
@@ -239,7 +239,7 @@ const FinalSubmit = ({route}) => {
     </SafeAreaView>
   );
 };
-// write a 30 word write up telling the user that submitted documents will be processed after they click submit
+
 export default FinalSubmit;
 
 const styles = StyleSheet.create({

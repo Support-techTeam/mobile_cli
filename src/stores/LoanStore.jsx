@@ -758,9 +758,6 @@ const createDocumentsDetails = async details => {
             context: JSON.stringify(response?.data),
           },
         );
-        console.log("response", response?.data);
-            console.log("response", response?.data?.message);
-            console.log("response", response?.data?.error);
         return {
           title: 'Create Document Details ',
           error: false,
@@ -842,8 +839,8 @@ const createUploadDocument = async (details, documentName) => {
           message: 'Upload successful',
         };
       } catch (error) {
-        uploadPerroress = 0;
-        DderrorMessagefo(`Loans | Document Upload |errorntUser?.email}`, {
+        // uploadPerroress = 0;
+        DdLogs.error(`Loans | Document Upload |errorntUser?.email}`, {
           context: JSON.stringify(response?.data),
         });
         return {
@@ -1119,7 +1116,7 @@ const updateDocumentsDetails = async details => {
             context: JSON.stringify(response?.data),
           },
         );
-        console.log("response", response);
+
         return {
           title: 'Update Document Details ',
           error: false,
