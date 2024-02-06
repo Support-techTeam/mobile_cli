@@ -7,7 +7,7 @@ import {
   View,
   AppState,
   LogBox,
-  TouchableWithoutFeedback,
+  useColorScheme,
 } from 'react-native';
 import SpInAppUpdates, {IAUUpdateKind} from 'sp-react-native-in-app-updates';
 import {version, SCREELOCK_CODE, SCREENLOCK_STATUS} from './app.json';
@@ -26,18 +26,15 @@ import {Provider} from 'react-redux';
 import {PersistGate} from 'redux-persist/integration/react';
 import {persistor, resetStore, store} from './src/util/redux/store';
 import {LightTheme} from './src/constants/lightTheme';
+import {DarkTheme} from './src/constants/darkTheme';
 import InputPin from './src/screens/SecurityScreens/PinInput';
 import NetworkStatus from './src/util/NetworkService';
 import RNRestart from 'react-native-restart';
 import COLORS from './src/constants/colors';
 import {userLogOut} from './src/stores/AuthStore';
 import {auth} from './src/util/firebase/firebaseConfig';
-import SInfo from 'react-native-sensitive-info';
 import BackgroundTimer from 'react-native-background-timer';
-
-
-
-
+import {TextColorProvider} from './src/component/TextColorContext';
 
 const inAppUpdates = new SpInAppUpdates(false);
 
@@ -64,7 +61,7 @@ datadogConfiguration.sampleRate = 80;
 const TRANSITIONS = ['fade', 'slide', 'none'];
 
 let inactiveTime = 0;
-const defaultWaitTime = Platform.select({ios: 30, android: 30});
+const defaultWaitTime = Platform.select({ios: 20, android: 30});
 let hasLockKey = false;
 let screelLockStatus = false;
 function App() {
@@ -76,8 +73,9 @@ function App() {
 
   //update check
   useEffect(() => {
-    try {
-      inAppUpdates.checkNeedsUpdate({curVersion: version}).then(result => {
+    inAppUpdates
+      .checkNeedsUpdate({curVersion: version})
+      .then(result => {
         if (result.shouldUpdate) {
           const updateOptions = Platform.select({
             ios: {
@@ -94,21 +92,17 @@ function App() {
 
           inAppUpdates.startUpdate(updateOptions);
         }
+      })
+      .catch(err => {
+        // console.log('Update Err: ', err);
       });
-    } catch (err) {
-      // console.log('Update Err: ', err);
-    }
   }, []);
 
   useEffect(() => {
-    try {
-      inAppUpdates.addStatusUpdateListener(onStatusUpdate);
-      return () => {
-        inAppUpdates.removeStatusUpdateListener(onStatusUpdate);
-      };
-    } catch (err) {
-      // console.log('Status Update Err: ', err);
-    }
+    inAppUpdates.addStatusUpdateListener(onStatusUpdate);
+    return () => {
+      inAppUpdates.removeStatusUpdateListener(onStatusUpdate);
+    };
   }, [onStatusUpdate]);
 
   const onStatusUpdate = status => {
@@ -136,117 +130,142 @@ function App() {
 
   // App State Monitor
   const logout = async () => {
-    // console.log(auth.currentUser);
     if (auth.currentUser) {
-      const logoutResult = await userLogOut();
-      if (!logoutResult?.error) {
-        await resetStore();
+      try {
+        const logoutResult = await userLogOut();
+        if (!logoutResult?.error) {
+          await resetStore();
+        }
+      } catch (error) {
+        // :TODO
       }
     }
   };
 
+  let backgroundTaskInterval;
   useEffect(() => {
+    // Function to handle background task
+    const runBackgroundTask = () => {
+      // console.log('Background task is running');
+      inactiveTimerCallback();
+    };
+
+    // Start the background task
+    const startBackgroundTask = () => {
+      // console.log('Starting background task...');
+      backgroundTaskInterval = BackgroundTimer.setInterval(() => {
+        runBackgroundTask();
+      }, 5000);
+    };
+
+    // Stop the background task
+    const stopBackgroundTask = () => {
+      // console.log('Stopping background task...');
+      inactiveTime = 0;
+      BackgroundTimer.clearInterval(backgroundTaskInterval);
+    };
+
+    // Listen for changes in app state
     const handleAppStateChange = nextAppState => {
-      if (appState.match(/inactive|background/) && nextAppState === 'active') {
-        // App became active, stop tracking inactivity
-        inactiveTime = 0;
-        BackgroundTimer?.stopBackgroundTimer();
+      // console.log('App state changed:', nextAppState);
+      if (nextAppState === 'active') {
+        // App is in the foreground
+        stopBackgroundTask();
       } else if (nextAppState === 'background') {
-        // App became inactive, start tracking inactivity
-        BackgroundTimer?.runBackgroundTimer(() => {
-          //code that will be called every 1 seconds
-          // console.log('Running background timer', inactiveTime);
-          if (inactiveTime < defaultWaitTime) {
-            inactiveTimerCallback();
-          }
-        }, 1000);
+        // App is in the background
+        startBackgroundTask();
       }
-      setAppState(nextAppState);
     };
 
     const inactiveTimerCallback = () => {
-      inactiveTime = inactiveTime + 1;
+      inactiveTime = inactiveTime + 5;
       if (inactiveTime >= defaultWaitTime) {
         performAction();
-        BackgroundTimer.stopBackgroundTimer(); // Stop the background timer once the action is performed
       }
     };
     const performAction = async () => {
-      // console.log('Performing action after 30 seconds of inactivity');
       await logout();
-      // Add your code here
     };
 
-    const appStateListener = AppState?.addEventListener(
+    // Subscribe to app state changes
+    const appListeener = AppState.addEventListener(
       'change',
       handleAppStateChange,
     );
 
-    return () => {
-      appStateListener?.remove();
-    };
-  }, [appState, inactiveTime]);
+    // Initial setup based on the app's initial state
+    if (AppState.currentState === 'background') {
+      startBackgroundTask();
+    }
 
-  const retrieveAllSecureInfoData = async () => {
-    const allData = await SInfo.getAllItems({
-      sharedPreferencesName: 'tradeLendaSharedPrefs',
-      keychainService: 'tradeLendaKeychain',
-    });
-    console.log('NORMAL GETTING ALL', allData);
-  };
+    if (AppState.currentState === 'active') {
+      stopBackgroundTask();
+    }
+
+    // Clean up
+    return () => {
+      appListeener.remove();
+      stopBackgroundTask();
+    };
+  }, []);
+
+  // const retrieveAllSecureInfoData = async () => {
+  //   const allData = await SInfo.getAllItems({
+  //     sharedPreferencesName: 'tradeLendaSharedPrefs',
+  //     keychainService: 'tradeLendaKeychain',
+  //   });
+  //   console.log('NORMAL GETTING ALL', allData);
+  // };
 
   // Set Passcode to blank
-  const setSecureInfoData = async (option, code) => {
-    const responseData = await SInfo.setItem(option, code, {
-      sharedPreferencesName: 'tradeLendaSharedPrefs',
-      keychainService: 'tradeLendaKeychain',
-    });
-    // console.log('NORMAL SETTING', responseData);
-  };
+  // const setSecureInfoData = async (option, code) => {
+  //   const responseData = await SInfo.setItem(option, code, {
+  //     sharedPreferencesName: 'tradeLendaSharedPrefs',
+  //     keychainService: 'tradeLendaKeychain',
+  //   });
+  //   // console.log('NORMAL SETTING', responseData);
+  // };
 
-  const getSecureInfoData = async option => {
-    const responseData = await SInfo.getItem(option, {
-      sharedPreferencesName: 'tradeLendaSharedPrefs',
-      keychainService: 'tradeLendaKeychain',
-    });
-    // console.log('NORMAL GETTING', responseData);
-    if (responseData === null || responseData === undefined) {
-      hasLockKey = false;
-    } else {
-      hasLockKey = true;
-    }
-  };
+  // const getSecureInfoData = async option => {
+  //   const responseData = await SInfo.getItem(option, {
+  //     sharedPreferencesName: 'tradeLendaSharedPrefs',
+  //     keychainService: 'tradeLendaKeychain',
+  //   });
+  //   // console.log('NORMAL GETTING', responseData);
+  //   if (responseData === null || responseData === undefined) {
+  //     hasLockKey = false;
+  //   } else {
+  //     hasLockKey = true;
+  //   }
+  // };
 
-  const getSecureInfoStatus = async option => {
-    const responseData = await SInfo.getItem(option, {
-      sharedPreferencesName: 'tradeLendaSharedPrefs',
-      keychainService: 'tradeLendaKeychain',
-    });
-    console.log('NORMAL GETTING', responseData);
-    if (responseData === null || responseData === undefined) {
-      screelLockStatus = false;
-    } else {
-      if (responseData === 'true') {
-        screelLockStatus = true;
-      } else {
-        screelLockStatus = false;
-      }
-    }
-  };
+  // const getSecureInfoStatus = async option => {
+  //   const responseData = await SInfo.getItem(option, {
+  //     sharedPreferencesName: 'tradeLendaSharedPrefs',
+  //     keychainService: 'tradeLendaKeychain',
+  //   });
+  //   console.log('NORMAL GETTING', responseData);
+  //   if (responseData === null || responseData === undefined) {
+  //     screelLockStatus = false;
+  //   } else {
+  //     if (responseData === 'true') {
+  //       screelLockStatus = true;
+  //     } else {
+  //       screelLockStatus = false;
+  //     }
+  //   }
+  // };
 
-  const deleteSecureInfoData = async option => {
-    const responseData = await SInfo.deleteItem(option, {
-      sharedPreferencesName: 'tradeLendaSharedPrefs',
-      keychainService: 'tradeLendaKeychain',
-    });
-    console.log('NORMAL DELETING', responseData);
-  };
+  // const deleteSecureInfoData = async option => {
+  //   const responseData = await SInfo.deleteItem(option, {
+  //     sharedPreferencesName: 'tradeLendaSharedPrefs',
+  //     keychainService: 'tradeLendaKeychain',
+  //   });
+  //   console.log('NORMAL DELETING', responseData);
+  // };
 
-  const theme = {
-    ...LightTheme,
-  };
-
-
+  const colorScheme = useColorScheme();
+  const theme = colorScheme === 'dark' ? {...DarkTheme} : {...LightTheme};
   return (
     <SafeAreaProvider style={styles.rootContainer}>
       <PaperProvider theme={theme}>
@@ -267,12 +286,14 @@ function App() {
                 style={styles.container}
                 onTouchStart={() => {
                   inactiveTime = 0;
-                  BackgroundTimer.stopBackgroundTimer();
+                  BackgroundTimer.clearInterval(backgroundTaskInterval);
                 }}>
                 <Provider store={store}>
                   <PersistGate persistor={persistor} loading={null}>
-                    <NetworkStatus />
-                    <AppNavigationContainer />
+                    <TextColorProvider>
+                      <NetworkStatus />
+                      <AppNavigationContainer />
+                    </TextColorProvider>
                   </PersistGate>
                 </Provider>
               </View>
