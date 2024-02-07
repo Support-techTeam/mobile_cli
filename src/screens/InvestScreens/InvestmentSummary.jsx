@@ -159,7 +159,12 @@ const InvestmentSummaryScreen = () => {
                   </Text>
                 </Text>
                 <View
-                  style={{flex: 1, flexDirection: 'row', alignSelf: 'center', paddingHorizontal: 10}}>
+                  style={{
+                    flex: 1,
+                    flexDirection: 'row',
+                    alignSelf: 'center',
+                    paddingHorizontal: 10,
+                  }}>
                   <Icon
                     name="information-outline"
                     style={{paddingRight: 3}}
@@ -267,15 +272,19 @@ const InvestmentSummaryScreen = () => {
                   <Text style={{color: COLORS.lendaBlue, alignSelf: 'center'}}>
                     ₦
                     {investment?.amountRange?.minAmount
-                      ? investment?.amountRange?.minAmount
-                          .toString()
-                          .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+                      ? new Intl.NumberFormat('en-US', {
+                          style: 'decimal',
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        }).format(Number(investment.amountRange.minAmount))
                       : '0.00'}{' '}
                     - ₦
                     {investment?.amountRange?.maxAmount
-                      ? investment?.amountRange?.maxAmount
-                          .toString()
-                          .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+                      ? new Intl.NumberFormat('en-US', {
+                          style: 'decimal',
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        }).format(Number(investment.amountRange.maxAmount))
                       : '0.00'}
                   </Text>
                 </Text>
@@ -314,15 +323,19 @@ const InvestmentSummaryScreen = () => {
                     <Text style={{color: COLORS.lendaBlue}}>
                       ₦
                       {investment?.amountRange?.minAmount
-                        ? investment?.amountRange?.minAmount
-                            .toString()
-                            .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+                        ? new Intl.NumberFormat('en-US', {
+                            style: 'decimal',
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          }).format(Number(investment.amountRange.minAmount))
                         : '0.00'}{' '}
                       - ₦
                       {investment?.amountRange?.maxAmount
-                        ? investment?.amountRange?.maxAmount
-                            .toString()
-                            .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+                        ? new Intl.NumberFormat('en-US', {
+                            style: 'decimal',
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          }).format(Number(investment.amountRange.maxAmount))
                         : '0.00'}{' '}
                     </Text>
                     at 3 months minimum tenor and{' '}

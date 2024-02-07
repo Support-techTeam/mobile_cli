@@ -47,37 +47,41 @@ const AddGuarantors = () => {
     !guarantorsDetails.phoneNumber;
 
   const handleCreateGuarantor = async () => {
-    setIsLoading(true);
-    const res = await createGuarantor(guarantorsDetails);
-    console.log('createGuarantor', res);
-    if (res?.data?.error) {
-      Toast.show({
-        type: 'error',
-        position: 'top',
-        topOffset: 50,
-        text1: res?.data?.title,
-        text2: res?.data?.message,
-        visibilityTime: 5000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
-    } else {
-      Toast.show({
-        type: 'success',
-        position: 'top',
-        topOffset: 50,
-        text1: res?.title,
-        text2: res?.message,
-        visibilityTime: 3000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
+    try {
+      setIsLoading(true);
+      const res = await createGuarantor(guarantorsDetails);
+      console.log('createGuarantor', res);
+      if (res?.data?.error) {
+        Toast.show({
+          type: 'error',
+          position: 'top',
+          topOffset: 50,
+          text1: res?.data?.title,
+          text2: res?.data?.message,
+          visibilityTime: 5000,
+          autoHide: true,
+          onPress: () => Toast.hide(),
+        });
+      } else {
+        Toast.show({
+          type: 'success',
+          position: 'top',
+          topOffset: 50,
+          text1: res?.title,
+          text2: res?.message,
+          visibilityTime: 3000,
+          autoHide: true,
+          onPress: () => Toast.hide(),
+        });
 
-      setTimeout(() => {
-        navigation.navigate('Guarantor');
-      }, 2000);
+        setTimeout(() => {
+          navigation.navigate('Guarantor');
+        }, 2000);
+      }
+      setIsLoading(false);
+    } catch (e) {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   return (

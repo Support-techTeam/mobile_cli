@@ -63,14 +63,18 @@ const GetData = () => {
   }, []);
 
   const fetchingAllNetworkProvider = async () => {
-    setIsLoading(true);
-    const res = await getDataProvider();
-    if (res?.error) {
-      // TODO: handle error
-    } else {
-      setNetworkProviders(res?.data?.data?.data);
+    try {
+      setIsLoading(true);
+      const res = await getDataProvider();
+      if (res?.error) {
+        // TODO: handle error
+      } else {
+        setNetworkProviders(res?.data?.data?.data);
+      }
+      setIsLoading(false);
+    } catch (e) {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   useEffect(() => {
@@ -93,14 +97,18 @@ const GetData = () => {
   // }, [airtimeDetails.network]);
 
   const fetchingAllProviderData = async e => {
-    setIsLoading(true);
-    const res = await getDataPlanByProvider(e);
-    if (res?.error) {
-      // TODO: handle error
-    } else {
-      setProviderPlan(res?.data?.data?.data);
+    try {
+      setIsLoading(true);
+      const res = await getDataPlanByProvider(e);
+      if (res?.error) {
+        // TODO: handle error
+      } else {
+        setProviderPlan(res?.data?.data?.data);
+      }
+      setIsLoading(false);
+    } catch (e) {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   useEffect(() => {

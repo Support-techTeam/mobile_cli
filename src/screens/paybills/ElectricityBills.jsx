@@ -60,44 +60,52 @@ const Electric = () => {
   }, []);
 
   const fetchingAllElectricityProvider = async () => {
-    setIsLoading(true);
-    const res = await getElectricityProviders();
-    if (res?.error) {
-      // TODO: handle error
-    } else {
-      setNetworkProviders(res?.data?.data?.data);
+    try {
+      setIsLoading(true);
+      const res = await getElectricityProviders();
+      if (res?.error) {
+        // TODO: handle error
+      } else {
+        setNetworkProviders(res?.data?.data?.data);
+      }
+      setIsLoading(false);
+    } catch (e) {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   const fetchingMeterValidation = async () => {
-    setIsLoading(true);
-    const data = {
-      serviceType: airtimeDetails.network,
-      meterNumber: airtimeDetails.meterNumber.toString(),
-    };
-    const res = await verifyMeter(data);
+    try {
+      setIsLoading(true);
+      const data = {
+        serviceType: airtimeDetails.network,
+        meterNumber: airtimeDetails.meterNumber.toString(),
+      };
+      const res = await verifyMeter(data);
 
-    if (res?.error) {
-      Toast.show({
-        type: 'error',
-        position: 'top',
-        topOffset: 50,
-        text1: res?.title,
-        text2: res?.data?.data?.message
-          ? res?.data?.data?.message
-          : res?.message,
-        visibilityTime: 5000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
-    } else {
-      setDetails({
-        name: res?.data?.data?.data?.customerName,
-        address: res?.data?.data?.data?.address,
-      });
+      if (res?.error) {
+        Toast.show({
+          type: 'error',
+          position: 'top',
+          topOffset: 50,
+          text1: res?.title,
+          text2: res?.data?.data?.message
+            ? res?.data?.data?.message
+            : res?.message,
+          visibilityTime: 5000,
+          autoHide: true,
+          onPress: () => Toast.hide(),
+        });
+      } else {
+        setDetails({
+          name: res?.data?.data?.data?.customerName,
+          address: res?.data?.data?.data?.address,
+        });
+      }
+      setIsLoading(false);
+    } catch (e) {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   useEffect(() => {

@@ -34,23 +34,27 @@ const LoanTransactions = ({route}) => {
   }, [loanIdd, navigation]);
 
   const getLoan = async () => {
-    setIsLoading(true);
-    const res = await getLoanById(loanIdd);
-    if (res?.error) {
-      Toast.show({
-        type: 'error',
-        position: 'top',
-        topOffset: 50,
-        text1: res?.title,
-        text2: res?.message,
-        visibilityTime: 5000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
-    } else {
-      setLoanDetails(res?.data);
+    try {
+      setIsLoading(true);
+      const res = await getLoanById(loanIdd);
+      if (res?.error) {
+        Toast.show({
+          type: 'error',
+          position: 'top',
+          topOffset: 50,
+          text1: res?.title,
+          text2: res?.message,
+          visibilityTime: 5000,
+          autoHide: true,
+          onPress: () => Toast.hide(),
+        });
+      } else {
+        setLoanDetails(res?.data);
+      }
+      setIsLoading(false);
+    } catch (e) {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   const openSendEmail = Id => {

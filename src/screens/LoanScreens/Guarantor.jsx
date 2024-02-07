@@ -35,43 +35,51 @@ const Guarantor = () => {
   }, [navigation]);
 
   const getGuarantorsData = async () => {
-    setIsLoading(true);
-    const res = await getGuarantors();
-    if (res?.error) {
-      Toast.show({
-        type: 'error',
-        position: 'top',
-        topOffset: 50,
-        text1: res?.title,
-        text2: res?.message,
-        visibilityTime: 5000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
-    } else {
-      setGuarantors(res?.data);
+    try {
+      setIsLoading(true);
+      const res = await getGuarantors();
+      if (res?.error) {
+        Toast.show({
+          type: 'error',
+          position: 'top',
+          topOffset: 50,
+          text1: res?.title,
+          text2: res?.message,
+          visibilityTime: 5000,
+          autoHide: true,
+          onPress: () => Toast.hide(),
+        });
+      } else {
+        setGuarantors(res?.data);
+      }
+      setIsLoading(false);
+    } catch (e) {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   const getLoanuserData = async () => {
-    setIsLoading(true);
-    const res = await getLoanUserDetails();
-    if (res?.error) {
-      Toast.show({
-        type: 'error',
-        position: 'top',
-        topOffset: 50,
-        text1: res?.title,
-        text2: res?.message,
-        visibilityTime: 5000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
-    } else {
-      setLoanUserdetails(res?.data);
+    try {
+      setIsLoading(true);
+      const res = await getLoanUserDetails();
+      if (res?.error) {
+        Toast.show({
+          type: 'error',
+          position: 'top',
+          topOffset: 50,
+          text1: res?.title,
+          text2: res?.message,
+          visibilityTime: 5000,
+          autoHide: true,
+          onPress: () => Toast.hide(),
+        });
+      } else {
+        setLoanUserdetails(res?.data);
+      }
+      setIsLoading(false);
+    } catch (e) {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   const loadingList = ['string', 'string', 'string', 'string'];

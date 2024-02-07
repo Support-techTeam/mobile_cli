@@ -64,33 +64,37 @@ const SignUp = () => {
     error !== '';
 
   const handleSignUp = async () => {
-    setIsLoading(true);
-    const res = await userSignUp(inputs);
-    if (res?.error) {
-      Toast.show({
-        type: 'error',
-        position: 'top',
-        topOffset: 50,
-        text1: res?.title,
-        text2: res?.message,
-        visibilityTime: 3000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
-    } else {
-      Toast.show({
-        type: 'success',
-        position: 'top',
-        topOffset: 50,
-        text1: res?.title,
-        text2: res?.message,
-        visibilityTime: 3000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
-      dispatch(signUpUser(JSON.stringify(res?.user)));
+    try {
+      setIsLoading(true);
+      const res = await userSignUp(inputs);
+      if (res?.error) {
+        Toast.show({
+          type: 'error',
+          position: 'top',
+          topOffset: 50,
+          text1: res?.title,
+          text2: res?.message,
+          visibilityTime: 3000,
+          autoHide: true,
+          onPress: () => Toast.hide(),
+        });
+      } else {
+        Toast.show({
+          type: 'success',
+          position: 'top',
+          topOffset: 50,
+          text1: res?.title,
+          text2: res?.message,
+          visibilityTime: 3000,
+          autoHide: true,
+          onPress: () => Toast.hide(),
+        });
+        dispatch(signUpUser(JSON.stringify(res?.user)));
+      }
+      setIsLoading(false);
+    } catch (e) {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   const validate = () => {

@@ -27,6 +27,7 @@ import InputPhone from '../../component/inputField/phone-input.component';
 import Toast from 'react-native-toast-message';
 import {useSelector} from 'react-redux';
 import {getStatusBarHeight} from 'react-native-status-bar-height';
+import {createAction} from '@reduxjs/toolkit';
 
 const statusBarHeight = getStatusBarHeight();
 const midth = Dimensions.get('window').width;
@@ -65,45 +66,53 @@ const Cable = () => {
     !airtimeDetails.amount || !airtimeDetails.network || !airtimeDetails.amount;
 
   const fetchingCableTvProvider = async e => {
-    setIsLoading(true);
-    const res = await getCableTvProvider(e);
-    if (res?.error) {
-      // TODO: handle error
-    } else {
-      setTvBouquets(res?.data?.data?.data);
+    try {
+      setIsLoading(true);
+      const res = await getCableTvProvider(e);
+      if (res?.error) {
+        // TODO: handle error
+      } else {
+        setTvBouquets(res?.data?.data?.data);
+      }
+      setIsLoading(false);
+    } catch (err) {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   const fetchingCardValidation = async () => {
-    setIsLoading(true);
-    const data = {
-      provider: airtimeDetails.network,
-      cardNumber: airtimeDetails.cardNumber.toString(),
-    };
+    try {
+      setIsLoading(true);
+      const data = {
+        provider: airtimeDetails.network,
+        cardNumber: airtimeDetails.cardNumber.toString(),
+      };
 
-    const res = await verifyIUC(data);
+      const res = await verifyIUC(data);
 
-    if (res?.error) {
-      Toast.show({
-        type: 'error',
-        position: 'top',
-        topOffset: 50,
-        text1: res?.title,
-        text2: res?.data?.data?.message
-          ? res?.data?.data?.message
-          : res?.message,
-        visibilityTime: 5000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
-    } else {
-      setDetails({
-        name: res?.data?.data?.data?.user?.name,
-        subscription: res?.data?.data?.data?.user?.outstandingBalance,
-      });
+      if (res?.error) {
+        Toast.show({
+          type: 'error',
+          position: 'top',
+          topOffset: 50,
+          text1: res?.title,
+          text2: res?.data?.data?.message
+            ? res?.data?.data?.message
+            : res?.message,
+          visibilityTime: 5000,
+          autoHide: true,
+          onPress: () => Toast.hide(),
+        });
+      } else {
+        setDetails({
+          name: res?.data?.data?.data?.user?.name,
+          subscription: res?.data?.data?.data?.user?.outstandingBalance,
+        });
+      }
+      setIsLoading(false);
+    } catch (e) {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   useEffect(() => {

@@ -62,14 +62,16 @@ const NextOfKin = () => {
   }, []);
 
   const unSubNOKDetails = async () => {
-    setIsLoading(true);
-    const res = await getLoanUserDetails();
-    if (res?.error) {
-      // TODO: handle error
-    } else {
-      setNokDetails(res?.data?.nextOfKinDetails);
-    }
-    setIsLoading(false);
+    try {
+      setIsLoading(true);
+      const res = await getLoanUserDetails();
+      if (res?.error) {
+        // TODO: handle error
+      } else {
+        setNokDetails(res?.data?.nextOfKinDetails);
+      }
+      setIsLoading(false);
+    } catch (e) {}
   };
 
   const [kinDetails, setKinDetails] = useState({
@@ -123,75 +125,83 @@ const NextOfKin = () => {
     !kinDetails.gender;
 
   const handleCreateNokDetails = async () => {
-    setIsUpdating(true);
-    const res = await createNextOfKin(kinDetails);
-    if (res?.error) {
-      Toast.show({
-        type: 'error',
-        position: 'top',
-        topOffset: 50,
-        text1: res?.title,
-        text2: res?.message,
-        visibilityTime: 5000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
-    } else {
-      Toast.show({
-        type: 'success',
-        position: 'top',
-        topOffset: 50,
-        text1: res?.title,
-        text2: res?.message,
-        visibilityTime: 3000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
-      setTimeout(() => {
-        if (previousRoute !== 'MyAccount') {
-          navigation.navigate('BankDetails');
-        } else {
-          navigation.navigate('MyAccount');
-        }
-      }, 1000);
+    try {
+      setIsUpdating(true);
+      const res = await createNextOfKin(kinDetails);
+      if (res?.error) {
+        Toast.show({
+          type: 'error',
+          position: 'top',
+          topOffset: 50,
+          text1: res?.title,
+          text2: res?.message,
+          visibilityTime: 5000,
+          autoHide: true,
+          onPress: () => Toast.hide(),
+        });
+      } else {
+        Toast.show({
+          type: 'success',
+          position: 'top',
+          topOffset: 50,
+          text1: res?.title,
+          text2: res?.message,
+          visibilityTime: 3000,
+          autoHide: true,
+          onPress: () => Toast.hide(),
+        });
+        setTimeout(() => {
+          if (previousRoute !== 'MyAccount') {
+            navigation.navigate('BankDetails');
+          } else {
+            navigation.navigate('MyAccount');
+          }
+        }, 1000);
+      }
+      setIsUpdating(false);
+    } catch (e) {
+      setIsUpdating(false);
     }
-    setIsUpdating(false);
   };
 
   const handleUpdateNokDetails = async () => {
-    setIsUpdating(true);
-    const res = await updateNokDetails(kinDetails);
-    if (res?.error) {
-      Toast.show({
-        type: 'error',
-        position: 'top',
-        topOffset: 50,
-        text1: res?.title,
-        text2: res?.message,
-        visibilityTime: 5000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
-    } else {
-      Toast.show({
-        type: 'success',
-        position: 'top',
-        topOffset: 50,
-        text1: res?.title,
-        text2: res?.message,
-        visibilityTime: 3000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
-      setTimeout(() => {
-        if (previousRoute !== 'MyAccount') {
-          navigation.navigate('BankDetails');
-        } else {
-          navigation.navigate('MyAccount');
-        }
-      }, 1000);
+    try {
+      setIsUpdating(true);
+      const res = await updateNokDetails(kinDetails);
+      if (res?.error) {
+        Toast.show({
+          type: 'error',
+          position: 'top',
+          topOffset: 50,
+          text1: res?.title,
+          text2: res?.message,
+          visibilityTime: 5000,
+          autoHide: true,
+          onPress: () => Toast.hide(),
+        });
+      } else {
+        Toast.show({
+          type: 'success',
+          position: 'top',
+          topOffset: 50,
+          text1: res?.title,
+          text2: res?.message,
+          visibilityTime: 3000,
+          autoHide: true,
+          onPress: () => Toast.hide(),
+        });
+        setTimeout(() => {
+          if (previousRoute !== 'MyAccount') {
+            navigation.navigate('BankDetails');
+          } else {
+            navigation.navigate('MyAccount');
+          }
+        }, 1000);
+      }
+      setIsUpdating(false);
+    } catch (e) {
+      setIsUpdating(false);
     }
-    setIsUpdating(false);
   };
 
   return (

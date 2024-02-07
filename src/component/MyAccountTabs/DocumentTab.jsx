@@ -22,11 +22,15 @@ const Document = () => {
   }, []);
 
   const unSubBankDetails = async () => {
-    const res = await getLoanUserDetails();
-    if (res?.error) {
+    try {
+      const res = await getLoanUserDetails();
+      if (res?.error) {
+        // TODO: handle error
+      } else {
+        setDocsDeets(res?.data?.loanDocumentDetails);
+      }
+    } catch (error) {
       // TODO: handle error
-    } else {
-      setDocsDeets(res?.data?.loanDocumentDetails);
     }
   };
   return (

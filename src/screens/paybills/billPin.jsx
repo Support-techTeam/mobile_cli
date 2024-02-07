@@ -71,148 +71,164 @@ const BillPin = ({route}) => {
 
   const createPayment = async () => {
     if (airtimeDetails.service === 'airtime purchase') {
-      setIsLoading(true);
-      const res = await purchaseAirtime(details);
-      if (res?.error || res?.data?.error) {
-        Toast.show({
-          type: 'error',
-          position: 'top',
-          topOffset: 50,
-          text1: res?.title,
-          text2: res?.data?.message ? res?.data?.message : res?.message,
-          visibilityTime: 5000,
-          autoHide: true,
-          onPress: () => Toast.hide(),
-        });
-        setTimeout(() => {
-          navigation.navigate('StatusFailed');
-        }, 1000);
-      } else {
-        Toast.show({
-          type: 'success',
-          position: 'top',
-          topOffset: 50,
-          text1: res?.title,
-          text2: res?.message,
-          visibilityTime: 3000,
-          autoHide: true,
-          onPress: () => Toast.hide(),
-        });
-        setTimeout(() => {
-          navigation.navigate('StatusSuc');
-        }, 1000);
+      try {
+        setIsLoading(true);
+        const res = await purchaseAirtime(details);
+        if (res?.error || res?.data?.error) {
+          Toast.show({
+            type: 'error',
+            position: 'top',
+            topOffset: 50,
+            text1: res?.title,
+            text2: res?.data?.message ? res?.data?.message : res?.message,
+            visibilityTime: 5000,
+            autoHide: true,
+            onPress: () => Toast.hide(),
+          });
+          setTimeout(() => {
+            navigation.navigate('StatusFailed');
+          }, 1000);
+        } else {
+          Toast.show({
+            type: 'success',
+            position: 'top',
+            topOffset: 50,
+            text1: res?.title,
+            text2: res?.message,
+            visibilityTime: 3000,
+            autoHide: true,
+            onPress: () => Toast.hide(),
+          });
+          setTimeout(() => {
+            navigation.navigate('StatusSuc');
+          }, 1000);
+        }
+        setIsLoading(false);
+      } catch (e) {
+        setIsLoading(false);
       }
-      setIsLoading(false);
     }
 
     if (airtimeDetails.service === 'data purchase') {
-      setIsLoading(true);
-      const res = await purchaseDataPlan(dataDetails);
-      if (res?.error || res?.data?.error) {
-        Toast.show({
-          type: 'error',
-          position: 'top',
-          topOffset: 50,
-          text1: res?.title,
-          text2: res?.data?.message ? res?.data?.message : res?.message,
-          visibilityTime: 5000,
-          autoHide: true,
-          onPress: () => Toast.hide(),
-        });
-        setTimeout(() => {
-          navigation.navigate('StatusFailed');
-        }, 1000);
-      } else {
-        Toast.show({
-          type: 'success',
-          position: 'top',
-          topOffset: 50,
-          text1: res?.title,
-          text2: res?.message,
-          visibilityTime: 3000,
-          autoHide: true,
-          onPress: () => Toast.hide(),
-        });
-        setTimeout(() => {
-          navigation.navigate('StatusSuc');
-        }, 1000);
+      try {
+        setIsLoading(true);
+        const res = await purchaseDataPlan(dataDetails);
+        if (res?.error || res?.data?.error) {
+          Toast.show({
+            type: 'error',
+            position: 'top',
+            topOffset: 50,
+            text1: res?.title,
+            text2: res?.data?.message ? res?.data?.message : res?.message,
+            visibilityTime: 5000,
+            autoHide: true,
+            onPress: () => Toast.hide(),
+          });
+          setTimeout(() => {
+            navigation.navigate('StatusFailed');
+          }, 1000);
+        } else {
+          Toast.show({
+            type: 'success',
+            position: 'top',
+            topOffset: 50,
+            text1: res?.title,
+            text2: res?.message,
+            visibilityTime: 3000,
+            autoHide: true,
+            onPress: () => Toast.hide(),
+          });
+          setTimeout(() => {
+            navigation.navigate('StatusSuc');
+          }, 1000);
+        }
+        setIsLoading(false);
+      } catch (e) {
+        setIsLoading(false);
       }
-      setIsLoading(false);
     }
 
     if (airtimeDetails.service === 'electricity purchase') {
-      setIsLoading(true);
-      const res = await purchaseElectricity(powerDetails);
-      if (res?.error || res?.data?.error) {
-        Toast.show({
-          type: 'error',
-          position: 'top',
-          topOffset: 50,
-          text1: res?.title,
-          text2: res?.data?.message ? res?.data?.message : res?.message,
-          visibilityTime: 5000,
-          autoHide: true,
-          onPress: () => Toast.hide(),
-        });
-        setTimeout(() => {
-          navigation.navigate('StatusFailed');
-        }, 1000);
-      } else {
-        Toast.show({
-          type: 'success',
-          position: 'top',
-          topOffset: 50,
-          text1: res?.title,
-          text2: res?.message,
-          visibilityTime: 3000,
-          autoHide: true,
-          onPress: () => Toast.hide(),
-        });
-        setTimeout(() => {
-          navigation.navigate('StatusSuc');
-        }, 1000);
+      try {
+        setIsLoading(true);
+        const res = await purchaseElectricity(powerDetails);
+        if (res?.error || res?.data?.error) {
+          Toast.show({
+            type: 'error',
+            position: 'top',
+            topOffset: 50,
+            text1: res?.title,
+            text2: res?.data?.message ? res?.data?.message : res?.message,
+            visibilityTime: 5000,
+            autoHide: true,
+            onPress: () => Toast.hide(),
+          });
+          setTimeout(() => {
+            navigation.navigate('StatusFailed');
+          }, 1000);
+        } else {
+          Toast.show({
+            type: 'success',
+            position: 'top',
+            topOffset: 50,
+            text1: res?.title,
+            text2: res?.message,
+            visibilityTime: 3000,
+            autoHide: true,
+            onPress: () => Toast.hide(),
+          });
+          setTimeout(() => {
+            navigation.navigate('StatusSuc');
+          }, 1000);
+        }
+        setIsLoading(false);
+      } catch (e) {
+        setIsLoading(false);
       }
-      setIsLoading(false);
     }
 
     if (airtimeDetails.service === 'cable_tv purchase') {
-      setIsLoading(true);
-      let res;
-      if (airtimeDetails.status == 'update') {
-        res = await updateSubscription(cableDetails);
-      } else {
-        res = await renewSubscription(cableDetails);
+      try {
+        setIsLoading(true);
+        let res;
+        if (airtimeDetails.status == 'update') {
+          res = await updateSubscription(cableDetails);
+        } else {
+          res = await renewSubscription(cableDetails);
+        }
+        if (res?.error || res?.data?.error) {
+          Toast.show({
+            type: 'error',
+            position: 'top',
+            topOffset: 50,
+            text1: res?.title,
+            text2: res?.data?.message ? res?.data?.message : res?.message,
+            visibilityTime: 5000,
+            autoHide: true,
+            onPress: () => Toast.hide(),
+          });
+          setTimeout(() => {
+            navigation.navigate('StatusFailed');
+          }, 1000);
+        } else {
+          Toast.show({
+            type: 'success',
+            position: 'top',
+            topOffset: 50,
+            text1: res?.title,
+            text2: res?.message,
+            visibilityTime: 3000,
+            autoHide: true,
+            onPress: () => Toast.hide(),
+          });
+          setTimeout(() => {
+            navigation.navigate('StatusSuc');
+          }, 1000);
+        }
+        setIsLoading(false);
+      } catch (e) {
+        setIsLoading(false);
       }
-      if (res?.error || res?.data?.error) {
-        Toast.show({
-          type: 'error',
-          position: 'top',
-          topOffset: 50,
-          text1: res?.title,
-          text2: res?.data?.message ? res?.data?.message : res?.message,
-          visibilityTime: 5000,
-          autoHide: true,
-          onPress: () => Toast.hide(),
-        });
-        setTimeout(() => {
-          navigation.navigate('StatusFailed');
-        }, 1000);
-      } else {
-        Toast.show({
-          type: 'success',
-          position: 'top',
-          topOffset: 50,
-          text1: res?.title,
-          text2: res?.message,
-          visibilityTime: 3000,
-          autoHide: true,
-          onPress: () => Toast.hide(),
-        });
-        setTimeout(() => {
-          navigation.navigate('StatusSuc');
-        }, 1000);
-      }
-      setIsLoading(false);
     }
   };
 

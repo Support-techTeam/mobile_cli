@@ -47,14 +47,18 @@ const Airtime = () => {
   }, []);
 
   const fetchingAllNetworkProvider = async () => {
-    setIsLoading(true);
-    const res = await getNetworkProvider();
-    if (res?.error) {
-      // TODO: handle error
-    } else {
-      setNetworkProviders(res?.data?.data?.data?.providers);
+    try {
+      setIsLoading(true);
+      const res = await getNetworkProvider();
+      if (res?.error) {
+        // TODO: handle error
+      } else {
+        setNetworkProviders(res?.data?.data?.data?.providers);
+      }
+      setIsLoading(false);
+    } catch (e) {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   useEffect(() => {
@@ -171,10 +175,11 @@ const Airtime = () => {
                 defaultValue={airtimeDetails?.amount}
                 isAirtime={true}
                 isBalance={
-                  userWalletData &&
-                  userWalletData?.availableBalance
-                    ?.toString()
-                    ?.replace(/\B(?=(\d{3})+\b)/g, ',')
+                  userWalletData && new Intl.NumberFormat('en-US', {
+                    style: 'decimal',
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  }).format(Number(userWalletData?.availableBalance))
                 }
                 keyboardType="numeric"
                 onChangeText={text =>

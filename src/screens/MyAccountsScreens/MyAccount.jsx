@@ -173,58 +173,62 @@ const MyAccount = () => {
   };
 
   const handleCreateDocs = async () => {
-    const res = await createDocumentsDetails(formDetails);
-    if (res?.error) {
-      Toast.show({
-        type: 'error',
-        position: 'top',
-        topOffset: 50,
-        text1: "Profile Picture",
-        text2: res?.message,
-        visibilityTime: 5000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
-    } else {
-      setTimeout(() => {
-        setFileUrl('');
-        setFileName('');
-        setFileType('');
-        setDocument('');
-        setImage(null);
-      }, 500);
-    }
+    try {
+      const res = await createDocumentsDetails(formDetails);
+      if (res?.error) {
+        Toast.show({
+          type: 'error',
+          position: 'top',
+          topOffset: 50,
+          text1: 'Profile Picture',
+          text2: res?.message,
+          visibilityTime: 5000,
+          autoHide: true,
+          onPress: () => Toast.hide(),
+        });
+      } else {
+        setTimeout(() => {
+          setFileUrl('');
+          setFileName('');
+          setFileType('');
+          setDocument('');
+          setImage(null);
+        }, 500);
+      }
+    } catch (e) {}
   };
 
   useEffect(() => {
-  if(image !== null){
-    s3UploadFunction();
-  }
+    if (image !== null) {
+      s3UploadFunction();
+    }
   }, [image]);
 
   const handleUpdateDocs = async () => {
-    const res = await updateDocumentsDetails(formDetails);
-    if (res?.error) {
-      Toast.show({
-        type: 'error',
-        position: 'top',
-        topOffset: 50,
-        text1: "Profile Picture",
-        text2: res?.message,
-        visibilityTime: 5000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
-    } else {
-      unSubBusinessDetails();
-      setTimeout(() => {
-        setFileUrl('');
-        setFileName('');
-        setFileType('');
-        setDocument('');
-        setImage(null);
-      }, 500);
-    }
+    try {
+      const res = await updateDocumentsDetails(formDetails);
+      if (res?.error) {
+        Toast.show({
+          type: 'error',
+          position: 'top',
+          topOffset: 50,
+          text1: 'Profile Picture',
+          text2: res?.message,
+          visibilityTime: 5000,
+          autoHide: true,
+          onPress: () => Toast.hide(),
+        });
+      } else {
+        unSubBusinessDetails();
+        setTimeout(() => {
+          setFileUrl('');
+          setFileName('');
+          setFileType('');
+          setDocument('');
+          setImage(null);
+        }, 500);
+      }
+    } catch (e) {}
   };
 
   const s3UploadFunction = async () => {
@@ -234,7 +238,7 @@ const MyAccount = () => {
           type: 'error',
           position: 'top',
           topOffset: 50,
-          text1: "Profile Picture",
+          text1: 'Profile Picture',
           text2: 'Empty file data',
           visibilityTime: 5000,
           autoHide: true,
@@ -253,7 +257,7 @@ const MyAccount = () => {
             type: 'error',
             position: 'top',
             topOffset: 50,
-            text1: "Profile Picture",
+            text1: 'Profile Picture',
             text2: res?.message,
             visibilityTime: 5000,
             autoHide: true,
@@ -263,11 +267,11 @@ const MyAccount = () => {
           setUserDocs(deetss => {
             formDetails = {
               ...deetss,
-              'personalPhoto': `${res?.data?.data?.url}`,
+              personalPhoto: `${res?.data?.data?.url}`,
             };
             return {
               ...deetss,
-              'personalPhoto': `${res?.data?.data?.url}`,
+              personalPhoto: `${res?.data?.data?.url}`,
             };
           });
 
@@ -276,9 +280,7 @@ const MyAccount = () => {
             : handleUpdateDocs();
         }
       }
-    } catch (err) {
-
-    }
+    } catch (err) {}
   };
 
   const navigation = useNavigation();
@@ -366,11 +368,13 @@ const MyAccount = () => {
   }, []);
 
   const unSubBusinessDetails = async () => {
-    const res = await getLoanUserDetails();
-    if (res?.error) {
-    } else {
-      setOrgDetails(res?.data?.loanDocumentDetails);
-    }
+    try {
+      const res = await getLoanUserDetails();
+      if (res?.error) {
+      } else {
+        setOrgDetails(res?.data?.loanDocumentDetails);
+      }
+    } catch (e) {}
   };
   return (
     <SafeAreaView

@@ -45,16 +45,26 @@ const InvestmentDetails = () => {
 
   const getArmInvestment = async () => {
     setIsLoading(true);
-    const res = await getSingleArmInvestment(
-      investment?.membershipId,
-      investment?.productCode,
-    );
-    if (res?.error) {
-    } else {
-      setInvestmentDetail(res?.data?.getArmUserInvestment[0]);
-      setPortfolioDetail(res?.data?.portfolio[0]);
+    try {
+      const res = await getSingleArmInvestment(
+        investment?.membershipId,
+        investment?.productCode,
+      );
+      if (res?.error) {
+      } else {
+        if (res?.data.length !== 0) {
+          if (res?.data?.getArmUserInvestment[0]) {
+            setInvestmentDetail(res?.data?.getArmUserInvestment[0]);
+          }
+          if (res?.data?.portfolio[0]) {
+            setPortfolioDetail(res?.data?.portfolio[0]);
+          }
+        }
+      }
+      setIsLoading(false);
+    } catch (e) {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
   return (
     <SafeAreaView
@@ -135,7 +145,7 @@ const InvestmentDetails = () => {
 
           {name === 'Arm' && investment?.createdAt && (
             <View style={styles.detailsView}>
-              <Text style={styles.desc}>Investment Commencement Date</Text>
+              <Text style={styles.desc}>Commencement Date</Text>
               <Text style={styles.amount}>
                 {investment?.createdAt?.substr(0, 10)}
               </Text>
@@ -162,7 +172,7 @@ const InvestmentDetails = () => {
 
           {name === 'Lenda' && investment?.created_at && (
             <View style={styles.detailsView}>
-              <Text style={styles.desc}>Investment Commencement Date</Text>
+              <Text style={styles.desc}>Commencement Date</Text>
               <Text style={[styles.amount, {fontFamily: 'serif'}]}>
                 {investment?.created_at?.substr(0, 10)}
               </Text>

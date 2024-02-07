@@ -25,21 +25,23 @@ const Morescreen = () => {
   const insets = useSafeAreaInsets();
 
   const handleLogout = async () => {
-    const res = await userLogOut();
-    if (res?.error) {
-      Toast.show({
-        type: 'error',
-        position: 'top',
-        topOffset: 50,
-        text1: res?.title,
-        text2: res?.message,
-        visibilityTime: 3000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
-    } else {
-      await resetStore();
-    }
+    try {
+      const res = await userLogOut();
+      if (res?.error) {
+        Toast.show({
+          type: 'error',
+          position: 'top',
+          topOffset: 50,
+          text1: res?.title,
+          text2: res?.message,
+          visibilityTime: 3000,
+          autoHide: true,
+          onPress: () => Toast.hide(),
+        });
+      } else {
+        await resetStore();
+      }
+    } catch (e) {}
   };
 
   return (
@@ -109,7 +111,7 @@ const Morescreen = () => {
               </Text>
             </View>
             <View style={{alignItems: 'center'}}>
-          <Text
+              <Text
                 style={{
                   color: '#000',
                   fontSize: 14,
@@ -117,7 +119,7 @@ const Morescreen = () => {
                 }}>
                 V {appVersion}
               </Text>
-          </View>
+            </View>
           </View>
 
           <View>
@@ -160,7 +162,6 @@ const Morescreen = () => {
               style={{width: 83, height: 32}}
             />
           </View>
-
         </View>
       </ScrollView>
     </SafeAreaView>

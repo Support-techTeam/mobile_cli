@@ -29,11 +29,15 @@ const Personal = () => {
   }, []);
 
   const unSubProfileDetails = async () => {
-    const res = await getProfileDetails();
-    if (res?.error) {
+    try {
+      const res = await getProfileDetails();
+      if (res?.error) {
+        // TODO: handle error
+      } else {
+        setProfile(res?.data);
+      }
+    } catch (e) {
       // TODO: handle error
-    } else {
-      setProfile(res?.data);
     }
   };
   return (

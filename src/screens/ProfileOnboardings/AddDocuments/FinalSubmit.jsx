@@ -87,67 +87,75 @@ const FinalSubmit = ({route}) => {
   };
 
   const handleCreateDocs = async () => {
-    setIsUpdating(true);
-    const res = await createDocumentsDetails(formDetails);
-    if (res?.error) {
-      Toast.show({
-        type: 'error',
-        position: 'top',
-        topOffset: 50,
-        text1: res?.title,
-        text2: res?.message,
-        visibilityTime: 5000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
-    } else {
-      Toast.show({
-        type: 'success',
-        position: 'top',
-        topOffset: 50,
-        text1: res?.title,
-        text2: res?.message,
-        visibilityTime: 3000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
-      setTimeout(() => {
-        navigation.navigate('GetLoan');
-      }, 1000);
+    try {
+      setIsUpdating(true);
+      const res = await createDocumentsDetails(formDetails);
+      if (res?.error) {
+        Toast.show({
+          type: 'error',
+          position: 'top',
+          topOffset: 50,
+          text1: res?.title,
+          text2: res?.message,
+          visibilityTime: 5000,
+          autoHide: true,
+          onPress: () => Toast.hide(),
+        });
+      } else {
+        Toast.show({
+          type: 'success',
+          position: 'top',
+          topOffset: 50,
+          text1: res?.title,
+          text2: res?.message,
+          visibilityTime: 3000,
+          autoHide: true,
+          onPress: () => Toast.hide(),
+        });
+        setTimeout(() => {
+          navigation.navigate('GetLoan');
+        }, 1000);
+      }
+      setIsUpdating(false);
+    } catch (e) {
+      setIsUpdating(false);
     }
-    setIsUpdating(false);
   };
 
   const handleUpdateDocs = async () => {
-    setIsUpdating(true);
-    const res = await updateDocumentsDetails(formDetails);
-    if (res?.error) {
-      Toast.show({
-        type: 'error',
-        position: 'top',
-        topOffset: 50,
-        text1: res?.title,
-        text2: res?.message,
-        visibilityTime: 5000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
-    } else {
-      Toast.show({
-        type: 'success',
-        position: 'top',
-        topOffset: 50,
-        text1: res?.title,
-        text2: res?.message,
-        visibilityTime: 3000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
-      setTimeout(() => {
-        navigation.navigate('MyAccount');
-      }, 1000);
+    try {
+      setIsUpdating(true);
+      const res = await updateDocumentsDetails(formDetails);
+      if (res?.error) {
+        Toast.show({
+          type: 'error',
+          position: 'top',
+          topOffset: 50,
+          text1: res?.title,
+          text2: res?.message,
+          visibilityTime: 5000,
+          autoHide: true,
+          onPress: () => Toast.hide(),
+        });
+      } else {
+        Toast.show({
+          type: 'success',
+          position: 'top',
+          topOffset: 50,
+          text1: res?.title,
+          text2: res?.message,
+          visibilityTime: 3000,
+          autoHide: true,
+          onPress: () => Toast.hide(),
+        });
+        setTimeout(() => {
+          navigation.navigate('MyAccount');
+        }, 1000);
+      }
+      setIsUpdating(false);
+    } catch (e) {
+      setIsUpdating(false);
     }
-    setIsUpdating(false);
   };
 
   return (
