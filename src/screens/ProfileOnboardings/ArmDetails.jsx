@@ -63,14 +63,18 @@ const ArmDetails = () => {
   }, []);
 
   const unSubArmDetails = async () => {
-    setIsLoading(true);
-    const res = await getLoanUserDetails();
-    if (res?.error) {
-      // TODO: handle error
-    } else {
-      setArmDeets(res?.data?.armUserBankDetails);
+    try {
+      setIsLoading(true);
+      const res = await getLoanUserDetails();
+      if (res?.error) {
+        // TODO: handle error
+      } else {
+        setArmDeets(res?.data?.armUserBankDetails);
+      }
+      setIsLoading(false);
+    } catch (e) {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   const [armDetails, setArmDetails] = useState({
@@ -141,39 +145,43 @@ const ArmDetails = () => {
     !armDetails?.utilityBillIdType;
 
   const handleCreateArmDetails = async () => {
-    setIsUpdating(true);
-    const res = await createArmDetails(armDetails);
-    if (res?.error) {
-      Toast.show({
-        type: 'error',
-        position: 'top',
-        topOffset: 50,
-        text1: res?.title,
-        text2: res?.message,
-        visibilityTime: 5000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
-    } else {
-      Toast.show({
-        type: 'success',
-        position: 'top',
-        topOffset: 50,
-        text1: res?.title,
-        text2: res?.message,
-        visibilityTime: 3000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
-      setTimeout(() => {
-        if (previousRoute !== 'MyAccount') {
-          navigation.navigate('ValidIdentity');
-        } else {
-          navigation.navigate('MyAccount');
-        }
-      }, 1000);
+    try {
+      setIsUpdating(true);
+      const res = await createArmDetails(armDetails);
+      if (res?.error) {
+        Toast.show({
+          type: 'error',
+          position: 'top',
+          topOffset: 50,
+          text1: res?.title,
+          text2: res?.message,
+          visibilityTime: 5000,
+          autoHide: true,
+          onPress: () => Toast.hide(),
+        });
+      } else {
+        Toast.show({
+          type: 'success',
+          position: 'top',
+          topOffset: 50,
+          text1: res?.title,
+          text2: res?.message,
+          visibilityTime: 3000,
+          autoHide: true,
+          onPress: () => Toast.hide(),
+        });
+        setTimeout(() => {
+          if (previousRoute !== 'MyAccount') {
+            navigation.navigate('ValidIdentity');
+          } else {
+            navigation.navigate('MyAccount');
+          }
+        }, 1000);
+      }
+      setIsUpdating(false);
+    } catch (e) {
+      setIsUpdating(false);
     }
-    setIsUpdating(false);
   };
 
   const showDatePicker = () => {

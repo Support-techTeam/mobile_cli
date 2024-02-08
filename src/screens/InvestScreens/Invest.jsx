@@ -45,8 +45,7 @@ const Investscreen = () => {
     allArmData &&
     allArmData?.reduce(
       (accumulator, currentValue) =>
-        accumulator +
-        (currentValue.investmentAmount),
+        accumulator + currentValue.investmentAmount,
       0,
     );
 
@@ -82,43 +81,55 @@ const Investscreen = () => {
   }, [allArmData, allILendaData]);
 
   const getLoanuserData = async () => {
-    setIsLoading(true);
-    const res = await getLoanUserDetails();
-    if (res?.error) {
-    } else {
-      setLoanUserDetails(res?.data);
+    try {
+      setIsLoading(true);
+      const res = await getLoanUserDetails();
+      if (res?.error) {
+      } else {
+        setLoanUserDetails(res?.data);
+      }
+      setIsLoading(false);
+    } catch (e) {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   const getAllLendaInvestments = async () => {
-    setIsLoading(true);
-    const res = await getAllLendaInvestment();
-    if (res?.error) {
-    } else {
-      setAllLendaData(res?.data);
+    try {
+      setIsLoading(true);
+      const res = await getAllLendaInvestment();
+      if (res?.error) {
+      } else {
+        setAllLendaData(res?.data);
+      }
+      setIsLoading(false);
+    } catch (e) {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   const getAllArmInvestments = async () => {
-    setIsLoading(true);
-    const res = await getAllArmInvestment();
-    if (res?.error) {
-    } else {
-      setAllArmData(res?.data?.data);
-      getSingleArmInvestment(
-        res?.data?.data[0]?.membershipId,
-        res?.data?.data[0]?.productCode,
-      ).then(res => {
-        if (!res?.error) {
-          if (res?.data?.length > 0){
-            setPortfolioDetail(res?.data?.portfolio[0]?.accountBalance);
+    try {
+      setIsLoading(true);
+      const res = await getAllArmInvestment();
+      if (res?.error) {
+      } else {
+        setAllArmData(res?.data?.data);
+        getSingleArmInvestment(
+          res?.data?.data[0]?.membershipId,
+          res?.data?.data[0]?.productCode,
+        ).then(res => {
+          if (!res?.error) {
+            if (res?.data?.length > 0) {
+              setPortfolioDetail(res?.data?.portfolio[0]?.accountBalance);
+            }
           }
-        }
-      });
+        });
+      }
+      setIsLoading(false);
+    } catch (e) {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
   const isReadyToInvest =
     loanUserDetails?.armUserBankDetails &&
@@ -182,10 +193,10 @@ const Investscreen = () => {
               totalLendaAmount === 0
                 ? '0.00'
                 : new Intl.NumberFormat('en-US', {
-                  style: 'decimal',
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2
-                }).format(Number(totalLendaAmount))
+                    style: 'decimal',
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  }).format(Number(totalLendaAmount))
             }`
       }`,
       icon: require('../../../assets/images/lenda.png'),
@@ -199,16 +210,16 @@ const Investscreen = () => {
       amount: `₦${
         portfolioDetail !== 0
           ? new Intl.NumberFormat('en-US', {
-            style: 'decimal',
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2
-          }).format(Number(portfolioDetail))
+              style: 'decimal',
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            }).format(Number(portfolioDetail))
           : totalArmAmount !== undefined
           ? new Intl.NumberFormat('en-US', {
-            style: 'decimal',
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2
-          }).format(Number(totalArmAmount))
+              style: 'decimal',
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            }).format(Number(totalArmAmount))
           : '0.00'
       }`,
       icon: require('../../../assets/images/arm.png'),
@@ -391,7 +402,11 @@ const Investscreen = () => {
                   }}>
                   <View style={{marginTop: 0}}>
                     <TouchableOpacity
-                    disabled={investment?.productCode && investment?.membershipId ? false : true}
+                      disabled={
+                        investment?.productCode && investment?.membershipId
+                          ? false
+                          : true
+                      }
                       onPress={() =>
                         navigation.navigate('InvestmentDetails', {
                           paramKey: {
@@ -456,9 +471,13 @@ const Investscreen = () => {
                             }}>
                             <Text style={styles.desc}>
                               {investment?.investmentType && 'Trade Lenda'}
-                              {investment?.productCode && !investment?.membershipId && "Processing "}
+                              {investment?.productCode &&
+                                !investment?.membershipId &&
+                                'Processing '}
                               {investment?.productCode && 'ARM'}
-                              {investment?.productCode && !investment?.membershipId && " Investment... "}
+                              {investment?.productCode &&
+                                !investment?.membershipId &&
+                                ' Investment... '}
                             </Text>
                             <View style={{flexDirection: 'row'}}>
                               <Text style={[styles.desc]}>

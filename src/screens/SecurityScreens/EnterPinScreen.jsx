@@ -36,59 +36,65 @@ const EnterPin = ({toggleVisibility}) => {
   }, []);
 
   const checkIfPinIsSet = async () => {
-    const res = await getAllPin();
-    if (res?.data?.length > 0) {
-      setHasPin(true);
-    } else if (res?.data == null) {
-      toggleVisibility();
-      setHasPin(false);
-    } else {
-      toggleVisibility();
-      setHasPin(false);
-    }
+    try {
+      const res = await getAllPin();
+      if (res?.data?.length > 0) {
+        setHasPin(true);
+      } else if (res?.data == null) {
+        toggleVisibility();
+        setHasPin(false);
+      } else {
+        toggleVisibility();
+        setHasPin(false);
+      }
+    } catch (e) {}
   };
 
   const handleValidatePin = async () => {
-    if (pinDetails.currentPin !== '') {
-      setIsLoading(true);
-      const res = await validatePin(pinDetails.currentPin.toString());
-      if (res?.error) {
+    try {
+      if (pinDetails.currentPin !== '') {
+        setIsLoading(true);
+        const res = await validatePin(pinDetails.currentPin.toString());
+        if (res?.error) {
+          Toast.show({
+            type: 'error',
+            position: 'top',
+            topOffset: 50,
+            text1: res?.title,
+            text2: res?.message,
+            visibilityTime: 5000,
+            autoHide: true,
+            onPress: () => Toast.hide(),
+          });
+        } else {
+          Toast.show({
+            type: 'success',
+            position: 'top',
+            topOffset: 50,
+            text1: res?.title,
+            text2: res?.message,
+            visibilityTime: 3000,
+            autoHide: true,
+            onPress: () => Toast.hide(),
+          });
+          toggleVisibility();
+        }
+
+        setIsLoading(false);
+      } else {
         Toast.show({
           type: 'error',
           position: 'top',
           topOffset: 50,
-          text1: res?.title,
-          text2: res?.message,
+          text1: 'Check Pin',
+          text2: 'Pin can not be empty!',
           visibilityTime: 5000,
           autoHide: true,
           onPress: () => Toast.hide(),
         });
-      } else {
-        Toast.show({
-          type: 'success',
-          position: 'top',
-          topOffset: 50,
-          text1: res?.title,
-          text2: res?.message,
-          visibilityTime: 3000,
-          autoHide: true,
-          onPress: () => Toast.hide(),
-        });
-        toggleVisibility();
       }
-
+    } catch (e) {
       setIsLoading(false);
-    } else {
-      Toast.show({
-        type: 'error',
-        position: 'top',
-        topOffset: 50,
-        text1: 'Check Pin',
-        text2: 'Pin can not be empty!',
-        visibilityTime: 5000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
     }
   };
 

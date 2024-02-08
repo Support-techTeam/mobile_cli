@@ -54,10 +54,12 @@ const InvestmentRedemption = () => {
     amount: '',
     otp: '',
     reason: '',
-    investmentAmount: investment?.investmentAmount.toString(),
-    productCode: investment?.productCode,
-    membershipId: investment?.membershipId,
-    investmentId: portfolio?.investmentId,
+    investmentAmount: investment?.investmentAmount
+      ? investment?.investmentAmount?.toString()
+      : '0.00',
+    productCode: investment?.productCode ? investment?.productCode : '',
+    membershipId: investment?.membershipId ? investment?.membershipId : '',
+    investmentId: portfolio?.investmentId ? portfolio?.investmentId : '',
   });
 
   const disableit =
@@ -75,133 +77,149 @@ const InvestmentRedemption = () => {
     armDetails.otp.length < 5;
 
   const handleGetArmOtp = async () => {
-    setIsLoading(true);
-    const res = await getArmOTP(armDetails?.membershipId);
+    try {
+      setIsLoading(true);
+      const res = await getArmOTP(armDetails?.membershipId);
 
-    if (res?.error) {
-      Toast.show({
-        type: 'error',
-        position: 'top',
-        topOffset: 50,
-        text1: res?.title,
-        text2: res?.message,
-        visibilityTime: 5000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
-    } else {
-      Toast.show({
-        type: 'success',
-        position: 'top',
-        topOffset: 50,
-        text1: res?.title,
-        text2: res?.message,
-        visibilityTime: 3000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
+      if (res?.error) {
+        Toast.show({
+          type: 'error',
+          position: 'top',
+          topOffset: 50,
+          text1: res?.title,
+          text2: res?.message,
+          visibilityTime: 5000,
+          autoHide: true,
+          onPress: () => Toast.hide(),
+        });
+      } else {
+        Toast.show({
+          type: 'success',
+          position: 'top',
+          topOffset: 50,
+          text1: res?.title,
+          text2: res?.message,
+          visibilityTime: 3000,
+          autoHide: true,
+          onPress: () => Toast.hide(),
+        });
+      }
+      setIsLoading(false);
+    } catch (e) {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
   const handleArmInvestmentRedemption = async () => {
-    setIsLoading(true);
-    const res = await redeemArmInvestment(armDetails);
-    if (res?.error) {
-      Toast.show({
-        type: 'error',
-        position: 'top',
-        topOffset: 50,
-        text1: res?.title,
-        text2: res?.message,
-        visibilityTime: 5000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
-    } else {
-      Toast.show({
-        type: 'success',
-        position: 'top',
-        topOffset: 50,
-        text1: res?.title,
-        text2: res?.message,
-        visibilityTime: 3000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
-      setTimeout(() => {
-        navigation.navigate('Invest');
-      }, 1000);
+    try {
+      setIsLoading(true);
+      const res = await redeemArmInvestment(armDetails);
+      if (res?.error) {
+        Toast.show({
+          type: 'error',
+          position: 'top',
+          topOffset: 50,
+          text1: res?.title,
+          text2: res?.message,
+          visibilityTime: 5000,
+          autoHide: true,
+          onPress: () => Toast.hide(),
+        });
+      } else {
+        Toast.show({
+          type: 'success',
+          position: 'top',
+          topOffset: 50,
+          text1: res?.title,
+          text2: res?.message,
+          visibilityTime: 3000,
+          autoHide: true,
+          onPress: () => Toast.hide(),
+        });
+        setTimeout(() => {
+          navigation.navigate('Invest');
+        }, 1000);
+      }
+      setIsLoading(false);
+    } catch (e) {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   const handleGetLendaOtp = async () => {
-    const param = {
-      id: investment._id,
-    };
-    setIsLoading(true);
-    const res = await getLendaOTP(param);
+    try {
+      const param = {
+        id: investment._id,
+      };
+      setIsLoading(true);
+      const res = await getLendaOTP(param);
 
-    if (res?.error) {
-      Toast.show({
-        type: 'error',
-        position: 'top',
-        topOffset: 50,
-        text1: res?.title,
-        text2: res?.message,
-        visibilityTime: 5000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
-    } else {
-      Toast.show({
-        type: 'success',
-        position: 'top',
-        topOffset: 50,
-        text1: res?.title,
-        text2: res?.message,
-        visibilityTime: 3000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
+      if (res?.error) {
+        Toast.show({
+          type: 'error',
+          position: 'top',
+          topOffset: 50,
+          text1: res?.title,
+          text2: res?.message,
+          visibilityTime: 5000,
+          autoHide: true,
+          onPress: () => Toast.hide(),
+        });
+      } else {
+        Toast.show({
+          type: 'success',
+          position: 'top',
+          topOffset: 50,
+          text1: res?.title,
+          text2: res?.message,
+          visibilityTime: 3000,
+          autoHide: true,
+          onPress: () => Toast.hide(),
+        });
+      }
+      setIsLoading(false);
+    } catch (e) {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   const handleLendaInvestmentRedemption = async () => {
-    const redemptionParams = {
-      id: investmentDetails?.id,
-      otp: investmentDetails?.otp?.toString(),
-    };
-    setIsLoading(true);
-    const res = await redeemLendaInvestment(redemptionParams);
-    if (res?.error) {
-      Toast.show({
-        type: 'error',
-        position: 'top',
-        topOffset: 50,
-        text1: res?.title,
-        text2: res?.message,
-        visibilityTime: 5000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
-    } else {
-      Toast.show({
-        type: 'success',
-        position: 'top',
-        topOffset: 50,
-        text1: res?.title,
-        text2: res?.message,
-        visibilityTime: 3000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
-      setTimeout(() => {
-        navigation.navigate('Invest');
-      }, 1000);
+    try {
+      const redemptionParams = {
+        id: investmentDetails?.id,
+        otp: investmentDetails?.otp?.toString(),
+      };
+      setIsLoading(true);
+      const res = await redeemLendaInvestment(redemptionParams);
+      if (res?.error) {
+        Toast.show({
+          type: 'error',
+          position: 'top',
+          topOffset: 50,
+          text1: res?.title,
+          text2: res?.message,
+          visibilityTime: 5000,
+          autoHide: true,
+          onPress: () => Toast.hide(),
+        });
+      } else {
+        Toast.show({
+          type: 'success',
+          position: 'top',
+          topOffset: 50,
+          text1: res?.title,
+          text2: res?.message,
+          visibilityTime: 3000,
+          autoHide: true,
+          onPress: () => Toast.hide(),
+        });
+        setTimeout(() => {
+          navigation.navigate('Invest');
+        }, 1000);
+      }
+      setIsLoading(false);
+    } catch (e) {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   return (
@@ -279,8 +297,12 @@ const InvestmentRedemption = () => {
                 isInvestment={true}
                 isBalance={
                   portfolio?.accountBalance
-                    ?.toString()
-                    ?.replace(/\B(?=(\d{3})+\b)/g, ',') ?? '0.00'
+                    ? new Intl.NumberFormat('en-US', {
+                        style: 'decimal',
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      }).format(Number(portfolio.accountBalance))
+                    : '0.00'
                 }
               />
 

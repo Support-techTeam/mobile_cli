@@ -271,17 +271,23 @@ const InvestmentOptionScreen = () => {
                           {name === 'Arm' ? (
                             `${
                               item?.minimumInvestmentAmount
-                                ? item?.minimumInvestmentAmount
-                                    .toString()
-                                    .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+                                ? new Intl.NumberFormat('en-US', {
+                                    style: 'decimal',
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2,
+                                  }).format(
+                                    Number(item.minimumInvestmentAmount),
+                                  )
                                 : '0.00'
                             }`
                           ) : (
                             <>
                               {item?.amountRange?.minAmount
-                                ? item?.amountRange?.minAmount
-                                    .toString()
-                                    .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+                                ? new Intl.NumberFormat('en-US', {
+                                    style: 'decimal',
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2,
+                                  }).format(Number(item.amountRange.minAmount))
                                 : '0.00'}
                             </>
                           )}
@@ -295,9 +301,11 @@ const InvestmentOptionScreen = () => {
                             }}>
                             ₦
                             {item?.amountRange?.maxAmount
-                              ? item?.amountRange?.maxAmount
-                                  .toString()
-                                  .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+                              ? new Intl.NumberFormat('en-US', {
+                                  style: 'decimal',
+                                  minimumFractionDigits: 2,
+                                  maximumFractionDigits: 2,
+                                }).format(Number(item.amountRange.maxAmount))
                               : '0.00'}
                           </Text>
                         )}

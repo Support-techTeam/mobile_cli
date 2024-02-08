@@ -143,14 +143,18 @@ const Others = () => {
   }, []);
 
   const unSubBusinessDetails = async () => {
-    setIsUpdating(true);
-    const res = await getLoanUserDetails();
-    if (res?.error) {
-      // TODO: handle error
-    } else {
-      setOrgDetails(res?.data?.loanDocumentDetails);
+    try {
+      setIsUpdating(true);
+      const res = await getLoanUserDetails();
+      if (res?.error) {
+        // TODO: handle error
+      } else {
+        setOrgDetails(res?.data?.loanDocumentDetails);
+      }
+      setIsUpdating(false);
+    } catch (e) {
+      setIsUpdating(false);
     }
-    setIsUpdating(false);
   };
   const disableit = !userDocs.othersName || !selectedDocument;
 
@@ -245,117 +249,129 @@ const Others = () => {
   }, []);
 
   const handleCreateDocs = async () => {
-    setIsUpdating(true);
-    const res = await createDocumentsDetails(formDetails);
-    if (res?.error) {
-      Toast.show({
-        type: 'error',
-        position: 'top',
-        topOffset: 50,
-        text1: res?.title,
-        text2: res?.message,
-        visibilityTime: 5000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
-    } else {
-      Toast.show({
-        type: 'success',
-        position: 'top',
-        topOffset: 50,
-        text1: res?.title,
-        text2: res?.message,
-        visibilityTime: 3000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
-      setTimeout(() => {
-        navigation.navigate('SubmitDocs', {
-          paramKey: {
-            ...paramKey,
-            [document]: newUrl,
-          },
+    try {
+      setIsUpdating(true);
+      const res = await createDocumentsDetails(formDetails);
+      if (res?.error) {
+        Toast.show({
+          type: 'error',
+          position: 'top',
+          topOffset: 50,
+          text1: res?.title,
+          text2: res?.message,
+          visibilityTime: 5000,
+          autoHide: true,
+          onPress: () => Toast.hide(),
         });
-      }, 500);
+      } else {
+        Toast.show({
+          type: 'success',
+          position: 'top',
+          topOffset: 50,
+          text1: res?.title,
+          text2: res?.message,
+          visibilityTime: 3000,
+          autoHide: true,
+          onPress: () => Toast.hide(),
+        });
+        setTimeout(() => {
+          navigation.navigate('SubmitDocs', {
+            paramKey: {
+              ...paramKey,
+              [document]: newUrl,
+            },
+          });
+        }, 500);
+      }
+      setIsUpdating(false);
+    } catch (e) {
+      setIsUpdating(false);
     }
-    setIsUpdating(false);
   };
 
   const handleUpdateDocs = async () => {
-    setIsUpdating(true);
-    const res = await updateDocumentsDetails(formDetails);
-    if (res?.error) {
-      Toast.show({
-        type: 'error',
-        position: 'top',
-        topOffset: 50,
-        text1: res?.title,
-        text2: res?.message,
-        visibilityTime: 5000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
-    } else {
-      Toast.show({
-        type: 'success',
-        position: 'top',
-        topOffset: 50,
-        text1: res?.title,
-        text2: res?.message,
-        visibilityTime: 3000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
-      setTimeout(() => {
-        navigation.navigate('SubmitDocs', {
-          paramKey: {
-            ...formDetails,
-          },
+    try {
+      setIsUpdating(true);
+      const res = await updateDocumentsDetails(formDetails);
+      if (res?.error) {
+        Toast.show({
+          type: 'error',
+          position: 'top',
+          topOffset: 50,
+          text1: res?.title,
+          text2: res?.message,
+          visibilityTime: 5000,
+          autoHide: true,
+          onPress: () => Toast.hide(),
         });
-      }, 500);
+      } else {
+        Toast.show({
+          type: 'success',
+          position: 'top',
+          topOffset: 50,
+          text1: res?.title,
+          text2: res?.message,
+          visibilityTime: 3000,
+          autoHide: true,
+          onPress: () => Toast.hide(),
+        });
+        setTimeout(() => {
+          navigation.navigate('SubmitDocs', {
+            paramKey: {
+              ...formDetails,
+            },
+          });
+        }, 500);
+      }
+      setIsUpdating(false);
+    } catch (e) {
+      setIsUpdating(false);
     }
-    setIsUpdating(false);
   };
 
   const s3UploadFunction = async () => {
-    setIsUpdating(true);
-    const res = await createUploadDocument(fileUri, 'signature');
-    if (res?.error) {
-      Toast.show({
-        type: 'error',
-        position: 'top',
-        topOffset: 50,
-        text1: res?.title,
-        text2: res?.message,
-        visibilityTime: 5000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
-    } else {
-      Toast.show({
-        type: 'success',
-        position: 'top',
-        topOffset: 50,
-        text1: res?.title,
-        text2: res?.message,
-        visibilityTime: 3000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
-      setUserDocs(deetss => {
-        formDetails = {
-          ...deetss,
-          others: `${res?.data?.data?.url}`,
-        };
-        return {
-          ...deetss,
-          others: `${res?.data?.data?.url}`,
-        };
-      });
+    try {
+      setIsUpdating(true);
+      const res = await createUploadDocument(fileUri, 'signature');
+      if (res?.error) {
+        Toast.show({
+          type: 'error',
+          position: 'top',
+          topOffset: 50,
+          text1: res?.title,
+          text2: res?.message,
+          visibilityTime: 5000,
+          autoHide: true,
+          onPress: () => Toast.hide(),
+        });
+      } else {
+        Toast.show({
+          type: 'success',
+          position: 'top',
+          topOffset: 50,
+          text1: res?.title,
+          text2: res?.message,
+          visibilityTime: 3000,
+          autoHide: true,
+          onPress: () => Toast.hide(),
+        });
+        setUserDocs(deetss => {
+          formDetails = {
+            ...deetss,
+            others: `${res?.data?.data?.url}`,
+          };
+          return {
+            ...deetss,
+            others: `${res?.data?.data?.url}`,
+          };
+        });
 
-      userDocs?.validIdentificationType === undefined
-        ? handleCreateDocs()
-        : handleUpdateDocs();
+        userDocs?.validIdentificationType === undefined
+          ? handleCreateDocs()
+          : handleUpdateDocs();
+      }
+    } catch (e) {
+      setIsUpdating(false);
     }
     // setIsUpdating(false);
   };

@@ -67,14 +67,16 @@ const BankDetails = () => {
   }, []);
 
   const unSubBankDetails = async () => {
-    setIsLoading(true);
-    const res = await getLoanUserDetails();
-    if (res?.error) {
-      // TODO: handle error
-    } else {
-      setBankDeets(res?.data?.bankDetails);
-    }
-    setIsLoading(false);
+    try {
+      setIsLoading(true);
+      const res = await getLoanUserDetails();
+      if (res?.error) {
+        // TODO: handle error
+      } else {
+        setBankDeets(res?.data?.bankDetails);
+      }
+      setIsLoading(false);
+    } catch (e) {}
   };
 
   const [bankDetails, setBankDetails] = useState({
@@ -89,8 +91,7 @@ const BankDetails = () => {
 
   useEffect(() => {
     setBankDetails({
-      email:
-        bankDeets && bankDeets?.email === undefined ? '' : '',
+      email: bankDeets && bankDeets?.email === undefined ? '' : '',
       bankName:
         bankDeets && bankDeets?.bankName === undefined
           ? ''
@@ -153,75 +154,83 @@ const BankDetails = () => {
   };
 
   const handleCreateBankDetails = async () => {
-    setIsUpdating(true);
-    const res = await createBankDetails(bankDetails);
-    if (res?.error) {
-      Toast.show({
-        type: 'error',
-        position: 'top',
-        topOffset: 50,
-        text1: res?.title,
-        text2: res?.message,
-        visibilityTime: 5000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
-    } else {
-      Toast.show({
-        type: 'success',
-        position: 'top',
-        topOffset: 50,
-        text1: res?.title,
-        text2: res?.message,
-        visibilityTime: 3000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
-      setTimeout(() => {
-        if (previousRoute !== 'MyAccount') {
-          navigation.navigate('ValidIndentity');
-        } else {
-          navigation.navigate('MyAccount');
-        }
-      }, 1000);
+    try {
+      setIsUpdating(true);
+      const res = await createBankDetails(bankDetails);
+      if (res?.error) {
+        Toast.show({
+          type: 'error',
+          position: 'top',
+          topOffset: 50,
+          text1: res?.title,
+          text2: res?.message,
+          visibilityTime: 5000,
+          autoHide: true,
+          onPress: () => Toast.hide(),
+        });
+      } else {
+        Toast.show({
+          type: 'success',
+          position: 'top',
+          topOffset: 50,
+          text1: res?.title,
+          text2: res?.message,
+          visibilityTime: 3000,
+          autoHide: true,
+          onPress: () => Toast.hide(),
+        });
+        setTimeout(() => {
+          if (previousRoute !== 'MyAccount') {
+            navigation.navigate('ValidIndentity');
+          } else {
+            navigation.navigate('MyAccount');
+          }
+        }, 1000);
+      }
+      setIsUpdating(false);
+    } catch (e) {
+      setIsUpdating(false);
     }
-    setIsUpdating(false);
   };
 
   const handleUpdateBankDetails = async () => {
-    setIsUpdating(true);
-    const res = await updateBankDetails(bankDetails);
-    if (res?.error) {
-      Toast.show({
-        type: 'error',
-        position: 'top',
-        topOffset: 50,
-        text1: res?.title,
-        text2: res?.message,
-        visibilityTime: 5000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
-    } else {
-      Toast.show({
-        type: 'success',
-        position: 'top',
-        topOffset: 50,
-        text1: res?.title,
-        text2: res?.message,
-        visibilityTime: 3000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
-      setTimeout(() => {
-        if (previousRoute !== 'MyAccount') {
-          navigation.navigate('ValidIdentity');
-        } else {
-          navigation.navigate('MyAccount');
-        }
-      }, 1000);
+    try {
+      setIsUpdating(true);
+      const res = await updateBankDetails(bankDetails);
+      if (res?.error) {
+        Toast.show({
+          type: 'error',
+          position: 'top',
+          topOffset: 50,
+          text1: res?.title,
+          text2: res?.message,
+          visibilityTime: 5000,
+          autoHide: true,
+          onPress: () => Toast.hide(),
+        });
+      } else {
+        Toast.show({
+          type: 'success',
+          position: 'top',
+          topOffset: 50,
+          text1: res?.title,
+          text2: res?.message,
+          visibilityTime: 3000,
+          autoHide: true,
+          onPress: () => Toast.hide(),
+        });
+        setTimeout(() => {
+          if (previousRoute !== 'MyAccount') {
+            navigation.navigate('ValidIdentity');
+          } else {
+            navigation.navigate('MyAccount');
+          }
+        }, 1000);
+      }
+      setIsUpdating(false);
+    } catch (e) {
+      setIsUpdating(false);
     }
-    setIsUpdating(false);
   };
 
   useEffect(() => {
@@ -229,27 +238,29 @@ const BankDetails = () => {
   }, []);
 
   const handleGetAllBanks = async () => {
-    const res = await getAllBankDetails();
-    if (res?.error) {
-      Toast.show({
-        type: 'error',
-        position: 'top',
-        topOffset: 50,
-        text1: res?.title,
-        text2: res?.data?.message,
-        visibilityTime: 5000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
-    } else {
-      const bankData = res?.data?.map((banks, i) => {
-        return {value: banks?.bankName, label: banks?.bankName, key: i};
-      });
+    try {
+      const res = await getAllBankDetails();
+      if (res?.error) {
+        Toast.show({
+          type: 'error',
+          position: 'top',
+          topOffset: 50,
+          text1: res?.title,
+          text2: res?.data?.message,
+          visibilityTime: 5000,
+          autoHide: true,
+          onPress: () => Toast.hide(),
+        });
+      } else {
+        const bankData = res?.data?.map((banks, i) => {
+          return {value: banks?.bankName, label: banks?.bankName, key: i};
+        });
 
-      if (currentBanks == undefined || currentBanks == '') {
-        setCurrentBanks(bankData);
+        if (currentBanks == undefined || currentBanks == '') {
+          setCurrentBanks(bankData);
+        }
       }
-    }
+    } catch (e) {}
   };
 
   return (
@@ -317,31 +328,31 @@ const BankDetails = () => {
         </Text>
       </View>
       <KeyboardAvoidingWrapper>
-      <ImageBackground
-        source={require('../../../assets/signup.png')}
-        resizeMode="cover"
-        style={styles.image}>
-        <ScrollView
-          bounces={false}
-          showsHorizontalScrollIndicator={false}
-          showsVerticalScrollIndicator={false}
-          style={{
-            paddingHorizontal: 10,
-            marginTop: 10,
-            marginBottom: insets.top + 60,
-          }}>
-          <View
+        <ImageBackground
+          source={require('../../../assets/signup.png')}
+          resizeMode="cover"
+          style={styles.image}>
+          <ScrollView
+            bounces={false}
+            showsHorizontalScrollIndicator={false}
+            showsVerticalScrollIndicator={false}
             style={{
-              paddingTop: 25,
-              backgroundColor: '#FFFFFF',
-              borderRadius: 15,
-              paddingHorizontal: 15,
-              paddingVertical: 15,
-              opacity: 0.86,
-              borderColor: '#D9DBE9',
-              borderWidth: 2,
+              paddingHorizontal: 10,
+              marginTop: 10,
+              marginBottom: insets.top + 60,
             }}>
-            {/* <Input
+            <View
+              style={{
+                paddingTop: 25,
+                backgroundColor: '#FFFFFF',
+                borderRadius: 15,
+                paddingHorizontal: 15,
+                paddingVertical: 15,
+                opacity: 0.86,
+                borderColor: '#D9DBE9',
+                borderWidth: 2,
+              }}>
+              {/* <Input
               iconName="email-outline"
               label="Email"
               placeholder="Enter email"
@@ -351,118 +362,118 @@ const BankDetails = () => {
               isNeeded={true}
               autoCapitalize="none"
             /> */}
-            <View style={{marginVertical: 10}}>
-              <CustomDropdown
-                label="Bank Name"
-                isNeeded={true}
-                iconName="bank-outline"
-                placeholder="Select Bank"
-                placeholderStyle={styles.placeholderStyle}
-                selectedTextStyle={styles.selectedTextStyle}
-                inputSearchStyle={styles.inputSearchStyle}
-                search
-                data={currentBanks ? currentBanks : defaultData}
-                maxHeight={300}
-                labelField="label"
-                valueField="value"
-                value={bankDetails?.receiverBankName}
-                onChange={text => onBankNameChange(text.value)}
-              />
-            </View>
-            <Input
-              label="Bank account name"
-              placeholder="Enter account name"
-              defaultValue={bankDetails?.bankAccountName}
-              onChangeText={text => onBankAccountNameChange(text)}
-              isNeeded={true}
-            />
-            <Input
-              label="Bank account number"
-              placeholder="Enter account number"
-              keyboardType="numeric"
-              defaultValue={bankDetails?.bankAccountNumber}
-              onChangeText={text => onBankAccountNumberChange(text)}
-              isNeeded={true}
-            />
-
-            <View style={{marginVertical: 10}}>
-              <CustomDropdown
-                label="Do you use online banking?"
-                isNeeded={true}
-                placeholder="Select Option"
-                placeholderStyle={styles.placeholderStyle}
-                selectedTextStyle={styles.selectedTextStyle}
-                inputSearchStyle={styles.inputSearchStyle}
-                data={onlinebankData}
-                maxHeight={300}
-                labelField="label"
-                valueField="value"
-                value={bankDetails?.hasOnlineBanking}
-                onChange={text =>
-                  setBankDetails({
-                    ...bankDetails,
-                    hasOnlineBanking:
-                      text.value === false
-                        ? Toast.show({
-                            type: 'error',
-                            position: 'top',
-                            topOffset: 50,
-                            text1: 'Online Banking',
-                            text2:
-                              'Please open a mobile application with your bank to continue with this process!',
-                            visibilityTime: 5000,
-                            autoHide: true,
-                            onPress: () => Toast.hide(),
-                          })
-                        : true,
-                  })
-                }
-              />
-            </View>
-            <View style={{marginVertical: 10}}>
-              <CustomDropdown
-                label="Have you taken a loan in the past 12months?"
-                isNeeded={true}
-                placeholder="Select Option"
-                placeholderStyle={styles.placeholderStyle}
-                selectedTextStyle={styles.selectedTextStyle}
-                inputSearchStyle={styles.inputSearchStyle}
-                data={onlinebankData}
-                maxHeight={300}
-                labelField="label"
-                valueField="value"
-                value={bankDetails?.wasLoanTakenWithinTheLast12Months}
-                onChange={text =>
-                  setBankDetails({
-                    ...bankDetails,
-                    wasLoanTakenWithinTheLast12Months: text.value,
-                  })
-                }
-              />
-            </View>
-            <Input
-              label="If yes, how much?"
-              keyboardType="numeric"
-              placeholder="Enter loan amount"
-              defaultValue={bankDetails?.loanAmount}
-              onChangeText={text =>
-                setBankDetails({...bankDetails, loanAmount: text})
-              }
-            />
-            <TouchableOpacity
-              onPress={
-                bankDeets?.email === undefined
-                  ? handleCreateBankDetails
-                  : handleUpdateBankDetails
-              }
-              disabled={disableit}>
-              <View style={{marginBottom: 40, marginTop: 20}}>
-                <Buttons label="Save & Continue" disabled={disableit} />
+              <View style={{marginVertical: 10}}>
+                <CustomDropdown
+                  label="Bank Name"
+                  isNeeded={true}
+                  iconName="bank-outline"
+                  placeholder="Select Bank"
+                  placeholderStyle={styles.placeholderStyle}
+                  selectedTextStyle={styles.selectedTextStyle}
+                  inputSearchStyle={styles.inputSearchStyle}
+                  search
+                  data={currentBanks ? currentBanks : defaultData}
+                  maxHeight={300}
+                  labelField="label"
+                  valueField="value"
+                  value={bankDetails?.receiverBankName}
+                  onChange={text => onBankNameChange(text.value)}
+                />
               </View>
-            </TouchableOpacity>
-          </View>
-        </ScrollView>
-      </ImageBackground>
+              <Input
+                label="Bank account name"
+                placeholder="Enter account name"
+                defaultValue={bankDetails?.bankAccountName}
+                onChangeText={text => onBankAccountNameChange(text)}
+                isNeeded={true}
+              />
+              <Input
+                label="Bank account number"
+                placeholder="Enter account number"
+                keyboardType="numeric"
+                defaultValue={bankDetails?.bankAccountNumber}
+                onChangeText={text => onBankAccountNumberChange(text)}
+                isNeeded={true}
+              />
+
+              <View style={{marginVertical: 10}}>
+                <CustomDropdown
+                  label="Do you use online banking?"
+                  isNeeded={true}
+                  placeholder="Select Option"
+                  placeholderStyle={styles.placeholderStyle}
+                  selectedTextStyle={styles.selectedTextStyle}
+                  inputSearchStyle={styles.inputSearchStyle}
+                  data={onlinebankData}
+                  maxHeight={300}
+                  labelField="label"
+                  valueField="value"
+                  value={bankDetails?.hasOnlineBanking}
+                  onChange={text =>
+                    setBankDetails({
+                      ...bankDetails,
+                      hasOnlineBanking:
+                        text.value === false
+                          ? Toast.show({
+                              type: 'error',
+                              position: 'top',
+                              topOffset: 50,
+                              text1: 'Online Banking',
+                              text2:
+                                'Please open a mobile application with your bank to continue with this process!',
+                              visibilityTime: 5000,
+                              autoHide: true,
+                              onPress: () => Toast.hide(),
+                            })
+                          : true,
+                    })
+                  }
+                />
+              </View>
+              <View style={{marginVertical: 10}}>
+                <CustomDropdown
+                  label="Have you taken a loan in the past 12months?"
+                  isNeeded={true}
+                  placeholder="Select Option"
+                  placeholderStyle={styles.placeholderStyle}
+                  selectedTextStyle={styles.selectedTextStyle}
+                  inputSearchStyle={styles.inputSearchStyle}
+                  data={onlinebankData}
+                  maxHeight={300}
+                  labelField="label"
+                  valueField="value"
+                  value={bankDetails?.wasLoanTakenWithinTheLast12Months}
+                  onChange={text =>
+                    setBankDetails({
+                      ...bankDetails,
+                      wasLoanTakenWithinTheLast12Months: text.value,
+                    })
+                  }
+                />
+              </View>
+              <Input
+                label="If yes, how much?"
+                keyboardType="numeric"
+                placeholder="Enter loan amount"
+                defaultValue={bankDetails?.loanAmount}
+                onChangeText={text =>
+                  setBankDetails({...bankDetails, loanAmount: text})
+                }
+              />
+              <TouchableOpacity
+                onPress={
+                  bankDeets?.email === undefined
+                    ? handleCreateBankDetails
+                    : handleUpdateBankDetails
+                }
+                disabled={disableit}>
+                <View style={{marginBottom: 40, marginTop: 20}}>
+                  <Buttons label="Save & Continue" disabled={disableit} />
+                </View>
+              </TouchableOpacity>
+            </View>
+          </ScrollView>
+        </ImageBackground>
       </KeyboardAvoidingWrapper>
     </SafeAreaView>
   );

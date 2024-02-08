@@ -98,43 +98,51 @@ const GetLoan = () => {
   }, []);
 
   const getLoanDuration = async () => {
-    setIsLoading(true);
-    const res = await getDuration();
-    if (res?.error) {
-      Toast.show({
-        type: 'error',
-        position: 'top',
-        topOffset: 50,
-        text1: res?.title,
-        text2: res?.message,
-        visibilityTime: 5000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
-    } else {
-      setDuration(res?.data);
+    try {
+      setIsLoading(true);
+      const res = await getDuration();
+      if (res?.error) {
+        Toast.show({
+          type: 'error',
+          position: 'top',
+          topOffset: 50,
+          text1: res?.title,
+          text2: res?.message,
+          visibilityTime: 5000,
+          autoHide: true,
+          onPress: () => Toast.hide(),
+        });
+      } else {
+        setDuration(res?.data);
+      }
+      setIsLoading(false);
+    } catch (e) {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   const getGuarantor = async () => {
-    setIsLoading(true);
-    const res = await getGuarantors();
-    if (res?.error) {
-      Toast.show({
-        type: 'error',
-        position: 'top',
-        topOffset: 50,
-        text1: res?.title,
-        text2: res?.message,
-        visibilityTime: 5000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
-    } else {
-      setGuarantors(res?.data);
+    try {
+      setIsLoading(true);
+      const res = await getGuarantors();
+      if (res?.error) {
+        Toast.show({
+          type: 'error',
+          position: 'top',
+          topOffset: 50,
+          text1: res?.title,
+          text2: res?.message,
+          visibilityTime: 5000,
+          autoHide: true,
+          onPress: () => Toast.hide(),
+        });
+      } else {
+        setGuarantors(res?.data);
+      }
+      setIsLoading(false);
+    } catch (e) {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   useEffect(() => {
@@ -144,24 +152,28 @@ const GetLoan = () => {
   }, [loanDetails.amount, loanDetails.loanTenor]);
 
   const getLoanDetail = async (amount, loanTenor) => {
-    setIsLoading(true);
-    const res = await getLoanDetails(amount, loanTenor);
-    if (res?.error) {
-      Toast.show({
-        type: 'error',
-        position: 'top',
-        topOffset: 50,
-        text1: res?.title,
-        text2: res?.message,
-        visibilityTime: 5000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
-    } else {
-      setDetails(res?.data);
-      // setLoanDetails({...loanDetails, interest: res?.data?.InterestRate});
+    try {
+      setIsLoading(true);
+      const res = await getLoanDetails(amount, loanTenor);
+      if (res?.error) {
+        Toast.show({
+          type: 'error',
+          position: 'top',
+          topOffset: 50,
+          text1: res?.title,
+          text2: res?.message,
+          visibilityTime: 5000,
+          autoHide: true,
+          onPress: () => Toast.hide(),
+        });
+      } else {
+        setDetails(res?.data);
+        // setLoanDetails({...loanDetails, interest: res?.data?.InterestRate});
+      }
+      setIsLoading(false);
+    } catch (e) {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   useEffect(() => {
@@ -202,33 +214,37 @@ const GetLoan = () => {
 
   const handleCreateLoan = async () => {
     if (guarantors.length !== 0) {
-      setIsLoading(true);
-      const res = await createLoan(loanDetails);
-      if (res?.error) {
-        Toast.show({
-          type: 'error',
-          position: 'top',
-          topOffset: 50,
-          text1: res?.title,
-          text2: res?.message,
-          visibilityTime: 5000,
-          autoHide: true,
-          onPress: () => Toast.hide(),
-        });
-      } else {
-        Toast.show({
-          type: 'success',
-          position: 'top',
-          topOffset: 50,
-          text1: res?.title,
-          text2: res?.message,
-          visibilityTime: 3000,
-          autoHide: true,
-          onPress: () => Toast.hide(),
-        });
-        navigation.navigate('Loan');
+      try {
+        setIsLoading(true);
+        const res = await createLoan(loanDetails);
+        if (res?.error) {
+          Toast.show({
+            type: 'error',
+            position: 'top',
+            topOffset: 50,
+            text1: res?.title,
+            text2: res?.message,
+            visibilityTime: 5000,
+            autoHide: true,
+            onPress: () => Toast.hide(),
+          });
+        } else {
+          Toast.show({
+            type: 'success',
+            position: 'top',
+            topOffset: 50,
+            text1: res?.title,
+            text2: res?.message,
+            visibilityTime: 3000,
+            autoHide: true,
+            onPress: () => Toast.hide(),
+          });
+          navigation.navigate('Loan');
+        }
+        setIsLoading(false);
+      } catch (e) {
+        setIsLoading(false);
       }
-      setIsLoading(false);
     } else {
       Toast.show({
         type: 'error',

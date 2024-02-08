@@ -41,153 +41,169 @@ const TransactionSummary = () => {
   } = route.params;
 
   const handleCreateARMInvestment = async () => {
-    const payload = {
-      productCode: productCode,
-      investmentAmount: Number(investmentAmount),
-    };
-    setIsLoading(true);
-    const res = await createArmInvestment(payload);
-    if (res?.error) {
-      Toast.show({
-        type: 'error',
-        position: 'top',
-        topOffset: 50,
-        text1: res?.title,
-        text2: res?.message,
-        visibilityTime: 5000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
-    } else {
-      Toast.show({
-        type: 'success',
-        position: 'top',
-        topOffset: 50,
-        text1: res?.title,
-        text2: res?.message,
-        visibilityTime: 3000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
-      setTimeout(() => {
-        navigation.navigate('Invest');
-      }, 1000);
+    try {
+      const payload = {
+        productCode: productCode,
+        investmentAmount: Number(investmentAmount),
+      };
+      setIsLoading(true);
+      const res = await createArmInvestment(payload);
+      if (res?.error) {
+        Toast.show({
+          type: 'error',
+          position: 'top',
+          topOffset: 50,
+          text1: res?.title,
+          text2: res?.message,
+          visibilityTime: 5000,
+          autoHide: true,
+          onPress: () => Toast.hide(),
+        });
+      } else {
+        Toast.show({
+          type: 'success',
+          position: 'top',
+          topOffset: 50,
+          text1: res?.title,
+          text2: res?.message,
+          visibilityTime: 3000,
+          autoHide: true,
+          onPress: () => Toast.hide(),
+        });
+        setTimeout(() => {
+          navigation.navigate('Invest');
+        }, 1000);
+      }
+      setIsLoading(false);
+    } catch (e) {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   const handleTopupARMInvestment = async () => {
-    const payload = {
-      membershipId: membershipId,
-      productCode: productCode,
-      investmentAmount: Number(investmentAmount),
-      leadId: leadId,
-      potentialClientId: potentialClientId,
-    };
-    setIsLoading(true);
-    const res = await topUpArmInvestment(payload);
-    if (res?.error) {
-      Toast.show({
-        type: 'error',
-        position: 'top',
-        topOffset: 50,
-        text1: res?.title,
-        text2: res?.message,
-        visibilityTime: 5000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
-    } else {
-      Toast.show({
-        type: 'success',
-        position: 'top',
-        topOffset: 50,
-        text1: res?.title,
-        text2: res?.message,
-        visibilityTime: 3000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
-      setTimeout(() => {
-        navigation.navigate('Invest');
-      }, 1000);
+    try {
+      const payload = {
+        membershipId: membershipId,
+        productCode: productCode,
+        investmentAmount: Number(investmentAmount),
+        leadId: leadId,
+        potentialClientId: potentialClientId,
+      };
+      setIsLoading(true);
+      const res = await topUpArmInvestment(payload);
+      if (res?.error) {
+        Toast.show({
+          type: 'error',
+          position: 'top',
+          topOffset: 50,
+          text1: res?.title,
+          text2: res?.message,
+          visibilityTime: 5000,
+          autoHide: true,
+          onPress: () => Toast.hide(),
+        });
+      } else {
+        Toast.show({
+          type: 'success',
+          position: 'top',
+          topOffset: 50,
+          text1: res?.title,
+          text2: res?.message,
+          visibilityTime: 3000,
+          autoHide: true,
+          onPress: () => Toast.hide(),
+        });
+        setTimeout(() => {
+          navigation.navigate('Invest');
+        }, 1000);
+      }
+      setIsLoading(false);
+    } catch (e) {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   const handleCreateLendaInvestment = async () => {
-    const payload = {
-      investmentType: investmentType,
-      investmentTenor: investmentTenor,
-      investmentAmount: investmentAmount.toString(),
-      transactionPin: transactionPin,
-    };
-    setIsLoading(true);
-    const res = await createLendaInvestment(payload);
-    if (res?.error) {
-      Toast.show({
-        type: 'error',
-        position: 'top',
-        topOffset: 50,
-        text1: res?.title,
-        text2: res?.message,
-        visibilityTime: 5000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
-    } else {
-      Toast.show({
-        type: 'success',
-        position: 'top',
-        topOffset: 50,
-        text1: res?.title,
-        text2: res?.message,
-        visibilityTime: 3000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
-      setTimeout(() => {
-        navigation.navigate('Invest');
-      }, 1000);
+    try {
+      const payload = {
+        investmentType: investmentType,
+        investmentTenor: investmentTenor,
+        investmentAmount: investmentAmount.toString(),
+        transactionPin: transactionPin,
+      };
+      setIsLoading(true);
+      const res = await createLendaInvestment(payload);
+      if (res?.error) {
+        Toast.show({
+          type: 'error',
+          position: 'top',
+          topOffset: 50,
+          text1: res?.title,
+          text2: res?.message,
+          visibilityTime: 5000,
+          autoHide: true,
+          onPress: () => Toast.hide(),
+        });
+      } else {
+        Toast.show({
+          type: 'success',
+          position: 'top',
+          topOffset: 50,
+          text1: res?.title,
+          text2: res?.message,
+          visibilityTime: 3000,
+          autoHide: true,
+          onPress: () => Toast.hide(),
+        });
+        setTimeout(() => {
+          navigation.navigate('Invest');
+        }, 1000);
+      }
+      setIsLoading(false);
+    } catch (e) {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   const handleTopupLendaInvestment = async () => {
-    const payload = {
-      id: id,
-      topUpAmount: investmentAmount.toString(),
-      transactionPin: transactionPin,
-    };
-    setIsLoading(true);
-    const res = await topUpLendaInvestment(payload);
-    if (res?.error) {
-      Toast.show({
-        type: 'error',
-        position: 'top',
-        topOffset: 50,
-        text1: res?.title,
-        text2: res?.message,
-        visibilityTime: 5000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
-    } else {
-      Toast.show({
-        type: 'success',
-        position: 'top',
-        topOffset: 50,
-        text1: res?.title,
-        text2: res?.message,
-        visibilityTime: 3000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
-      setTimeout(() => {
-        navigation.navigate('Invest');
-      }, 1000);
+    try {
+      const payload = {
+        id: id,
+        topUpAmount: investmentAmount.toString(),
+        transactionPin: transactionPin,
+      };
+      setIsLoading(true);
+      const res = await topUpLendaInvestment(payload);
+      if (res?.error) {
+        Toast.show({
+          type: 'error',
+          position: 'top',
+          topOffset: 50,
+          text1: res?.title,
+          text2: res?.message,
+          visibilityTime: 5000,
+          autoHide: true,
+          onPress: () => Toast.hide(),
+        });
+      } else {
+        Toast.show({
+          type: 'success',
+          position: 'top',
+          topOffset: 50,
+          text1: res?.title,
+          text2: res?.message,
+          visibilityTime: 3000,
+          autoHide: true,
+          onPress: () => Toast.hide(),
+        });
+        setTimeout(() => {
+          navigation.navigate('Invest');
+        }, 1000);
+      }
+      setIsLoading(false);
+    } catch (e) {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   return (

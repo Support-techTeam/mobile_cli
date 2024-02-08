@@ -71,14 +71,18 @@ const ValidIdentity = () => {
   }, []);
 
   const unSubBusinessDetails = async () => {
-    setIsLoading(true);
-    const res = await getLoanUserDetails();
-    if (res?.error) {
-      // TODO: handle error
-    } else {
-      setOrgDetails(res?.data?.loanDocumentDetails);
+    try {
+      setIsLoading(true);
+      const res = await getLoanUserDetails();
+      if (res?.error) {
+        // TODO: handle error
+      } else {
+        setOrgDetails(res?.data?.loanDocumentDetails);
+      }
+      setIsLoading(false);
+    } catch (e) {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   useEffect(() => {
@@ -155,67 +159,75 @@ const ValidIdentity = () => {
 
   //Instant Update
   const handleCreateDocs = async () => {
-    setIsLoading(true);
-    const res = await createDocumentsDetails(formDetails);
-    if (res?.error) {
-      Toast.show({
-        type: 'error',
-        position: 'top',
-        topOffset: 50,
-        text1: res?.title,
-        text2: res?.message,
-        visibilityTime: 5000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
-    } else {
-      Toast.show({
-        type: 'success',
-        position: 'top',
-        topOffset: 50,
-        text1: res?.title,
-        text2: res?.message,
-        visibilityTime: 3000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
-      setTimeout(() => {
-        navigation.navigate('ProofOfAddress', {paramKey: formDetails});
-      }, 1000);
+    try {
+      setIsLoading(true);
+      const res = await createDocumentsDetails(formDetails);
+      if (res?.error) {
+        Toast.show({
+          type: 'error',
+          position: 'top',
+          topOffset: 50,
+          text1: res?.title,
+          text2: res?.message,
+          visibilityTime: 5000,
+          autoHide: true,
+          onPress: () => Toast.hide(),
+        });
+      } else {
+        Toast.show({
+          type: 'success',
+          position: 'top',
+          topOffset: 50,
+          text1: res?.title,
+          text2: res?.message,
+          visibilityTime: 3000,
+          autoHide: true,
+          onPress: () => Toast.hide(),
+        });
+        setTimeout(() => {
+          navigation.navigate('ProofOfAddress', {paramKey: formDetails});
+        }, 1000);
+      }
+      setIsLoading(false);
+    } catch (e) {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   const handleUpdateDocs = async () => {
-    setIsLoading(true);
-    const res = await updateDocumentsDetails(formDetails);
-    if (res?.error) {
-      Toast.show({
-        type: 'error',
-        position: 'top',
-        topOffset: 50,
-        text1: res?.title,
-        text2: res?.message,
-        visibilityTime: 5000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
-    } else {
-      Toast.show({
-        type: 'success',
-        position: 'top',
-        topOffset: 50,
-        text1: res?.title,
-        text2: res?.message,
-        visibilityTime: 3000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
-      setTimeout(() => {
-        navigation.navigate('ProofOfAddress', {paramKey: formDetails});
-      }, 1000);
+    try {
+      setIsLoading(true);
+      const res = await updateDocumentsDetails(formDetails);
+      if (res?.error) {
+        Toast.show({
+          type: 'error',
+          position: 'top',
+          topOffset: 50,
+          text1: res?.title,
+          text2: res?.message,
+          visibilityTime: 5000,
+          autoHide: true,
+          onPress: () => Toast.hide(),
+        });
+      } else {
+        Toast.show({
+          type: 'success',
+          position: 'top',
+          topOffset: 50,
+          text1: res?.title,
+          text2: res?.message,
+          visibilityTime: 3000,
+          autoHide: true,
+          onPress: () => Toast.hide(),
+        });
+        setTimeout(() => {
+          navigation.navigate('ProofOfAddress', {paramKey: formDetails});
+        }, 1000);
+      }
+      setIsLoading(false);
+    } catch (e) {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   return (
@@ -328,8 +340,8 @@ const ValidIdentity = () => {
         <TouchableOpacity
           onPress={() => {
             formDetails?.validIdentificationType === undefined
-            ? handleCreateDocs()
-            : handleUpdateDocs();
+              ? handleCreateDocs()
+              : handleUpdateDocs();
           }}
           disabled={disableit}>
           <Buttons label={'Save & Continue'} disabled={disableit} />

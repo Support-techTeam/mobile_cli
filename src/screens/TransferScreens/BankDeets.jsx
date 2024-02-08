@@ -9,7 +9,7 @@ import React, {useState, useContext, useEffect} from 'react';
 import ToggleSwitch from 'toggle-switch-react-native';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { SelectList } from 'react-native-dropdown-select-list'
+import {SelectList} from 'react-native-dropdown-select-list';
 import Spinner from 'react-native-loading-spinner-overlay/lib';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 
@@ -68,31 +68,33 @@ const BankDeets = ({route}) => {
       setHoldersName('');
       setIsLoading(true);
       const unsubVerifyBeneficiaryInfo = async () => {
-        const res = await verifyBeneficiaryInfo(
-          bankDetails?.toWalletIdAccountNumber,
-        );
-        if (res?.data?.error) {
-          Toast.show({
-            type: 'error',
-            position: 'top',
-            topOffset: 50,
-            text1: res?.title,
-            text2: res?.data?.message,
-            visibilityTime: 5000,
-            autoHide: true,
-            onPress: () => Toast.hide(),
-          });
-          setHoldersName('');
-        } else {
-          setBankDetails({
-            ...bankDetails,
-            amount: 0,
-            narration: '',
-            saveBeneficiary: false,
-            beneficiaryAccountName: res?.data,
-          });
-          setHoldersName(res?.data);
-        }
+        try {
+          const res = await verifyBeneficiaryInfo(
+            bankDetails?.toWalletIdAccountNumber,
+          );
+          if (res?.data?.error) {
+            Toast.show({
+              type: 'error',
+              position: 'top',
+              topOffset: 50,
+              text1: res?.title,
+              text2: res?.data?.message,
+              visibilityTime: 5000,
+              autoHide: true,
+              onPress: () => Toast.hide(),
+            });
+            setHoldersName('');
+          } else {
+            setBankDetails({
+              ...bankDetails,
+              amount: 0,
+              narration: '',
+              saveBeneficiary: false,
+              beneficiaryAccountName: res?.data,
+            });
+            setHoldersName(res?.data);
+          }
+        } catch (e) {}
       };
 
       setTimeout(() => {
@@ -151,7 +153,10 @@ const BankDeets = ({route}) => {
   };
 
   useEffect(() => {
-    if (bankDetails?.receiverAccountNumber?.length === 10 && bankDetails?.receiverBankName !== '') {
+    if (
+      bankDetails?.receiverAccountNumber?.length === 10 &&
+      bankDetails?.receiverBankName !== ''
+    ) {
       setBankDetails({
         ...bankDetails,
         receiverAccountFirstName: '',
@@ -159,33 +164,35 @@ const BankDeets = ({route}) => {
       });
       setIsLoading(true);
       const unsubVerifyBeneficiaryInfo = async () => {
-        const res = await verifyNIPAccountInfo(
-          bankDetails?.receiverAccountNumber,
-          bankDetails?.receiverBankName,
-        );
-        if (res?.error) {
-          Toast.show({
-            type: 'error',
-            position: 'top',
-            topOffset: 50,
-            text1: res?.title,
-            text2: res?.message,
-            visibilityTime: 5000,
-            autoHide: true,
-            onPress: () => Toast.hide(),
-          });
-          setHoldersName('');
-        } else {
-          setNumComplete(true);
-          const [firstPart, ...restParts] = res?.data?.split(/\s(.+)/);
-          setBankDetails({
-            ...bankDetails,
-            receiverAccountFirstName:
-              res?.data?.length === undefined ? '' : [...restParts][0],
-            receiverAccountLastName:
-              res?.data?.length === undefined ? '' : firstPart,
-          });
-        }
+        try {
+          const res = await verifyNIPAccountInfo(
+            bankDetails?.receiverAccountNumber,
+            bankDetails?.receiverBankName,
+          );
+          if (res?.error) {
+            Toast.show({
+              type: 'error',
+              position: 'top',
+              topOffset: 50,
+              text1: res?.title,
+              text2: res?.message,
+              visibilityTime: 5000,
+              autoHide: true,
+              onPress: () => Toast.hide(),
+            });
+            setHoldersName('');
+          } else {
+            setNumComplete(true);
+            const [firstPart, ...restParts] = res?.data?.split(/\s(.+)/);
+            setBankDetails({
+              ...bankDetails,
+              receiverAccountFirstName:
+                res?.data?.length === undefined ? '' : [...restParts][0],
+              receiverAccountLastName:
+                res?.data?.length === undefined ? '' : firstPart,
+            });
+          }
+        } catch (e) {}
       };
 
       setTimeout(() => {
@@ -409,22 +416,23 @@ const BankDeets = ({route}) => {
           ) : (
             <>
               <View style={{marginTop: 10}}>
-                    <View style={{flexDirection: 'row'}}>
-                      <Text style={styles.droplabel}>Bank Name</Text>
-                      <Text style={{color: 'red', marginRight: 10}}>*</Text>
-                    </View>
-                  <SelectList 
-                      setSelected={(val) => setBankDetails({
+                <View style={{flexDirection: 'row'}}>
+                  <Text style={styles.droplabel}>Bank Name</Text>
+                  <Text style={{color: 'red', marginRight: 10}}>*</Text>
+                </View>
+                <SelectList
+                  setSelected={val =>
+                    setBankDetails({
                       ...bankDetails,
                       receiverBankName: val,
-                    })} 
-                      data={currentBanks ? currentBanks : defaultData} 
-                      save="value"
-                      placeholder="Select Bank"
-                      boxStyles={styles.inputContainer}
-                      // inputStyles={}
-                  />
-      
+                    })
+                  }
+                  data={currentBanks ? currentBanks : defaultData}
+                  save="value"
+                  placeholder="Select Bank"
+                  boxStyles={styles.inputContainer}
+                  // inputStyles={}
+                />
               </View>
 
               {bankDetails?.receiverBankName !== '' && (
@@ -640,13 +648,12 @@ const styles = StyleSheet.create({
     height: 40,
     fontSize: 16,
   },
-    droplabel: {
+  droplabel: {
     marginVertical: 5,
     fontSize: 14,
     color: COLORS.labelColor,
-    
   },
-    inputContainer: {
+  inputContainer: {
     height: 55,
     alignItems: 'center',
     backgroundColor: COLORS.light,

@@ -26,23 +26,27 @@ const GuarantorDetails = ({route}) => {
   }, []);
 
   const getGuarantorData = async () => {
-    setIsLoading(true);
-    const res = await getGuarantor(guarantorId);
-    if (res?.error) {
-      Toast.show({
-        type: 'error',
-        position: 'top',
-        topOffset: 50,
-        text1: res?.title,
-        text2: res?.message,
-        visibilityTime: 5000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
-    } else {
-      setGuarantor(res?.data);
+    try {
+      setIsLoading(true);
+      const res = await getGuarantor(guarantorId);
+      if (res?.error) {
+        Toast.show({
+          type: 'error',
+          position: 'top',
+          topOffset: 50,
+          text1: res?.title,
+          text2: res?.message,
+          visibilityTime: 5000,
+          autoHide: true,
+          onPress: () => Toast.hide(),
+        });
+      } else {
+        setGuarantor(res?.data);
+      }
+      setIsLoading(false);
+    } catch (e) {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   return (

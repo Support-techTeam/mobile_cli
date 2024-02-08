@@ -205,14 +205,18 @@ const BusinessDetails = () => {
   }, []);
 
   const unSubBusinessDetails = async () => {
-    setIsLoading(true);
-    const res = await getLoanUserDetails();
-    if (res?.error) {
-      // TODO: handle error
-    } else {
-      setOrgDetails(res?.data?.organizationDetails);
+    try {
+      setIsLoading(true);
+      const res = await getLoanUserDetails();
+      if (res?.error) {
+        // TODO: handle error
+      } else {
+        setOrgDetails(res?.data?.organizationDetails);
+      }
+      setIsLoading(false);
+    } catch (e) {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   useEffect(() => {
@@ -354,75 +358,83 @@ const BusinessDetails = () => {
   };
 
   const handleCreateBusinessDetails = async () => {
-    setIsUpdating(true);
-    const res = await createBusinessDetails(businessDetails);
-    if (res?.error) {
-      Toast.show({
-        type: 'error',
-        position: 'top',
-        topOffset: 50,
-        text1: res?.title,
-        text2: res?.message,
-        visibilityTime: 5000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
-    } else {
-      Toast.show({
-        type: 'success',
-        position: 'top',
-        topOffset: 50,
-        text1: res?.title,
-        text2: res?.message,
-        visibilityTime: 3000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
-      setTimeout(() => {
-        if (previousRoute !== 'MyAccount') {
-          navigation.navigate('NextOfKin');
-        } else {
-          navigation.navigate('MyAccount');
-        }
-      }, 1000);
+    try {
+      setIsUpdating(true);
+      const res = await createBusinessDetails(businessDetails);
+      if (res?.error) {
+        Toast.show({
+          type: 'error',
+          position: 'top',
+          topOffset: 50,
+          text1: res?.title,
+          text2: res?.message,
+          visibilityTime: 5000,
+          autoHide: true,
+          onPress: () => Toast.hide(),
+        });
+      } else {
+        Toast.show({
+          type: 'success',
+          position: 'top',
+          topOffset: 50,
+          text1: res?.title,
+          text2: res?.message,
+          visibilityTime: 3000,
+          autoHide: true,
+          onPress: () => Toast.hide(),
+        });
+        setTimeout(() => {
+          if (previousRoute !== 'MyAccount') {
+            navigation.navigate('NextOfKin');
+          } else {
+            navigation.navigate('MyAccount');
+          }
+        }, 1000);
+      }
+      setIsUpdating(false);
+    } catch (e) {
+      setIsUpdating(false);
     }
-    setIsUpdating(false);
   };
 
   const handleUpdateBusinessDetails = async () => {
-    setIsUpdating(true);
-    const res = await updateBusinessDetails(businessDetails);
-    if (res?.error) {
-      Toast.show({
-        type: 'error',
-        position: 'top',
-        topOffset: 50,
-        text1: res?.title,
-        text2: res?.message,
-        visibilityTime: 5000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
-    } else {
-      Toast.show({
-        type: 'success',
-        position: 'top',
-        topOffset: 50,
-        text1: res?.title,
-        text2: res?.message,
-        visibilityTime: 3000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
-      setTimeout(() => {
-        if (previousRoute !== 'MyAccount') {
-          navigation.navigate('NextOfKin');
-        } else {
-          navigation.navigate('MyAccount');
-        }
-      }, 1000);
+    try {
+      setIsUpdating(true);
+      const res = await updateBusinessDetails(businessDetails);
+      if (res?.error) {
+        Toast.show({
+          type: 'error',
+          position: 'top',
+          topOffset: 50,
+          text1: res?.title,
+          text2: res?.message,
+          visibilityTime: 5000,
+          autoHide: true,
+          onPress: () => Toast.hide(),
+        });
+      } else {
+        Toast.show({
+          type: 'success',
+          position: 'top',
+          topOffset: 50,
+          text1: res?.title,
+          text2: res?.message,
+          visibilityTime: 3000,
+          autoHide: true,
+          onPress: () => Toast.hide(),
+        });
+        setTimeout(() => {
+          if (previousRoute !== 'MyAccount') {
+            navigation.navigate('NextOfKin');
+          } else {
+            navigation.navigate('MyAccount');
+          }
+        }, 1000);
+      }
+      setIsUpdating(false);
+    } catch (e) {
+      setIsUpdating(false);
     }
-    setIsUpdating(false);
   };
 
   useEffect(() => {
@@ -482,18 +494,18 @@ const BusinessDetails = () => {
   }, [stateCity]);
 
   useEffect(() => {
-    if(businessDetails.state !== ''){
-     const getStateData = getCity(businessDetails.state).then((res) => {
-      fetchedCity = [];
-      res?.data && res?.data.map((item, index) => {
-        fetchedCity.push({value: item, label: item, key: index});
-      });
-    }).catch(err => {
-    
-    })
-  }
-
-}, [businessDetails.state]);
+    if (businessDetails.state !== '') {
+      const getStateData = getCity(businessDetails.state)
+        .then(res => {
+          fetchedCity = [];
+          res?.data &&
+            res?.data.map((item, index) => {
+              fetchedCity.push({value: item, label: item, key: index});
+            });
+        })
+        .catch(err => {});
+    }
+  }, [businessDetails.state]);
 
   useEffect(() => {
     setIsLoading(true);
@@ -792,14 +804,21 @@ const BusinessDetails = () => {
                         ...businessDetails,
                         state: option.value,
                       });
-                      const getStateData = getCity(option.value).then((res) => {
-                        fetchedCity = [];
-                        res?.data && res?.data.map((item, index) => {
-                          fetchedCity.push({value: item, label: item, key: index});
+                      const getStateData = getCity(option.value)
+                        .then(res => {
+                          fetchedCity = [];
+                          res?.data &&
+                            res?.data.map((item, index) => {
+                              fetchedCity.push({
+                                value: item,
+                                label: item,
+                                key: index,
+                              });
+                            });
+                        })
+                        .catch(err => {
+                          // console.log(err);
                         });
-                      }).catch(err => {
-                                                // console.log(err);
-                      })
                     }}
                   />
                 </View>

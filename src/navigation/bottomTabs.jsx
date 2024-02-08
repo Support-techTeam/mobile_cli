@@ -75,6 +75,7 @@ export default function BottomTabs() {
   );
 
   const handleSignOut = async () => {
+  try{
     const res = await userLogOut();
     if (res?.error) {
       Toast.show({
@@ -90,6 +91,9 @@ export default function BottomTabs() {
     } else {
       await resetStore();
     }
+  }catch(error){
+    // console.log(error);
+  }
   };
 
   return (

@@ -136,9 +136,11 @@ const InvestmentTransaction = () => {
                 isAirtime={true}
                 isBalance={
                   userWalletData &&
-                  userWalletData?.availableBalance
-                    ?.toString()
-                    ?.replace(/\B(?=(\d{3})+\b)/g, ',')
+                  new Intl.NumberFormat('en-US', {
+                    style: 'decimal',
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  }).format(Number(userWalletData?.availableBalance))
                 }
               />
               {investment?.minimumInvestmentAmount && (
@@ -151,9 +153,11 @@ const InvestmentTransaction = () => {
                   }}>
                   Minimum Investment (₦
                   {investment?.minimumInvestmentAmount
-                    ? investment?.minimumInvestmentAmount
-                        .toString()
-                        .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+                    ? new Intl.NumberFormat('en-US', {
+                        style: 'decimal',
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      }).format(Number(investment?.minimumInvestmentAmount))
                     : '0.00'}
                   )
                 </Text>
@@ -251,9 +255,11 @@ const InvestmentTransaction = () => {
                 isAirtime={true}
                 isBalance={
                   userWalletData &&
-                  userWalletData?.availableBalance
-                    ?.toString()
-                    ?.replace(/\B(?=(\d{3})+\b)/g, ',')
+                  new Intl.NumberFormat('en-US', {
+                    style: 'decimal',
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  }).format(Number(userWalletData?.availableBalance))
                 }
               />
               {investment?.amountRange?.minAmount && (
@@ -266,14 +272,17 @@ const InvestmentTransaction = () => {
                   }}>
                   Investment Range (₦
                   {investment?.amountRange
-                    ? `${investment?.amountRange?.minAmount
-                        .toString()
-                        .replace(
-                          /\B(?=(\d{3})+(?!\d))/g,
-                          ',',
-                        )} - ${investment?.amountRange?.maxAmount
-                        .toString()
-                        .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`
+                    ? `${new Intl.NumberFormat('en-US', {
+                        style: 'decimal',
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      }).format(
+                        Number(investment?.amountRange?.minAmount),
+                      )} - ${new Intl.NumberFormat('en-US', {
+                        style: 'decimal',
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      }).format(Number(investment?.amountRange?.maxAmount))}`
                     : '0.00'}
                   )
                 </Text>

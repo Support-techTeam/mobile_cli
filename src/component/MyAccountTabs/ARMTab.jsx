@@ -25,11 +25,15 @@ const ARM = () => {
   }, []);
 
   const unSubBankDetails = async () => {
-    const res = await getLoanUserDetails();
-    if (res?.error) {
+    try {
+      const res = await getLoanUserDetails();
+      if (res?.error) {
+        // TODO: handle error
+      } else {
+        setBankDeets(res?.data?.armUserBankDetails);
+      }
+    } catch (e) {
       // TODO: handle error
-    } else {
-      setBankDeets(res?.data?.armUserBankDetails);
     }
   };
   return (

@@ -459,8 +459,8 @@ const Homescreen = () => {
         type: 'info',
         position: 'top',
         topOffset: 50,
-        text1: "Copy Action",
-        text2: "Account number copied to clipboard",
+        text1: 'Copy Action',
+        text2: 'Account number copied to clipboard',
         visibilityTime: 3000,
         autoHide: true,
         onPress: () => Toast.hide(),
@@ -1803,22 +1803,20 @@ const Homescreen = () => {
                                     {item.credit === null ? (
                                       <>
                                         ₦
-                                        {item.debit
-                                          .toString()
-                                          .replace(
-                                            /\B(?=(\d{3})+(?!\d))/g,
-                                            ',',
-                                          )}
+                                        {new Intl.NumberFormat('en-US', {
+                                          style: 'decimal',
+                                          minimumFractionDigits: 2,
+                                          maximumFractionDigits: 2,
+                                        }).format(Number(item.debit))}
                                       </>
                                     ) : (
                                       <>
                                         ₦
-                                        {item.credit
-                                          .toString()
-                                          .replace(
-                                            /\B(?=(\d{3})+(?!\d))/g,
-                                            ',',
-                                          )}
+                                        {new Intl.NumberFormat('en-US', {
+                                          style: 'decimal',
+                                          minimumFractionDigits: 2,
+                                          maximumFractionDigits: 2,
+                                        }).format(Number(item.credit))}
                                       </>
                                     )}
                                   </Text>
@@ -3035,16 +3033,20 @@ const Homescreen = () => {
                             {item.credit === null ? (
                               <>
                                 ₦
-                                {item.debit
-                                  .toString()
-                                  .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                                {new Intl.NumberFormat('en-US', {
+                                          style: 'decimal',
+                                          minimumFractionDigits: 2,
+                                          maximumFractionDigits: 2,
+                                        }).format(Number(item.debit))}
                               </>
                             ) : (
                               <>
                                 ₦
-                                {item.credit
-                                  .toString()
-                                  .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                                {new Intl.NumberFormat('en-US', {
+                                          style: 'decimal',
+                                          minimumFractionDigits: 2,
+                                          maximumFractionDigits: 2,
+                                        }).format(Number(item.credit))}
                               </>
                             )}
                           </Text>

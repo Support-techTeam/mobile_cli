@@ -96,61 +96,65 @@ const Pin = ({route}) => {
   }, [bankDetails, otp]);
 
   const handleTransfer = async () => {
-    if (internalTransferDetails.toWalletIdAccountNumber !== '') {
-      setIsLoading(true);
-      const res = await createInternalTransfer(internalTransferDetails);
-      if (res?.error) {
-        Toast.show({
-          type: 'error',
-          position: 'top',
-          topOffset: 50,
-          text1: res?.title,
-          text2: res?.message,
-          visibilityTime: 3000,
-          autoHide: true,
-          onPress: () => Toast.hide(),
-        });
+    try {
+      if (internalTransferDetails.toWalletIdAccountNumber !== '') {
+        setIsLoading(true);
+        const res = await createInternalTransfer(internalTransferDetails);
+        if (res?.error) {
+          Toast.show({
+            type: 'error',
+            position: 'top',
+            topOffset: 50,
+            text1: res?.title,
+            text2: res?.message,
+            visibilityTime: 3000,
+            autoHide: true,
+            onPress: () => Toast.hide(),
+          });
+        } else {
+          Toast.show({
+            type: 'success',
+            position: 'top',
+            topOffset: 50,
+            text1: res?.title,
+            text2: res?.message,
+            visibilityTime: 3000,
+            autoHide: true,
+            onPress: () => Toast.hide(),
+          });
+          navigation.navigate('Success');
+        }
+        setIsLoading(false);
       } else {
-        Toast.show({
-          type: 'success',
-          position: 'top',
-          topOffset: 50,
-          text1: res?.title,
-          text2: res?.message,
-          visibilityTime: 3000,
-          autoHide: true,
-          onPress: () => Toast.hide(),
-        });
-        navigation.navigate('Success');
+        setIsLoading(true);
+        const res = await createNIPTransfer(transferDetails);
+        if (res?.error) {
+          Toast.show({
+            type: 'error',
+            position: 'top',
+            topOffset: 50,
+            text1: res?.title,
+            text2: res?.message,
+            visibilityTime: 3000,
+            autoHide: true,
+            onPress: () => Toast.hide(),
+          });
+        } else {
+          Toast.show({
+            type: 'success',
+            position: 'top',
+            topOffset: 50,
+            text1: res?.title,
+            text2: res?.message,
+            visibilityTime: 3000,
+            autoHide: true,
+            onPress: () => Toast.hide(),
+          });
+          navigation.navigate('Success');
+        }
+        setIsLoading(false);
       }
-      setIsLoading(false);
-    } else {
-      setIsLoading(true);
-      const res = await createNIPTransfer(transferDetails);
-      if (res?.error) {
-        Toast.show({
-          type: 'error',
-          position: 'top',
-          topOffset: 50,
-          text1: res?.title,
-          text2: res?.message,
-          visibilityTime: 3000,
-          autoHide: true,
-          onPress: () => Toast.hide(),
-        });
-      } else {
-        Toast.show({
-          type: 'success',
-          position: 'top',
-          topOffset: 50,
-          text1: res?.title,
-          text2: res?.message,
-          visibilityTime: 3000,
-          autoHide: true,
-          onPress: () => Toast.hide(),
-        });
-        navigation.navigate('Success');
-      }
+    } catch (e) {
       setIsLoading(false);
     }
   };

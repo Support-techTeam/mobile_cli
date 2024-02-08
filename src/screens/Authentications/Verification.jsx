@@ -48,21 +48,23 @@ const Verification = () => {
   }, [isVerified == false && route.name === 'Verification' ? count : '']);
 
   const handleSignOut = async () => {
-    const res = await userLogOut();
-    if (res?.error) {
-      Toast.show({
-        type: 'error',
-        position: 'top',
-        topOffset: 50,
-        text1: res?.title,
-        text2: res?.message,
-        visibilityTime: 3000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
-    } else {
-      await resetStore();
-    }
+    try {
+      const res = await userLogOut();
+      if (res?.error) {
+        Toast.show({
+          type: 'error',
+          position: 'top',
+          topOffset: 50,
+          text1: res?.title,
+          text2: res?.message,
+          visibilityTime: 3000,
+          autoHide: true,
+          onPress: () => Toast.hide(),
+        });
+      } else {
+        await resetStore();
+      }
+    } catch (err) {}
   };
 
   const handleResendVerificationEmail = async () => {
