@@ -3,6 +3,8 @@
   "displayName": "Tradelenda",
   "version": "3.0.5",
   "orientation": "portrait",
+  "appFlyerIos": "K6w4r5jRgUTHz6nZtK9e6h",
+  "appFlyerAndroid": "LS9qXSm8D99riSBy6v434V",
   "BASE_URL": "https://sjrg8dpghv.us-east-1.awsapprunner.com",
   "BASE_API_URL": "https://eywxitmij3.us-east-1.awsapprunner.com/api/v1",
   "SCREELOCK_CODE": "screellockcode",

@@ -19,6 +19,7 @@ import {
 } from '../../stores/InvestStore';
 import Spinner from 'react-native-loading-spinner-overlay';
 import Toast from 'react-native-toast-message';
+import appsFlyer from 'react-native-appsflyer';
 
 const TransactionSummary = () => {
   const insets = useSafeAreaInsets();
@@ -40,6 +41,27 @@ const TransactionSummary = () => {
     action,
   } = route.params;
 
+  const logAppsFlyer = (event, investmentName, activity, value) => {
+    const eventName = event;
+    const eventValues = {
+      investment_type: investmentName,
+      activity_type: activity,
+      currency: 'NGN',
+      revenue: value,
+    };
+
+    appsFlyer.logEvent(
+      eventName,
+      eventValues,
+      res => {
+        // console.log(res);
+      },
+      err => {
+        // console.error(err);
+      },
+    );
+  };
+
   const handleCreateARMInvestment = async () => {
     try {
       const payload = {
@@ -60,6 +82,12 @@ const TransactionSummary = () => {
           onPress: () => Toast.hide(),
         });
       } else {
+        logAppsFlyer(
+          'invest',
+          `ARM ${productCode}`,
+          'Initial Investment',
+          investmentAmount,
+        );
         Toast.show({
           type: 'success',
           position: 'top',
@@ -103,6 +131,12 @@ const TransactionSummary = () => {
           onPress: () => Toast.hide(),
         });
       } else {
+        logAppsFlyer(
+          'invest',
+          `ARM ${productCode} ${membershipId}`,
+          'Investment Topup',
+          investmentAmount,
+        );
         Toast.show({
           type: 'success',
           position: 'top',
@@ -145,6 +179,12 @@ const TransactionSummary = () => {
           onPress: () => Toast.hide(),
         });
       } else {
+        logAppsFlyer(
+          'invest',
+          `Lenda ${investmentType}`,
+          'Initial Investment',
+          investmentAmount,
+        );
         Toast.show({
           type: 'success',
           position: 'top',
@@ -186,6 +226,12 @@ const TransactionSummary = () => {
           onPress: () => Toast.hide(),
         });
       } else {
+        logAppsFlyer(
+          'invest',
+          `Lenda ${investmentType}`,
+          'Investment Topup',
+          investmentAmount,
+        );
         Toast.show({
           type: 'success',
           position: 'top',

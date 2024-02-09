@@ -28,10 +28,6 @@ import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 import COLORS from '../../constants/colors';
 import LinearGradient from 'react-native-linear-gradient';
 import {useSelector, useDispatch} from 'react-redux';
-import {
-  getAccountWallet,
-  getAccountTransactions,
-} from '../../stores/WalletStore/';
 import Toast from 'react-native-toast-message';
 import {
   setAccount,
@@ -57,7 +53,11 @@ import {
 } from '../../stores/InvestStore';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import Input from '../../component/inputField/input.component';
-import {getTransactionsStatement} from '../../stores/WalletStore';
+import {
+  getTransactionsStatement,
+  getAccountWallet,
+  getAccountTransactions,
+} from '../../stores/WalletStore';
 
 const {width} = Dimensions.get('window');
 const Homescreen = () => {
@@ -240,7 +240,7 @@ const Homescreen = () => {
         .catch(error => {
           // Handle any unexpected errors
         });
-    }, 100000);
+    }, 60000);
 
     return () => {
       clearInterval(interval);
@@ -3034,19 +3034,19 @@ const Homescreen = () => {
                               <>
                                 ₦
                                 {new Intl.NumberFormat('en-US', {
-                                          style: 'decimal',
-                                          minimumFractionDigits: 2,
-                                          maximumFractionDigits: 2,
-                                        }).format(Number(item.debit))}
+                                  style: 'decimal',
+                                  minimumFractionDigits: 2,
+                                  maximumFractionDigits: 2,
+                                }).format(Number(item.debit))}
                               </>
                             ) : (
                               <>
                                 ₦
                                 {new Intl.NumberFormat('en-US', {
-                                          style: 'decimal',
-                                          minimumFractionDigits: 2,
-                                          maximumFractionDigits: 2,
-                                        }).format(Number(item.credit))}
+                                  style: 'decimal',
+                                  minimumFractionDigits: 2,
+                                  maximumFractionDigits: 2,
+                                }).format(Number(item.credit))}
                               </>
                             )}
                           </Text>

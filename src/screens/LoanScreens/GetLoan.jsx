@@ -23,6 +23,7 @@ import {useRoute} from '@react-navigation/native';
 import {useSelector} from 'react-redux';
 import {getGuarantors} from '../../stores/GuarantorStore';
 import COLORS from '../../constants/colors';
+import appsFlyer from 'react-native-appsflyer';
 
 const durationData = [
   {value: '', label: 'Select Duration'},
@@ -212,6 +213,28 @@ const GetLoan = () => {
     !loanDetails.amount ||
     !loanDetails.loanTenor;
 
+
+    const logAppsFlyer = (event, duration, type, value) => {
+      const eventName = event;
+      const eventValues = {
+        loan_duration: duration,
+        loan_type: type,
+        currency: 'NGN',
+        revenue: value,
+      };
+  
+      appsFlyer.logEvent(
+        eventName,
+        eventValues,
+        res => {
+          // console.log(res);
+        },
+        err => {
+          // console.error(err);
+        },
+      );
+    };
+
   const handleCreateLoan = async () => {
     if (guarantors.length !== 0) {
       try {
@@ -229,6 +252,7 @@ const GetLoan = () => {
             onPress: () => Toast.hide(),
           });
         } else {
+          logAppsFlyer('loan', loanDetails?.loanTenor, loanDetails?.loanType, loanDetails?.amount);
           Toast.show({
             type: 'success',
             position: 'top',

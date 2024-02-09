@@ -27,7 +27,7 @@ import {PersistGate} from 'redux-persist/integration/react';
 import {persistor, resetStore, store} from './src/util/redux/store';
 import {LightTheme} from './src/constants/lightTheme';
 import {DarkTheme} from './src/constants/darkTheme';
-import { DefaultTheme } from 'react-native-paper';
+import {DefaultTheme} from 'react-native-paper';
 import InputPin from './src/screens/SecurityScreens/PinInput';
 import NetworkStatus from './src/util/NetworkService';
 import RNRestart from 'react-native-restart';
@@ -36,6 +36,8 @@ import {userLogOut} from './src/stores/AuthStore';
 import {auth} from './src/util/firebase/firebaseConfig';
 import BackgroundTimer from 'react-native-background-timer';
 import {TextColorProvider} from './src/component/TextColorContext';
+import InitializeSDKHandler from './src/component/appFlyer/InitializeSDKHandler';
+import DeviceInfo from 'react-native-device-info';
 
 const inAppUpdates = new SpInAppUpdates(false);
 
@@ -53,6 +55,7 @@ const datadogConfiguration = new DatadogProviderConfiguration(
   true, // track XHR Resources
   true, // track Errors
 );
+
 // Optional: Select your Datadog website (one of "US", "EU" or "GOV")
 datadogConfiguration.site = 'US';
 // Optional: enable or disable native crash reports
@@ -90,7 +93,6 @@ function App() {
               updateType: IAUUpdateKind.FLEXIBLE,
             },
           });
-
           inAppUpdates.startUpdate(updateOptions);
         }
       })
@@ -267,7 +269,12 @@ function App() {
 
   const colorScheme = useColorScheme();
   // const theme = colorScheme === 'dark' ? {...DefaultTheme} : {...LightTheme};
-  const theme = {...DefaultTheme}; 
+  const theme = {...DefaultTheme};
+
+  // const deviceId = DeviceInfo.getUniqueId();
+  // console.log(Platform.select({ios: 'IOS', android: 'Sndroid'}));
+  // console.log('Device Id:', deviceId);
+
   return (
     <SafeAreaProvider style={styles.rootContainer}>
       <PaperProvider theme={theme}>
@@ -293,6 +300,7 @@ function App() {
                 <Provider store={store}>
                   <PersistGate persistor={persistor} loading={null}>
                     <TextColorProvider>
+                      <InitializeSDKHandler />
                       <NetworkStatus />
                       <AppNavigationContainer />
                     </TextColorProvider>

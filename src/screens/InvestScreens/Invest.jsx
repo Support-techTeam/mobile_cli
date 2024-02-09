@@ -27,6 +27,7 @@ import {
   getAllLendaInvestment,
   getSingleArmInvestment,
 } from '../../stores/InvestStore';
+import appsFlyer from 'react-native-appsflyer';
 
 const Investscreen = () => {
   const navigation = useNavigation();
@@ -284,12 +285,14 @@ const Investscreen = () => {
                 <TouchableOpacity
                   onPress={() => {
                     if (item.id == 1) {
+                      logAppsFlyer('invest', 'lend with tradelenda', 'view plans', 0);
                       navigation.navigate('InvestmentOption', {
                         name: 'Lenda',
                         header: 'LEND WITH TRADELENDA',
                       });
                     } else if (item.id == 2) {
                       if (isReadyToInvest) {
+                        logAppsFlyer('invest', 'save with arm','view plans', 0);
                         navigation.navigate('InvestmentOption', {
                           name: 'Arm',
                           header: 'SAVE WITH ARM',
@@ -521,6 +524,27 @@ const Investscreen = () => {
   const renderScene = SceneMap({
     myInvesments: FirstRoute,
   });
+
+  const logAppsFlyer = (event, investmentName, activity, value) => {
+    const eventName = event;
+    const eventValues = {
+      investment_type: investmentName,
+      activity_type: activity,
+      currency: 'NGN',
+      revenue: value,
+    };
+
+    appsFlyer.logEvent(
+      eventName,
+      eventValues,
+      res => {
+        // console.log(res);
+      },
+      err => {
+        // console.error(err);
+      },
+    );
+  };
 
   return (
     <>

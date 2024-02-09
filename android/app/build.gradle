@@ -100,8 +100,8 @@ android {
         applicationId 'com.tradelenda.app'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionName "3.0.5"
-        versionCode 38
+        versionName "3.0.6"
+        versionCode 39
         multiDexEnabled true
     }
 
@@ -244,6 +244,7 @@ dependencies {
     implementation("com.facebook.react:react-android")
     implementation project(':react-native-splash-screen')
     implementation project(':react-native-share')
+    implementation("com.android.installreferrer:installreferrer:2.2")
     // implementation project(':RNSendIntentModule')
 
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}")
