@@ -10,7 +10,7 @@ import {
   Dimensions,
 } from 'react-native';
 import React, {useState, useEffect} from 'react';
-import {Formik} from 'formik';
+import { Formik } from 'formik';
 import {CheckBox} from '@rneui/themed';
 import {useNavigation} from '@react-navigation/native';
 import Spinner from 'react-native-loading-spinner-overlay';
@@ -438,13 +438,13 @@ const SignUp = () => {
                                 }}>
                                 {lengthValid ? (
                                   <Icon
-                                    name="checkcircle"
+                                    name="check-circle-outline"
                                     size={20}
                                     color="#24348B"
                                   />
                                 ) : (
                                   <Icon
-                                    name="closecircle"
+                                    name="close-circle-outline"
                                     size={20}
                                     color="#ED2E7E"
                                   />
@@ -463,13 +463,13 @@ const SignUp = () => {
                                 }}>
                                 {lengthValid ? (
                                   <Icon
-                                    name="checkcircle"
+                                    name="check-circle-outline"
                                     size={20}
                                     color="#24348B"
                                   />
                                 ) : (
                                   <Icon
-                                    name="closecircle"
+                                    name="close-circle-outline"
                                     size={20}
                                     color="#ED2E7E"
                                   />
@@ -488,13 +488,13 @@ const SignUp = () => {
                                 }}>
                                 {upperValid ? (
                                   <Icon
-                                    name="checkcircle"
+                                    name="check-circle-outline"
                                     size={20}
                                     color="#24348B"
                                   />
                                 ) : (
                                   <Icon
-                                    name="closecircle"
+                                    name="close-circle-outline"
                                     size={20}
                                     color="#ED2E7E"
                                   />
@@ -513,13 +513,13 @@ const SignUp = () => {
                                 }}>
                                 {numberValid ? (
                                   <Icon
-                                    name="checkcircle"
+                                    name="check-circle-outline"
                                     size={20}
                                     color="#24348B"
                                   />
                                 ) : (
                                   <Icon
-                                    name="closecircle"
+                                    name="close-circle-outline"
                                     size={20}
                                     color="#ED2E7E"
                                   />
@@ -537,13 +537,13 @@ const SignUp = () => {
                                 }}>
                                 {specialValid ? (
                                   <Icon
-                                    name="checkcircle"
+                                    name="check-circle-outline"
                                     size={20}
                                     color="#24348B"
                                   />
                                 ) : (
                                   <Icon
-                                    name="closecircle"
+                                    name="close-circle-outline"
                                     size={20}
                                     color="#ED2E7E"
                                   />

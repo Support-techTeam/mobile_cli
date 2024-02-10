@@ -14,7 +14,7 @@ const CustomTabBar = ({navigationState, onIndexChange}) => {
   const handleTabPress = index => {
     setActiveTab(index);
     onIndexChange(index);
-    flatListRef.current.scrollToIndex({index, animated: true});
+    flatListRef?.current?.scrollToIndex({index, animated: true});
   };
 
   const renderItem = ({item, index}) => {
@@ -35,7 +35,7 @@ const CustomTabBar = ({navigationState, onIndexChange}) => {
     <View style={styles.tabBar}>
       <FlatList
         ref={flatListRef}
-        data={data}
+        data={data ? data : []}
         renderItem={renderItem}
         horizontal
         showsHorizontalScrollIndicator={false}

@@ -12,7 +12,7 @@ import {useSafeAreaInsets, SafeAreaView} from 'react-native-safe-area-context';
 import {resendVerificationEmail, userLogOut} from '../../stores/AuthStore';
 import {useDispatch, useSelector} from 'react-redux';
 import {signUpUser} from '../../util/redux/userAuth/user.auth.slice';
-import {auth} from '../../util/firebase/firebaseConfig';
+import auth from '@react-native-firebase/auth';
 import Toast from 'react-native-toast-message';
 import Spinner from 'react-native-loading-spinner-overlay';
 import COLORS from '../../constants/colors';
@@ -24,19 +24,21 @@ const Verification = () => {
   const user = useSelector(state => state.userAuth.user);
   const insets = useSafeAreaInsets();
   const [isLoading, setIsLoading] = useState(false);
-  const [isVerified, setIsVerified] = useState(
-    JSON.parse(user)?.user?.emailVerified,
-  );
+  // const [isVerified, setIsVerified] = useState(
+  //   JSON.parse(user)?.user?.emailVerified,
+  // );
+  let isVerified = auth().currentUser?.emailVerified;
   const [count, setCount] = useState(0);
   const route = useRoute();
 
   useEffect(() => {
     const interval = setInterval(async () => {
-      const userData = auth.currentUser;
+      // const userData = auth().currentUser;
+      const userData = auth().currentUser;
       await userData?.reload();
       if (userData && userData.emailVerified) {
         dispatch(signUpUser(JSON.stringify(userData)));
-        setIsVerified(userData.emailVerified);
+        isVerified = userData.emailVerified;
       } else {
         setCount(count + 1);
       }

@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "24130547176",
+    "firebase_url": "https://tradelenda-app-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "tradelenda-app",
+    "storage_bucket": "tradelenda-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:24130547176:android:7f09da39545b4a0f1cc85d",
+        "android_client_info": {
+          "package_name": "com.tradelenda.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "24130547176-7v8e92ivld438dkh8snm39dm6b13u25k.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA3bQfyS42dumJR1gkdYQvToDPZiYzMhQ8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "24130547176-7v8e92ivld438dkh8snm39dm6b13u25k.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

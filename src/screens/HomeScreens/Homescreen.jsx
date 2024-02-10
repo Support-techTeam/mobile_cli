@@ -259,7 +259,7 @@ const Homescreen = () => {
           setAllUserTransactionsData(res?.data?.transactions.transaction);
         }
       }
-    }, 100000);
+    }, 60000);
 
     return () => {
       clearInterval(interval);
@@ -358,8 +358,8 @@ const Homescreen = () => {
       .then(res => {
         if (res) {
           if (!res?.error) {
-            dispatch(setWallet(resWallet?.data?.data?.wallet));
-            dispatch(setAccount(resWallet?.data?.data?.accountDetails));
+            dispatch(setWallet(res?.data?.data?.wallet));
+            dispatch(setAccount(res?.data?.data?.accountDetails));
           }
         }
       })

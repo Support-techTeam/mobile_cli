@@ -67,6 +67,13 @@ target 'Tradelenda' do
   :path => '../node_modules/react-native-appsflyer'
   # Flags change depending on the env values.
   flags = get_default_flags()
+  pod 'Firebase', :modular_headers => true
+  pod 'Firebase/Core', :modular_headers => true
+  pod 'Firebase/Auth', :modular_headers => true
+  pod 'FirebaseCoreInternal', :modular_headers => true
+  pod 'GoogleUtilities', :modular_headers => true
+  pod 'FirebaseCore', :modular_headers => true
+  pod 'Firebase/Messaging', :modular_headers => true
   # use_react_native!(:path => config[:reactNativePath], :hermes_enabled => false)
 
   use_react_native!(
@@ -102,7 +109,7 @@ target 'Tradelenda' do
   'MediaLibrary',
   'Microphone',
   # 'Motion',
-  # 'Notifications',
+  'Notifications',
   'PhotoLibrary',
   'PhotoLibraryAddOnly',
   # 'Reminders',

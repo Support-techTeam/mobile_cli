@@ -8,15 +8,5 @@
   "BASE_URL": "https://sjrg8dpghv.us-east-1.awsapprunner.com",
   "BASE_API_URL": "https://eywxitmij3.us-east-1.awsapprunner.com/api/v1",
   "SCREELOCK_CODE": "screellockcode",
-  "SCREENLOCK_STATUS": "screellockstatus",
-  "firebase_config": {
-    "apiKey": "AIzaSyCjf2yeQk6DkOLiPbigFK1oi1slcmmFJQo",
-    "authDomain": "tradelenda-staging.firebaseapp.com",
-    "databaseURL": "https://tradelenda-staging-default-rtdb.europe-west1.firebasedatabase.app",
-    "projectId": "tradelenda-staging",
-    "storageBucket": "tradelenda-staging.appspot.com",
-    "messagingSenderId": "1046946781296",
-    "appId": "1:1046946781296:web:2915787620c19ca662fcb5",
-    "measurementId": "G-1JEE8QKLC7"
-  }
+  "SCREENLOCK_STATUS": "screellockstatus"
 }
