@@ -45,6 +45,7 @@
 		D434D03E0EF1FAE15DBC4A1F /* Pods-Tradelenda-TradelendaTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Tradelenda-TradelendaTests.debug.xcconfig"; path = "Target Support Files/Pods-Tradelenda-TradelendaTests/Pods-Tradelenda-TradelendaTests.debug.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		F42C4CB0AD08C48F74339B82 /* Pods-Tradelenda.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Tradelenda.release.xcconfig"; path = "Target Support Files/Pods-Tradelenda/Pods-Tradelenda.release.xcconfig"; sourceTree = "<group>"; };
+		F90FA5D32B7791270016D4BF /* Tradelenda.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = Tradelenda.entitlements; path = Tradelenda/Tradelenda.entitlements; sourceTree = "<group>"; };
 		F9CEE3A72B76EE6F004C1C13 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -88,6 +89,7 @@
 		13B07FAE1A68108700A75B9A /* Tradelenda */ = {
 			isa = PBXGroup;
 			children = (
+				F90FA5D32B7791270016D4BF /* Tradelenda.entitlements */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.mm */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
@@ -550,11 +552,12 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				CODE_SIGN_ENTITLEMENTS = Tradelenda/Tradelenda.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Distribution: TRADE LENDA COM LIMITED (BZG5ZNL62R)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Distribution: TRADE LENDA COM LIMITED (BZG5ZNL62R)";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 8;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = BZG5ZNL62R;
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = BZG5ZNL62R;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Tradelenda/Info.plist;
@@ -573,7 +576,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.tradelenda.ios;
 				PRODUCT_NAME = Tradelenda;
-				PROVISIONING_PROFILE_SPECIFIER = "";
+				PROVISIONING_PROFILE_SPECIFIER = "tradelenda-dacodin";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "tradelenda-dacodin";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -591,11 +594,12 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				CODE_SIGN_ENTITLEMENTS = Tradelenda/Tradelenda.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Distribution: TRADE LENDA COM LIMITED (BZG5ZNL62R)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Distribution: TRADE LENDA COM LIMITED (BZG5ZNL62R)";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 8;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = BZG5ZNL62R;
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = BZG5ZNL62R;
 				INFOPLIST_FILE = Tradelenda/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Trade Lenda";
@@ -613,7 +617,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.tradelenda.ios;
 				PRODUCT_NAME = Tradelenda;
-				PROVISIONING_PROFILE_SPECIFIER = "";
+				PROVISIONING_PROFILE_SPECIFIER = "tradelenda-dacodin";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "tradelenda-dacodin";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
