@@ -2,18 +2,15 @@ import React from 'react';
 import axios from 'axios';
 import {BASE_API_URL} from '../../app.json';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {auth} from '../util/firebase/firebaseConfig';
 import {store} from '../util/redux/store';
 import {DdLogs} from '@datadog/mobile-react-native';
+import auth from '@react-native-firebase/auth';
 
 //get login token
 const reduxStore = store.getState().userAuth;
 
 let token = null;
 let headers;
-if (reduxStore !== null || reduxStore !== undefined) {
-  token = JSON.parse(reduxStore.user)?.stsTokenManager?.accessToken;
-}
 const axiosInstance = axios.create({baseURL: BASE_API_URL});
 
 const getState = async () => {
@@ -94,10 +91,11 @@ const getProfileDetails = async () => {
     store.getState().networkState.network.isConnected &&
     store.getState().networkState.network.isInternetReachable
   ) {
-    if (auth?.currentUser?.stsTokenManager?.accessToken) {
+    await getFirebaseAuthToken();
+    if (token) {
       headers = {
         accept: 'application/json',
-        Authorization: `Bearer ${auth.currentUser?.stsTokenManager?.accessToken}`,
+        Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       };
       try {
@@ -145,10 +143,11 @@ const createUserProfile = async details => {
     store.getState().networkState.network.isConnected &&
     store.getState().networkState.network.isInternetReachable
   ) {
-    if (auth?.currentUser?.stsTokenManager?.accessToken) {
+    await getFirebaseAuthToken();
+    if (token) {
       headers = {
         accept: 'application/json',
-        Authorization: `Bearer ${auth.currentUser?.stsTokenManager?.accessToken}`,
+        Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       };
       try {
@@ -200,10 +199,11 @@ const checkPin = async () => {
     store.getState().networkState.network.isConnected &&
     store.getState().networkState.network.isInternetReachable
   ) {
-    if (auth?.currentUser?.stsTokenManager?.accessToken) {
+    await getFirebaseAuthToken();
+    if (token) {
       headers = {
         accept: 'application/json',
-        Authorization: `Bearer ${auth.currentUser?.stsTokenManager?.accessToken}`,
+        Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       };
       try {
@@ -246,10 +246,11 @@ const createTransactionPin = async details => {
     store.getState().networkState.network.isConnected &&
     store.getState().networkState.network.isInternetReachable
   ) {
-    if (auth?.currentUser?.stsTokenManager?.accessToken) {
+    await getFirebaseAuthToken();
+    if (token) {
       headers = {
         accept: 'application/json',
-        Authorization: `Bearer ${auth.currentUser?.stsTokenManager?.accessToken}`,
+        Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       };
       try {
@@ -317,10 +318,11 @@ const changePin = async details => {
     store.getState().networkState.network.isConnected &&
     store.getState().networkState.network.isInternetReachable
   ) {
-    if (auth?.currentUser?.stsTokenManager?.accessToken) {
+    await getFirebaseAuthToken();
+    if (token) {
       headers = {
         accept: 'application/json',
-        Authorization: `Bearer ${auth.currentUser?.stsTokenManager?.accessToken}`,
+        Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       };
       try {
@@ -378,6 +380,20 @@ const changePin = async details => {
       data: null,
       message: 'No Internet Connection',
     };
+  }
+};
+
+const getFirebaseAuthToken = async () => {
+  try {
+    const user = auth().currentUser;
+    if (user) {
+      token = await user.getIdToken();
+      return '';
+    } else {
+      return '';
+    }
+  } catch (error) {
+    return '';
   }
 };
 

@@ -79,8 +79,8 @@ const Loanscreen = () => {
     try {
       setIsLoading(true);
       const response = await getLoanUserDetails();
-      if (!response.error) {
-        setLoanUserDetails(response.data);
+      if (!response?.error) {
+        setLoanUserDetails(response?.data);
       }
     } catch (error) {
     } finally {
@@ -92,8 +92,8 @@ const Loanscreen = () => {
     try {
       setIsLoading(true);
       const response = await getApprovedLoans();
-      if (!response.error) {
-        setApprovedLoansData(response.data);
+      if (!response?.error) {
+        setApprovedLoansData(response?.data);
       }
     } finally {
       setIsLoading(false);
@@ -300,7 +300,7 @@ const Loanscreen = () => {
         </View>
       ) : (
         <View style={{flex: 1}}>
-          {allLoansData.length > 0 ? (
+          {allLoansData?.length > 0 ? (
             <ScrollView
               showsHorizontalScrollIndicator={false}
               showsVerticalScrollIndicator={false}>
@@ -459,7 +459,7 @@ const Loanscreen = () => {
         </View>
       ) : (
         <View style={{flex: 1}}>
-          {approvedLoansData.length > 0 ? (
+          {approvedLoansData?.length > 0 ? (
             <ScrollView
               showsHorizontalScrollIndicator={false}
               showsVerticalScrollIndicator={false}>
@@ -610,7 +610,7 @@ const Loanscreen = () => {
         </View>
       ) : (
         <View style={{flex: 1}}>
-          {paidLoansData.length > 0 ? (
+          {paidLoansData?.length > 0 ? (
             <ScrollView
               showsHorizontalScrollIndicator={false}
               showsVerticalScrollIndicator={false}>
@@ -761,7 +761,7 @@ const Loanscreen = () => {
         </View>
       ) : (
         <View style={{flex: 1}}>
-          {pendingLoansData.length > 0 ? (
+          {pendingLoansData?.length > 0 ? (
             <ScrollView
               showsHorizontalScrollIndicator={false}
               showsVerticalScrollIndicator={false}>
@@ -1023,7 +1023,7 @@ const Loanscreen = () => {
 
             <TouchableOpacity
               onPress={() => {
-                if (guarantor && guarantor.length <= 0) {
+                if (guarantor && guarantor?.length <= 0) {
                   Toast.show({
                     type: 'warning',
                     position: 'top',
@@ -1041,7 +1041,7 @@ const Loanscreen = () => {
                     loanUserDetails?.loanDocumentDetails
                       ?.validIdentification === undefined
                       ? 'OnboardingHome'
-                      : guarantor && guarantor.length > 0
+                      : guarantor && guarantor?.length > 0
                       ? 'GetLoan'
                       : 'AddGuarantors'
                   }`,

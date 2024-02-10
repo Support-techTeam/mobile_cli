@@ -1,16 +1,10 @@
-import {auth} from '../util/firebase/firebaseConfig';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-  signOut,
-  sendEmailVerification,
-  sendPasswordResetEmail,
-  updateProfile,
-} from 'firebase/auth';
 import {BASE_URL} from '../../app.json';
 import {store} from '../util/redux/store';
 import {DdLogs} from '@datadog/mobile-react-native';
+import auth from '@react-native-firebase/auth';
+
+let confirm = null;
 
 const userLogin = async (email, password) => {
   if (
@@ -19,8 +13,7 @@ const userLogin = async (email, password) => {
     store.getState().networkState.network.isInternetReachable
   ) {
     try {
-      const userCredential = await signInWithEmailAndPassword(
-        auth,
+      const userCredential = await auth().signInWithEmailAndPassword(
         email,
         password,
       );
@@ -66,22 +59,25 @@ const userLogOut = async () => {
     store.getState().networkState.network.isConnected &&
     store.getState().networkState.network.isInternetReachable
   ) {
-    try {
-      await signOut(auth);
-      return {
-        user: null,
-        title: 'Account Logout',
-        error: false,
-        message: 'Logout Successful',
-      };
-    } catch (err) {
-      return {
-        user: null,
-        title: 'Account Logout',
-        error: true,
-        message: 'Logout Failed',
-      };
-    }
+    // await signOut(auth);
+    await auth()
+      .signOut()
+      .then(() => {
+        return {
+          user: null,
+          title: 'Account Logout',
+          error: false,
+          message: 'Logout Successful',
+        };
+      })
+      .catch(err => {
+        return {
+          user: null,
+          title: 'Account Logout',
+          error: true,
+          message: err,
+        };
+      });
   } else {
     return {
       error: true,
@@ -98,19 +94,18 @@ const userSignUp = async details => {
     store.getState().networkState.network.isInternetReachable
   ) {
     try {
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
+      const userCredential = await auth().createUserWithEmailAndPassword(
         details.email.trim(),
         details.password.trim(),
       );
-      const newUser = userCredential.user;
 
+      const newUser = userCredential.user;
+      console.log(userCredential.user);
       if (newUser) {
-        await updateProfile(newUser, {
-          displayName: details.firstname.trim() + ' ' + details.lastname.trim(),
-        });
+        await updateProfileData(details.firstname, details.lastname);
       }
-      await sendEmailVerification(newUser);
+      await sendVerificationEmail();
+
       DdLogs.info(`User | Account Signup | ${details.email.trim()}`, {
         context: JSON.stringify(newUser),
       });
@@ -147,12 +142,12 @@ const resendVerificationEmail = async () => {
     store.getState().networkState.network.isInternetReachable
   ) {
     try {
-      await sendEmailVerification(auth.currentUser);
+      auth().currentUser.sendEmailVerification();
       DdLogs.info(`User | Resend Verification Email |`, {
-        context: JSON.stringify(auth.currentUser),
+        context: JSON.stringify(auth().currentUser),
       });
       return {
-        user: auth.currentUser,
+        user: auth().currentUser,
         title: 'Resend Verification Email',
         error: false,
         message: 'Resend Verification Email Successful',
@@ -162,7 +157,7 @@ const resendVerificationEmail = async () => {
         errorMessage: JSON.stringify(err),
       });
       return {
-        user: auth.currentUser,
+        user: auth().currentUser,
         title: 'Resend Verification Email',
         error: false,
         message: `${err.message}`,
@@ -177,6 +172,26 @@ const resendVerificationEmail = async () => {
   }
 };
 
+const sendVerificationEmail = async () => {
+  try {
+    await auth().currentUser.sendEmailVerification();
+    // console.log('Verification email sent');
+  } catch (error) {
+    // console.error(error);
+  }
+};
+
+const updateProfileData = async (firstname, lastname) => {
+  try {
+    await auth().currentUser.updateProfile({
+      displayName: firstname.trim() + ' ' + lastname.trim(),
+    });
+    // console.log('Update displayName');
+  } catch (error) {
+    // console.error(error);
+  }
+};
+
 const forgotPassword = async email => {
   if (
     store.getState().networkState &&
@@ -188,12 +203,12 @@ const forgotPassword = async email => {
         url: `${BASE_URL}/login/?email=${email}`,
         handleCodeInApp: true,
       };
-      await sendPasswordResetEmail(auth, email.trim(), actionCodeSettings);
+      await auth().sendPasswordResetEmail(email.trim(), actionCodeSettings);
       DdLogs.info(`User | Password Reset | ${email}`, {
-        context: JSON.stringify(auth.currentUser),
+        context: JSON.stringify(auth().currentUser),
       });
       return {
-        user: auth.currentUser,
+        user: auth().currentUser,
         title: 'Password Reset',
         error: false,
         message: 'Password reset link sent to email.',
@@ -203,7 +218,7 @@ const forgotPassword = async email => {
         errorMessage: JSON.stringify(err),
       });
       return {
-        user: auth.currentUser,
+        user: auth().currentUser,
         title: 'Password Reset',
         error: false,
         message: `${err.message}`,

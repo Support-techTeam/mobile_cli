@@ -8,7 +8,8 @@ import {
 import {useColorScheme} from 'react-native';
 import AppStack from './AppStack';
 import AuthStack from './AuthStack';
-import {auth} from '../util/firebase/firebaseConfig';
+// import {auth} from '../util/firebase/firebaseConfig';
+import auth from '@react-native-firebase/auth';
 import SplashScreen from 'react-native-splash-screen';
 import Splashscreen from './Splashscreen';
 import NetworkScreen from './NetworkError';
@@ -26,36 +27,45 @@ const AppNavigationContainer = () => {
 
   useLayoutEffect(() => {
     if (
-      auth.currentUser === undefined ||
-      auth.currentUser === null ||
-      auth.currentUser
+      auth().currentUser === undefined ||
+      auth().currentUser === null ||
+      auth().currentUser
     ) {
       SplashScreen.hide();
     }
   }, []);
 
+  //auth state change listener
   useLayoutEffect(() => {
-    const subscriber = auth.onAuthStateChanged(user => {
-      setUser(user);
-      setIsLoading(false);
+    const unsubscribe = auth().onAuthStateChanged(currentUser => {
+      if (currentUser) {
+        setUser(currentUser);
+        setIsLoading(false);
+      } else {
+        setUser(null);
+        setIsLoading(false);
+      }
     });
 
-    return subscriber;
+    // Clean up the listener when the component unmounts
+    return unsubscribe;
   }, []);
 
+  //refresh token
   useEffect(() => {
     const checkAndRenewToken = async () => {
-      const currentUser = auth.currentUser;
-      if (currentUser) {
-        try {
-          const idToken = await currentUser.getIdToken(true);
-        } catch (err) {
-          // Handle error
+      try {
+        const currentUser = auth().currentUser;
+        if (currentUser) {
+          const token = await currentUser.getIdToken(true);
+        } else {
         }
+      } catch (error) {
+        // console.error('Error renewing token:', error);
       }
     };
     const intervalCheck = setInterval(checkAndRenewToken, 600000);
-
+    
     return () => clearInterval(intervalCheck);
   }, []);
   return (

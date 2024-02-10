@@ -341,7 +341,7 @@ const InvestmentDetails = () => {
 
           {name === 'Lenda' && investment?.topUpAmount !== 0 && (
             <View style={styles.detailsView}>
-              <Text style={styles.desc}>Top-Up Amount</Text>
+              <Text style={styles.desc}>Total Top-Up Amount</Text>
               <Text style={[styles.amount, {fontFamily: 'serif'}]}>
                 ₦
                 {investment?.topUpAmount

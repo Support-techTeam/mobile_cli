@@ -20,6 +20,7 @@ import {
   renewSubscription,
   updateSubscription,
 } from '../../stores/BillStore';
+import appsFlyer from 'react-native-appsflyer';
 
 const BillPin = ({route}) => {
   const {airtimeDetails, acctNumber, selectedPackageData} = route.params;
@@ -43,7 +44,6 @@ const BillPin = ({route}) => {
     amount: Number(airtimeDetails.amount),
     phone: airtimeDetails.number,
     transactionPin: pinString,
-    // transactionPin: `${otp.f + otp.s + otp.t + otp.fo}`,
   };
   const dataDetails = {
     serviceType: airtimeDetails.network,
@@ -69,6 +69,27 @@ const BillPin = ({route}) => {
     cardNumber: airtimeDetails.cardNumber,
   };
 
+  const logAppsFlyer = (event, serviceType, phone, value) => {
+    const eventName = event;
+    const eventValues = {
+      service_type: serviceType,
+      contact: phone,
+      currency: 'NGN',
+      revenue: value,
+    };
+
+    appsFlyer.logEvent(
+      eventName,
+      eventValues,
+      res => {
+        // console.log(res);
+      },
+      err => {
+        // console.error(err);
+      },
+    );
+  };
+
   const createPayment = async () => {
     if (airtimeDetails.service === 'airtime purchase') {
       try {
@@ -89,6 +110,7 @@ const BillPin = ({route}) => {
             navigation.navigate('StatusFailed');
           }, 1000);
         } else {
+          logAppsFlyer('bill_purchase', details?.serviceType, details?.phone, details?.amount);
           Toast.show({
             type: 'success',
             position: 'top',
@@ -128,6 +150,7 @@ const BillPin = ({route}) => {
             navigation.navigate('StatusFailed');
           }, 1000);
         } else {
+          logAppsFlyer('bill_purchase', dataDetails?.serviceType, dataDetails?.phone, dataDetails?.amount);
           Toast.show({
             type: 'success',
             position: 'top',
@@ -167,6 +190,7 @@ const BillPin = ({route}) => {
             navigation.navigate('StatusFailed');
           }, 1000);
         } else {
+          logAppsFlyer('bill_purchase', powerDetails?.serviceType, powerDetails?.phone, powerDetails?.amount);
           Toast.show({
             type: 'success',
             position: 'top',
@@ -211,6 +235,7 @@ const BillPin = ({route}) => {
             navigation.navigate('StatusFailed');
           }, 1000);
         } else {
+          logAppsFlyer('bill_purchase', cableDetails?.serviceType, cableDetails?.phone, cableDetails?.amount);
           Toast.show({
             type: 'success',
             position: 'top',

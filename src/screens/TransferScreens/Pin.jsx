@@ -18,6 +18,7 @@ import {
   createInternalTransfer,
   createNIPTransfer,
 } from '../../stores/WalletStore';
+import appsFlyer from 'react-native-appsflyer';
 
 const Pin = ({route}) => {
   const insets = useSafeAreaInsets();
@@ -95,6 +96,26 @@ const Pin = ({route}) => {
     });
   }, [bankDetails, otp]);
 
+  const logAppsFlyer = (event, serviceType, value) => {
+    const eventName = event;
+    const eventValues = {
+      service_type: serviceType,
+      currency: 'NGN',
+      revenue: value,
+    };
+
+    appsFlyer.logEvent(
+      eventName,
+      eventValues,
+      res => {
+        // console.log(res);
+      },
+      err => {
+        // console.error(err);
+      },
+    );
+  };
+
   const handleTransfer = async () => {
     try {
       if (internalTransferDetails.toWalletIdAccountNumber !== '') {
@@ -112,6 +133,7 @@ const Pin = ({route}) => {
             onPress: () => Toast.hide(),
           });
         } else {
+          logAppsFlyer('Transfer', 'Internal Transfer', transferDetails?.amount);
           Toast.show({
             type: 'success',
             position: 'top',
@@ -140,6 +162,7 @@ const Pin = ({route}) => {
             onPress: () => Toast.hide(),
           });
         } else {
+          logAppsFlyer('Transfer', 'NIP Transfer', internalTransferDetails?.amount);
           Toast.show({
             type: 'success',
             position: 'top',

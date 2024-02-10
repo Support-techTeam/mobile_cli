@@ -2,11 +2,17 @@
 import React from 'react';
 import {AppRegistry, Text, View} from 'react-native';
 import App from './App';
-import {name as appName} from './app.json';
+import {name as appName, firebase_config} from './app.json';
 import Toast, {BaseToast, ErrorToast} from 'react-native-toast-message';
 import {NativeBaseProvider, extendTheme} from 'native-base';
 import networkService from './src/util/NetworkService';
+import RemotePushController from './src/component/push-notifications/RemotePushController';
+import messaging from '@react-native-firebase/messaging';
 
+// Register background handler
+messaging().setBackgroundMessageHandler(async remoteMessage => {
+  // console.log('Message handled in the background!', remoteMessage);
+});
 
 // Initialize network service
 // const network = new networkService();
@@ -152,6 +158,7 @@ const toastConfig = {
 const AppWithToast = () => (
   <NativeBaseProvider theme={themeNative}>
     <App />
+    {/* <RemotePushController /> */}
     <Toast config={toastConfig} />
   </NativeBaseProvider>
 );

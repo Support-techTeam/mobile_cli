@@ -28,6 +28,7 @@ import {
   redeemArmInvestment,
   redeemLendaInvestment,
 } from '../../stores/InvestStore';
+import appsFlyer from 'react-native-appsflyer';
 
 const durationData = [
   {value: '', label: 'Select Option'},
@@ -75,6 +76,27 @@ const InvestmentRedemption = () => {
     !armDetails.membershipId ||
     !armDetails.investmentId ||
     armDetails.otp.length < 5;
+
+  const logAppsFlyer = (event, investmentName, activity, value) => {
+    const eventName = event;
+    const eventValues = {
+      investment_type: investmentName,
+      activity_type: activity,
+      currency: 'NGN',
+      revenue: value,
+    };
+
+    appsFlyer.logEvent(
+      eventName,
+      eventValues,
+      res => {
+        // console.log(res);
+      },
+      err => {
+        // console.error(err);
+      },
+    );
+  };
 
   const handleGetArmOtp = async () => {
     try {
@@ -125,6 +147,12 @@ const InvestmentRedemption = () => {
           onPress: () => Toast.hide(),
         });
       } else {
+        logAppsFlyer(
+          'invest',
+          `ARM ${armDetails?.membershipId}`,
+          'Investment Redemption',
+          armDetails?.amount,
+        );
         Toast.show({
           type: 'success',
           position: 'top',
@@ -202,6 +230,12 @@ const InvestmentRedemption = () => {
           onPress: () => Toast.hide(),
         });
       } else {
+        logAppsFlyer(
+          'invest',
+          `Lenda ${investmentDetails?.id}`,
+          'Investment Redemption',
+          investmentDetails?.amount,
+        );
         Toast.show({
           type: 'success',
           position: 'top',

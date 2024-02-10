@@ -11,6 +11,9 @@ import com.facebook.soloader.SoLoader;
 import java.util.List;
 import cl.json.RNSharePackage;
 import cl.json.ShareApplication;
+
+// import io.invertase.firebase.app.ReactNativeFirebaseAppPackage';
+// import io.invertase.firebase.messaging.RNFirebaseMessagingPackage;
 // import com.burnweb.rnsendintent.RNSendIntentPackage;
 
 public class MainApplication extends Application implements ReactApplication {
@@ -27,6 +30,8 @@ public class MainApplication extends Application implements ReactApplication {
           @SuppressWarnings("UnnecessaryLocalVariable")
           List<ReactPackage> packages = new PackageList(this).getPackages();
           
+          // packages.add(new RNFirebaseMessagingPackage());
+          // packages.add(new ReactNativeFirebaseAppPackage());
           // Packages that cannot be autolinked yet can be added manually here, for example:
           // packages.add(new MyReactNativePackage());
           // packages.add(new RNSharePackage());
