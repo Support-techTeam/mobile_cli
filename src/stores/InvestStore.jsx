@@ -1,22 +1,16 @@
 import React from 'react';
 import axios from 'axios';
 import {BASE_API_URL} from '../../app.json';
-import {auth} from '../util/firebase/firebaseConfig';
+import auth from '@react-native-firebase/auth';
 import {store} from '../util/redux/store';
 import {DdLogs} from '@datadog/mobile-react-native';
 
 //get login token
-const reduxStore = store.getState().userAuth;
+let token = null;
 let uploadProgress = 0;
 
 let headers;
-if (reduxStore !== null || reduxStore !== undefined) {
-  token =
-    JSON.parse(reduxStore.user)?.user?.stsTokenManager?.accessToken != null ||
-    JSON.parse(reduxStore.user)?.user?.stsTokenManager?.accessToken != undefined
-      ? JSON.parse(reduxStore.user)?.user?.stsTokenManager?.accessToken
-      : JSON.parse(reduxStore.user)?.stsTokenManager?.accessToken;
-}
+
 const axiosInstance = axios.create({baseURL: BASE_API_URL});
 
 const getAllLendaProduct = async () => {
@@ -25,10 +19,11 @@ const getAllLendaProduct = async () => {
     store.getState().networkState.network.isConnected &&
     store.getState().networkState.network.isInternetReachable
   ) {
-    if (auth?.currentUser?.stsTokenManager?.accessToken) {
+    await getFirebaseAuthToken();
+    if (token) {
       headers = {
         accept: 'application/json',
-        Authorization: `Bearer ${auth.currentUser?.stsTokenManager?.accessToken}`,
+        Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       };
       try {
@@ -80,10 +75,11 @@ const getAllArmProduct = async () => {
     store.getState().networkState.network.isConnected &&
     store.getState().networkState.network.isInternetReachable
   ) {
-    if (auth?.currentUser?.stsTokenManager?.accessToken) {
+    await getFirebaseAuthToken();
+    if (token) {
       headers = {
         accept: 'application/json',
-        Authorization: `Bearer ${auth.currentUser?.stsTokenManager?.accessToken}`,
+        Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       };
       try {
@@ -132,10 +128,11 @@ const getArmProductYield = async productCode => {
     store.getState().networkState.network.isConnected &&
     store.getState().networkState.network.isInternetReachable
   ) {
-    if (auth?.currentUser?.stsTokenManager?.accessToken) {
+    await getFirebaseAuthToken();
+    if (token) {
       headers = {
         accept: 'application/json',
-        Authorization: `Bearer ${auth.currentUser?.stsTokenManager?.accessToken}`,
+        Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       };
       try {
@@ -187,10 +184,11 @@ const getAllLendaInvestment = async () => {
     store.getState().networkState.network.isConnected &&
     store.getState().networkState.network.isInternetReachable
   ) {
-    if (auth?.currentUser?.stsTokenManager?.accessToken) {
+    await getFirebaseAuthToken();
+    if (token) {
       headers = {
         accept: 'application/json',
-        Authorization: `Bearer ${auth.currentUser?.stsTokenManager?.accessToken}`,
+        Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       };
       try {
@@ -242,10 +240,11 @@ const getAllArmInvestment = async () => {
     store.getState().networkState.network.isConnected &&
     store.getState().networkState.network.isInternetReachable
   ) {
-    if (auth?.currentUser?.stsTokenManager?.accessToken) {
+    await getFirebaseAuthToken();
+    if (token) {
       headers = {
         accept: 'application/json',
-        Authorization: `Bearer ${auth.currentUser?.stsTokenManager?.accessToken}`,
+        Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       };
       try {
@@ -297,10 +296,11 @@ const getSingleArmInvestment = async (membershipId, productCode) => {
     store.getState().networkState.network.isConnected &&
     store.getState().networkState.network.isInternetReachable
   ) {
-    if (auth?.currentUser?.stsTokenManager?.accessToken) {
+    await getFirebaseAuthToken();
+    if (token) {
       headers = {
         accept: 'application/json',
-        Authorization: `Bearer ${auth.currentUser?.stsTokenManager?.accessToken}`,
+        Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       };
       try {
@@ -352,10 +352,11 @@ const createLendaInvestment = async details => {
     store.getState().networkState.network.isConnected &&
     store.getState().networkState.network.isInternetReachable
   ) {
-    if (auth?.currentUser?.stsTokenManager?.accessToken) {
+    await getFirebaseAuthToken();
+    if (token) {
       headers = {
         accept: 'application/json',
-        Authorization: `Bearer ${auth.currentUser?.stsTokenManager?.accessToken}`,
+        Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       };
       try {
@@ -422,10 +423,11 @@ const createArmInvestment = async details => {
     store.getState().networkState.network.isConnected &&
     store.getState().networkState.network.isInternetReachable
   ) {
-    if (auth?.currentUser?.stsTokenManager?.accessToken) {
+    await getFirebaseAuthToken();
+    if (token) {
       headers = {
         accept: 'application/json',
-        Authorization: `Bearer ${auth.currentUser?.stsTokenManager?.accessToken}`,
+        Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       };
       try {
@@ -493,10 +495,11 @@ const topUpArmInvestment = async details => {
     store.getState().networkState.network.isConnected &&
     store.getState().networkState.network.isInternetReachable
   ) {
-    if (auth?.currentUser?.stsTokenManager?.accessToken) {
+    await getFirebaseAuthToken();
+    if (token) {
       headers = {
         accept: 'application/json',
-        Authorization: `Bearer ${auth.currentUser?.stsTokenManager?.accessToken}`,
+        Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       };
       try {
@@ -563,10 +566,11 @@ const topUpLendaInvestment = async details => {
     store.getState().networkState.network.isConnected &&
     store.getState().networkState.network.isInternetReachable
   ) {
-    if (auth?.currentUser?.stsTokenManager?.accessToken) {
+    await getFirebaseAuthToken();
+    if (token) {
       headers = {
         accept: 'application/json',
-        Authorization: `Bearer ${auth.currentUser?.stsTokenManager?.accessToken}`,
+        Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       };
       try {
@@ -633,10 +637,11 @@ const redeemArmInvestment = async details => {
     store.getState().networkState.network.isConnected &&
     store.getState().networkState.network.isInternetReachable
   ) {
-    if (auth?.currentUser?.stsTokenManager?.accessToken) {
+    await getFirebaseAuthToken();
+    if (token) {
       headers = {
         accept: 'application/json',
-        Authorization: `Bearer ${auth.currentUser?.stsTokenManager?.accessToken}`,
+        Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       };
       try {
@@ -703,10 +708,11 @@ const getArmOTP = async membershipId => {
     store.getState().networkState.network.isConnected &&
     store.getState().networkState.network.isInternetReachable
   ) {
-    if (auth?.currentUser?.stsTokenManager?.accessToken) {
+    await getFirebaseAuthToken();
+    if (token) {
       headers = {
         accept: 'application/json',
-        Authorization: `Bearer ${auth.currentUser?.stsTokenManager?.accessToken}`,
+        Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       };
       try {
@@ -758,10 +764,11 @@ const redeemLendaInvestment = async details => {
     store.getState().networkState.network.isConnected &&
     store.getState().networkState.network.isInternetReachable
   ) {
-    if (auth?.currentUser?.stsTokenManager?.accessToken) {
+    await getFirebaseAuthToken();
+    if (token) {
       headers = {
         accept: 'application/json',
-        Authorization: `Bearer ${auth.currentUser?.stsTokenManager?.accessToken}`,
+        Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       };
       try {
@@ -828,10 +835,11 @@ const getLendaOTP = async data => {
     store.getState().networkState.network.isConnected &&
     store.getState().networkState.network.isInternetReachable
   ) {
-    if (auth?.currentUser?.stsTokenManager?.accessToken) {
+    await getFirebaseAuthToken();
+    if (token) {
       headers = {
         accept: 'application/json',
-        Authorization: `Bearer ${auth.currentUser?.stsTokenManager?.accessToken}`,
+        Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       };
       try {
@@ -898,10 +906,11 @@ const getArmTransactionsStatement = async (membershipId, startDate, endDate) => 
     store.getState().networkState.network.isConnected &&
     store.getState().networkState.network.isInternetReachable
   ) {
-    if (auth?.currentUser?.stsTokenManager?.accessToken) {
+    await getFirebaseAuthToken();
+    if (token) {
       headers = {
         accept: 'application/json',
-        Authorization: `Bearer ${auth.currentUser?.stsTokenManager?.accessToken}`,
+        Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       };
       try {
@@ -952,10 +961,11 @@ const getLendaTransactionsStatement = async (startDate, endDate) => {
     store.getState().networkState.network.isConnected &&
     store.getState().networkState.network.isInternetReachable
   ) {
-    if (auth?.currentUser?.stsTokenManager?.accessToken) {
+    await getFirebaseAuthToken();
+    if (token) {
       headers = {
         accept: 'application/json',
-        Authorization: `Bearer ${auth.currentUser?.stsTokenManager?.accessToken}`,
+        Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       };
       try {
@@ -997,6 +1007,20 @@ const getLendaTransactionsStatement = async (startDate, endDate) => {
       data: null,
       message: 'No Internet Connection',
     };
+  }
+};
+
+const getFirebaseAuthToken = async () => {
+  try {
+    const user = auth().currentUser;
+    if (user) {
+      token = await user.getIdToken();
+      return '';
+    } else {
+      return '';
+    }
+  } catch (error) {
+    return '';
   }
 };
 

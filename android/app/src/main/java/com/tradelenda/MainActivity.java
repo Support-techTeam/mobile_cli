@@ -11,8 +11,13 @@ public class MainActivity extends ReactActivity {
 
  @Override
     protected void onCreate(Bundle savedInstanceState) {
-        SplashScreen.show(this);  // here
+       try {
+        SplashScreen.show(this);
         super.onCreate(savedInstanceState);
+      } catch (Exception e) {
+          // e.printStackTrace();
+          // Handle the exception here, if needed
+      }
     }
   /**
    * Returns the name of the main component registered from JavaScript. This is used to schedule

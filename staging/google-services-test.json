@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "1046946781296",
+    "firebase_url": "https://tradelenda-staging-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "tradelenda-staging",
+    "storage_bucket": "tradelenda-staging.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1046946781296:android:9f6cd7986da7ab7962fcb5",
+        "android_client_info": {
+          "package_name": "com.tradelenda.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1046946781296-5tgv9fg28da423hctg85s3bob0159l4h.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD5sOwe91jt67WrSa83Y6g24sZKvgl5Au4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1046946781296-5tgv9fg28da423hctg85s3bob0159l4h.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

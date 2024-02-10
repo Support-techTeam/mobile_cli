@@ -17,7 +17,7 @@
 	<key>CFBundlePackageType</key>
 	<string>$(PRODUCT_BUNDLE_PACKAGE_TYPE)</string>
 	<key>CFBundleShortVersionString</key>
-	<string>3.0.5</string>
+	<string>3.0.6</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleURLTypes</key>
@@ -42,7 +42,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>35</string>
+	<string>1</string>
 	<key>FacebookAppID</key>
 	<string>225305113437958</string>
 	<key>FacebookClientToken</key>
@@ -51,18 +51,20 @@
 	<string>Trade Lenda</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSAllowsArbitraryLoads</key>
+	<true/>
+	<key>NSAllowsArbitraryLoadsForMedia</key>
+	<true/>
+	<key>NSAllowsArbitraryLoadsForPhotosFramework</key>
+	<true/>
+	<key>NSAllowsArbitraryLoadsInWebContent</key>
+	<true/>
+	<key>NSAllowsLocalNetworking</key>
+	<true/>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
-		<key>NSExceptionDomains</key>
-		<dict>
-			<key>localhost</key>
-			<dict>
-				<key>NSExceptionAllowsInsecureHTTPLoads</key>
-				<true/>
-			</dict>
-		</dict>
 	</dict>
 	<key>NSAppleMusicUsageDescription</key>
 	<string>$(PRODUCT_NAME) needs permission to save and select media documents to complete forms and applications.</string>
@@ -88,6 +90,12 @@
 		<string>MaterialCommunityIcons.ttf</string>
 		<string>MaterialIcons.ttf</string>
 		<string>Octicons.ttf</string>
+	</array>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+		<string>processing</string>
+		<string>remote-notification</string>
 	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>SplashScreen</string>

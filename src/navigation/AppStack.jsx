@@ -66,8 +66,8 @@ import {
 //Pending
 
 // import BeneficiaryList from '../screens/TransferScreens/BeneficiaryList';
-
-import {auth} from '../util/firebase/firebaseConfig';
+import auth from '@react-native-firebase/auth';
+// import {auth} from '../util/firebase/firebaseConfig';
 import {getProfileDetails} from '../stores/ProfileStore';
 import {setProfile} from '../util/redux/userProfile/user.profile.slice';
 
@@ -86,13 +86,13 @@ const config = {
 const AppStack = () => {
   const dispatch = useDispatch();
   const userData = useSelector(state => state.userAuth.user);
-  const isVerified = JSON.parse(userData)?.emailVerified;
+  const isVerified = auth().currentUser?.emailVerified;
   const userProfileData = useSelector(state => state.userProfile.profile);
   const [timeOut, setTimeOut] = useState(false);
 
   useEffect(() => {
     // fetch profile
-    if (auth.currentUser !== null) {
+    if (auth().currentUser !== null) {
       const fetchState = async () => {
         try {
           const res = await getProfileDetails();
@@ -117,8 +117,8 @@ const AppStack = () => {
       setTimeOut(true);
     }, 5000);
   });
-
-  return !isVerified && !timeOut ? (
+  
+  return isVerified === undefined && !timeOut ? (
     <Stack.Navigator screenOptions={{headerShown: false}}>
       <Stack.Screen
         name="Splashscreen"
@@ -134,7 +134,7 @@ const AppStack = () => {
     </Stack.Navigator>
   ) : (
     <Stack.Navigator screenOptions={{headerShown: false}}>
-      {userData && !isVerified && userProfileData?.profileProgress == null ? (
+      {auth().currentUser && isVerified === false && userProfileData?.profileProgress == null ? (
         <Stack.Screen
           name="Verification"
           component={Verification}

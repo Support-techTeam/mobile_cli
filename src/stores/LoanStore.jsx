@@ -2,22 +2,16 @@ import React from 'react';
 import axios from 'axios';
 import {BASE_API_URL} from '../../app.json';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {auth} from '../util/firebase/firebaseConfig';
+import auth from '@react-native-firebase/auth';
 import {store} from '../util/redux/store';
 import {DdLogs} from '@datadog/mobile-react-native';
 
 //get login token
 const reduxStore = store.getState().userAuth;
 let uploadProgress = 0;
-
+let token = null;
 let headers;
-if (reduxStore !== null || reduxStore !== undefined) {
-  token =
-    JSON.parse(reduxStore.user)?.user?.stsTokenManager?.accessToken != null ||
-    JSON.parse(reduxStore.user)?.user?.stsTokenManager?.accessToken != undefined
-      ? JSON.parse(reduxStore.user)?.user?.stsTokenManager?.accessToken
-      : JSON.parse(reduxStore.user)?.stsTokenManager?.accessToken;
-}
+
 const axiosInstance = axios.create({baseURL: BASE_API_URL});
 
 const getAllLoans = async () => {
@@ -26,10 +20,11 @@ const getAllLoans = async () => {
     store.getState().networkState.network.isConnected &&
     store.getState().networkState.network.isInternetReachable
   ) {
-    if (auth?.currentUser?.stsTokenManager?.accessToken) {
+    await getFirebaseAuthToken();
+    if (token) {
       headers = {
         accept: 'application/json',
-        Authorization: `Bearer ${auth.currentUser?.stsTokenManager?.accessToken}`,
+        Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       };
       try {
@@ -74,10 +69,11 @@ const getApprovedLoans = async () => {
     store.getState().networkState.network.isConnected &&
     store.getState().networkState.network.isInternetReachable
   ) {
-    if (auth?.currentUser?.stsTokenManager?.accessToken) {
+    await getFirebaseAuthToken();
+    if (token) {
       headers = {
         accept: 'application/json',
-        Authorization: `Bearer ${auth.currentUser?.stsTokenManager?.accessToken}`,
+        Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       };
       try {
@@ -125,10 +121,11 @@ const getPaidLoans = async () => {
     store.getState().networkState.network.isConnected &&
     store.getState().networkState.network.isInternetReachable
   ) {
-    if (auth?.currentUser?.stsTokenManager?.accessToken) {
+    await getFirebaseAuthToken();
+    if (token) {
       headers = {
         accept: 'application/json',
-        Authorization: `Bearer ${auth.currentUser?.stsTokenManager?.accessToken}`,
+        Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       };
       try {
@@ -170,10 +167,11 @@ const getPendingLoans = async () => {
     store.getState().networkState.network.isConnected &&
     store.getState().networkState.network.isInternetReachable
   ) {
-    if (auth?.currentUser?.stsTokenManager?.accessToken) {
+    await getFirebaseAuthToken();
+    if (token) {
       headers = {
         accept: 'application/json',
-        Authorization: `Bearer ${auth.currentUser?.stsTokenManager?.accessToken}`,
+        Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       };
       try {
@@ -219,10 +217,11 @@ const getLoansAmount = async () => {
     store.getState().networkState.network.isConnected &&
     store.getState().networkState.network.isInternetReachable
   ) {
-    if (auth?.currentUser?.stsTokenManager?.accessToken) {
+    await getFirebaseAuthToken();
+    if (token) {
       headers = {
         accept: 'application/json',
-        Authorization: `Bearer ${auth.currentUser?.stsTokenManager?.accessToken}`,
+        Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       };
       try {
@@ -268,10 +267,11 @@ const getDuration = async () => {
     store.getState().networkState.network.isConnected &&
     store.getState().networkState.network.isInternetReachable
   ) {
-    if (auth?.currentUser?.stsTokenManager?.accessToken) {
+    await getFirebaseAuthToken();
+    if (token) {
       headers = {
         accept: 'application/json',
-        Authorization: `Bearer ${auth.currentUser?.stsTokenManager?.accessToken}`,
+        Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       };
       try {
@@ -320,10 +320,11 @@ const getLoanUserDetails = async () => {
     store.getState().networkState.network.isConnected &&
     store.getState().networkState.network.isInternetReachable
   ) {
-    if (auth?.currentUser?.stsTokenManager?.accessToken) {
+    await getFirebaseAuthToken();
+    if (token) {
       headers = {
         accept: 'application/json',
-        Authorization: `Bearer ${auth.currentUser?.stsTokenManager?.accessToken}`,
+        Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       };
       try {
@@ -372,10 +373,11 @@ const getLoanById = async id => {
     store.getState().networkState.network.isConnected &&
     store.getState().networkState.network.isInternetReachable
   ) {
-    if (auth?.currentUser?.stsTokenManager?.accessToken) {
+    await getFirebaseAuthToken();
+    if (token) {
       headers = {
         accept: 'application/json',
-        Authorization: `Bearer ${auth.currentUser?.stsTokenManager?.accessToken}`,
+        Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       };
       try {
@@ -418,10 +420,11 @@ const getLoanDetails = async (amount, tenor) => {
     store.getState().networkState.network.isConnected &&
     store.getState().networkState.network.isInternetReachable
   ) {
-    if (auth?.currentUser?.stsTokenManager?.accessToken) {
+    await getFirebaseAuthToken();
+    if (token) {
       headers = {
         accept: 'application/json',
-        Authorization: `Bearer ${auth.currentUser?.stsTokenManager?.accessToken}`,
+        Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       };
       try {
@@ -467,10 +470,11 @@ const createLoan = async details => {
     store.getState().networkState.network.isConnected &&
     store.getState().networkState.network.isInternetReachable
   ) {
-    if (auth?.currentUser?.stsTokenManager?.accessToken) {
+    await getFirebaseAuthToken();
+    if (token) {
       headers = {
         accept: 'application/json',
-        Authorization: `Bearer ${auth.currentUser?.stsTokenManager?.accessToken}`,
+        Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       };
       try {
@@ -517,10 +521,11 @@ const createUserProfile = async details => {
     store.getState().networkState.network.isConnected &&
     store.getState().networkState.network.isInternetReachable
   ) {
-    if (auth?.currentUser?.stsTokenManager?.accessToken) {
+    await getFirebaseAuthToken();
+    if (token) {
       headers = {
         accept: 'application/json',
-        Authorization: `Bearer ${auth.currentUser?.stsTokenManager?.accessToken}`,
+        Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       };
       try {
@@ -561,16 +566,18 @@ const createUserProfile = async details => {
     };
   }
 };
+
 const createBusinessDetails = async details => {
   if (
     store.getState().networkState &&
     store.getState().networkState.network.isConnected &&
     store.getState().networkState.network.isInternetReachable
   ) {
-    if (auth?.currentUser?.stsTokenManager?.accessToken) {
+    await getFirebaseAuthToken();
+    if (token) {
       headers = {
         accept: 'application/json',
-        Authorization: `Bearer ${auth.currentUser?.stsTokenManager?.accessToken}`,
+        Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       };
       try {
@@ -624,10 +631,11 @@ const createNextOfKin = async details => {
     store.getState().networkState.network.isConnected &&
     store.getState().networkState.network.isInternetReachable
   ) {
-    if (auth?.currentUser?.stsTokenManager?.accessToken) {
+    await getFirebaseAuthToken();
+    if (token) {
       headers = {
         accept: 'application/json',
-        Authorization: `Bearer ${auth.currentUser?.stsTokenManager?.accessToken}`,
+        Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       };
       try {
@@ -681,10 +689,11 @@ const createBankDetails = async details => {
     store.getState().networkState.network.isConnected &&
     store.getState().networkState.network.isInternetReachable
   ) {
-    if (auth?.currentUser?.stsTokenManager?.accessToken) {
+    await getFirebaseAuthToken();
+    if (token) {
       headers = {
         accept: 'application/json',
-        Authorization: `Bearer ${auth.currentUser?.stsTokenManager?.accessToken}`,
+        Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       };
       try {
@@ -738,10 +747,11 @@ const createDocumentsDetails = async details => {
     store.getState().networkState.network.isConnected &&
     store.getState().networkState.network.isInternetReachable
   ) {
-    if (auth?.currentUser?.stsTokenManager?.accessToken) {
+    await getFirebaseAuthToken();
+    if (token) {
       headers = {
         accept: 'application/json',
-        Authorization: `Bearer ${auth.currentUser?.stsTokenManager?.accessToken}`,
+        Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       };
       try {
@@ -797,7 +807,7 @@ const createUploadDocument = async (details, documentName) => {
     if (auth?.currentUser?.stsTokenManager?.accessToken) {
       headers = {
         accept: 'application/json',
-        Authorization: `Bearer ${auth.currentUser?.stsTokenManager?.accessToken}`,
+        Authorization: `Bearer ${auth().currentUser?.stsTokenManager?.accessToken}`,
         'Content-Type': 'multipart/form-data',
       };
       try {
@@ -866,10 +876,11 @@ const updatePersonalDetails = async details => {
     store.getState().networkState.network.isConnected &&
     store.getState().networkState.network.isInternetReachable
   ) {
-    if (auth?.currentUser?.stsTokenManager?.accessToken) {
+    await getFirebaseAuthToken();
+    if (token) {
       headers = {
         accept: 'application/json',
-        Authorization: `Bearer ${auth.currentUser?.stsTokenManager?.accessToken}`,
+        Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       };
       try {
@@ -910,16 +921,18 @@ const updatePersonalDetails = async details => {
     };
   }
 };
+
 const updateBusinessDetails = async details => {
   if (
     store.getState().networkState &&
     store.getState().networkState.network.isConnected &&
     store.getState().networkState.network.isInternetReachable
   ) {
-    if (auth?.currentUser?.stsTokenManager?.accessToken) {
+    await getFirebaseAuthToken();
+    if (token) {
       headers = {
         accept: 'application/json',
-        Authorization: `Bearer ${auth.currentUser?.stsTokenManager?.accessToken}`,
+        Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       };
       try {
@@ -976,10 +989,11 @@ const updateNokDetails = async details => {
     store.getState().networkState.network.isConnected &&
     store.getState().networkState.network.isInternetReachable
   ) {
-    if (auth?.currentUser?.stsTokenManager?.accessToken) {
+    await getFirebaseAuthToken();
+    if (token) {
       headers = {
         accept: 'application/json',
-        Authorization: `Bearer ${auth.currentUser?.stsTokenManager?.accessToken}`,
+        Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       };
       try {
@@ -1036,10 +1050,11 @@ const updateBankDetails = async details => {
     store.getState().networkState.network.isConnected &&
     store.getState().networkState.network.isInternetReachable
   ) {
-    if (auth?.currentUser?.stsTokenManager?.accessToken) {
+    await getFirebaseAuthToken();
+    if (token) {
       headers = {
         accept: 'application/json',
-        Authorization: `Bearer ${auth.currentUser?.stsTokenManager?.accessToken}`,
+        Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       };
       try {
@@ -1096,10 +1111,11 @@ const updateDocumentsDetails = async details => {
     store.getState().networkState.network.isConnected &&
     store.getState().networkState.network.isInternetReachable
   ) {
-    if (auth?.currentUser?.stsTokenManager?.accessToken) {
+    await getFirebaseAuthToken();
+    if (token) {
       headers = {
         accept: 'application/json',
-        Authorization: `Bearer ${auth.currentUser?.stsTokenManager?.accessToken}`,
+        Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       };
       try {
@@ -1153,10 +1169,11 @@ const createArmDetails = async details => {
     store.getState().networkState.network.isConnected &&
     store.getState().networkState.network.isInternetReachable
   ) {
-    if (auth?.currentUser?.stsTokenManager?.accessToken) {
+    await getFirebaseAuthToken();
+    if (token) {
       headers = {
         accept: 'application/json',
-        Authorization: `Bearer ${auth.currentUser?.stsTokenManager?.accessToken}`,
+        Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       };
       try {
@@ -1201,6 +1218,20 @@ const createArmDetails = async details => {
       data: null,
       message: 'No Internet Connection',
     };
+  }
+};
+
+const getFirebaseAuthToken = async () => {
+  try {
+    const user = auth().currentUser;
+    if (user) {
+      token = await user.getIdToken();
+      return '';
+    } else {
+      return '';
+    }
+  } catch (error) {
+    return '';
   }
 };
 

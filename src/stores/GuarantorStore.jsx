@@ -3,21 +3,15 @@ import axios from 'axios';
 import {BASE_API_URL} from '../../app.json';
 import {useSelector, useDispatch} from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {auth} from '../util/firebase/firebaseConfig';
+import auth from '@react-native-firebase/auth';
 import {store} from '../util/redux/store';
 import {DdLogs} from '@datadog/mobile-react-native';
 
 //get login token
 const reduxStore = store.getState().userAuth;
-
+let token = null;
 let headers;
-if (reduxStore !== null || reduxStore !== undefined) {
-  token =
-    JSON.parse(reduxStore.user)?.user?.stsTokenManager?.accessToken != null ||
-    JSON.parse(reduxStore.user)?.user?.stsTokenManager?.accessToken != undefined
-      ? JSON.parse(reduxStore.user)?.user?.stsTokenManager?.accessToken
-      : JSON.parse(reduxStore.user)?.stsTokenManager?.accessToken;
-}
+
 const axiosInstance = axios.create({baseURL: BASE_API_URL});
 
 const createGuarantor = async data => {
@@ -26,10 +20,11 @@ const createGuarantor = async data => {
     store.getState().networkState.network.isConnected &&
     store.getState().networkState.network.isInternetReachable
   ) {
-    if (auth?.currentUser?.stsTokenManager?.accessToken) {
+    await getFirebaseAuthToken();
+    if (token) {
       headers = {
         accept: 'application/json',
-        Authorization: `Bearer ${auth.currentUser?.stsTokenManager?.accessToken}`,
+        Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       };
       try {
@@ -79,10 +74,11 @@ const getGuarantors = async () => {
     store.getState().networkState.network.isConnected &&
     store.getState().networkState.network.isInternetReachable
   ) {
-    if (auth?.currentUser?.stsTokenManager?.accessToken) {
+    await getFirebaseAuthToken();
+    if (token) {
       headers = {
         accept: 'application/json',
-        Authorization: `Bearer ${auth.currentUser?.stsTokenManager?.accessToken}`,
+        Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       };
       try {
@@ -131,10 +127,11 @@ const getGuarantor = async id => {
     store.getState().networkState.network.isConnected &&
     store.getState().networkState.network.isInternetReachable
   ) {
-    if (auth?.currentUser?.stsTokenManager?.accessToken) {
+    await getFirebaseAuthToken();
+    if (token) {
       headers = {
         accept: 'application/json',
-        Authorization: `Bearer ${auth.currentUser?.stsTokenManager?.accessToken}`,
+        Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       };
       try {
@@ -183,10 +180,11 @@ const sendOtp = async data => {
     store.getState().networkState.network.isConnected &&
     store.getState().networkState.network.isInternetReachable
   ) {
-    if (auth?.currentUser?.stsTokenManager?.accessToken) {
+    await getFirebaseAuthToken();
+    if (token) {
       headers = {
         accept: 'application/json',
-        Authorization: `Bearer ${auth.currentUser?.stsTokenManager?.accessToken}`,
+        Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       };
       try {
@@ -228,4 +226,17 @@ const sendOtp = async data => {
   }
 };
 
+const getFirebaseAuthToken = async () => {
+  try {
+    const user = auth().currentUser;
+    if (user) {
+      token = await user.getIdToken();
+      return '';
+    } else {
+      return '';
+    }
+  } catch (error) {
+    return '';
+  }
+};
 export {createGuarantor, getGuarantors, getGuarantor, sendOtp};

@@ -27,6 +27,7 @@ import {
   getAllLendaInvestment,
   getSingleArmInvestment,
 } from '../../stores/InvestStore';
+import appsFlyer from 'react-native-appsflyer';
 
 const Investscreen = () => {
   const navigation = useNavigation();
@@ -43,6 +44,7 @@ const Investscreen = () => {
   //total ARM Investment
   let totalArmAmount =
     allArmData &&
+    allArmData?.length > 0 &&
     allArmData?.reduce(
       (accumulator, currentValue) =>
         accumulator + currentValue.investmentAmount,
@@ -52,6 +54,7 @@ const Investscreen = () => {
   //total Lenda Investment
   let totalLendaAmount =
     allILendaData &&
+    allILendaData?.length > 0 &&
     allILendaData
       ?.filter(item => item?.investmentStatus === 'ACTIVE')
       .reduce(
@@ -100,7 +103,9 @@ const Investscreen = () => {
       const res = await getAllLendaInvestment();
       if (res?.error) {
       } else {
-        setAllLendaData(res?.data);
+        if (res?.data?.length > 0) {
+          setAllLendaData(res?.data);
+        }
       }
       setIsLoading(false);
     } catch (e) {
@@ -114,17 +119,19 @@ const Investscreen = () => {
       const res = await getAllArmInvestment();
       if (res?.error) {
       } else {
-        setAllArmData(res?.data?.data);
-        getSingleArmInvestment(
-          res?.data?.data[0]?.membershipId,
-          res?.data?.data[0]?.productCode,
-        ).then(res => {
-          if (!res?.error) {
-            if (res?.data?.length > 0) {
-              setPortfolioDetail(res?.data?.portfolio[0]?.accountBalance);
+        if (res?.data?.data?.length > 0) {
+          setAllArmData(res?.data?.data);
+          getSingleArmInvestment(
+            res?.data?.data[0]?.membershipId,
+            res?.data?.data[0]?.productCode,
+          ).then(res => {
+            if (!res?.error) {
+              if (res?.data?.length > 0) {
+                setPortfolioDetail(res?.data?.portfolio[0]?.accountBalance);
+              }
             }
-          }
-        });
+          });
+        }
       }
       setIsLoading(false);
     } catch (e) {
@@ -284,12 +291,24 @@ const Investscreen = () => {
                 <TouchableOpacity
                   onPress={() => {
                     if (item.id == 1) {
+                      logAppsFlyer(
+                        'invest',
+                        'lend with tradelenda',
+                        'view plans',
+                        0,
+                      );
                       navigation.navigate('InvestmentOption', {
                         name: 'Lenda',
                         header: 'LEND WITH TRADELENDA',
                       });
                     } else if (item.id == 2) {
                       if (isReadyToInvest) {
+                        logAppsFlyer(
+                          'invest',
+                          'save with arm',
+                          'view plans',
+                          0,
+                        );
                         navigation.navigate('InvestmentOption', {
                           name: 'Arm',
                           header: 'SAVE WITH ARM',
@@ -330,62 +349,72 @@ const Investscreen = () => {
           <ScrollView
             showsHorizontalScrollIndicator={false}
             showsVerticalScrollIndicator={false}>
-            {loadingList.map((investment, i) => (
-              <View key={i} style={{paddingHorizontal: 20}}>
-                <View style={{marginTop: 10}}>
-                  <TouchableOpacity>
-                    <View
-                      style={{
-                        flexDirection: 'row',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        marginTop: 10,
-                      }}>
+            {loadingList &&
+              loadingList?.length > 0 &&
+              loadingList.map((investment, i) => (
+                <View key={i} style={{paddingHorizontal: 20}}>
+                  <View style={{marginTop: 10}}>
+                    <TouchableOpacity>
                       <View
                         style={{
-                          backgroundColor: '#CDDBEB',
-                          width: 30,
-                          height: 30,
-                          borderRadius: 5,
-                          marginRight: 16,
-                          justifyContent: 'center',
+                          flexDirection: 'row',
+                          justifyContent: 'space-between',
                           alignItems: 'center',
+                          marginTop: 10,
                         }}>
-                        <Skeleton animation="wave" width={20} height={20} />
-                      </View>
-                      <View style={{flex: 1}}>
                         <View
                           style={{
-                            flexDirection: 'row',
-                            justifyContent: 'space-between',
+                            backgroundColor: '#CDDBEB',
+                            width: 30,
+                            height: 30,
+                            borderRadius: 5,
+                            marginRight: 16,
+                            justifyContent: 'center',
+                            alignItems: 'center',
                           }}>
-                          <Skeleton animation="wave" width={70} height={20} />
-                          <Skeleton animation="wave" width={50} height={20} />
+                          <Skeleton animation="wave" width={20} height={20} />
                         </View>
-
-                        <View
-                          style={{
-                            flexDirection: 'row',
-                            justifyContent: 'space-between',
-                          }}>
-                          <Text style={{marginTop: 10}}>
-                            <Skeleton animation="wave" width={90} height={20} />
-                          </Text>
-                          <Text style={{marginTop: 10}}>
+                        <View style={{flex: 1}}>
+                          <View
+                            style={{
+                              flexDirection: 'row',
+                              justifyContent: 'space-between',
+                            }}>
                             <Skeleton animation="wave" width={70} height={20} />
-                          </Text>
+                            <Skeleton animation="wave" width={50} height={20} />
+                          </View>
+
+                          <View
+                            style={{
+                              flexDirection: 'row',
+                              justifyContent: 'space-between',
+                            }}>
+                            <Text style={{marginTop: 10}}>
+                              <Skeleton
+                                animation="wave"
+                                width={90}
+                                height={20}
+                              />
+                            </Text>
+                            <Text style={{marginTop: 10}}>
+                              <Skeleton
+                                animation="wave"
+                                width={70}
+                                height={20}
+                              />
+                            </Text>
+                          </View>
                         </View>
                       </View>
-                    </View>
-                  </TouchableOpacity>
+                    </TouchableOpacity>
+                  </View>
                 </View>
-              </View>
-            ))}
+              ))}
           </ScrollView>
         </View>
       ) : (
         <View style={{flex: 1}}>
-          {allInvestmentData.length > 0 ? (
+          {allInvestmentData && allInvestmentData?.length > 0 ? (
             <ScrollView
               showsHorizontalScrollIndicator={false}
               showsVerticalScrollIndicator={false}>
@@ -403,9 +432,9 @@ const Investscreen = () => {
                   <View style={{marginTop: 0}}>
                     <TouchableOpacity
                       disabled={
-                        investment?.productCode && investment?.membershipId
-                          ? false
-                          : true
+                        !investment?.investmentType 
+                          ? investment?.productCode && investment?.membershipId ? false : true
+                          : false
                       }
                       onPress={() =>
                         navigation.navigate('InvestmentDetails', {
@@ -522,6 +551,27 @@ const Investscreen = () => {
     myInvesments: FirstRoute,
   });
 
+  const logAppsFlyer = (event, investmentName, activity, value) => {
+    const eventName = event;
+    const eventValues = {
+      investment_type: investmentName,
+      activity_type: activity,
+      currency: 'NGN',
+      revenue: value,
+    };
+
+    appsFlyer.logEvent(
+      eventName,
+      eventValues,
+      res => {
+        // console.log(res);
+      },
+      err => {
+        // console.error(err);
+      },
+    );
+  };
+
   return (
     <>
       {isLoading ? (
@@ -550,7 +600,7 @@ const Investscreen = () => {
             </View>
 
             <FlatList
-              data={status}
+              data={status ? status : []}
               numColumns={1}
               showsHorizontalScrollIndicator={false}
               showsVerticalScrollIndicator={false}
@@ -610,7 +660,7 @@ const Investscreen = () => {
             </View>
 
             <FlatList
-              data={status}
+              data={status ? status : []}
               showsHorizontalScrollIndicator={false}
               showsVerticalScrollIndicator={false}
               contentContainerStyle={{flex: 1, justifyContent: 'center'}}

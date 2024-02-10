@@ -8,6 +8,7 @@ import {
   AppState,
   LogBox,
   useColorScheme,
+  PermissionsAndroid,
 } from 'react-native';
 import SpInAppUpdates, {IAUUpdateKind} from 'sp-react-native-in-app-updates';
 import {version, SCREELOCK_CODE, SCREENLOCK_STATUS} from './app.json';
@@ -27,15 +28,23 @@ import {PersistGate} from 'redux-persist/integration/react';
 import {persistor, resetStore, store} from './src/util/redux/store';
 import {LightTheme} from './src/constants/lightTheme';
 import {DarkTheme} from './src/constants/darkTheme';
-import { DefaultTheme } from 'react-native-paper';
+import {DefaultTheme} from 'react-native-paper';
 import InputPin from './src/screens/SecurityScreens/PinInput';
 import NetworkStatus from './src/util/NetworkService';
 import RNRestart from 'react-native-restart';
 import COLORS from './src/constants/colors';
 import {userLogOut} from './src/stores/AuthStore';
-import {auth} from './src/util/firebase/firebaseConfig';
+// import {app, auth} from './src/util/firebase/firebaseConfig';
 import BackgroundTimer from 'react-native-background-timer';
 import {TextColorProvider} from './src/component/TextColorContext';
+import InitializeSDKHandler from './src/component/appFlyer/InitializeSDKHandler';
+import DeviceInfo from 'react-native-device-info';
+import PushNotification from 'react-native-push-notification';
+import RemotePushController from './src/component/push-notifications/RemotePushController';
+import messaging from '@react-native-firebase/messaging';
+import CustomNotification from './src/component/push-notifications/CustomNotification';
+import auth from '@react-native-firebase/auth';
+import {requestNotifications} from 'react-native-permissions';
 
 const inAppUpdates = new SpInAppUpdates(false);
 
@@ -53,6 +62,7 @@ const datadogConfiguration = new DatadogProviderConfiguration(
   true, // track XHR Resources
   true, // track Errors
 );
+
 // Optional: Select your Datadog website (one of "US", "EU" or "GOV")
 datadogConfiguration.site = 'US';
 // Optional: enable or disable native crash reports
@@ -65,6 +75,46 @@ let inactiveTime = 0;
 const defaultWaitTime = Platform.select({ios: 120, android: 120});
 let hasLockKey = false;
 let screelLockStatus = false;
+
+
+const requestUserPermission = async () => {
+  if (Platform.OS === 'ios') {
+    try {
+      await requestNotifications(['alert', 'sound', 'badge']);
+    } catch (error) {
+      // console.log('Error requesting push notification permissions:', error);
+    }
+    const authStatus = await messaging().requestPermission({
+      sound: true,
+      announcement: true,
+      alert: true,
+      badge: true,
+    });
+    const enabled =
+      authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+      authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+
+    if (enabled) {
+      // console.log('Authorization status:', authStatus);
+    }else{
+        // console.log('Authorization status:', authStatus);
+    }
+  } else if (Platform.OS === 'android') {
+    try {
+      await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.RECEIVE_SMS,
+        PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
+        {
+          title: 'Permission to receive SMS',
+          message: 'This app needs access to receive SMS',
+          buttonPositive: 'OK',
+        },
+      );
+    } catch (err) {
+      // console.warn(err);
+    }
+  }
+};
 function App() {
   const [appState, setAppState] = useState(AppState.currentState);
   const [hidden, setHidden] = useState(false);
@@ -90,7 +140,6 @@ function App() {
               updateType: IAUUpdateKind.FLEXIBLE,
             },
           });
-
           inAppUpdates.startUpdate(updateOptions);
         }
       })
@@ -131,7 +180,7 @@ function App() {
 
   // App State Monitor
   const logout = async () => {
-    if (auth.currentUser) {
+    if (auth().currentUser) {
       try {
         const logoutResult = await userLogOut();
         if (!logoutResult?.error) {
@@ -210,64 +259,43 @@ function App() {
     };
   }, []);
 
-  // const retrieveAllSecureInfoData = async () => {
-  //   const allData = await SInfo.getAllItems({
-  //     sharedPreferencesName: 'tradeLendaSharedPrefs',
-  //     keychainService: 'tradeLendaKeychain',
-  //   });
-  //   console.log('NORMAL GETTING ALL', allData);
-  // };
-
-  // Set Passcode to blank
-  // const setSecureInfoData = async (option, code) => {
-  //   const responseData = await SInfo.setItem(option, code, {
-  //     sharedPreferencesName: 'tradeLendaSharedPrefs',
-  //     keychainService: 'tradeLendaKeychain',
-  //   });
-  //   // console.log('NORMAL SETTING', responseData);
-  // };
-
-  // const getSecureInfoData = async option => {
-  //   const responseData = await SInfo.getItem(option, {
-  //     sharedPreferencesName: 'tradeLendaSharedPrefs',
-  //     keychainService: 'tradeLendaKeychain',
-  //   });
-  //   // console.log('NORMAL GETTING', responseData);
-  //   if (responseData === null || responseData === undefined) {
-  //     hasLockKey = false;
-  //   } else {
-  //     hasLockKey = true;
-  //   }
-  // };
-
-  // const getSecureInfoStatus = async option => {
-  //   const responseData = await SInfo.getItem(option, {
-  //     sharedPreferencesName: 'tradeLendaSharedPrefs',
-  //     keychainService: 'tradeLendaKeychain',
-  //   });
-  //   console.log('NORMAL GETTING', responseData);
-  //   if (responseData === null || responseData === undefined) {
-  //     screelLockStatus = false;
-  //   } else {
-  //     if (responseData === 'true') {
-  //       screelLockStatus = true;
-  //     } else {
-  //       screelLockStatus = false;
-  //     }
-  //   }
-  // };
-
-  // const deleteSecureInfoData = async option => {
-  //   const responseData = await SInfo.deleteItem(option, {
-  //     sharedPreferencesName: 'tradeLendaSharedPrefs',
-  //     keychainService: 'tradeLendaKeychain',
-  //   });
-  //   console.log('NORMAL DELETING', responseData);
-  // };
-
   const colorScheme = useColorScheme();
   // const theme = colorScheme === 'dark' ? {...DefaultTheme} : {...LightTheme};
-  const theme = {...DefaultTheme}; 
+  const theme = {...DefaultTheme};
+
+  const [notification, setNotification] = useState(null);
+
+  useEffect(() => {
+    requestUserPermission();
+  }, []);
+
+  useEffect(() => {
+    messaging()
+      .getToken()
+      .then(fid => {
+        // console.log('FCM message:', Platform.OS);
+        // console.log('Firebase Installation ID:', fid);
+      })
+      .catch(error => {
+        // console.error('Error getting Firebase Installation ID:', error);
+      });
+
+    const unsubscribe = messaging().onMessage(async remoteMessage => {
+      // console.log(remoteMessage.notification);
+      const {title, body, android} = remoteMessage.notification;
+      const {clickAction, smallIcon, imageUrl, redirectUrl} = android;
+      // console.log('Img', imageUrl);
+      // console.log('And', android);
+      setNotification({title, body, android});
+    });
+
+    return unsubscribe;
+  }, []);
+
+  const handleNotificationPress = () => {
+    setNotification(null);
+  };
+
   return (
     <SafeAreaProvider style={styles.rootContainer}>
       <PaperProvider theme={theme}>
@@ -293,6 +321,15 @@ function App() {
                 <Provider store={store}>
                   <PersistGate persistor={persistor} loading={null}>
                     <TextColorProvider>
+                      <InitializeSDKHandler />
+                      <CustomNotification
+                        isVisible={!!notification}
+                        title={notification?.title}
+                        body={notification?.body}
+                        imageUrl={notification?.android?.imageUrl}
+                        redirectUrl={notification?.android?.redirectUrl}
+                        onPress={handleNotificationPress}
+                      />
                       <NetworkStatus />
                       <AppNavigationContainer />
                     </TextColorProvider>
