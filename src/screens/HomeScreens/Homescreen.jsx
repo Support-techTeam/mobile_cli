@@ -1126,8 +1126,7 @@ const Homescreen = () => {
             <BottomSheet
               visible={isFundWalletVisible}
               onBackButtonPress={toggleFundWallet}
-              onBackdropPress={toggleFundWallet}
-            >
+              onBackdropPress={toggleFundWallet}>
               <View
                 style={{
                   backgroundColor: '#fff',
@@ -1368,11 +1367,10 @@ const Homescreen = () => {
 
           {/* Make Transfer Section */}
           <View style={styles.container}>
-          <BottomSheet
+            <BottomSheet
               visible={isMakeTransferVisible}
               onBackButtonPress={toggleMakeTransfer}
-              onBackdropPress={toggleMakeTransfer}
-            >
+              onBackdropPress={toggleMakeTransfer}>
               <View
                 style={{
                   backgroundColor: '#fff',
@@ -2838,7 +2836,8 @@ const Homescreen = () => {
                       ? true
                       : false
                   }
-                  onPress={toggleAllTransaction}>
+                  // onPress={toggleAllTransaction}>
+                  onPress={() => navigation.navigate('TransactionHistory')}>
                   <Text
                     style={[
                       styles.seeHistory,
