@@ -9,6 +9,8 @@ import {
   LogBox,
   useColorScheme,
   PermissionsAndroid,
+  NativeEventEmitter,
+  NativeModules,
 } from 'react-native';
 import SpInAppUpdates, {IAUUpdateKind} from 'sp-react-native-in-app-updates';
 import {version, SCREELOCK_CODE, SCREENLOCK_STATUS} from './app.json';
@@ -45,9 +47,10 @@ import messaging from '@react-native-firebase/messaging';
 import CustomNotification from './src/component/push-notifications/CustomNotification';
 import auth from '@react-native-firebase/auth';
 import {requestNotifications} from 'react-native-permissions';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const inAppUpdates = new SpInAppUpdates(false);
-
+const deviceInfoEmitter = new NativeEventEmitter(NativeModules.RNDeviceInfo);
 LogBox.ignoreAllLogs();
 
 AppCenter.setLogLevel(AppCenter.LogLevel.VERBOSE);
@@ -76,7 +79,6 @@ const defaultWaitTime = Platform.select({ios: 120, android: 120});
 let hasLockKey = false;
 let screelLockStatus = false;
 
-
 const requestUserPermission = async () => {
   if (Platform.OS === 'ios') {
     try {
@@ -96,8 +98,8 @@ const requestUserPermission = async () => {
 
     if (enabled) {
       // console.log('Authorization status:', authStatus);
-    }else{
-        // console.log('Authorization status:', authStatus);
+    } else {
+      // console.log('Authorization status:', authStatus);
     }
   } else if (Platform.OS === 'android') {
     try {
@@ -267,6 +269,7 @@ function App() {
 
   useEffect(() => {
     requestUserPermission();
+    getDeviceInfo();
   }, []);
 
   useEffect(() => {
@@ -294,6 +297,50 @@ function App() {
 
   const handleNotificationPress = () => {
     setNotification(null);
+  };
+
+  const getDeviceInfo = async () => {
+    try {
+      let deviceJSON = {};
+
+      new Promise.all([
+        DeviceInfo.getIpAddress().then(ip => {
+          deviceJSON.ipAddress = ip;
+        }),
+        DeviceInfo.getMacAddress().then(mac => {
+          deviceJSON.macAddress = mac;
+        }),
+        DeviceInfo.getCarrier().then(carrier => {
+          deviceJSON.deviceCarrier = carrier;
+        }),
+        DeviceInfo.getPhoneNumber().then(phoneNumber => {
+          deviceJSON.devicePhoneNumber = phoneNumber;
+        }),
+        (deviceJSON.brand = DeviceInfo.getBrand()),
+        (deviceJSON.bundleId = DeviceInfo.getBundleId()),
+        DeviceInfo.getDevice().then(device => {
+          deviceJSON.deviceName = device;
+        }),
+        DeviceInfo.getFingerprint().then(fingerprint => {
+          deviceJSON.deviceFingerPrint = fingerprint;
+        }),
+
+        (deviceJSON.type = DeviceInfo.getDeviceType()),
+        (deviceJSON.Device = Platform.OS),
+      ]).then(async () => {
+        // set device information
+        storeDeviceData(deviceJSON);
+      });
+    } catch (e) {}
+  };
+
+  const storeDeviceData = async value => {
+    try {
+      const jsonValue = JSON.stringify(value);
+      await AsyncStorage.setItem('deviceInfo', jsonValue);
+    } catch (e) {
+      // saving error
+    }
   };
 
   return (
