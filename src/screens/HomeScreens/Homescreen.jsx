@@ -10,7 +10,6 @@ import {
   ImageBackground,
   Pressable,
   TouchableWithoutFeedback,
-  ToastAndroid,
   NativeModules,
   RefreshControl,
 } from 'react-native';
@@ -58,6 +57,7 @@ import {
   getAccountWallet,
   getAccountTransactions,
 } from '../../stores/WalletStore';
+import {BottomSheet} from 'react-native-btr';
 
 const {width} = Dimensions.get('window');
 const Homescreen = () => {
@@ -1121,12 +1121,24 @@ const Homescreen = () => {
           contentContainerStyle={styles.contentContainer}
           alwaysBounceVertical={true}>
           {/* Fund Wallet Section */}
+
           <View style={styles.container}>
-            <Actionsheet
-              isOpen={isFundWalletVisible}
-              onClose={toggleFundWallet}
-              hideDragIndicator={true}>
-              <Actionsheet.Content justifyContent="center">
+            <BottomSheet
+              visible={isFundWalletVisible}
+              onBackButtonPress={toggleFundWallet}
+              onBackdropPress={toggleFundWallet}
+            >
+              <View
+                style={{
+                  backgroundColor: '#fff',
+                  height: 'auto',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  paddingVertical: 10,
+                  borderTopRightRadius: 10,
+                  borderTopLeftRadius: 10,
+                  paddingHorizontal: 10,
+                }}>
                 <View
                   style={{
                     flexDirection: 'row',
@@ -1178,9 +1190,7 @@ const Homescreen = () => {
                   Transfer Money to the account details below to fund your
                   account
                 </Text>
-                <View
-                  style={[styles.demark, {marginLeft: 16, marginRight: 16}]}
-                />
+                <View style={[styles.demark]} />
                 <View style={{marginTop: 16, marginHorizontal: 16}}>
                   <View
                     style={{
@@ -1219,7 +1229,7 @@ const Homescreen = () => {
                     </View>
                   </View>
                 </View>
-                <View style={[styles.demark, {marginLeft: 16}]} />
+                <View style={[styles.demark]} />
                 <View style={{marginTop: 16, marginHorizontal: 16}}>
                   <View
                     style={{
@@ -1276,7 +1286,7 @@ const Homescreen = () => {
                   </View>
                 </View>
 
-                <View style={[styles.demark, {marginLeft: 16}]} />
+                <View style={[styles.demark]} />
                 <View style={{marginTop: 16, marginHorizontal: 16}}>
                   <View
                     style={{
@@ -1350,23 +1360,36 @@ const Homescreen = () => {
                     </View>
                   </View>
                 </View>
-              </Actionsheet.Content>
-            </Actionsheet>
+              </View>
+              {/* </Actionsheet.Content>
+            </Actionsheet> */}
+            </BottomSheet>
           </View>
 
           {/* Make Transfer Section */}
           <View style={styles.container}>
-            <Actionsheet
-              isOpen={isMakeTransferVisible}
-              onClose={toggleMakeTransfer}
-              hideDragIndicator={true}>
-              <Actionsheet.Content justifyContent="center">
+          <BottomSheet
+              visible={isMakeTransferVisible}
+              onBackButtonPress={toggleMakeTransfer}
+              onBackdropPress={toggleMakeTransfer}
+            >
+              <View
+                style={{
+                  backgroundColor: '#fff',
+                  height: 'auto',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  paddingVertical: 10,
+                  borderTopRightRadius: 10,
+                  borderTopLeftRadius: 10,
+                  paddingHorizontal: 10,
+                }}>
                 <View
                   style={{
                     flexDirection: 'row',
                     justifyContent: 'space-between',
                     alignItems: 'center',
-                    marginHorizontal: 15,
+                    // marginHorizontal: 15,
                   }}>
                   <TouchableOpacity>
                     <View
@@ -1459,7 +1482,7 @@ const Homescreen = () => {
                       <Icon name="chevron-right" size={24} color="black" />
                     </View>
                   </TouchableOpacity>
-                  <View style={[styles.demark, {width: width * 0.8}]} />
+                  <View style={[styles.demark, {width: width * 0.96}]} />
                   <TouchableOpacity
                     style={{
                       marginTop: 20,
@@ -1510,8 +1533,8 @@ const Homescreen = () => {
                   </TouchableOpacity>
                   <View style={styles.demark} />
                 </View>
-              </Actionsheet.Content>
-            </Actionsheet>
+              </View>
+            </BottomSheet>
           </View>
 
           {/* Show All Transaction */}
