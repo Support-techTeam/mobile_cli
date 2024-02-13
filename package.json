@@ -7,6 +7,8 @@
     "ios": "react-native run-ios",
     "lint": "eslint .",
     "start": "react-native start",
+    "mod-android": "cd android && ./gradlew clean && cd .. && npx react-native run-android",
+    "mod-android-build": "cd android && ./gradlew clean && ./gradlew bundleRelease",
     "test": "jest",
     "version:up": "node ./node_modules/react-native-version-up/index.js"
   },
@@ -49,6 +51,7 @@
     "qs": "^6.11.2",
     "react": "18.2.0",
     "react-native": "0.72.4",
+    "react-native-app-intro-slider": "^4.0.4",
     "react-native-appsflyer": "^6.12.2",
     "react-native-background-timer": "^2.4.1",
     "react-native-blob-util": "^0.19.1",

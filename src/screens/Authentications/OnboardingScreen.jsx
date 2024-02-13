@@ -1,220 +1,193 @@
-/* eslint-disable react/no-unstable-nested-components */
-import {
-  View,
-  Text,
-  Image,
-  StyleSheet,
-  Dimensions,
-  StatusBar,
-  FlatList,
-  TouchableOpacity,
-  Pressable,
-} from 'react-native';
+// React Native App Intro Slider using AppIntroSlider
+// https://aboutreact.com/react-native-app-intro-slider/
+// Intro slider with Custom Buttons
+
+// import React in our code
 import React, {useState} from 'react';
-import {useNavigation} from '@react-navigation/native';
-import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
+
+// import all the components we are going to use
+import {StyleSheet, View, Text, Image, ImageBackground} from 'react-native';
+import AppIntroSlider from 'react-native-app-intro-slider';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
+import Icon from 'react-native-vector-icons/FontAwesome';
+import onbd1 from '../../../assets/images/onb1.png';
+import onbd2 from '../../../assets/images/onb2.png';
+import onbd3 from '../../../assets/images/onb3.png';
+import {useNavigation} from '@react-navigation/native';
+import COLORS from '../../constants/colors';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-const {width, height} = Dimensions.get('window');
-const midth = Dimensions.get('window').width;
-const hidth = Dimensions.get('window').height;
-const text = <Text style={{color: 'red'}}>blue</Text>;
-const slides = [
-  {
-    id: '1',
-    image: require('../../../assets/images/onb1.png'),
-    title: 'Financial Solution & inclusion for your MSME is here!',
-    subtitle: '',
-  },
-  {
-    id: '2',
-    image: require('../../../assets/images/onb2.png'),
-    title: 'Face the future confidently, Protect all that matters!',
-    subtitle: '',
-  },
-  {
-    id: '3',
-    image: require('../../../assets/images/onb3.png'),
-    title: 'Make the right money moves, Lend funds and earn returns.',
-    subtitle: '',
-  },
-];
 
-const Slide = ({item}) => {
-  return (
-    <View style={styles.imageContainer}>
-      <Image source={item.image} style={styles.image} />
-      <View
-        style={{
-          position: 'absolute',
-          top: hp(65),
-          marginBottom: 0,
-          width: wp(100),
-          paddingLeft: 24,
-        }}>
-        <Text style={styles.watermark}>{item.title}</Text>
-      </View>
-    </View>
-  );
-};
-const OnboardingScreen = () => {
+const App = () => {
   const navigation = useNavigation();
-  const [currentslide, setCurrentSlide] = useState(0);
-  const insets = useSafeAreaInsets();
-  const Footer = () => {
-    const handleCompleteOnboarding = async () => {
-      // Set the onboarding state as completed
-      try {
-        await AsyncStorage.setItem('onboardingCompleted', JSON.stringify(true));
-      } catch (error) {}
-    };
+  const onDone = () => {
+    handleCompleteOnboarding();
+    navigation.navigate('SignUp');
+  };
+
+  const RenderNextButton = () => {
     return (
-      <View
-        style={{
-          height: hp(20),
-          // height: height * 0.25,
-          justifyContent: 'space-between',
-        }}>
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'center',
-            marginTop: 2,
-          }}>
-          {slides.map((_, index) => (
-            <View
-              key={index}
-              style={[
-                styles.indicator,
-                currentslide === index && {
-                  borderColor: '#054B99',
-                  borderWidth: 2,
-                },
-              ]}
-            />
-          ))}
-        </View>
-
-        <View style={{marginBottom: 30}}>
-          <TouchableOpacity
-            onPress={() => {
-              handleCompleteOnboarding();
-              navigation.navigate('SignUp');
-            }}>
-            <View
-              style={{
-                marginBottom: 2,
-                marginLeft: 24,
-                marginRight: 18,
-                backgroundColor: '#054B99',
-                height: hp(6),
-                borderRadius: 12,
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}>
-              <Text
-                style={{fontWeight: '500', color: '#fff', fontSize: hp(2.5)}}>
-                Get Started
-              </Text>
-            </View>
-          </TouchableOpacity>
-
-          <Pressable
-            onPress={() => {
-              handleCompleteOnboarding();
-              navigation.navigate('Login');
-            }}>
-            <View
-              style={{
-                marginTop: 16,
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexDirection: 'row',
-              }}>
-              <Text style={{fontSize: hp('2.5%')}}>
-                Already have an account?{' '}
-              </Text>
-              <Text style={{color: '#054B99', fontSize: hp('2.5%')}}>
-                Log in
-              </Text>
-            </View>
-          </Pressable>
-        </View>
+      <View style={styles.buttonCircle}>
+        <Icon name="arrow-right" color="rgba(255, 255, 255, .9)" size={24} />
       </View>
     );
   };
-  const updateCurrentSlide = e => {
-    const contentOffsetX = e.nativeEvent.contentOffset.x;
-    const currentIndex = Math.round(contentOffsetX / wp(100));
-    setCurrentSlide(currentIndex);
+
+  const RenderPreviousButton = () => {
+    return (
+      <View style={styles.buttonCircle}>
+        <Icon name="arrow-left" color="rgba(255, 255, 255, .9)" size={24} />
+      </View>
+    );
   };
+
+  const RenderDoneButton = () => {
+    return (
+      <View style={styles.buttonCircle}>
+        <Icon name="check" color="rgba(255, 255, 255, .9)" size={24} />
+      </View>
+    );
+  };
+
+  const RenderItem = ({item}) => {
+    return (
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: item.backgroundColor,
+          justifyContent: 'space-between',
+          paddingBottom: 100,
+        }}>
+        <ImageBackground source={item.image} style={styles.imageBackground}>
+          <View style={styles.logoContainer}>
+            <Image
+              source={require('../../../assets/icons/logo_white.png')}
+              style={styles.logo}
+            />
+          </View>
+          <Text style={styles.text}>
+            <Text style={styles.normalText}>{item.normalText}</Text>
+            <Text style={styles.specialText}>{item.specialText}</Text>
+            <Text style={styles.normalText}>{item.normalText2}</Text>
+          </Text>
+        </ImageBackground>
+      </View>
+    );
+  };
+
+  const handleCompleteOnboarding = async () => {
+    // Set the onboarding state as completed
+    try {
+      await AsyncStorage.setItem('onboardingCompleted', JSON.stringify(true));
+    } catch (error) {}
+  };
+
   return (
-    <SafeAreaView
-      style={{
-        flex: 1,
-        backgroundColor: '#fff',
-        // paddingTop: insets.top !== 0 ? insets.top : 18,
-        // paddingBottom: insets.bottom !== 0 ? insets.bottom / 2 : 'auto',
-        // paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
-        // paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
-      }}>
-      <FlatList
-        onMomentumScrollEnd={updateCurrentSlide}
-        data={slides}
-        pagingEnabled
-        contentContainerStyle={{height: hp(80)}}
-        showsHorizontalScrollIndicator={false}
-        showsVerticalScrollIndicator={false}
-        horizontal
-        renderItem={({item}) => <Slide item={item} />}
-      />
-      <Footer />
-      <StatusBar />
-    </SafeAreaView>
+    <AppIntroSlider
+      data={slides}
+      renderItem={RenderItem}
+      onDone={onDone}
+      dotStyle={{
+        backgroundColor: 'rgba(0, 0, 0, .2)',
+      }}
+      activeDotStyle={{
+        backgroundColor: 'rgba(255, 255, 255, .9)',
+        borderColor: COLORS.lendaBlue,
+        borderWidth: 1,
+      }}
+      renderDoneButton={RenderDoneButton}
+      renderNextButton={RenderNextButton}
+      renderPrevButton={RenderPreviousButton}
+      showPrevButton={true}
+    />
   );
 };
 
-export default OnboardingScreen;
+export default App;
 
 const styles = StyleSheet.create({
-  indicator: {
-    backgroundColor: '#A0A3BD',
-    borderRadius: 5,
-    height: 10,
-    width: 10,
-    marginHorizontal: 3,
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    padding: 10,
+    justifyContent: 'center',
   },
-  content: {
-    paddingRight: 40,
-    fontSize: hp(5),
-    color: '#054B99',
-    fontFamily: 'serif',
-    letterSpacing: 0.4,
+  buttonCircle: {
+    width: 40,
+    height: 40,
+    backgroundColor: 'rgba(0, 0, 0, .2)',
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  image: {
-    maxHeight: hp(80),
-    maxWidth: wp(100),
-    width: wp(100),
-    height: hp(80),
+  imageBackground: {
+    flex: 1,
     resizeMode: 'cover',
-    borderWidth: 0,
+    justifyContent: 'center',
   },
-  imageContainer: {
-    position: 'relative',
-    display: 'inline-block',
-  },
-  watermark: {
+  text: {
     position: 'absolute',
-    top: hp(1),
-    left: 0,
+    bottom: 10,
+    left: 10,
+    right: 1,
+  },
+  normalText: {
     fontSize: hp(3.5),
     fontWeight: '600',
-    paddingLeft: 5,
     color: '#054B99',
-    fontFamily: 'serif',
-    letterSpacing: 0.4,
+  },
+  specialText: {
+    fontSize: hp(3.5),
+    fontWeight: '600',
+    color: '#06A77D',
+    fontStyle: 'italic',
+  },
+  logoContainer: {
+    position: 'absolute',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
+    height: '100%',
+  },
+  logo: {
+    width: 47.38,
+    height: 47.38,
+    opacity: 1,
   },
 });
+
+const slides = [
+  {
+    key: 's1',
+    normalText: 'Financial Solution & inclusion for your ',
+    specialText: 'MSME',
+    normalText2: ' is here!',
+    image: {
+      uri: Image.resolveAssetSource(onbd1).uri,
+    },
+    backgroundColor: '#fff',
+  },
+  {
+    key: 's2',
+    normalText: 'Face the future confidently, ',
+    specialText: 'Protect',
+    normalText2: ' all that matters!',
+    image: {
+      uri: Image.resolveAssetSource(onbd2).uri,
+    },
+    backgroundColor: '#fff',
+  },
+  {
+    key: 's3',
+    normalText: 'Make the right money moves, Lend funds and ',
+    specialText: 'earn returns',
+    normalText2: '.',
+    image: {
+      uri: Image.resolveAssetSource(onbd3).uri,
+    },
+    backgroundColor: '#fff',
+  },
+];
