@@ -21,9 +21,10 @@ const AppNavigationContainer = () => {
   const navigationRef = useNavigationContainerRef();
   const routeNameRef = useRef();
   const scheme = useColorScheme();
-  const [user, setUser] = useState();
+  const [user, setUser] = useState(undefined);
   const [isLoading, setIsLoading] = useState(true);
   const networkState = useSelector(state => state.networkState.network);
+  const [networkStatus, setNetworkStatus] = useState(true);
 
   useLayoutEffect(() => {
     if (
@@ -37,19 +38,34 @@ const AppNavigationContainer = () => {
 
   //auth state change listener
   useLayoutEffect(() => {
+    setIsLoading(true);
     const unsubscribe = auth().onAuthStateChanged(currentUser => {
       if (currentUser) {
         setUser(currentUser);
-        setIsLoading(false);
+        setTimeout(() => {
+          setIsLoading(false);
+        }, 4000);
       } else {
         setUser(null);
-        setIsLoading(false);
+        setTimeout(() => {
+          setIsLoading(false);
+        }, 4000);
       }
     });
 
     // Clean up the listener when the component unmounts
     return unsubscribe;
   }, []);
+
+  useLayoutEffect(() => {
+    if (networkState) {
+      setNetworkStatus(
+        networkState?.isConnected && networkState?.isInternetReachable
+          ? true
+          : false,
+      );
+    }
+  }, [networkState]);
 
   //refresh token
   useEffect(() => {
@@ -65,7 +81,7 @@ const AppNavigationContainer = () => {
       }
     };
     const intervalCheck = setInterval(checkAndRenewToken, 600000);
-    
+
     return () => clearInterval(intervalCheck);
   }, []);
   return (
@@ -83,9 +99,7 @@ const AppNavigationContainer = () => {
         {isLoading ? (
           <Splashscreen text="Checking Authentication..." />
         ) : user ? (
-          networkState &&
-          networkState?.isConnected &&
-          networkState?.isInternetReachable ? (
+          networkStatus ? (
             <AppStack />
           ) : (
             <NetworkScreen />
