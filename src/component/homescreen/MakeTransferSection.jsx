@@ -40,7 +40,7 @@ export const MakeTransferSection = props => {
           paddingVertical: 10,
           borderTopRightRadius: 10,
           borderTopLeftRadius: 10,
-          paddingHorizontal: 10,
+          paddingHorizontal: 20,
         }}>
         <View
           style={{
@@ -140,7 +140,7 @@ export const MakeTransferSection = props => {
               <Icon name="chevron-right" size={24} color="black" />
             </View>
           </TouchableOpacity>
-          <View style={[styles.demark, {width: width * 0.96}]} />
+          <View style={[styles.demark, {width: width * 0.90}]} />
           <TouchableOpacity
             style={{
               marginTop: 20,
@@ -189,7 +189,6 @@ export const MakeTransferSection = props => {
               <Icon name="chevron-right" size={24} color="black" />
             </View>
           </TouchableOpacity>
-          <View style={styles.demark} />
         </View>
       </View>
     </BottomSheet>
@@ -220,5 +219,6 @@ const styles = StyleSheet.create({
     borderRadius: 1,
     backgroundColor: '#D9DBE9',
     marginTop: 10,
+    
   },
 });
