@@ -297,7 +297,7 @@ export const SingleTransactionSection = props => {
                       }}>
                       {item.credit === null ? (
                         <>
-                           ₦
+                          ₦
                           {hideBalance
                             ? '******'
                             : new Intl.NumberFormat('en-US', {
