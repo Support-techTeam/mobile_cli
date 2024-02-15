@@ -9,6 +9,7 @@ import {
   ImageBackground,
   TouchableWithoutFeedback,
   FlatList,
+  Dimensions,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import FontIcon from 'react-native-vector-icons/FontAwesome';
@@ -20,6 +21,9 @@ import LinearGradient from 'react-native-linear-gradient';
 import EntypoIcon from 'react-native-vector-icons/Entypo';
 import COLORS from '../../constants/colors';
 import Carousel, {ParallaxImage, Pagination} from 'react-native-snap-carousel';
+
+const SLIDE_WIDTH = Dimensions.get('window').width;
+const ITEM_WIDTH = SLIDE_WIDTH - 60;
 
 export const SlideSection = props => {
   const {
@@ -35,27 +39,9 @@ export const SlideSection = props => {
   } = props;
   const navigation = useNavigation();
   const carouselRef = useRef(null);
+  const [index, setIndex] = useState(0);
 
   const slides = [
-    {
-      id: '3',
-      title: 'My investment',
-      balance:
-        Number(portfolioDetail) !== 0
-          ? new Intl.NumberFormat('en-US', {
-              style: 'decimal',
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            }).format(Number(portfolioDetail) + totalLendaAmount)
-          : new Intl.NumberFormat('en-US', {
-              style: 'decimal',
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            }).format(totalArmAmount + totalLendaAmount),
-      button: 'View investment',
-      extra: '',
-      image: require('../../../assets/icons/wallet_background.png'),
-    },
     {
       id: '1',
       title: 'Wallet balance',
@@ -96,6 +82,25 @@ export const SlideSection = props => {
       }`,
       button: 'Get loan',
       extra: 'Loan details',
+      image: require('../../../assets/icons/wallet_background.png'),
+    },
+    {
+      id: '3',
+      title: 'My investment',
+      balance:
+        Number(portfolioDetail) !== 0
+          ? new Intl.NumberFormat('en-US', {
+              style: 'decimal',
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            }).format(Number(portfolioDetail) + totalLendaAmount)
+          : new Intl.NumberFormat('en-US', {
+              style: 'decimal',
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            }).format(totalArmAmount + totalLendaAmount),
+      button: 'View investment',
+      extra: '',
       image: require('../../../assets/icons/wallet_background.png'),
     },
   ];
@@ -312,32 +317,37 @@ export const SlideSection = props => {
   };
   return (
     <View style={styles.container}>
-      {/* <Carousel
-        layout={'stack'}
+      <Carousel
+        layout={'default'}
         ref={carouselRef}
         data={slides}
         renderItem={({item}) => <Slide item={item} />}
-        sliderWidth={wp('100%')}
-        itemWidth={wp('100%') * 0.88}
+        sliderWidth={SLIDE_WIDTH}
+        itemWidth={ITEM_WIDTH}
+        useScrollView={true}
         inactiveSlideScale={0.9}
-        inactiveSlideOpacity={0.4}
-        activeSlideAlignment="start"
-        containerCustomStyle={styles.carouselContainer}
-        contentContainerCustomStyle={styles.carouselContentContainer}
-        firstItem={1}
-        initialScrollIndex={1}
-        hasParallaxImages={true}
-      /> */}
-      <FlatList
-        data={slides}
-        horizontal
-        snapToAlign="center"
-        declarationRate="fast"
-        pagingEnabled
-        renderItem={({item}) => <Slide item={item} />}
-        contentContainerStyle={styles.carouselContentContainer}
-        snapToInterval={wp('100%') - 55}
-        showsHorizontalScrollIndicator={false}
+        inactiveSlideOpacity={0.6}
+        firstItem={0}
+        initialScrollIndex={0}
+        onSnapToItem={index => setIndex(index)}
+      />
+      <Pagination
+        dotsLength={slides?.length}
+        activeDotIndex={index}
+        carouselRef={carouselRef}
+        containerStyle={{alignSelf: 'flex-end', paddingVertical: 0, paddingTop: 10, paddingBottom: 5, marginVertical: 0}}
+        dotStyle={{
+          width: 10,
+          height: 10,
+          borderRadius: 5,
+          backgroundColor: index == 0 ? COLORS.lendaOrange : index == 1 ? COLORS.lendaBlue : COLORS.lendaGreen,
+        }}
+        tappableDots={true}
+        inactiveDotStyle={{
+          backgroundColor: 'black',
+        }}
+        inactiveDotOpacity={0.4}
+        inactiveDotScale={0.6}
       />
     </View>
   );
@@ -346,16 +356,20 @@ export const SlideSection = props => {
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 10,
+    paddingVertical: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   gradient: {
-    // marginHorizontal: 16,
-    borderRadius: 15,
     marginTop: 20,
-    width: wp(100) - 55,
+    width: ITEM_WIDTH,
+    borderRadius: 15,
     justifyContent: 'center',
     alignSelf: 'center',
     height: 'auto',
+    // backgroundColor: 'rgba(255, 255, 255, 0.1)',
   },
+
   card: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -390,15 +404,5 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: '#fff',
     marginTop: 20,
-  },
-  carouselContainer: {
-    // paddingHorizontal: 7,
-    // gap: 10,
-  },
-  carouselContentContainer: {
-    alignItems: 'center',
-    paddingHorizontal: 7,
-    gap: 10,
-    marginBottom: 10,
   },
 });
