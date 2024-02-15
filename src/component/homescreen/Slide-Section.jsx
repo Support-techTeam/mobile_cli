@@ -29,6 +29,8 @@ export const SlideSection = props => {
     totalArmAmount,
     userLoanAmount,
     guarantor,
+    hideBalance,
+    toggleHideBalance,
   } = props;
   const navigation = useNavigation();
   const carouselRef = useRef(null);
@@ -98,10 +100,7 @@ export const SlideSection = props => {
   ];
 
   const Slide = ({item}) => {
-    const [hideBalance, setHideBalance] = useState(true);
-    const toggleHideBalance = () => {
-      setHideBalance(!hideBalance);
-    };
+
 
     return (
       <LinearGradient
@@ -336,7 +335,7 @@ export const SlideSection = props => {
         declarationRate="fast"
         pagingEnabled
         renderItem={({item}) => <Slide item={item} />}
-    contentContainerStyle={styles.carouselContentContainer}
+        contentContainerStyle={styles.carouselContentContainer}
         snapToInterval={wp('100%') - 55}
         showsHorizontalScrollIndicator={false}
       />
