@@ -31,6 +31,7 @@ export const SlideSection = props => {
     guarantor,
     hideBalance,
     toggleHideBalance,
+    handleLongPress,
   } = props;
   const navigation = useNavigation();
   const carouselRef = useRef(null);
@@ -100,8 +101,6 @@ export const SlideSection = props => {
   ];
 
   const Slide = ({item}) => {
-
-
     return (
       <LinearGradient
         colors={
@@ -268,7 +267,8 @@ export const SlideSection = props => {
                           justifyContent: 'center',
                           alignItems: 'center',
                         }}>
-                        <TouchableWithoutFeedback>
+                        <TouchableWithoutFeedback
+                          onPress={() => handleLongPress(item.accountName)}>
                           <Text
                             style={{
                               color: '#14142A',
@@ -399,5 +399,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 7,
     gap: 10,
+    marginBottom: 10,
   },
 });

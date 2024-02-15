@@ -1,33 +1,15 @@
-/* eslint-disable react/no-unstable-nested-components */
 import {
-  View,
-  Text,
   StyleSheet,
   ScrollView,
-  TouchableOpacity,
-  Dimensions,
-  Image,
-  ImageBackground,
-  Pressable,
-  TouchableWithoutFeedback,
   NativeModules,
   RefreshControl,
   ActivityIndicator,
-  FlatList,
 } from 'react-native';
-import React, {useEffect, useRef, useState} from 'react';
-import {Actionsheet, Modal, Center, Button as Btn} from 'native-base';
-import {MD2Colors} from 'react-native-paper';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import OctaIcon from 'react-native-vector-icons/Octicons';
-import EntypoIcon from 'react-native-vector-icons/Entypo';
-import FontIcon from 'react-native-vector-icons/FontAwesome';
+import React, {useEffect, useState} from 'react';
 import {useNavigation, useFocusEffect} from '@react-navigation/native';
 import {useClipboard} from '@react-native-clipboard/clipboard';
-import Spinner from 'react-native-loading-spinner-overlay/lib';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 import COLORS from '../../constants/colors';
-import LinearGradient from 'react-native-linear-gradient';
 import {useSelector, useDispatch} from 'react-redux';
 import Toast from 'react-native-toast-message';
 import {
@@ -52,14 +34,11 @@ import {
   getLendaTransactionsStatement,
   getSingleArmInvestment,
 } from '../../stores/InvestStore';
-import DateTimePickerModal from 'react-native-modal-datetime-picker';
-import Input from '../../component/inputField/input.component';
 import {
   getTransactionsStatement,
   getAccountWallet,
   getAccountTransactions,
 } from '../../stores/WalletStore';
-import {BottomSheet} from 'react-native-btr';
 import {IntroSection} from '../../component/homescreen/Intro-Section';
 import {SlideSection} from '../../component/homescreen/Slide-Section';
 import {ItemsSection} from '../../component/homescreen/Items-Section';
@@ -67,15 +46,15 @@ import {SingleTransactionSection} from '../../component/homescreen/Single-Transa
 import {LendaStatementModal} from '../../component/modals/LendaStatementModal';
 import {ArmStatementModal} from '../../component/modals/ArmStatementModal';
 import {WalletStatementModal} from '../../component/modals/WalletStatementModal';
+import {UpdateProfileBtn} from '../../component/homescreen/Update-Profile-Btn';
+import {FundWalletSection} from '../../component/homescreen/FundWallet-Section';
+import {MakeTransferSection} from '../../component/homescreen/MakeTransferSection';
 
-const {width} = Dimensions.get('window');
-let mySecret = false;
 const Homescreen = () => {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
   const [isMakeTransferVisible, setIsMakeTransferVisible] = useState(false);
   const [isFundWalletVisible, setIsFundWalletVisible] = useState(false);
-  const [isAllTransactionVisible, setIsAllTransactionVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isSending, setIsSending] = useState(false);
   const [isLoadingWallet, setIsLoadingWallet] = useState(false);
@@ -85,9 +64,6 @@ const Homescreen = () => {
   const [isLoadingArm, setIsLoadingArm] = useState(false);
   const [isLoadingLoanAmount, setIsLoadingLoanAmount] = useState(false);
   const [isLoadingPullDown, setIsLoadingPullDown] = useState(false);
-  const [isPrevious, setPrevious] = useState(false);
-  const [isNext, setNext] = useState(false);
-  const [isFetching, setIsFetching] = useState(false);
   //Redux Calls
   const userProfileData = useSelector(state => state.userProfile.profile);
   const userWalletData = useSelector(state => state.userProfile.wallet);
@@ -102,12 +78,10 @@ const Homescreen = () => {
   const route = useRoute();
   const [loanUserDetails, setLoanUserDetails] = useState(undefined);
   const [userPin, setUserPin] = useState(true);
-  const [isScrolling, setIsScrolling] = useState(false);
   const [guarantor, setGuarantor] = useState([]);
   const dispatch = useDispatch();
   const [allArmData, setAllArmData] = useState([]);
   const [allILendaData, setAllLendaData] = useState([]);
-  // const [investmentDetail, setInvestmentDetail] = useState([]);
   const [portfolioDetail, setPortfolioDetail] = useState(0);
   // Modal Codes
   // Wallet
@@ -878,6 +852,8 @@ const Homescreen = () => {
             }}
           />
         ) : null}
+        {/* First Section */}
+        <IntroSection userProfileData={userProfileData} />
         <ScrollView
           bounces={false}
           refreshControl={
@@ -894,421 +870,20 @@ const Homescreen = () => {
           alwaysBounceVertical={true}>
           {/* Fund Wallet Section */}
 
-          <View style={styles.container}>
-            <BottomSheet
-              visible={isFundWalletVisible}
-              onBackButtonPress={toggleFundWallet}
-              onBackdropPress={toggleFundWallet}>
-              <View
-                style={{
-                  backgroundColor: '#fff',
-                  height: 'auto',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  paddingVertical: 10,
-                  borderTopRightRadius: 10,
-                  borderTopLeftRadius: 10,
-                  paddingHorizontal: 10,
-                }}>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    marginHorizontal: 15,
-                  }}>
-                  <TouchableOpacity>
-                    <View
-                      style={{
-                        borderWidth: 0.5,
-                        borderColor: '#D9DBE9',
-                        borderRadius: 5,
-                      }}>
-                      <TouchableOpacity onPress={toggleFundWallet}>
-                        <Icon name="chevron-left" size={36} color="black" />
-                      </TouchableOpacity>
-                    </View>
-                  </TouchableOpacity>
-
-                  <View
-                    style={[
-                      styles.HeadView,
-                      {
-                        flex: 1,
-                      },
-                    ]}>
-                    <View style={styles.TopView}>
-                      <Text style={styles.TextHead}>Fund Wallet</Text>
-                    </View>
-                  </View>
-                  <TouchableOpacity>
-                    <View
-                      style={{
-                        padding: 2,
-                      }}>
-                      <Text>{'      '}</Text>
-                    </View>
-                  </TouchableOpacity>
-                </View>
-                <Text
-                  style={{
-                    fontSize: 14,
-                    fontFamily: 'MontSBold',
-                    color: '#4E4B66',
-                    textAlign: 'center',
-                    margin: 4,
-                  }}>
-                  Transfer Money to the account details below to fund your
-                  account
-                </Text>
-                <View style={[styles.demark]} />
-                <View style={{marginTop: 16, marginHorizontal: 16}}>
-                  <View
-                    style={{
-                      marginBottom: 10,
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                    }}>
-                    <View
-                      style={{
-                        backgroundColor: '#CDDBEB',
-                        width: 40,
-                        height: 40,
-                        borderRadius: 5,
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                      }}>
-                      <FontIcon name="bank" size={24} color="#054B99" />
-                    </View>
-                    <View
-                      style={{
-                        flexDirection: 'row',
-                        alignContent: 'center',
-                        justifyContent: 'space-between',
-                        width: '90%',
-                      }}>
-                      <View>
-                        <Text
-                          style={[
-                            styles.TextHead,
-                            {fontSize: 14, color: '#4E4B66', marginLeft: 5},
-                          ]}>
-                          Bank Name:
-                        </Text>
-                      </View>
-                      <Text style={styles.TextHead}>Providus bank</Text>
-                    </View>
-                  </View>
-                </View>
-                <View style={[styles.demark]} />
-                <View style={{marginTop: 16, marginHorizontal: 16}}>
-                  <View
-                    style={{
-                      marginBottom: 10,
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                    }}>
-                    <View
-                      style={{
-                        backgroundColor: '#CDDBEB',
-                        width: 40,
-                        height: 40,
-                        borderRadius: 5,
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                      }}>
-                      <Icon
-                        name="account-box-outline"
-                        size={24}
-                        color="#054B99"
-                      />
-                    </View>
-                    <View
-                      style={{
-                        flexDirection: 'row',
-                        alignContent: 'center',
-                        justifyContent: 'space-between',
-                        width: '90%',
-                      }}>
-                      <View>
-                        <Text
-                          style={[
-                            styles.TextHead,
-                            {fontSize: 14, color: '#4E4B66', marginLeft: 5},
-                          ]}>
-                          Account Name:
-                        </Text>
-                      </View>
-                      <Text
-                        style={
-                          (styles.TextHead,
-                          {
-                            fontSize: 14,
-                            textAlign: 'right',
-                            fontFamily: 'MontSBold',
-                            lineHeight: 20,
-                            letterSpacing: 0.5,
-                            flexShrink: 1,
-                          })
-                        }>
-                        {userProfileData?.firstName} {userProfileData?.lastName}
-                      </Text>
-                    </View>
-                  </View>
-                </View>
-
-                <View style={[styles.demark]} />
-                <View style={{marginTop: 16, marginHorizontal: 16}}>
-                  <View
-                    style={{
-                      marginBottom: 10,
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                    }}>
-                    <View
-                      style={{
-                        backgroundColor: '#CDDBEB',
-                        width: 40,
-                        height: 40,
-                        borderRadius: 5,
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                      }}>
-                      <OctaIcon name="number" size={24} color="#054B99" />
-                    </View>
-                    <View
-                      style={{
-                        flexDirection: 'row',
-                        alignContent: 'center',
-                        justifyContent: 'space-between',
-                        width: '90%',
-                      }}>
-                      <View>
-                        <Text
-                          style={[
-                            styles.TextHead,
-                            {fontSize: 14, color: '#4E4B66', marginLeft: 5},
-                          ]}>
-                          Account Number:
-                        </Text>
-                      </View>
-                      <View
-                        style={{
-                          flex: 1,
-                          flexDirection: 'row',
-                          justifyContent: 'flex-end',
-                        }}>
-                        <TouchableWithoutFeedback>
-                          <FontIcon
-                            size={17}
-                            color={COLORS.lendaBlue}
-                            name="copy"
-                            style={{marginRight: 4}}
-                            onPress={() =>
-                              handleLongPress(
-                                userWalletData?.walletIdAccountNumber,
-                              )
-                            }
-                          />
-                        </TouchableWithoutFeedback>
-                        <TouchableWithoutFeedback
-                          onLongPress={() =>
-                            handleLongPress(
-                              userWalletData?.walletIdAccountNumber,
-                            )
-                          }>
-                          <Text
-                            selectable={true}
-                            selectionColor={'#CED4DA'}
-                            style={styles.TextHead}>
-                            {userWalletData &&
-                            userWalletData?.walletIdAccountNumber
-                              ? userWalletData?.walletIdAccountNumber
-                              : 'N/A'}
-                          </Text>
-                        </TouchableWithoutFeedback>
-                      </View>
-                    </View>
-                  </View>
-                </View>
-              </View>
-              {/* </Actionsheet.Content>
-            </Actionsheet> */}
-            </BottomSheet>
-          </View>
+          <FundWalletSection
+            isFundWalletVisible={isFundWalletVisible}
+            toggleFundWallet={toggleFundWallet}
+            userProfileData={userProfileData}
+            userWalletData={userWalletData}
+            handleLongPress={handleLongPress}
+          />
 
           {/* Make Transfer Section */}
-          <View style={styles.container}>
-            <BottomSheet
-              visible={isMakeTransferVisible}
-              onBackButtonPress={toggleMakeTransfer}
-              onBackdropPress={toggleMakeTransfer}>
-              <View
-                style={{
-                  backgroundColor: '#fff',
-                  height: 'auto',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  paddingVertical: 10,
-                  borderTopRightRadius: 10,
-                  borderTopLeftRadius: 10,
-                  paddingHorizontal: 10,
-                }}>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    // marginHorizontal: 15,
-                  }}>
-                  <TouchableOpacity>
-                    <View
-                      style={{
-                        borderWidth: 0.5,
-                        borderColor: '#D9DBE9',
-                        borderRadius: 5,
-                      }}>
-                      <TouchableOpacity onPress={toggleMakeTransfer}>
-                        <Icon name="chevron-left" size={36} color="black" />
-                      </TouchableOpacity>
-                    </View>
-                  </TouchableOpacity>
-
-                  <View
-                    style={[
-                      styles.HeadView,
-                      {
-                        flex: 1,
-                      },
-                    ]}>
-                    <View style={styles.TopView}>
-                      <Text style={styles.TextHead}>SELECT TRANSFER TYPE</Text>
-                    </View>
-                  </View>
-                  <TouchableOpacity>
-                    <View
-                      style={{
-                        padding: 2,
-                      }}>
-                      <Text>{'      '}</Text>
-                    </View>
-                  </TouchableOpacity>
-                </View>
-                <View style={styles.demark} />
-                <View
-                  style={{
-                    marginTop: 16,
-                    justifyContent: 'space-between',
-                  }}>
-                  <TouchableOpacity
-                    style={{
-                      marginBottom: 5,
-                      flexDirection: 'row',
-                    }}
-                    onPress={() => {
-                      setIsMakeTransferVisible(false);
-                      navigation.navigate('Transfer', {
-                        paramKey: 'InternalTransfer',
-                      });
-                    }}>
-                    <View
-                      style={{
-                        backgroundColor: '#CDDBEB',
-                        borderRadius: 5,
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        marginRight: 10,
-                      }}>
-                      <EntypoIcon name="wallet" size={24} color="#054B99" />
-                    </View>
-                    <View>
-                      <Text
-                        style={[
-                          styles.TextHead,
-                          {
-                            fontSize: 14,
-                            color: '#4E4B66',
-                            marginHorizontal: 12,
-                          },
-                        ]}>
-                        Transfer to Trade Lenda wallet
-                      </Text>
-                      <Text
-                        style={{
-                          fontSize: 12,
-                          fontFamily: 'Montserat',
-                          color: '#4E4B66',
-                          marginHorizontal: 12,
-                        }}>
-                        Make transfer to other trade Lenda wallets
-                      </Text>
-                    </View>
-                    <View
-                      style={{
-                        flexDirection: 'row',
-                        justifyContent: 'flex-end',
-                        flexGrow: 1,
-                      }}>
-                      <Icon name="chevron-right" size={24} color="black" />
-                    </View>
-                  </TouchableOpacity>
-                  <View style={[styles.demark, {width: width * 0.96}]} />
-                  <TouchableOpacity
-                    style={{
-                      marginTop: 20,
-                      flexDirection: 'row',
-                    }}
-                    onPress={() => {
-                      setIsMakeTransferVisible(false);
-                      navigation.navigate('Transfer', {
-                        paramKey: 'Nip',
-                      });
-                    }}>
-                    <View
-                      style={{
-                        backgroundColor: '#CDDBEB',
-                        borderRadius: 5,
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        marginRight: 20,
-                      }}>
-                      <EntypoIcon name="wallet" size={24} color="#054B99" />
-                    </View>
-                    <View>
-                      <Text
-                        style={[
-                          styles.TextHead,
-                          {fontSize: 14, color: '#4E4B66'},
-                        ]}>
-                        Transfer to Bank
-                      </Text>
-                      <Text
-                        style={{
-                          fontSize: 12,
-                          fontFamily: 'Montserat',
-                          color: '#4E4B66',
-                        }}>
-                        Make transfer to other bank accounts{'         '}
-                      </Text>
-                    </View>
-
-                    <View
-                      style={{
-                        flexDirection: 'row',
-                        justifyContent: 'flex-end',
-                        flexGrow: 1,
-                      }}>
-                      <Icon name="chevron-right" size={24} color="black" />
-                    </View>
-                  </TouchableOpacity>
-                  <View style={styles.demark} />
-                </View>
-              </View>
-            </BottomSheet>
-          </View>
-
-          {/* First Section */}
-          <IntroSection userProfileData={userProfileData} />
+          <MakeTransferSection
+            isMakeTransferVisible={isMakeTransferVisible}
+            toggleMakeTransfer={toggleMakeTransfer}
+            setIsMakeTransferVisible={setIsMakeTransferVisible}
+          />
 
           {/* Second Section */}
           <SlideSection
@@ -1320,122 +895,29 @@ const Homescreen = () => {
             totalArmAmount={totalArmAmount}
             hideBalance={hideBalance}
             toggleHideBalance={toggleHideBalance}
+            handleLongPress={handleLongPress}
           />
 
           {/* Optional Section */}
-          {!userPin ? (
-            <TouchableOpacity
-              style={[
-                styles.container,
-                {
-                  height: hp(9),
-                  width: wp('90%'),
-                  alignSelf: 'center',
-                  backgroundColor: '#CDDBEB',
-                  marginHorizontal: 15,
-                  marginVertical: 5,
-                  borderRadius: 8,
-                  justifyContent: 'center',
-                },
-              ]}
-              onPress={() => navigation.navigate('SetPin')}>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                }}>
-                <View
-                  style={{
-                    width: 30,
-                    height: 30,
-                    borderRadius: 5,
-                    marginRight: 16,
-                    marginLeft: 16,
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                  }}>
-                  <Image source={require('../../../assets/images/badge.png')} />
-                </View>
-
-                <View style={{flex: 1, marginHorizontal: 10}}>
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      justifyContent: 'space-between',
-                    }}>
-                    <Text style={styles.title}>Attention Needed !!!</Text>
-                  </View>
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      justifyContent: 'space-between',
-                    }}>
-                    <Text style={styles.desc}>
-                      Click here to create your transaction pin
-                    </Text>
-                  </View>
-                </View>
-              </View>
-            </TouchableOpacity>
-          ) : null}
+          {!userPin && (
+            <UpdateProfileBtn
+              title="Attention Needed !!!"
+              body="Click here to create your transaction pin"
+              image={require('../../../assets/images/badge.png')}
+              action={() => navigation.navigate('SetPin')}
+            />
+          )}
 
           {/* Optional Section */}
           {loanUserDetails === undefined ||
-          loanUserDetails?.loanDocumentDetails === undefined ? (
-            <TouchableOpacity
-              style={[
-                styles.container,
-                {
-                  height: hp(9),
-                  width: wp('90%'),
-                  alignSelf: 'center',
-                  backgroundColor: '#CDDBEB',
-                  marginHorizontal: 15,
-                  marginVertical: 5,
-                  borderRadius: 8,
-                  justifyContent: 'center',
-                },
-              ]}
-              onPress={() => navigation.navigate('OnboardingHome')}>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                }}>
-                <View
-                  style={{
-                    width: 30,
-                    height: 30,
-                    borderRadius: 5,
-                    marginRight: 16,
-                    marginLeft: 16,
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                  }}>
-                  <Image source={require('../../../assets/images/badge.png')} />
-                </View>
-
-                <View style={{flex: 1, marginHorizontal: 10}}>
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      justifyContent: 'space-between',
-                    }}>
-                    <Text style={styles.title}>Complete Account Setup</Text>
-                  </View>
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      justifyContent: 'space-between',
-                    }}>
-                    <Text style={styles.desc}>Update your profile details</Text>
-                  </View>
-                </View>
-              </View>
-            </TouchableOpacity>
-          ) : null}
+            (loanUserDetails?.loanDocumentDetails === undefined && (
+              <UpdateProfileBtn
+                title="Complete Account Setup"
+                body="Update your profile details"
+                image={require('../../../assets/images/badge.png')}
+                action={() => navigation.navigate('OnboardingHome')}
+              />
+            ))}
 
           {/* Third Section Wallet and Bill*/}
           <ItemsSection buttonParameters={buttonItems} userPin={userPin} />
@@ -1492,105 +974,6 @@ const Homescreen = () => {
             setShowStartLenda={setShowStartLenda}
             setShowEndLenda={setShowEndLenda}
           />
-          {/* <Center>
-            <Modal
-              isOpen={showLendaStatementModal}
-              onClose={() => {
-                setShowLendaStatementModal(false);
-              }}
-              closeOnOverlayClick={false}>
-              <Modal.Content width={wp(90)} height={hp(50)}>
-                <Modal.CloseButton />
-                <Modal.Header>Generate Lenda E-Statement</Modal.Header>
-                <Modal.Body>
-                  <Pressable onPress={showDatePickerStartLenda}>
-                    <Input
-                      label="Start Date"
-                      iconName="calendar-month-outline"
-                      placeholder="2000 - 01 - 01"
-                      defaultValue={lendaStatementDetails?.startDate}
-                      isDate={true}
-                      editable={false}
-                      showDatePicker={showDatePickerStartLenda}
-                      isNeeded={true}
-                    />
-                  </Pressable>
-
-                  <DateTimePickerModal
-                    isVisible={showStartLenda}
-                    testID="dateTimePicker"
-                    defaultValue={lendaStatementDetails?.startDate}
-                    mode="date"
-                    is24Hour={true}
-                    onConfirm={text => {
-                      const formattedDate = new Date(text)
-                        .toISOString()
-                        .split('T')[0];
-                      setLendaStatementDetails({
-                        ...lendaStatementDetails,
-                        startDate: formattedDate,
-                      });
-                      setShowStartLenda(false);
-                    }}
-                    onCancel={hideDatePickerStartLenda}
-                    textColor="#054B99"
-                  />
-
-                  <Pressable onPress={showDatePickerEndLenda}>
-                    <Input
-                      label="Stop Date"
-                      iconName="calendar-month-outline"
-                      placeholder="2000 - 01 - 01"
-                      defaultValue={lendaStatementDetails?.endDate}
-                      isDate={true}
-                      editable={false}
-                      showDatePicker={showDatePickerEndLenda}
-                      isNeeded={true}
-                    />
-                  </Pressable>
-
-                  <DateTimePickerModal
-                    isVisible={showEndLenda}
-                    testID="dateTimePicker"
-                    defaultValue={lendaStatementDetails?.endDate}
-                    mode="date"
-                    is24Hour={true}
-                    onConfirm={text => {
-                      const formattedDate = new Date(text)
-                        .toISOString()
-                        .split('T')[0];
-                      setLendaStatementDetails({
-                        ...lendaStatementDetails,
-                        endDate: formattedDate,
-                      });
-                      setShowEndLenda(false);
-                    }}
-                    onCancel={hideDatePickerEndLenda}
-                    textColor="#054B99"
-                  />
-                </Modal.Body>
-                <Modal.Footer>
-                  <Btn.Group space={2}>
-                    <Btn
-                      variant="ghost"
-                      colorScheme="blueGray"
-                      onPress={() => {
-                        setShowLendaStatementModal(false);
-                      }}>
-                      Cancel
-                    </Btn>
-                    <Btn
-                      onPress={() => {
-                        handleLendaStatement();
-                        setShowLendaStatementModal(false);
-                      }}>
-                      Send Statement
-                    </Btn>
-                  </Btn.Group>
-                </Modal.Footer>
-              </Modal.Content>
-            </Modal>
-          </Center> */}
 
           {/* Sixth Section Single Transaction History*/}
           <SingleTransactionSection
