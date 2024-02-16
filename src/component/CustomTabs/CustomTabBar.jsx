@@ -96,10 +96,11 @@ const styles = StyleSheet.create({
   tabBar: {
     flexDirection: 'row',
     alignItems: 'center',
-
+    justifyContent: 'center',
     height: 50,
-    width: '100%',
-    marginTop: 20,
+    width: '98%',
+    paddingHorizontal: 10,
+    // marginTop: 20,
   },
   tab: {
     paddingHorizontal: 20,

@@ -804,11 +804,24 @@ const createUploadDocument = async (details, documentName) => {
     store.getState().networkState.network.isConnected &&
     store.getState().networkState.network.isInternetReachable
   ) {
-    if (auth?.currentUser?.stsTokenManager?.accessToken) {
+    await getFirebaseAuthToken();
+    if (token) {
       headers = {
         accept: 'application/json',
-        Authorization: `Bearer ${auth().currentUser?.stsTokenManager?.accessToken}`,
+        Authorization: `Bearer ${token}`,
         'Content-Type': 'multipart/form-data',
+      };
+
+      const config = {
+        onUploadProgress: progressEvent => {
+          if (progressEvent.total) {
+            const progress = Math.round(
+              (progressEvent.loaded / progressEvent.total) * 100,
+            );
+            uploadProgress = progress;
+          }
+        },
+        headers,
       };
       try {
         const formData = new FormData();
@@ -817,24 +830,15 @@ const createUploadDocument = async (details, documentName) => {
         const response = await axiosInstance.post(
           `/loan-details/upload/${documentName}`,
           formData,
-          {
-            headers,
-            onUploadProgress: progressEvent => {
-              if (progressEvent.total) {
-                const progress = Math.round(
-                  (progressEvent.loaded / progressEvent.total) * 100,
-                );
-                uploadProgress = progress;
-              }
-            },
-          },
+          config,
         );
+
         uploadProgress = 0;
         DdLogs.info(`Loans | Document Upload | ${auth?.currentUser?.email}`, {
           context: JSON.stringify(response?.data),
         });
 
-        if(response?.data?.error){
+        if (response?.data?.error) {
           return {
             title: 'Document Upload ',
             error: true,
@@ -851,7 +855,7 @@ const createUploadDocument = async (details, documentName) => {
       } catch (error) {
         // uploadPerroress = 0;
         DdLogs.error(`Loans | Document Upload |errorntUser?.email}`, {
-          context: JSON.stringify(response?.data),
+          context: JSON.stringify(error),
         });
         return {
           title: 'Document Upload ',

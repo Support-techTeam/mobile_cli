@@ -18,14 +18,18 @@ const dialPad = [1, 2, 3, 4, 5, 6, 7, 8, 9, '', 0, 'del'];
 const dialPadSize = width * 0.2;
 const pinLength = 6;
 
-export default function PinInput() {
+export default function PinInput(props) {
   const [pinCode, setPinCode] = useState([]);
+  const { unlockApp } = props;
 
   useEffect(() => {
     if (pinCode.length === pinLength) {
       startShakeAnimation();
+      unlockApp();
     }
   }, [pinCode]);
+
+  
 
   const shakeAnimationValue = useRef(new Animated.Value(0)).current;
 

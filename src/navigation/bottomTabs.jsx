@@ -25,14 +25,16 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
+import { useNavigation } from '@react-navigation/native';
 
 const Tab = createBottomTabNavigator();
 
-export default function BottomTabs() {
+export default function BottomTabs({ navigation}) {
   const timerId = useRef(false);
   const [timeForInactivityInSecond] = useState(600);
   const userProfileData = useSelector(state => state.userProfile.profile);
   const {opened, toggleOpened} = useTabMenu();
+  // const navigation = useNavigation();
 
   useEffect(() => {
     resetInactivityTimeout();
@@ -50,7 +52,8 @@ export default function BottomTabs() {
   const resetInactivityTimeout = () => {
     clearTimeout(timerId.current);
     timerId.current = setTimeout(() => {
-      handleSignOut();
+      // handleSignOut();
+      console.log('log me out');
     }, timeForInactivityInSecond * 10000);
   };
 
@@ -284,27 +287,28 @@ const styles = StyleSheet.create({
     paddingTop: 0,
     marginTop: 0,
     height: 58,
-    marginBottom: 1,
     paddingTop: 5,
-    paddingBottom: 5,
-    borderTopLeftRadius: 16,
-    borderTopRightRadius: 16,
+    paddingVertical: 5,
     borderColor: COLORS.grey,
     backgroundColor: COLORS.white,
-    shadowColor: COLORS.black,
-    shadowOffset: {
-      height: 6,
-      width: 0,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 3,
+    // borderTopLeftRadius: 10,
+    // borderTopRightRadius: 10,
+    // marginBottom: 1,
+    // shadowColor: COLORS.black,
+    // shadowOffset: {
+    //   height: 6,
+    //   width: 0,
+    // },
+    // shadowOpacity: 0.1,
+    // shadowRadius: 3,
+    // elevation: 3,
   },
   tabIconContainer: {
     position: 'absolute',
     top: 12,
     alignItems: 'center',
     justifyContent: 'center',
+    
   },
   tabIcon: {
     width: 32,

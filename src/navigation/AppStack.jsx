@@ -65,6 +65,7 @@ import {
   InvestmentRedemption,
 } from '../screens/InvestScreens';
 import SupportScreen from '../screens/MoreScreens/SupportScreen';
+import NotificationsScreen from '../screens/MoreScreens/NotificationsScreen';
 //Pending
 
 // import BeneficiaryList from '../screens/TransferScreens/BeneficiaryList';
@@ -249,6 +250,7 @@ const AppStack = () => {
             component={InvestmentRedemption}
           />
           <Stack.Screen name='SupportScreen' component={SupportScreen} />
+          <Stack.Screen name='NotificationsScreen' component={NotificationsScreen} />
         </>
       )}
     </Stack.Navigator>

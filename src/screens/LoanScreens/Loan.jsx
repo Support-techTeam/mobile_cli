@@ -9,14 +9,15 @@ import {
   Dimensions,
   ImageBackground,
 } from 'react-native';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useRef} from 'react';
 import {TabView, SceneMap} from 'react-native-tab-view';
 import {useNavigation} from '@react-navigation/native';
 import {Skeleton} from '@rneui/base';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import CustomTabBar from '../../component/CustomTabs/CustomTabBar';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
-import Toast from 'react-native-toast-message';
+// import {Button} from 'native-base';
+import {Button, ButtonGroup, withTheme} from '@rneui/themed';
 import {
   getApprovedLoans,
   getPendingLoans,
@@ -26,12 +27,24 @@ import {
 } from '../../stores/LoanStore';
 import {useRoute, useIsFocused} from '@react-navigation/native';
 import {getGuarantors} from '../../stores/GuarantorStore';
+import {IntroSection} from '../../component/homescreen/Intro-Section';
+import {useSelector} from 'react-redux';
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from 'react-native-responsive-screen';
+import COLORS from '../../constants/colors';
+import Toast from 'react-native-toast-message';
+import Carousel, {Pagination} from 'react-native-snap-carousel';
 
+const SLIDE_WIDTH = Dimensions.get('window').width * 0.88;
+const ITEM_WIDTH = SLIDE_WIDTH;
 const {width, height} = Dimensions.get('window');
 
 const Loanscreen = () => {
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
+  const userProfileData = useSelector(state => state.userProfile.profile);
   const [index, setIndex] = useState(0);
   const [pendingLoansData, setPendingLoansData] = useState([]);
   const [paidLoansData, setPaidLoansData] = useState([]);
@@ -41,22 +54,24 @@ const Loanscreen = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [guarantor, setGuarantor] = useState([]);
   const route = useRoute();
+  const carouselRef = useRef(null);
+  const [slide, setSlide] = useState(0);
   //total approvedLoans
   let totalApprovedLoanAmount = approvedLoansData?.reduce(
     (total, loan) => total + (loan?.amount || 0),
-    0
+    0,
   );
 
   //total Pending
   let totalPendingLoanAmount = pendingLoansData?.reduce(
     (total, loan) => total + (loan?.amount || 0),
-    0
+    0,
   );
 
   //total Paid
   let totalPaidLoanAmount = paidLoansData?.reduce(
     (total, loan) => total + (loan?.amount || 0),
-    0
+    0,
   );
 
   useEffect(() => {
@@ -156,83 +171,91 @@ const Loanscreen = () => {
         {isLoading ? (
           <View
             style={{
-              width: width - 32,
-              height: 120,
-              marginRight: 15,
-              borderRadius: 20,
-              borderColor: '#F7F7FC',
-              borderWidth: 1,
-              overflow: 'hidden',
+              width: ITEM_WIDTH,
+              borderRadius: 15,
+              justifyContent: 'center',
+              alignSelf: 'center',
+              borderWidth: 0.5,
+              borderColor: COLORS.lendaComponentBorder,
             }}>
-            <View>
-              <Skeleton animation="wave" width={120} height={120} />
-            </View>
+            <Skeleton
+              animation="pulse"
+              width={ITEM_WIDTH}
+              height={170}
+              style={{borderRadius: 15}}
+            />
           </View>
         ) : (
-          <ImageBackground
-            source={require('../../../assets/icons/wallet_background.png')}>
-            <View
-              style={{
-                width: width - 32,
-                height: 170,
-                marginRight: 16,
-                borderRadius: 20,
-                borderColor: '#F7F7FC',
-                borderWidth: 1.5,
-                overflow: 'hidden',
-              }}>
-              <View style={{padding: 10}}>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                  }}>
-                  <View style={{width: '70%'}}>
-                    <Text style={styles.state}>{item.state}</Text>
+          <View
+            style={{
+              width: ITEM_WIDTH,
+              borderRadius: 15,
+              justifyContent: 'center',
+              alignSelf: 'center',
+              borderWidth: 0.5,
+              borderColor: COLORS.lendaComponentBorder,
+            }}>
+            <ImageBackground
+              source={require('../../../assets/icons/wallet_background.png')}>
+              <View
+                style={{
+                  paddingHorizontal: 15,
+                  paddingVertical: 15,
+                  height: 170,
+                }}>
+                <View>
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                    }}>
+                    <View style={{width: '70%'}}>
+                      <Text style={styles.state}>{item.state}</Text>
+                    </View>
+                    <Image source={item.icon} />
                   </View>
-                  <Image source={item.icon} />
+                  <Text style={styles.amount}>{item.amount}</Text>
+                  <View
+                    style={{
+                      width: 140,
+                      height: 170,
+                      borderRadius: 100,
+                      borderWidth: 12,
+                      bottom: -185,
+                      right: -20,
+                      position: 'absolute',
+                      borderColor:
+                        item.id === 1
+                          ? '#E6EDF5'
+                          : item.id === 2
+                          ? 'rgba(244, 183, 64, 0.2)'
+                          : '#DAEED8',
+                      opacity: 0.5,
+                    }}
+                  />
+                  <View
+                    style={{
+                      width: 100,
+                      height: 120,
+                      borderRadius: 100,
+                      borderWidth: 12,
+                      bottom: -155,
+                      right: item.id === 1 ? -15 : item.id === 2 ? 20 : -15,
+                      position: 'absolute',
+                      borderColor:
+                        item.id === 1
+                          ? 'linear-gradient(114.44deg, rgba(36, 52, 139, 0.5) 0%, rgba(99, 168, 235, 0.5) 100%)'
+                          : item.id === 2
+                          ? 'linear-gradient(114.44deg, rgba(235, 0, 85, 1) 100%, rgba(255, 250, 128, 1) 100%)'
+                          : 'linear-gradient(180deg, rgba(68, 171, 59, 1) 0%, #D8FF69 100%)',
+                      opacity: 0.3,
+                    }}
+                  />
                 </View>
-                <Text style={styles.amount}>{item.amount}</Text>
-                <View
-                  style={{
-                    width: 140,
-                    height: 170,
-                    borderRadius: 100,
-                    borderWidth: 12,
-                    bottom: -185,
-                    right: -20,
-                    position: 'absolute',
-                    borderColor:
-                      item.id === 1
-                        ? '#E6EDF5'
-                        : item.id === 2
-                        ? 'rgba(244, 183, 64, 0.2)'
-                        : '#DAEED8',
-                    opacity: 0.5,
-                  }}
-                />
-                <View
-                  style={{
-                    width: 100,
-                    height: 120,
-                    borderRadius: 100,
-                    borderWidth: 12,
-                    bottom: -155,
-                    right: item.id === 1 ? -15 : item.id === 2 ? 20 : -15,
-                    position: 'absolute',
-                    borderColor:
-                      item.id === 1
-                        ? 'linear-gradient(114.44deg, rgba(36, 52, 139, 0.5) 0%, rgba(99, 168, 235, 0.5) 100%)'
-                        : item.id === 2
-                        ? 'linear-gradient(114.44deg, rgba(235, 0, 85, 1) 100%, rgba(255, 250, 128, 1) 100%)'
-                        : 'linear-gradient(180deg, rgba(68, 171, 59, 1) 0%, #D8FF69 100%)',
-                    opacity: 0.3,
-                  }}
-                />
               </View>
-            </View>
-          </ImageBackground>
+            </ImageBackground>
+          </View>
         )}
       </>
     );
@@ -241,12 +264,12 @@ const Loanscreen = () => {
   const FirstRoute = () => (
     <>
       {isLoading ? (
-        <View style={{flex: 1}}>
+        <View style={{flex: 1, marginHorizontal: 15}}>
           <ScrollView
             showsHorizontalScrollIndicator={false}
             showsVerticalScrollIndicator={false}>
             {loadingList.map((loan, i) => (
-              <View key={i} style={{paddingHorizontal: 10}}>
+              <View key={i} style={{paddingHorizontal: 0}}>
                 <View style={{marginTop: 10}}>
                   <TouchableOpacity>
                     <View
@@ -299,13 +322,13 @@ const Loanscreen = () => {
           </ScrollView>
         </View>
       ) : (
-        <View style={{flex: 1}}>
+        <View style={{flex: 1, marginHorizontal: 15}}>
           {allLoansData?.length > 0 ? (
             <ScrollView
               showsHorizontalScrollIndicator={false}
               showsVerticalScrollIndicator={false}>
               {allLoansData.map((loan, i) => (
-                <View key={i} style={{paddingHorizontal: 10}}>
+                <View key={i} style={{paddingHorizontal: 0}}>
                   <View style={{marginTop: 10}}>
                     <TouchableOpacity
                       onPress={() =>
@@ -400,12 +423,12 @@ const Loanscreen = () => {
   const SecondRoute = () => (
     <>
       {isLoading ? (
-        <View style={{flex: 1}}>
+     <View style={{flex: 1, marginHorizontal: 15}}>
           <ScrollView
             showsHorizontalScrollIndicator={false}
             showsVerticalScrollIndicator={false}>
             {loadingList.map((loan, i) => (
-              <View key={i} style={{paddingHorizontal: 10}}>
+              <View key={i} style={{paddingHorizontal: 0}}>
                 <View style={{marginTop: 10}}>
                   <TouchableOpacity>
                     <View
@@ -458,13 +481,13 @@ const Loanscreen = () => {
           </ScrollView>
         </View>
       ) : (
-        <View style={{flex: 1}}>
+        <View style={{flex: 1, marginHorizontal: 15}}>
           {approvedLoansData?.length > 0 ? (
             <ScrollView
               showsHorizontalScrollIndicator={false}
               showsVerticalScrollIndicator={false}>
               {approvedLoansData.map((loan, i) => (
-                <View key={i} style={{paddingHorizontal: 10}}>
+                <View key={i} style={{paddingHorizontal: 0}}>
                   <View style={{marginTop: 10}}>
                     <TouchableOpacity
                       onPress={() =>
@@ -551,12 +574,12 @@ const Loanscreen = () => {
   const ThirdRoute = () => (
     <>
       {isLoading ? (
-        <View style={{flex: 1}}>
+   <View style={{flex: 1, marginHorizontal: 15}}>
           <ScrollView
             showsHorizontalScrollIndicator={false}
             showsVerticalScrollIndicator={false}>
             {loadingList.map((loan, i) => (
-              <View key={i} style={{paddingHorizontal: 10}}>
+              <View key={i} style={{paddingHorizontal: 0}}>
                 <View style={{marginTop: 10}}>
                   <TouchableOpacity>
                     <View
@@ -609,13 +632,13 @@ const Loanscreen = () => {
           </ScrollView>
         </View>
       ) : (
-        <View style={{flex: 1}}>
+        <View style={{flex: 1, marginHorizontal: 15}}>
           {paidLoansData?.length > 0 ? (
             <ScrollView
               showsHorizontalScrollIndicator={false}
               showsVerticalScrollIndicator={false}>
               {paidLoansData.map((loan, i) => (
-                <View key={i} style={{paddingHorizontal: 10}}>
+                <View key={i} style={{paddingHorizontal: 0}}>
                   <View style={{marginTop: 10}}>
                     <TouchableOpacity
                       onPress={() =>
@@ -653,11 +676,13 @@ const Loanscreen = () => {
                             <Text style={styles.title}>{loan?.loanType}</Text>
                             <Text style={styles.price}>
                               ₦
-                              {loan?.amount ? new Intl.NumberFormat('en-US', {
-                                style:'decimal',
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2,
-                              }).format(loan?.amount) : '0.00'}
+                              {loan?.amount
+                                ? new Intl.NumberFormat('en-US', {
+                                    style: 'decimal',
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2,
+                                  }).format(loan?.amount)
+                                : '0.00'}
                             </Text>
                           </View>
                           <View
@@ -702,12 +727,12 @@ const Loanscreen = () => {
   const fourthRoute = () => (
     <>
       {isLoading ? (
-        <View style={{flex: 1}}>
+          <View style={{flex: 1, marginHorizontal: 15}}>
           <ScrollView
             showsHorizontalScrollIndicator={false}
             showsVerticalScrollIndicator={false}>
             {loadingList.map((loan, i) => (
-              <View key={i} style={{paddingHorizontal: 10}}>
+              <View key={i} style={{paddingHorizontal: 0}}>
                 <View style={{marginTop: 10}}>
                   <TouchableOpacity>
                     <View
@@ -760,13 +785,13 @@ const Loanscreen = () => {
           </ScrollView>
         </View>
       ) : (
-        <View style={{flex: 1}}>
+        <View style={{flex: 1, marginHorizontal: 15}}>
           {pendingLoansData?.length > 0 ? (
             <ScrollView
               showsHorizontalScrollIndicator={false}
               showsVerticalScrollIndicator={false}>
               {pendingLoansData.map((loan, i) => (
-                <View key={i} style={{paddingHorizontal: 10}}>
+                <View key={i} style={{paddingHorizontal: 0}}>
                   <View style={{marginTop: 10}}>
                     <TouchableOpacity
                       onPress={() =>
@@ -917,164 +942,233 @@ const Loanscreen = () => {
     },
   ];
 
+  const reanderIntroSection = () => {
+    return isLoading ? (
+      <View style={[styles.headerContainer]}>
+        <Skeleton
+          animation="pulse"
+          width={ITEM_WIDTH}
+          height={50}
+          style={styles.tobTab}
+        />
+      </View>
+    ) : (
+      <IntroSection
+        userProfileData={userProfileData}
+        loanUserDetails={loanUserDetails}
+      />
+    );
+  };
+
+  const renderHeaderComponents = () => {
+    return isLoading ? (
+      <View style={[styles.headerContainer]}>
+        <View style={styles.leftView}>
+          <View style={{flexDirection: 'row'}}>
+            <Skeleton
+              animation="pulse"
+              width={70}
+              height={20}
+              style={styles.tobTab}
+            />
+            <Skeleton
+              animation="pulse"
+              width={70}
+              height={20}
+              style={styles.tobTab}
+            />
+          </View>
+        </View>
+
+        <View style={styles.rightView}>
+          <Skeleton
+            animation="pulse"
+            width={70}
+            height={20}
+            style={styles.tobTab}
+          />
+        </View>
+      </View>
+    ) : (
+      <View style={[styles.headerContainer]}>
+        <View style={styles.leftView}>
+          <View style={{flexDirection: 'row'}}>
+            <Button
+              onPress={() => navigation.navigate('Loan')}
+              title="Loan"
+              type="outline"
+              raised={true}
+              titleStyle={{
+                color: COLORS.lendaBlue,
+                fontSize: 12,
+                fontWeight: '600',
+              }}
+              buttonStyle={{
+                borderRadius: 5,
+                borderColor: COLORS.lendaBlue,
+                paddingHorizontal: 15,
+              }}
+              containerStyle={styles.tobTab}
+            />
+            <Button
+              onPress={() => navigation.navigate('Guarantor')}
+              title="Guarantor"
+              type="outline"
+              raised={true}
+              titleStyle={{
+                color: COLORS.lendaBlue,
+                fontSize: 12,
+                fontWeight: '600',
+              }}
+              buttonStyle={{
+                borderRadius: 5,
+                borderColor: COLORS.lendaBlue,
+                paddingHorizontal: 15,
+              }}
+              containerStyle={styles.tobTab}
+            />
+          </View>
+        </View>
+
+        <View style={styles.rightView}>
+          <Button
+            onPress={() => {
+              if (guarantor && guarantor?.length <= 0) {
+                Toast.show({
+                  type: 'warning',
+                  position: 'top',
+                  topOffset: 50,
+                  text1: 'Guarantor Data',
+                  text2: 'Guarantor Data is not available',
+                  visibilityTime: 2000,
+                  autoHide: true,
+                  onPress: () => Toast.hide(),
+                });
+              }
+              navigation.navigate(
+                `${
+                  loanUserDetails === undefined ||
+                  loanUserDetails?.loanDocumentDetails?.validIdentification ===
+                    undefined
+                    ? 'OnboardingHome'
+                    : guarantor && guarantor?.length > 0
+                    ? 'GetLoan'
+                    : 'AddGuarantors'
+                }`,
+              );
+            }}
+            title="Get Loan"
+            type="solid"
+            raised={true}
+            titleStyle={{
+              color: COLORS.white,
+              fontSize: 12,
+              fontWeight: '600',
+            }}
+            buttonStyle={{
+              borderRadius: 5,
+              borderColor: COLORS.lendaBlue,
+              backgroundColor: COLORS.lendaBlue,
+              paddingHorizontal: 20,
+            }}
+            containerStyle={styles.getLoan}
+          />
+        </View>
+      </View>
+    );
+  };
+
+  const renderSlideComponent = () => {
+    return (
+      <>
+        <View style={styles.innerContainer}>
+          <Carousel
+            layout={'default'}
+            ref={carouselRef}
+            data={status}
+            renderItem={({item}) => <Slide item={item} />}
+            sliderWidth={SLIDE_WIDTH}
+            itemWidth={ITEM_WIDTH}
+            useScrollView={true}
+            inactiveSlideScale={0.9}
+            inactiveSlideOpacity={0.6}
+            firstItem={0}
+            initialScrollIndex={0}
+            onSnapToItem={index => setSlide(index)}
+          />
+        </View>
+        <Pagination
+          dotsLength={status?.length}
+          activeDotIndex={slide}
+          carouselRef={carouselRef}
+          containerStyle={{
+            alignSelf: 'flex-end',
+            paddingVertical: 0,
+            paddingTop: 0,
+            paddingBottom: 0,
+            marginVertical: 6,
+          }}
+          dotStyle={{
+            width: 10,
+            height: 10,
+            borderRadius: 5,
+            backgroundColor:
+              slide == 0
+                ? COLORS.lendaBlue
+                : slide == 1
+                ? COLORS.lendaLightOrange
+                : COLORS.lendaGreen,
+          }}
+          tappableDots={true}
+          inactiveDotStyle={{
+            backgroundColor: 'black',
+          }}
+          inactiveDotOpacity={0.4}
+          inactiveDotScale={0.6}
+        />
+      </>
+    );
+  };
+
+  const renderRootComponents = () => {
+    return (
+      <>
+        {reanderIntroSection()}
+        {renderHeaderComponents()}
+        {renderSlideComponent()}
+      </>
+    );
+  };
+
   return (
-    <>
-      {isLoading ? (
-        <SafeAreaView
-          style={{
-            flex: 1,
-            backgroundColor: '#fff',
-            paddingTop: insets.top !== 0 ? insets.top : 18,
-            paddingBottom: insets.bottom !== 0 ? insets.bottom / 2 : 'auto',
-            paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
-            paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
-          }}>
-          <View style={styles.innerContainer}>
-            <View style={{flexDirection: 'row', width: '45%'}}>
-              <View style={{flexDirection: 'row'}}>
-                <View style={{marginRight: 16}}>
-                  <Skeleton animation="wave" width={70} height={20} />
-                </View>
+    <SafeAreaView
+      style={{
+        flex: 1,
+        height: hp('100%'),
+        width: wp('100%'),
+        backgroundColor: COLORS.lendaLightGrey,
+        paddingTop: insets.top !== 0 ? insets.top : 18,
+        paddingBottom: insets.bottom !== 0 ? insets.bottom / 2 : 'auto',
+        paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
+        paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
+      }}>
+      {/* Intro Component */}
+      {renderRootComponents()}
 
-                <Skeleton animation="wave" width={70} height={20} />
-              </View>
-            </View>
-
-            <View style={styles.getLoanLoader}>
-              <Skeleton animation="wave" width={80} height={25} />
-            </View>
-
-            <FlatList
-              data={status}
-              showsHorizontalScrollIndicator={false}
-              showsVerticalScrollIndicator={false}
-              horizontal
-              renderItem={({item}) => <Slide item={item} />}
-            />
-          </View>
-          <TabView
-            navigationState={{
-              index,
-              routes: data?.map(item => ({key: item.id, title: item.title})),
-            }}
-            renderScene={renderScene}
-            onIndexChange={setIndex}
-            swipeEnabled={false}
-            tabBarPosition="top"
-            renderTabBar={props => (
-              <CustomTabBar {...props} onIndexChange={setIndex} />
-            )}
-          />
-        </SafeAreaView>
-      ) : (
-        <SafeAreaView
-          style={{
-            flex: 1,
-            backgroundColor: '#fff',
-            paddingTop: insets.top !== 0 ? insets.top : 18,
-            paddingBottom: insets.bottom !== 0 ? insets.bottom / 2 : 'auto',
-            paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
-            paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
-          }}>
-          <View style={styles.innerContainer}>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                marginBottom: 20,
-                marginRight: 15,
-              }}>
-              <Image
-                source={require('../../../assets/images/HeadLogo.png')}
-                style={{width: 83, height: 32}}
-              />
-              <TouchableOpacity
-                onPress={() => navigation.navigate('More')}
-                style={{
-                  backgroundColor: '#D9DBE9',
-                  padding: 8,
-                  borderRadius: 50,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}>
-                <Icon name="account-circle-outline" size={24} color="black" />
-              </TouchableOpacity>
-            </View>
-
-            <View style={{flexDirection: 'row', width: '45%'}}>
-              <View style={{flexDirection: 'row'}}>
-                <TouchableOpacity onPress={() => navigation.navigate('Loan')}>
-                  <View style={[styles.tobTab, {marginRight: 16}]}>
-                    <Text style={[styles.tabText, {color: '#054B99'}]}>
-                      Loans
-                    </Text>
-                  </View>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  onPress={() => navigation.navigate('Guarantor')}>
-                  <View style={styles.tobTab}>
-                    <Text style={styles.tabText}>Guarantor</Text>
-                  </View>
-                </TouchableOpacity>
-              </View>
-            </View>
-
-            <TouchableOpacity
-              onPress={() => {
-                if (guarantor && guarantor?.length <= 0) {
-                  Toast.show({
-                    type: 'warning',
-                    position: 'top',
-                    topOffset: 50,
-                    text1: 'Guarantor Data',
-                    text2: 'Guarantor Data is not available',
-                    visibilityTime: 2000,
-                    autoHide: true,
-                    onPress: () => Toast.hide(),
-                  });
-                }
-                navigation.navigate(
-                  `${
-                    loanUserDetails === undefined ||
-                    loanUserDetails?.loanDocumentDetails
-                      ?.validIdentification === undefined
-                      ? 'OnboardingHome'
-                      : guarantor && guarantor?.length > 0
-                      ? 'GetLoan'
-                      : 'AddGuarantors'
-                  }`,
-                );
-              }}>
-              <View style={styles.getLoan}>
-                <Text style={styles.getText}>Get Loan</Text>
-              </View>
-            </TouchableOpacity>
-            <FlatList
-              data={status}
-              showsHorizontalScrollIndicator={false}
-              showsVerticalScrollIndicator={false}
-              horizontal
-              renderItem={({item}) => <Slide item={item} />}
-            />
-          </View>
-          <TabView
-            navigationState={{
-              index,
-              routes: data?.map(item => ({key: item.id, title: item.title})),
-            }}
-            renderScene={renderScene}
-            onIndexChange={setIndex}
-            swipeEnabled={false}
-            tabBarPosition="top"
-            renderTabBar={props => (
-              <CustomTabBar {...props} onIndexChange={setIndex} />
-            )}
-          />
-        </SafeAreaView>
-      )}
-    </>
+      <TabView
+        navigationState={{
+          index,
+          routes: data?.map(item => ({key: item.id, title: item.title})),
+        }}
+        renderScene={renderScene}
+        onIndexChange={setIndex}
+        swipeEnabled={false}
+        tabBarPosition="top"
+        renderTabBar={props => (
+          <CustomTabBar {...props} onIndexChange={setIndex} />
+        )}
+      />
+    </SafeAreaView>
   );
 };
 
@@ -1085,15 +1179,25 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
   },
+  headerContainer: {
+    paddingHorizontal: 20,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 10,
+  },
   innerContainer: {
-    marginHorizontal: 20,
+    paddingHorizontal: 20,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 5,
   },
   tobTab: {
-    borderWidth: 1,
-    borderColor: '#D9DBE9',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
     borderRadius: 5,
-    paddingVertical: 4,
-    paddingHorizontal: 8,
   },
   tabText: {
     fontSize: 12,
@@ -1102,13 +1206,9 @@ const styles = StyleSheet.create({
   },
   getLoan: {
     backgroundColor: '#054B99',
-    borderRadius: 12,
-    width: '30%',
-    left: '68%',
-    bottom: 32,
-    height: 35,
     justifyContent: 'center',
-    //  paddingHorizontal:12,
+    alignItems: 'center',
+    borderRadius: 5,
   },
   getLoanLoader: {
     left: '78%',
@@ -1173,5 +1273,19 @@ const styles = StyleSheet.create({
 
     marginBottom: -10,
     // fontWeight: 'bold',
+  },
+  rightView: {
+    flexGrow: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    gap: 10,
+  },
+  leftView: {
+    flexGrow: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    gap: 10,
   },
 });

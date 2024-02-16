@@ -1,12 +1,10 @@
 import React from 'react';
-import {StyleSheet, Pressable} from 'react-native';
-import {Modal, Center, Button} from 'native-base';
+import {Text, StyleSheet} from 'react-native';
+import {Center, Pressable, Button} from 'native-base';
 import Input from '../inputField/input.component';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from 'react-native-responsive-screen';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import CustomModal from './CustomModal';
 
 export const WalletStatementModal = props => {
   const {
@@ -24,19 +22,27 @@ export const WalletStatementModal = props => {
     setShowStartWallet,
     setShowEndWallet,
   } = props;
+
   return (
     <Center>
-      <Modal
-        animationPreset="slide"
-        isOpen={showWalletStatementModal}
-        onClose={() => {
-          setShowWalletStatementModal(false);
-        }}
-        closeOnOverlayClick={false}>
-        <Modal.Content width={wp(90)} height={hp(50)}>
-          <Modal.CloseButton />
-          <Modal.Header>Generate Wallet E-Statement</Modal.Header>
-          <Modal.Body>
+      <CustomModal
+        visible={showWalletStatementModal}
+        onClose={() => setShowWalletStatementModal(false)}
+        title={
+          <>
+            <Text style={styles.title}>Generate Wallet E-Statement</Text>
+
+            <Button
+              variant="ghost"
+              colorScheme="blueGray"
+              onPress={() => setShowWalletStatementModal(false)}
+              style={styles.closeButton}>
+              <Icon name="close" size={24} color="black" />
+            </Button>
+          </>
+        }
+        body={
+          <>
             <Pressable onPress={showDatePickerStartWallet}>
               <Input
                 label="Start Date"
@@ -102,8 +108,10 @@ export const WalletStatementModal = props => {
               onCancel={hideDatePickerEndWallet}
               textColor="#054B99"
             />
-          </Modal.Body>
-          <Modal.Footer>
+          </>
+        }
+        footer={
+          <>
             <Button.Group space={2}>
               <Button
                 variant="ghost"
@@ -121,22 +129,19 @@ export const WalletStatementModal = props => {
                 Send Statement
               </Button>
             </Button.Group>
-          </Modal.Footer>
-        </Modal.Content>
-      </Modal>
+          </>
+        }
+      />
     </Center>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    paddingHorizontal: 10,
-    width: wp('100%'),
-    height: hp(8),
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: '#FCFCFC',
-    marginVertical: 1,
+  title: {
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  closeButton: {
+    marginVertical: 10,
   },
 });

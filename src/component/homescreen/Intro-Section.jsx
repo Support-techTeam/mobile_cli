@@ -17,7 +17,7 @@ import FastImage from 'react-native-fast-image';
 import COLORS from '../../constants/colors';
 
 const SLIDE_WIDTH = Dimensions.get('window').width;
-const ITEM_WIDTH = SLIDE_WIDTH - 60;
+const ITEM_WIDTH = SLIDE_WIDTH - 30;
 
 export const IntroSection = props => {
   const {userProfileData, loanUserDetails} = props;
@@ -63,6 +63,7 @@ export const IntroSection = props => {
           <Icon name="headset" size={26} color={COLORS.lendaBlue} />
         </TouchableOpacity>
         <TouchableOpacity
+         onPress={() => navigation.navigate('NotificationsScreen')}
           style={{
             paddingLeft: 10,
             paddingVertical: 5,

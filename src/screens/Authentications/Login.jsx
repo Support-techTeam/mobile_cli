@@ -54,7 +54,19 @@ const Login = () => {
 
   useEffect(() => {
     getUSerStorage();
+    // getData();
   }, []);
+
+  // const getData = async () => {
+  //   try {
+  //     const value = await AsyncStorage.getItem('deviceInfo');
+  //     if (value !== null) {
+  //       console.log(value, 'deviceInfo');
+  //     }
+  //   } catch (e) {
+  //     // error reading value
+  //   }
+  // };
 
   useEffect(() => {
     setUserDetails({

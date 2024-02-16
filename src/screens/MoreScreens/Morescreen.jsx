@@ -17,12 +17,17 @@ import Toast from 'react-native-toast-message';
 import {resetStore} from '../../util/redux/store';
 import {useSelector} from 'react-redux';
 import {version as appVersion} from '../../../app.json';
+import FastImage from 'react-native-fast-image';
+import {useRoute} from '@react-navigation/native';
+import {getLoanUserDetails} from '../../stores/LoanStore';
 
 const Morescreen = () => {
   const navigation = useNavigation();
   const [visibility, setVisibility] = useState(false);
   const profile = useSelector(state => state.userProfile.profile);
   const insets = useSafeAreaInsets();
+  const [orgDetails, setOrgDetails] = useState([]);
+  const route = useRoute();
 
   const handleLogout = async () => {
     try {
@@ -40,6 +45,22 @@ const Morescreen = () => {
         });
       } else {
         await resetStore();
+      }
+    } catch (e) {}
+  };
+
+  useEffect(() => {
+    if (route.name === 'More') {
+      unSubBusinessDetails();
+    }
+  }, [navigation]);
+
+  const unSubBusinessDetails = async () => {
+    try {
+      const res = await getLoanUserDetails();
+      if (res?.error) {
+      } else {
+        setOrgDetails(res?.data?.loanDocumentDetails);
       }
     } catch (e) {}
   };
@@ -88,7 +109,29 @@ const Morescreen = () => {
           <View style={[styles.profileHeadView2]}>
             <TouchableOpacity onPress={() => navigation.navigate('MyAccount')}>
               <View style={styles.profileHeadView}>
-                <Icon name="account-circle-outline" size={48} color="#6E7191" />
+                <View style={styles.imagesView}>
+                  {orgDetails?.personalPhoto ? (
+                    <FastImage
+                      style={{width: 50, height: 50}}
+                      source={{
+                        uri: orgDetails?.personalPhoto,
+                        priority: FastImage.priority.normal,
+                      }}
+                      resizeMode={FastImage.resizeMode.cover}
+                    />
+                  ) : (
+                    <FastImage
+                      style={{width: 50, height: 50}}
+                      source={{
+                        uri: Image.resolveAssetSource(
+                          require('../../../assets/images/guarantorProfile.png'),
+                        ).uri,
+                        priority: FastImage.priority.normal,
+                      }}
+                      resizeMode={FastImage.resizeMode.cover}
+                    />
+                  )}
+                </View>
                 <Text style={styles.ProfileText}>
                   {profile?.firstName} {profile?.lastName}
                 </Text>
@@ -124,20 +167,25 @@ const Morescreen = () => {
 
           <View>
             <TouchableOpacity onPress={() => navigation.navigate('Security')}>
+              <CustomView isWallet={true} label="Wallet" />
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={() => navigation.navigate('Security')}>
               <CustomView isSecurity={true} label="Security" />
             </TouchableOpacity>
 
-            <TouchableOpacity onPress={() => navigation.navigate('MyAccount')}>
-              <CustomView isSettings={true} label="Profile" />
-            </TouchableOpacity>
-            {/* 
-            <TouchableOpacity>
-              <CustomView isSupport={true} label="Support" />
+            <TouchableOpacity onPress={() => navigation.navigate('Security')}>
+              <CustomView isSettings={true} label="Settings" />
             </TouchableOpacity>
 
-            <TouchableOpacity>
-              <CustomView isRate={true} label="Rate us" />
-            </TouchableOpacity> */}
+            <TouchableOpacity onPress={() => navigation.navigate('MyAccount')}>
+              <CustomView isAccount={true} label="Profile" />
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={() => navigation.navigate('SupportScreen')}>
+              <CustomView isSupport={true} label="Supports" />
+            </TouchableOpacity>
+
           </View>
 
           <TouchableOpacity
@@ -156,12 +204,7 @@ const Morescreen = () => {
             </View>
           </TouchableOpacity>
 
-          <View style={{alignItems: 'center'}}>
-            <Image
-              source={require('../../../assets/images/HeadLogo.png')}
-              style={{width: 83, height: 32}}
-            />
-          </View>
+          <View style={{alignItems: 'center'}}></View>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -197,7 +240,7 @@ const styles = StyleSheet.create({
   },
   signOutView: {
     alignItems: 'center',
-    marginVertical: 60,
+    marginVertical: 20,
   },
   signOutText: {
     color: '#ED2E7E',
@@ -220,5 +263,9 @@ const styles = StyleSheet.create({
   confirmText: {
     color: '#fff',
     fontSize: 16,
+  },
+  imagesView: {
+    borderRadius: 50,
+    overflow: 'hidden',
   },
 });

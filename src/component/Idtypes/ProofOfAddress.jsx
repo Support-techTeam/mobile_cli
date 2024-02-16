@@ -70,19 +70,6 @@ const ProofofAdd = ({
   // const [documentName, setDocumentName] = useState('');
   const {params} = route;
   const {paramKey} = params;
-  // const {
-  //   validIdentificationType,
-  //   validIdentification,
-  //   utilityBill,
-  //   bankStatement,
-  //   passport,
-  //   signature,
-  //   seal,
-  //   cacCertificate,
-  //   others,
-  //   identityCard,
-  //   personalPhoto,
-  // } = paramKey;
 
   const [userDocs, setUserDocs] = useState({
     validIdentificationType: '',
@@ -111,7 +98,6 @@ const ProofofAdd = ({
     identityCard: '',
     personalPhoto: '',
   });
-
 
   useEffect(() => {
     setUserDocs({
@@ -1133,6 +1119,7 @@ const ProofofAdd = ({
           name: fileName,
           type: fileType,
         };
+
         const res = await createUploadDocument(param, document);
         if (res?.error) {
           Toast.show({
@@ -1169,7 +1156,7 @@ const ProofofAdd = ({
               [document]: `${res?.data?.data?.url}`,
             };
           });
-
+          
           userDocs?.validIdentificationType === undefined
             ? handleCreateDocs()
             : handleUpdateDocs();
@@ -1190,7 +1177,7 @@ const ProofofAdd = ({
       setIsUpdating(false);
     }
   };
-  
+
   return (
     <ScrollView
       bounces={false}
@@ -1457,7 +1444,10 @@ const ProofofAdd = ({
                 disabled={docsName.seal === '' || fileUrl === ''}
                 style={{marginTop: 10}}
                 onPress={s3UploadFunction}>
-                <Buttons label="Upload" disabled={docsName.seal === '' || fileUrl === ''} />
+                <Buttons
+                  label="Upload"
+                  disabled={docsName.seal === '' || fileUrl === ''}
+                />
               </TouchableOpacity>
               <TouchableOpacity style={{marginTop: 10}} onPress={pickDocument5}>
                 <Buttons
@@ -1862,7 +1852,10 @@ const ProofofAdd = ({
                 disabled={docsName.passport === '' || fileUrl === ''}
                 style={{marginTop: 10}}
                 onPress={s3UploadFunction}>
-                <Buttons label="Upload" disabled={docsName.passport === '' || fileUrl === ''} />
+                <Buttons
+                  label="Upload"
+                  disabled={docsName.passport === '' || fileUrl === ''}
+                />
               </TouchableOpacity>
               <TouchableOpacity style={{marginTop: 10}} onPress={pickDocument3}>
                 <Buttons
@@ -1992,7 +1985,10 @@ const ProofofAdd = ({
                 disabled={docsName.signature === '' || fileUrl === ''}
                 style={{marginTop: 10}}
                 onPress={s3UploadFunction}>
-                <Buttons label="Upload" disabled={docsName.signature === '' || fileUrl === ''} />
+                <Buttons
+                  label="Upload"
+                  disabled={docsName.signature === '' || fileUrl === ''}
+                />
               </TouchableOpacity>
               <TouchableOpacity style={{marginTop: 10}} onPress={pickDocument4}>
                 <Buttons
