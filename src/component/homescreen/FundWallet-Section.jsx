@@ -225,17 +225,6 @@ export const FundWalletSection = props => {
                     flexDirection: 'row',
                     justifyContent: 'flex-end',
                   }}>
-                  <TouchableWithoutFeedback>
-                    <FontIcon
-                      size={17}
-                      color={COLORS.lendaBlue}
-                      name="copy"
-                      style={{marginRight: 4}}
-                      onPress={() =>
-                        handleLongPress(userWalletData?.walletIdAccountNumber)
-                      }
-                    />
-                  </TouchableWithoutFeedback>
                   <TouchableWithoutFeedback
                     onPress={() =>
                       handleLongPress(userWalletData?.walletIdAccountNumber)
@@ -248,6 +237,17 @@ export const FundWalletSection = props => {
                         ? userWalletData?.walletIdAccountNumber
                         : 'N/A'}
                     </Text>
+                  </TouchableWithoutFeedback>
+                  <TouchableWithoutFeedback>
+                    <Icon
+                      size={17}
+                      color={COLORS.lendaBlue}
+                      name="content-copy"
+                      style={{marginLeft: 4}}
+                      onPress={() =>
+                        handleLongPress(userWalletData?.walletIdAccountNumber)
+                      }
+                    />
                   </TouchableWithoutFeedback>
                 </View>
               </View>

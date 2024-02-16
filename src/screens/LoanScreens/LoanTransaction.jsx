@@ -16,7 +16,6 @@ import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 import {getLoanById} from '../../stores/LoanStore';
 import COLORS from '../../constants/colors';
 import ViewShot from 'react-native-view-shot';
-import SendIntentAndroid from 'react-native-send-intent';
 import Share from 'react-native-share';
 import Toast from 'react-native-toast-message';
 import email from 'react-native-email';
@@ -59,19 +58,13 @@ const LoanTransactions = ({route}) => {
 
   const openSendEmail = Id => {
     const text = `Hello, I would like to report a loan transaction, with Transaction ID: ${Id}`;
-    if (Platform.OS === 'android') {
-      SendIntentAndroid.sendMail(
-        'support@tradelenda.com',
-        `Report Loan Transaction`,
-        `${text}`,
-      );
-    } else {
+ 
       email('support@tradelenda.com', {
-        subject: 'Report Transaction',
+        subject: `Report transaction issue from ${Platform.OS}`,
         body: `${text}`,
         checkCanOpen: false, // Call Linking.canOpenURL prior to Linking.openURL
       }).catch(console.error);
-    }
+    
   };
 
   const shareToSocialMedia = async () => {

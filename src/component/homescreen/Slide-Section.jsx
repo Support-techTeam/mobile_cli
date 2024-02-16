@@ -2,25 +2,19 @@ import {useNavigation} from '@react-navigation/native';
 import React, {useRef, useState} from 'react';
 import {
   StyleSheet,
-  Image,
   View,
   Text,
   TouchableOpacity,
   ImageBackground,
   TouchableWithoutFeedback,
-  FlatList,
   Dimensions,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import FontIcon from 'react-native-vector-icons/FontAwesome';
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from 'react-native-responsive-screen';
 import LinearGradient from 'react-native-linear-gradient';
 import EntypoIcon from 'react-native-vector-icons/Entypo';
 import COLORS from '../../constants/colors';
-import Carousel, {ParallaxImage, Pagination} from 'react-native-snap-carousel';
+import Carousel, {Pagination} from 'react-native-snap-carousel';
 
 const SLIDE_WIDTH = Dimensions.get('window').width;
 const ITEM_WIDTH = SLIDE_WIDTH - 60;
@@ -286,10 +280,10 @@ export const SlideSection = props => {
                           </Text>
                         </TouchableWithoutFeedback>
                         <TouchableWithoutFeedback>
-                          <FontIcon
+                          <Icon
                             size={17}
                             color={COLORS.lendaBlue}
-                            name="copy"
+                            name="content-copy"
                             style={{marginLeft: 4}}
                             onPress={() => handleLongPress(item.accountName)}
                           />
