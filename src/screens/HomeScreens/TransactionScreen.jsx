@@ -390,7 +390,7 @@ const TransactionScreen = ({route}) => {
         paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
         paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
       }}>
-      <Header routeAction={() => navigation.goBack()} heading="TRANSACTION" />
+      <Header routeAction={() => navigation.goBack()} heading="TRANSACTION" disable={false}/>
 
       <ScrollView
         bounces={false}

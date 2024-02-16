@@ -407,7 +407,7 @@ const TransactionHistory = () => {
         paddingLeft: insets.left !== 0 ? insets.left : 'auto',
         paddingRight: insets.right !== 0 ? insets.right : 'auto',
       }}>
-      <Header routeAction={() => navigation.navigate('Home')} heading="TRANSACTION HISTORY" />
+      <Header routeAction={() => navigation.navigate('Home')} heading="TRANSACTION HISTORY" disable={false}/>
       <View
         style={{
           margin: 0,

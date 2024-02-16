@@ -9,7 +9,7 @@ import {
 import COLORS from '../../constants/colors';
 
 export const Header = props => {
-  const {routeAction, heading} = props;
+  const {routeAction, heading, disable} = props;
   const navigation = useNavigation();
   return (
     <View>
@@ -28,12 +28,14 @@ export const Header = props => {
         </View>
 
         <View style={styles.rightView}>
-          <TouchableOpacity style={{
+         {disable === false && <TouchableOpacity style={{
                 paddingHorizontal: 10,
                 paddingVertical: 5,
-          }}>
+          }}
+          onPress={() => navigation.navigate('SupportScreen')}
+          >
             <Icon name="headset" size={26} color={COLORS.lendaBlue} />
-          </TouchableOpacity>
+          </TouchableOpacity>}
         </View>
       </View>
       <View style={styles.demark} />
