@@ -176,7 +176,7 @@ export default function BottomTabs() {
         />
         {/* )} */}
 
-        <Tab.Screen
+        {/* <Tab.Screen
           name="Message"
           component={Homescreen}
           options={{
@@ -188,7 +188,7 @@ export default function BottomTabs() {
               <AddButton opened={opened} toggleOpened={toggleOpened} />
             ),
           }}
-        />
+        /> */}
         <Tab.Screen
           name="Invest"
           component={Investscreen}

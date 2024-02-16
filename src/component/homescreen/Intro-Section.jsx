@@ -50,17 +50,29 @@ export const IntroSection = props => {
         <Text style={styles.hello}>Hi {userProfileData?.firstName}!</Text>
       </View>
       <View style={styles.rightView}>
-        <Image
+        {/* <Image
           source={require('../../../assets/images/newLogo.png')}
           style={{width: 28, height: 28, resizeMode: 'contain'}}
-        />
-        <TouchableOpacity>
-          <Icon name="headset" size={28} color={COLORS.lendaBlue} />
+        /> */}
+        <TouchableOpacity
+          onPress={() => navigation.navigate('SupportScreen')}
+          style={{
+            paddingLeft: 10,
+            paddingVertical: 5,
+          }}>
+          <Icon name="headset" size={26} color={COLORS.lendaBlue} />
         </TouchableOpacity>
-        <TouchableOpacity>
-          <Icon name="bell-outline" size={28} color={COLORS.lendaBlue} />
+        <TouchableOpacity
+          style={{
+            paddingLeft: 10,
+            paddingVertical: 5,
+          }}>
+          <Icon name="bell-outline" size={26} color={COLORS.lendaBlue} />
         </TouchableOpacity>
-        {/* <TouchableOpacity>
+        {/* <TouchableOpacity style={{
+                paddingLeft: 10,
+                paddingVertical: 5,
+          }}>
           <Icon name="bell-badge-outline" size={28} color={COLORS.highwayRed} />
         </TouchableOpacity> */}
       </View>
@@ -102,7 +114,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'flex-end',
-    gap: 10,
+    gap: 5,
   },
   leftView: {
     flexGrow: 1,
