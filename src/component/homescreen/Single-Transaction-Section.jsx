@@ -47,7 +47,7 @@ export const SingleTransactionSection = props => {
             Recent Transactions
           </Text>
           <TouchableOpacity
-            style={{flexDirection: 'row', justifyContent: 'center'}}
+            style={{flexDirection: 'row', justifyContent: 'center', borderBlockColor: COLORS.lendaComponentBorder, borderWidth: 0.1, paddingLeft: 25, paddingBottom: 5}}
             disabled={
               (userTransactionsData && userTransactionsData.length === 0) ||
               userTransactionsData == undefined
@@ -135,6 +135,7 @@ export const SingleTransactionSection = props => {
                 onPress={() =>
                   navigation.navigate('Transaction', {
                     transaction: item,
+                    wallet: userWalletData,
                     time: time,
                     day: date,
                   })
@@ -381,8 +382,8 @@ const styles = StyleSheet.create({
     resizeMode: 'cover',
   },
   PanelItemContainer: {
-    borderWidth: 0.4,
-    borderColor: COLORS.lightGray,
+    borderWidth: 0.2,
+    borderColor: COLORS.lendaComponentBorder,
     padding: 10,
     borderRadius: 6,
     flexDirection: 'row',
@@ -390,7 +391,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 15,
     marginHorizontal: 5,
-    backgroundColor: COLORS.lightGray,
+    backgroundColor: COLORS.lendaLightGrey,
   },
   PanelImage: {
     width: 30,
@@ -398,7 +399,7 @@ const styles = StyleSheet.create({
     borderRadius: 40,
   },
   desc: {
-    fontFamily: 'Montserat',
+    fontFamily: 'Montserrat',
     fontSize: 12,
     fontWeight: '400',
     lineHeight: 18,

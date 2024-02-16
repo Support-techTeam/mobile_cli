@@ -118,7 +118,7 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 10,
     borderWidth: 0.3,
-    borderColor: '#D9DBE9',
+    borderColor: COLORS.lendaComponentBorder,
     marginHorizontal: 20,
     width: wp(90),
     alignSelf: 'center',

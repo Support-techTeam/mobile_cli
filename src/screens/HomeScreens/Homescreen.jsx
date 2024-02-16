@@ -4,6 +4,7 @@ import {
   NativeModules,
   RefreshControl,
   ActivityIndicator,
+  Platform,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {useNavigation, useFocusEffect} from '@react-navigation/native';
@@ -790,51 +791,152 @@ const Homescreen = () => {
     },
   ];
 
-  return !timeOut ? (
-    <Splashscreen text="Getting Profile Details..." />
-  ) : timeOut &&
-    userProfileData &&
-    userProfileData?.profileProgress === null ? (
-    <PersonalDetails />
-  ) : (
-    timeOut &&
-    userProfileData &&
-    userProfileData?.profileProgress !== null && (
-      <SafeAreaView
-        style={{
-          flex: 1,
-          height: hp('100%'),
-          width: wp('100%'),
-          backgroundColor: '#FCFCFC',
-          paddingTop: insets.top !== 0 ? insets.top : 18,
-          paddingBottom: insets.bottom !== 0 ? insets.bottom / 2 : 'auto',
-          paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
-          paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
-        }}>
-        {/* {isLoading ||
-        isLoadingWallet ||
-        isLoadingTransaction ||
-        isLoadingLoanData ||
-        isLoadingLenda ||
-        isLoadingArm ||
-        isLoadingLoanAmount ? (
-          <ActivityIndicator
-            size="large"
-            color="rgba(78, 75, 102, 0.7)"
-            animating
-            style={{
-              zIndex: 99999,
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}
-          />
-        ) : null} */}
+  const renderOverLayComponents = () => {
+    return (
+      <>
+        {/* Fund Wallet Section */}
+        <FundWalletSection
+          isFundWalletVisible={isFundWalletVisible}
+          toggleFundWallet={toggleFundWallet}
+          userProfileData={userProfileData}
+          userWalletData={userWalletData}
+          handleLongPress={handleLongPress}
+        />
 
+        {/* Make Transfer Section */}
+        <MakeTransferSection
+          isMakeTransferVisible={isMakeTransferVisible}
+          toggleMakeTransfer={toggleMakeTransfer}
+          setIsMakeTransferVisible={setIsMakeTransferVisible}
+        />
+
+        {/* E-Statements Modal */}
+        {/* Wallet Statement Modal */}
+        <WalletStatementModal
+          showWalletStatementModal={showWalletStatementModal}
+          setShowWalletStatementModal={setShowWalletStatementModal}
+          showDatePickerStartWallet={showDatePickerStartWallet}
+          walletStatementDetails={walletStatementDetails}
+          setWalletStatementDetails={setWalletStatementDetails}
+          hideDatePickerStartWallet={hideDatePickerStartWallet}
+          showDatePickerEndWallet={showDatePickerEndWallet}
+          hideDatePickerEndWallet={hideDatePickerEndWallet}
+          handleWalletStatement={handleWalletStatement}
+          showStartWallet={showStartWallet}
+          showEndWallet={showEndWallet}
+          setShowStartWallet={setShowStartWallet}
+          setShowEndWallet={setShowEndWallet}
+        />
+
+        {/* ARM Statement Modal */}
+        <ArmStatementModal
+          allArmData={allArmData}
+          showArmStatementModal={showArmStatementModal}
+          setShowArmStatementModal={setShowArmStatementModal}
+          showDatePickerStartArm={showDatePickerStartArm}
+          armStatementDetails={armStatementDetails}
+          setArmStatementDetails={setArmStatementDetails}
+          hideDatePickerStartArm={hideDatePickerStartArm}
+          showDatePickerEndArm={showDatePickerEndArm}
+          hideDatePickerEndArm={hideDatePickerEndArm}
+          handleArmStatement={handleArmStatement}
+          showStartArm={showStartArm}
+          showEndArm={showEndArm}
+          setShowStartArm={setShowStartArm}
+          setShowEndArm={setShowEndArm}
+        />
+
+        {/* Lenda Statement Modal */}
+        <LendaStatementModal
+          showLendaStatementModal={showLendaStatementModal}
+          setShowLendaStatementModal={setShowLendaStatementModal}
+          showDatePickerStartLenda={showDatePickerStartLenda}
+          lendaStatementDetails={lendaStatementDetails}
+          setLendaStatementDetails={setLendaStatementDetails}
+          hideDatePickerStartLenda={hideDatePickerStartLenda}
+          showDatePickerEndLenda={showDatePickerEndLenda}
+          hideDatePickerEndLenda={hideDatePickerEndLenda}
+          handleLendaStatement={handleLendaStatement}
+          showStartLenda={showStartLenda}
+          showEndLenda={showEndLenda}
+          setShowStartLenda={setShowStartLenda}
+          setShowEndLenda={setShowEndLenda}
+        />
+      </>
+    );
+  };
+
+  const renderHeaderComponents = () => {
+    return (
+      <>
+        {/* First Section */}
+        <IntroSection
+          userProfileData={userProfileData}
+          loanUserDetails={loanUserDetails}
+        />
+
+        {/* Second Section */}
+        <SlideSection
+          portfolioDetail={portfolioDetail}
+          userWalletData={userWalletData}
+          totalLendaAmount={totalLendaAmount}
+          userLoanAmount={userLoanAmount}
+          guarantor={guarantor}
+          totalArmAmount={totalArmAmount}
+          hideBalance={hideBalance}
+          toggleHideBalance={toggleHideBalance}
+          handleLongPress={handleLongPress}
+        />
+      </>
+    );
+  };
+
+  const renderOptionalComponents = () => {
+    return (
+      <>
+        {/* Optional Section */}
+        {!userPin && (
+          <UpdateProfileBtn
+            title="Attention Needed !!!"
+            body="Click here to create your transaction pin"
+            image={require('../../../assets/images/badge.png')}
+            action={() => navigation.navigate('SetPin')}
+          />
+        )}
+
+        {/* Optional Section */}
+        {loanUserDetails === undefined ||
+        loanUserDetails?.loanDocumentDetails === undefined ? (
+          <UpdateProfileBtn
+            title="Complete Account Setup"
+            body="Update your profile details"
+            image={require('../../../assets/images/badge.png')}
+            action={() => navigation.navigate('OnboardingHome')}
+          />
+        ) : null}
+      </>
+    );
+  };
+
+  const renderScrollableComponents = () => {
+    return (
+      <>
+        {/* Third Section Wallet and Bill*/}
+        <ItemsSection buttonParameters={buttonItems} userPin={userPin} />
+
+        {/* Sixth Section Single Transaction History*/}
+        <SingleTransactionSection
+          userTransactionsData={userTransactionsData}
+          userWalletData={userWalletData}
+          hideBalance={hideBalance}
+        />
+      </>
+    );
+  };
+
+  const renderMainComponents = () => {
+    return (
+      <>
         {isSending ? (
           <ActivityIndicator
             size="large"
@@ -852,8 +954,9 @@ const Homescreen = () => {
             }}
           />
         ) : null}
-        {/* First Section */}
-        <IntroSection userProfileData={userProfileData} />
+        {renderOverLayComponents()}
+        {renderHeaderComponents()}
+
         <ScrollView
           bounces={false}
           refreshControl={
@@ -868,120 +971,35 @@ const Homescreen = () => {
           style={[styles.scrollView, {marginBottom: 10, height: hp('100%')}]}
           contentContainerStyle={styles.contentContainer}
           alwaysBounceVertical={true}>
-          {/* Fund Wallet Section */}
-
-          <FundWalletSection
-            isFundWalletVisible={isFundWalletVisible}
-            toggleFundWallet={toggleFundWallet}
-            userProfileData={userProfileData}
-            userWalletData={userWalletData}
-            handleLongPress={handleLongPress}
-          />
-
-          {/* Make Transfer Section */}
-          <MakeTransferSection
-            isMakeTransferVisible={isMakeTransferVisible}
-            toggleMakeTransfer={toggleMakeTransfer}
-            setIsMakeTransferVisible={setIsMakeTransferVisible}
-          />
-
-          {/* Second Section */}
-          <SlideSection
-            portfolioDetail={portfolioDetail}
-            userWalletData={userWalletData}
-            totalLendaAmount={totalLendaAmount}
-            userLoanAmount={userLoanAmount}
-            guarantor={guarantor}
-            totalArmAmount={totalArmAmount}
-            hideBalance={hideBalance}
-            toggleHideBalance={toggleHideBalance}
-            handleLongPress={handleLongPress}
-          />
-
-          {/* Optional Section */}
-          {!userPin && (
-            <UpdateProfileBtn
-              title="Attention Needed !!!"
-              body="Click here to create your transaction pin"
-              image={require('../../../assets/images/badge.png')}
-              action={() => navigation.navigate('SetPin')}
-            />
-          )}
-
-          {/* Optional Section */}
-          {loanUserDetails === undefined ||
-            (loanUserDetails?.loanDocumentDetails === undefined && (
-              <UpdateProfileBtn
-                title="Complete Account Setup"
-                body="Update your profile details"
-                image={require('../../../assets/images/badge.png')}
-                action={() => navigation.navigate('OnboardingHome')}
-              />
-            ))}
-
-          {/* Third Section Wallet and Bill*/}
-          <ItemsSection buttonParameters={buttonItems} userPin={userPin} />
-
-          {/* E-Statements Modal */}
-          {/* Wallet Statement Modal */}
-          <WalletStatementModal
-            showWalletStatementModal={showWalletStatementModal}
-            setShowWalletStatementModal={setShowWalletStatementModal}
-            showDatePickerStartWallet={showDatePickerStartWallet}
-            walletStatementDetails={walletStatementDetails}
-            setWalletStatementDetails={setWalletStatementDetails}
-            hideDatePickerStartWallet={hideDatePickerStartWallet}
-            showDatePickerEndWallet={showDatePickerEndWallet}
-            hideDatePickerEndWallet={hideDatePickerEndWallet}
-            handleWalletStatement={handleWalletStatement}
-            showStartWallet={showStartWallet}
-            showEndWallet={showEndWallet}
-            setShowStartWallet={setShowStartWallet}
-            setShowEndWallet={setShowEndWallet}
-          />
-
-          {/* ARM Statement Modal */}
-          <ArmStatementModal
-            allArmData={allArmData}
-            showArmStatementModal={showArmStatementModal}
-            setShowArmStatementModal={setShowArmStatementModal}
-            showDatePickerStartArm={showDatePickerStartArm}
-            armStatementDetails={armStatementDetails}
-            setArmStatementDetails={setArmStatementDetails}
-            hideDatePickerStartArm={hideDatePickerStartArm}
-            showDatePickerEndArm={showDatePickerEndArm}
-            hideDatePickerEndArm={hideDatePickerEndArm}
-            handleArmStatement={handleArmStatement}
-            showStartArm={showStartArm}
-            showEndArm={showEndArm}
-            setShowStartArm={setShowStartArm}
-            setShowEndArm={setShowEndArm}
-          />
-
-          {/* Lenda Statement Modal */}
-          <LendaStatementModal
-            showLendaStatementModal={showLendaStatementModal}
-            setShowLendaStatementModal={setShowLendaStatementModal}
-            showDatePickerStartLenda={showDatePickerStartLenda}
-            lendaStatementDetails={lendaStatementDetails}
-            setLendaStatementDetails={setLendaStatementDetails}
-            hideDatePickerStartLenda={hideDatePickerStartLenda}
-            showDatePickerEndLenda={showDatePickerEndLenda}
-            hideDatePickerEndLenda={hideDatePickerEndLenda}
-            handleLendaStatement={handleLendaStatement}
-            showStartLenda={showStartLenda}
-            showEndLenda={showEndLenda}
-            setShowStartLenda={setShowStartLenda}
-            setShowEndLenda={setShowEndLenda}
-          />
-
-          {/* Sixth Section Single Transaction History*/}
-          <SingleTransactionSection
-            userTransactionsData={userTransactionsData}
-            userWalletData={userWalletData}
-            hideBalance={hideBalance}
-          />
+          {renderOptionalComponents()}
+          {renderScrollableComponents()}
         </ScrollView>
+      </>
+    );
+  };
+
+  return !timeOut ? (
+    <Splashscreen text="Getting Profile Details..." />
+  ) : timeOut &&
+    userProfileData &&
+    userProfileData?.profileProgress === null ? (
+    <PersonalDetails />
+  ) : (
+    timeOut &&
+    userProfileData &&
+    userProfileData?.profileProgress !== null && (
+      <SafeAreaView
+        style={{
+          flex: 1,
+          height: hp('100%'),
+          width: wp('100%'),
+          backgroundColor: COLORS.lendaLightGrey,
+          paddingTop: insets.top !== 0 ? insets.top : 18,
+          paddingBottom: insets.bottom !== 0 ? insets.bottom / 2 : 'auto',
+          paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
+          paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
+        }}>
+        {renderMainComponents()}
       </SafeAreaView>
     )
   );
@@ -1057,14 +1075,14 @@ const styles = StyleSheet.create({
     marginRight: 16,
   },
   hello: {
-    fontFamily: 'Montserat',
+    fontFamily: 'Montserrat',
     fontWeight: '800',
     fontSize: 16,
     lineHeight: 24,
     color: '#14142B',
   },
   netInfo: {
-    fontFamily: 'Montserat',
+    fontFamily: 'Montserrat',
     fontWeight: '800',
     fontSize: 14,
     lineHeight: 24,
@@ -1078,7 +1096,7 @@ const styles = StyleSheet.create({
     borderColor: '#D9DBE9',
   },
   tabtexts: {
-    fontFamily: 'Montserat',
+    fontFamily: 'Montserrat',
     fontSize: 12,
     fontWeight: '600',
     lineHeight: 18,
@@ -1086,7 +1104,7 @@ const styles = StyleSheet.create({
   },
   wallet: {
     color: '#054B99',
-    fontFamily: 'Montserat',
+    fontFamily: 'Montserrat',
     fontWeight: '400',
     fontSize: 14,
     lineHeight: 18,
@@ -1121,21 +1139,21 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   title: {
-    fontFamily: 'Montserat',
+    fontFamily: 'Montserrat',
     fontSize: 14,
     fontWeight: '800',
     lineHeight: 21,
     color: '#14142B',
   },
   price: {
-    fontFamily: 'Montserat',
+    fontFamily: 'Montserrat',
     fontSize: 16,
     fontWeight: '800',
     lineHeight: 24,
     color: '#14142B',
   },
   desc: {
-    fontFamily: 'Montserat',
+    fontFamily: 'Montserrat',
     fontSize: 12,
     fontWeight: '400',
     lineHeight: 18,

@@ -8,6 +8,7 @@ import PersonalDetails from '../screens/ProfileOnboardings/PersonalDetails';
 import Splashscreen from './Splashscreen';
 import BottomTabs from './bottomTabs';
 import TransactionScreen from '../screens/HomeScreens/TransactionScreen';
+import TransactionHistory from '../screens/HomeScreens/TransactionHistory';
 import BankDeets from '../screens/TransferScreens/BankDeets';
 import Summary from '../screens/TransferScreens/Summary';
 import Pin from '../screens/TransferScreens/Pin';
@@ -117,7 +118,7 @@ const AppStack = () => {
       setTimeOut(true);
     }, 5000);
   });
-  
+
   return isVerified === undefined && !timeOut ? (
     <Stack.Navigator screenOptions={{headerShown: false}}>
       <Stack.Screen
@@ -134,7 +135,9 @@ const AppStack = () => {
     </Stack.Navigator>
   ) : (
     <Stack.Navigator screenOptions={{headerShown: false}}>
-      {auth().currentUser && isVerified === false && userProfileData?.profileProgress == null ? (
+      {auth().currentUser &&
+      isVerified === false &&
+      userProfileData?.profileProgress == null ? (
         <Stack.Screen
           name="Verification"
           component={Verification}
@@ -160,6 +163,10 @@ const AppStack = () => {
             }}
           />
           <Stack.Screen name="Transaction" component={TransactionScreen} />
+          <Stack.Screen
+            name="TransactionHistory"
+            component={TransactionHistory}
+          />
           <Stack.Screen name="PersonalDetails" component={PersonalDetails} />
           {/* Transfer Screens */}
           <Stack.Screen name="Transfer" component={BankDeets} />

@@ -8,8 +8,9 @@ import {
   Dimensions,
   FlatList,
   ActivityIndicator,
+  VirtualizedList,
 } from 'react-native';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useRef} from 'react';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useNavigation, useFocusEffect} from '@react-navigation/native';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
@@ -23,7 +24,9 @@ import {
 import COLORS from '../../constants/colors';
 import {useSelector} from 'react-redux';
 import Input from '../../component/inputField/input.component';
+import { Header } from '../../component/header/Header';
 
+let filter = '';
 const {width} = Dimensions.get('window');
 const TransactionHistory = () => {
   const insets = useSafeAreaInsets();
@@ -31,6 +34,7 @@ const TransactionHistory = () => {
   const userWalletData = useSelector(state => state.userProfile.wallet);
   const [isLoadingTransaction, setIsLoadingTransaction] = useState(false);
   const [allUserTransactionsData, setAllUserTransactionsData] = useState([]);
+  const [filteredList, setFilteredList] = useState([]);
   const [userTransactionsPages, setUserTransactionsPages] = useState([]);
   const [userTransactionsTotal, setUserTransactionsTotal] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
@@ -39,10 +43,11 @@ const TransactionHistory = () => {
   const [nextPage, setNextPage] = useState('');
   const [isFirstPageReceived, setIsFirstPageReceived] = useState(false);
   const route = useRoute();
-
+  const [userInput, setUserInput] = useState('');
+  const [filter, setFilter] = useState('');
   const unsubGetAllTransactions = async () => {
     setIsLoadingTransaction(true);
-    getAccountTransactions(0, 10)
+    getAccountTransactions(0, 30)
       .then(res => {
         if (res) {
           if (!res?.error) {
@@ -181,6 +186,7 @@ const TransactionHistory = () => {
             : () => {
                 navigation.navigate('Transaction', {
                   transaction: item,
+                  wallet: userWalletData,
                   time: time,
                   day: date,
                 });
@@ -388,9 +394,7 @@ const TransactionHistory = () => {
   };
 
   const ListEndLoader = () => {
-    if (isFirstPageReceived && isLoading) {
-      return <ActivityIndicator size={'large'} />;
-    }
+    return <View></View>;
   };
 
   return (
@@ -403,36 +407,7 @@ const TransactionHistory = () => {
         paddingLeft: insets.left !== 0 ? insets.left : 'auto',
         paddingRight: insets.right !== 0 ? insets.right : 'auto',
       }}>
-      <View
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-        }}>
-        <TouchableOpacity
-          onPress={() => {
-            navigation.navigate('Home');
-          }}>
-          <View
-            style={{
-              borderWidth: 0.5,
-              borderColor: '#D9DBE9',
-              borderRadius: 5,
-            }}>
-            <Icon name="chevron-left" size={36} color="black" />
-          </View>
-        </TouchableOpacity>
-        <View style={styles.HeadView}>
-          <View style={styles.TopView}>
-            <Text style={styles.TextHead}>TRANSACTION HISTORY</Text>
-          </View>
-        </View>
-
-        <View style={{}}>
-          <Text>{'       '}</Text>
-        </View>
-      </View>
-      <View style={styles.demark} />
+      <Header routeAction={() => navigation.navigate('Home')} heading="TRANSACTION HISTORY" />
       <View
         style={{
           margin: 0,
@@ -444,12 +419,12 @@ const TransactionHistory = () => {
           width: wp(95),
         }}>
         <Input
-          onChangeText={text => console.log(text)}
-          style={{width: 'auto'}}
+          // onChangeText={handleSearch}
+          style={{width: wp('60%')}}
           iconName="magnify"
-          placeholder="Search by transaction type or amount"
+          placeholder="Search by transaction type"
         />
-        <TouchableOpacity onPress={() => console.log('Open Filter')}>
+        <TouchableOpacity>
           <Icon name="tune-vertical" size={30} color={COLORS.lendaBlue} />
         </TouchableOpacity>
       </View>
@@ -457,26 +432,24 @@ const TransactionHistory = () => {
         <ActivityIndicator size={'large'} />
       ) : (
         <FlatList
-          data={allUserTransactionsData}
+          data={
+            userInput !== ''
+              ? filteredList
+              : filter !== ''
+              ? filteredList
+              : allUserTransactionsData
+          }
           renderItem={({item}) => RenderItem(item)}
           contentContainerStyle={{gap: 10}}
           refreshing={isLoadingTransaction}
           onRefresh={unsubGetAllTransactions}
           scrollEnabled={true}
-          onEndReached={handleLoadMore}
-          onEndReachedThreshold={1}
           ListEmptyComponent={<RenderEmptyItem />}
           ListFooterComponent={<ListEndLoader />}
           showsVerticalScrollIndicator={true}
-          // snapToInterval={Dimensions.get('window').height}
-          // snapToAlignment="start"
-          // decelerationRate="fast"
-          // removeClippedSubviews
-          // initialNumToRender={10}
-          // maxToRenderPerBatch={1}
-          // windowSize={5}
         />
       )}
+      {/* {FloatBtn()} */}
     </SafeAreaView>
   );
 };
@@ -514,27 +487,27 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   title: {
-    fontFamily: 'Montserat',
+    fontFamily: 'Montserrat',
     fontSize: 14,
     fontWeight: '800',
     lineHeight: 21,
     color: '#14142B',
   },
   desc: {
-    fontFamily: 'Montserat',
+    fontFamily: 'Montserrat',
     fontSize: 12,
     fontWeight: '400',
     lineHeight: 18,
   },
   PanelItemContainer: {
-    borderWidth: 0.4,
-    borderColor: COLORS.lightGray,
+    borderWidth: 0.2,
+    borderColor: COLORS.lendaComponentBorder,
     padding: 10,
     borderRadius: 6,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: COLORS.lightGray,
+    backgroundColor: COLORS.lendaComponentBg,
   },
   PanelImage: {
     width: 30,

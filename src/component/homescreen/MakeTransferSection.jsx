@@ -124,7 +124,7 @@ export const MakeTransferSection = props => {
               <Text
                 style={{
                   fontSize: 12,
-                  fontFamily: 'Montserat',
+                  fontFamily: 'Montserrat',
                   color: '#4E4B66',
                   marginHorizontal: 12,
                 }}>
@@ -173,7 +173,7 @@ export const MakeTransferSection = props => {
               <Text
                 style={{
                   fontSize: 12,
-                  fontFamily: 'Montserat',
+                  fontFamily: 'Montserrat',
                   color: '#4E4B66',
                 }}>
                 Make transfer to other bank accounts{'         '}

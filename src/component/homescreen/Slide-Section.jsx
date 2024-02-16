@@ -259,7 +259,7 @@ export const SlideSection = props => {
                         style={{
                           color: '#6E7191',
                           marginTop: 5,
-                          fontFamily: 'Montserat',
+                          fontFamily: 'Montserrat',
                           fontWeight: '400',
                           textAlign: 'right',
                         }}>
@@ -278,7 +278,7 @@ export const SlideSection = props => {
                             style={{
                               color: '#14142A',
                               marginTop: 5,
-                              fontFamily: 'Montserat',
+                              fontFamily: 'Montserrat',
                               fontWeight: '400',
                               textAlign: 'right',
                             }}>
@@ -376,7 +376,7 @@ const styles = StyleSheet.create({
   },
   FundButton: {
     color: '#054B99',
-    fontFamily: 'Montserat',
+    fontFamily: 'Montserrat',
     fontWeight: '500',
     fontSize: 16,
   },
@@ -392,7 +392,7 @@ const styles = StyleSheet.create({
   },
   wallet: {
     color: '#054B99',
-    fontFamily: 'Montserat',
+    fontFamily: 'Montserrat',
     fontWeight: '400',
     fontSize: 14,
     lineHeight: 18,
