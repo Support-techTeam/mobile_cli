@@ -46,5 +46,9 @@ const COLORS = {
   amazonOrange: '#FF9900',
   floatingGray: '#F4F4F4',
   textLight: '#fff',
+  lendaGrey: '#6E7191',
+  lendaLightGrey: '#FCFCFC',
+  lendaComponentBg: '#fff',
+  lendaComponentBorder: '#D9DBE9',
 };
 export default COLORS;
