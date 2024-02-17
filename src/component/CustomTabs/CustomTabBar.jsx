@@ -1,5 +1,6 @@
+import { FlashList } from '@shopify/flash-list';
 import React, {useState, useRef} from 'react';
-import {FlatList, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const data = [
@@ -63,7 +64,7 @@ const CustomTabBar = ({navigationState, onIndexChange}) => {
           style={styles.nextButtonText}
         />
       </TouchableOpacity>
-      <FlatList
+      <FlashList
         ref={flatListRef}
         data={data}
         renderItem={renderItem}
