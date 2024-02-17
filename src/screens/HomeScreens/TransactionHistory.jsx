@@ -6,9 +6,8 @@ import {
   TouchableHighlight,
   Image,
   Dimensions,
-  FlatList,
   ActivityIndicator,
-  VirtualizedList,
+  Pressable
 } from 'react-native';
 import React, {useEffect, useState, useRef} from 'react';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -24,7 +23,8 @@ import {
 import COLORS from '../../constants/colors';
 import {useSelector} from 'react-redux';
 import Input from '../../component/inputField/input.component';
-import { Header } from '../../component/header/Header';
+import {Header} from '../../component/header/Header';
+import {FlashList} from '@shopify/flash-list';
 
 let filter = '';
 const {width} = Dimensions.get('window');
@@ -45,9 +45,11 @@ const TransactionHistory = () => {
   const route = useRoute();
   const [userInput, setUserInput] = useState('');
   const [filter, setFilter] = useState('');
+
+
   const unsubGetAllTransactions = async () => {
     setIsLoadingTransaction(true);
-    getAccountTransactions(0, 30)
+    getAccountTransactions(0, 10)
       .then(res => {
         if (res) {
           if (!res?.error) {
@@ -109,7 +111,7 @@ const TransactionHistory = () => {
       return;
     }
     if (currentPage !== Number(userTransactionsPages)) {
-      console.log('Loading more', currentPage);
+      console.log('Loading more', currentPage, ' | ', userTransactionsPages);
       setIsLoading(true);
       const nextPage = currentPage + 1;
       getAccountTransactions(nextPage, 10)
@@ -178,8 +180,14 @@ const TransactionHistory = () => {
       imageResource = require('../../../assets/images/smile.png');
     }
     return (
-      <TouchableHighlight
-        style={{marginHorizontal: 15}}
+      <Pressable
+        style={({ pressed }) => [
+          styles.button,
+          {
+            marginHorizontal: 15,
+            backgroundColor: pressed ? COLORS.lendaLightGrey : COLORS.lendaComponentBg,
+          },
+        ]}
         onPress={
           isScrolling
             ? null
@@ -372,7 +380,7 @@ const TransactionHistory = () => {
             <Icon name="chevron-right" size={16} color={COLORS.lendaBlue} />
           </View>
         </View>
-      </TouchableHighlight>
+      </Pressable>
     );
   };
 
@@ -394,7 +402,7 @@ const TransactionHistory = () => {
   };
 
   const ListEndLoader = () => {
-    return <View></View>;
+    return isLoading && <View><ActivityIndicator size={'large'} /></View>
   };
 
   return (
@@ -407,7 +415,11 @@ const TransactionHistory = () => {
         paddingLeft: insets.left !== 0 ? insets.left : 'auto',
         paddingRight: insets.right !== 0 ? insets.right : 'auto',
       }}>
-      <Header routeAction={() => navigation.navigate('Home')} heading="TRANSACTION HISTORY" disable={false}/>
+      <Header
+        routeAction={() => navigation.navigate('Home')}
+        heading="TRANSACTION HISTORY"
+        disable={false}
+      />
       <View
         style={{
           margin: 0,
@@ -431,7 +443,7 @@ const TransactionHistory = () => {
       {!isFirstPageReceived && isLoadingTransaction ? (
         <ActivityIndicator size={'large'} />
       ) : (
-        <FlatList
+        <FlashList
           data={
             userInput !== ''
               ? filteredList
@@ -440,13 +452,16 @@ const TransactionHistory = () => {
               : allUserTransactionsData
           }
           renderItem={({item}) => RenderItem(item)}
-          contentContainerStyle={{gap: 10}}
+          contentContainerStyle={{paddingVertical: 10}}
           refreshing={isLoadingTransaction}
           onRefresh={unsubGetAllTransactions}
           scrollEnabled={true}
           ListEmptyComponent={<RenderEmptyItem />}
           ListFooterComponent={<ListEndLoader />}
           showsVerticalScrollIndicator={true}
+          estimatedItemSize={userTransactionsTotal}
+          onEndReached={() => handleLoadMore()}
+          // onEndReachedThreshold={2}
         />
       )}
       {/* {FloatBtn()} */}
@@ -499,15 +514,18 @@ const styles = StyleSheet.create({
     fontWeight: '400',
     lineHeight: 18,
   },
-  PanelItemContainer: {
+  button:{
     borderWidth: 0.2,
     borderColor: COLORS.lendaComponentBorder,
-    padding: 10,
     borderRadius: 6,
+    paddingVertical: 5,
+    marginBottom: 10,
+  },
+  PanelItemContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: COLORS.lendaComponentBg,
+    padding: 10,
   },
   PanelImage: {
     width: 30,

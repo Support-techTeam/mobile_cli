@@ -18,6 +18,7 @@ import {
 } from 'react-native-responsive-screen';
 import COLORS from '../../constants/colors';
 import Spinner from 'react-native-loading-spinner-overlay';
+import {Header} from '../../component/header/Header';
 
 const listData = [
   {id: '1', text: 'Long term income generation.'},
@@ -59,25 +60,12 @@ const InvestmentSummaryScreen = () => {
           animation="slide"
         />
       )}
-      <View
-        style={{
-          width: wp(90),
-          marginHorizontal: 10,
-          flexDirection: 'row',
-          alignItems: 'center',
-        }}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <View
-            style={{
-              borderWidth: 0.5,
-              borderColor: '#D9DBE9',
-              borderRadius: 5,
-            }}>
-            <Icon name="chevron-left" size={36} color="black" />
-          </View>
-        </TouchableOpacity>
-      </View>
-      <View style={styles.demark} />
+
+      <Header
+        routeAction={() => navigation.goBack()}
+        heading={`${investment?.investmentName?.toUpperCase()} OVERVIEW`}
+        disable={false}
+      />
       <ScrollView
         style={[styles.scrollView]}
         bounces={false}

@@ -754,7 +754,7 @@ const Homescreen = () => {
       buttonIcon: false,
     },
     {
-      buttonText: 'Save With ARM E-Statement',
+      buttonText: 'ARM eStatement',
       buttonImage: 'file-document-outline',
       buttonImageColor: COLORS.highwayRed,
       buttonAction: () => {
@@ -766,7 +766,7 @@ const Homescreen = () => {
       buttonIcon: true,
     },
     {
-      buttonText: 'Earn With Us E-Statement',
+      buttonText: 'Earn With Us eStatement',
       buttonImage: 'file-document-outline',
       buttonImageColor: COLORS.lendaGreen,
       buttonAction: () => {
@@ -778,7 +778,7 @@ const Homescreen = () => {
       buttonIcon: true,
     },
     {
-      buttonText: 'Transactions E-Statement',
+      buttonText: 'Wallet eStatement',
       buttonImage: 'file-document-outline',
       buttonImageColor: COLORS.lendaBlue,
       buttonAction: () => {

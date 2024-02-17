@@ -17,6 +17,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
+import {Header} from '../../component/header/Header';
 const InvestmentDetails = () => {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
@@ -70,7 +71,6 @@ const InvestmentDetails = () => {
     <SafeAreaView
       style={{
         flex: 1,
-        paddingHorizontal: 16,
         backgroundColor: '#fff',
         paddingTop: insets.top !== 0 ? insets.top : 18,
         paddingBottom: insets.bottom !== 0 ? insets.bottom : 'auto',
@@ -86,37 +86,18 @@ const InvestmentDetails = () => {
           animation="slide"
         />
       )}
-      <View
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-        }}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <View
-            style={{
-              borderWidth: 0.5,
-              borderColor: '#D9DBE9',
-              borderRadius: 5,
-            }}>
-            <Icon name="chevron-left" size={36} color="black" />
-          </View>
-        </TouchableOpacity>
-        <View style={styles.HeadView}>
-          <View style={styles.TopView}>
-            <Text style={styles.TextHead}>INVESTMENT DETAILS</Text>
-          </View>
-        </View>
-
-        <View style={{}}>
-          <Text>{'       '}</Text>
-        </View>
-      </View>
-      <View style={styles.demark} />
+      <Header
+        routeAction={() => navigation.goBack()}
+        heading={`${name?.toUpperCase()} INVESTMENT DETAILS`}
+        disable={false}
+      />
       <ScrollView
         bounces={false}
         showsHorizontalScrollIndicator={false}
-        showsVerticalScrollIndicator={false}>
+        showsVerticalScrollIndicator={false}
+        style={{
+          paddingHorizontal: 10,
+        }}>
         <View style={{padding: 16}}>
           <View style={styles.detailsView}>
             <Text style={styles.desc}>Investment</Text>

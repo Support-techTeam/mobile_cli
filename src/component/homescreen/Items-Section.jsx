@@ -1,12 +1,15 @@
 import {useNavigation} from '@react-navigation/native';
 import React from 'react';
-import {StyleSheet, Image, View, Text, Pressable} from 'react-native';
+import {StyleSheet, View, Text, Image, Pressable} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import COLORS from '../../constants/colors';
+import FastImage from 'react-native-fast-image';
+
+
 
 export const ItemsSection = props => {
   const {buttonParameters, userPin} = props;
@@ -78,17 +81,18 @@ export const ItemsSection = props => {
                   color={details.buttonImageColor}
                 />
               ) : (
-                <Image
-                  style={{
-                    zIndex: 101,
-                    height: 32,
-                    width: 32,
-                    resizeMode: 'contain',
-                    backgroundColor: COLORS.white,
-                    borderRadius: 100,
-                  }}
-                  source={details.buttonImage}
-                />
+                      <FastImage
+              style={{  zIndex: 101,
+                height: 32,
+                width: 32,
+                backgroundColor: COLORS.white,
+                borderRadius: 100,}}
+              source={{
+                uri: Image.resolveAssetSource(details?.buttonImage).uri,
+                priority: FastImage.priority.normal,
+              }}
+              resizeMode={FastImage.resizeMode.contain}
+            />
               )}
             </View>
             <View style={{alignSelf: 'center', marginTop: 5}}>

@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
   TextHead: {
     fontFamily: 'MontSBold',
     fontWeight: '700',
-    fontSize: 18,
+    fontSize: 16,
     lineHeight: 20,
     letterSpacing: 0.5,
     flexShrink: 1,

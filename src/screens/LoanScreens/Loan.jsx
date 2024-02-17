@@ -13,11 +13,9 @@ import React, {useEffect, useState, useRef} from 'react';
 import {TabView, SceneMap} from 'react-native-tab-view';
 import {useNavigation} from '@react-navigation/native';
 import {Skeleton} from '@rneui/base';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import CustomTabBar from '../../component/CustomTabs/CustomTabBar';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
-// import {Button} from 'native-base';
-import {Button, ButtonGroup, withTheme} from '@rneui/themed';
+import {Button} from '@rneui/themed';
 import {
   getApprovedLoans,
   getPendingLoans,
@@ -36,6 +34,7 @@ import {
 import COLORS from '../../constants/colors';
 import Toast from 'react-native-toast-message';
 import Carousel, {Pagination} from 'react-native-snap-carousel';
+import { useData } from '../../context/DataProvider';
 
 const SLIDE_WIDTH = Dimensions.get('window').width * 0.88;
 const ITEM_WIDTH = SLIDE_WIDTH;
@@ -56,6 +55,7 @@ const Loanscreen = () => {
   const route = useRoute();
   const carouselRef = useRef(null);
   const [slide, setSlide] = useState(0);
+  const { dataStore } = useData();
   //total approvedLoans
   let totalApprovedLoanAmount = approvedLoansData?.reduce(
     (total, loan) => total + (loan?.amount || 0),
@@ -74,6 +74,7 @@ const Loanscreen = () => {
     0,
   );
 
+
   useEffect(() => {
     if (route.name === 'LoanHome') {
       const unsubscribe = navigation.addListener('focus', async () => {
@@ -85,10 +86,20 @@ const Loanscreen = () => {
           fetchPaidLoansData(),
           fetchGuarantorData(),
         ]);
+      // setAllLoansData(dataStore?.allLoanData);
+      // setLoanUserDetails(dataStore?.loanUserDetailsData);
+      // setApprovedLoansData(dataStore?.approvedData);
+      // setPendingLoansData(dataStore?.pendingLoanData);
+      // setPaidLoansData(dataStore?.paidLoanData);
+      // setGuarantor(dataStore?.guarantorsData);
+
+      console.log(dataStore);
       });
       return unsubscribe;
     }
   }, [navigation]);
+
+
 
   const fetchLoanUserData = async () => {
     try {

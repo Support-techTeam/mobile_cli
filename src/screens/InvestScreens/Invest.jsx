@@ -6,17 +6,18 @@ import {
   TouchableOpacity,
   ScrollView,
   FlatList,
+  Dimensions,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {TabView, SceneMap} from 'react-native-tab-view';
 import {useNavigation} from '@react-navigation/native';
 import {Skeleton} from '@rneui/base';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import CustomTabBar from '../../component/CustomTabs/CustomTabBar3';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
-import Toast from 'react-native-toast-message';
+import {Button} from '@rneui/themed';
 import {getLoanUserDetails} from '../../stores/LoanStore';
 import {useRoute} from '@react-navigation/native';
+import {useSelector} from 'react-redux';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -28,6 +29,11 @@ import {
   getSingleArmInvestment,
 } from '../../stores/InvestStore';
 import appsFlyer from 'react-native-appsflyer';
+import {IntroSection} from '../../component/homescreen/Intro-Section';
+import { FlashList } from '@shopify/flash-list';
+
+const SLIDE_WIDTH = Dimensions.get('window').width * 0.88;
+const ITEM_WIDTH = SLIDE_WIDTH;
 
 const Investscreen = () => {
   const navigation = useNavigation();
@@ -40,6 +46,7 @@ const Investscreen = () => {
   const [isLoading, setIsLoading] = useState(false);
   const route = useRoute();
   const [portfolioDetail, setPortfolioDetail] = useState(0);
+  const userProfileData = useSelector(state => state.userProfile.profile);
 
   //total ARM Investment
   let totalArmAmount =
@@ -192,7 +199,7 @@ const Investscreen = () => {
   const status = [
     {
       id: 1,
-      state: 'Lend with Trade Lenda',
+      state: 'Earn With Us',
       amount: `₦${
         totalLendaAmount === undefined
           ? '0.00'
@@ -288,7 +295,7 @@ const Investscreen = () => {
               </View>
               <View>
                 <Text style={styles.amount}>{item.amount}</Text>
-                <TouchableOpacity
+                <Button
                   onPress={() => {
                     if (item.id == 1) {
                       logAppsFlyer(
@@ -317,11 +324,18 @@ const Investscreen = () => {
                         navigation.navigate('OnboardingHome');
                       }
                     }
-                  }}>
-                  <View style={styles.buttonAction}>
-                    <Text style={styles.getText}>{item.buttonText}</Text>
-                  </View>
-                </TouchableOpacity>
+                  }}
+                  title={item.buttonText}
+                  type="solid"
+                  raised={true}
+                  titleStyle={styles.getText}
+                  buttonStyle={{
+                    borderRadius: 5,
+                    borderColor: COLORS.lendaBlue,
+                    backgroundColor: COLORS.lendaBlue,
+                  }}
+                  containerStyle={styles.buttonAction}
+                />
               </View>
               <View
                 style={{
@@ -432,8 +446,10 @@ const Investscreen = () => {
                   <View style={{marginTop: 0}}>
                     <TouchableOpacity
                       disabled={
-                        !investment?.investmentType 
-                          ? investment?.productCode && investment?.membershipId ? false : true
+                        !investment?.investmentType
+                          ? investment?.productCode && investment?.membershipId
+                            ? false
+                            : true
                           : false
                       }
                       onPress={() =>
@@ -572,118 +588,63 @@ const Investscreen = () => {
     );
   };
 
+  const reanderIntroSection = () => {
+    return isLoading ? (
+      <View style={[styles.headerContainer]}>
+        <Skeleton
+          animation="pulse"
+          width={ITEM_WIDTH}
+          height={50}
+          style={styles.tobTab}
+        />
+      </View>
+    ) : (
+      <IntroSection
+        userProfileData={userProfileData}
+        loanUserDetails={loanUserDetails}
+      />
+    );
+  };
+
+  const renderRootComponents = () => {
+    return <>{reanderIntroSection()}</>;
+  };
+
   return (
-    <>
-      {isLoading ? (
-        <SafeAreaView
-          style={{
-            flex: 1,
-            backgroundColor: '#fff',
-            paddingTop: insets.top !== 0 ? insets.top : 18,
-            paddingBottom: insets.bottom !== 0 ? insets.bottom / 2 : 'auto',
-            paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
-            paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
-          }}>
-          <View style={styles.innerContainer}>
-            <View style={{flexDirection: 'row', width: '45%'}}>
-              <View style={{flexDirection: 'row'}}>
-                <View style={{marginRight: 16}}>
-                  <Skeleton animation="wave" width={70} height={20} />
-                </View>
-
-                <Skeleton animation="wave" width={70} height={20} />
-              </View>
-            </View>
-
-            <View style={styles.getInvestmentLoader}>
-              <Skeleton animation="wave" width={80} height={25} />
-            </View>
-
-            <FlatList
-              data={status ? status : []}
-              numColumns={1}
-              showsHorizontalScrollIndicator={false}
-              showsVerticalScrollIndicator={false}
-              contentContainerStyle={{flex: 1, justifyContent: 'center'}}
-              horizontal
-              renderItem={({item}) => <Slide item={item} />}
-            />
-          </View>
-          <TabView
-            navigationState={{
-              index,
-              routes: data?.map(item => ({key: item.id, title: item.title})),
-            }}
-            renderScene={renderScene}
-            onIndexChange={setIndex}
-            swipeEnabled={false}
-            tabBarPosition="top"
-            renderTabBar={props => (
-              <CustomTabBar {...props} onIndexChange={setIndex} />
-            )}
-          />
-        </SafeAreaView>
-      ) : (
-        <SafeAreaView
-          style={{
-            flex: 1,
-            backgroundColor: '#fff',
-            paddingTop: insets.top !== 0 ? insets.top : 18,
-            paddingBottom: insets.bottom !== 0 ? insets.bottom / 2 : 'auto',
-            paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
-            paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
-          }}>
-          <View style={styles.innerContainer}>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                marginBottom: 20,
-                marginRight: 15,
-              }}>
-              <Image
-                source={require('../../../assets/images/HeadLogo.png')}
-                style={{width: 83, height: 32}}
-              />
-              <TouchableOpacity
-                onPress={() => navigation.navigate('More')}
-                style={{
-                  backgroundColor: '#D9DBE9',
-                  padding: 8,
-                  borderRadius: 50,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}>
-                <Icon name="account-circle-outline" size={24} color="black" />
-              </TouchableOpacity>
-            </View>
-
-            <FlatList
-              data={status ? status : []}
-              showsHorizontalScrollIndicator={false}
-              showsVerticalScrollIndicator={false}
-              contentContainerStyle={{flex: 1, justifyContent: 'center'}}
-              horizontal
-              renderItem={({item}) => <Slide item={item} />}
-            />
-          </View>
-          <TabView
-            navigationState={{
-              index,
-              routes: data?.map(item => ({key: item.id, title: item.title})),
-            }}
-            renderScene={renderScene}
-            onIndexChange={setIndex}
-            swipeEnabled={false}
-            tabBarPosition="top"
-            renderTabBar={props => (
-              <CustomTabBar {...props} onIndexChange={setIndex} />
-            )}
-          />
-        </SafeAreaView>
-      )}
-    </>
+    <SafeAreaView
+      style={{
+        flex: 1,
+        backgroundColor: '#fff',
+        paddingTop: insets.top !== 0 ? insets.top : 18,
+        paddingBottom: insets.bottom !== 0 ? insets.bottom / 2 : 'auto',
+        paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
+        paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
+      }}>
+      {renderRootComponents()}
+      <View style={styles.innerContainer}>
+        <FlashList
+          data={status ? status : []}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{flex: 1, justifyContent: 'center'}}
+          horizontal
+          renderItem={({item}) => <Slide item={item} />}
+        />
+      </View>
+      <TabView
+        navigationState={{
+          index,
+          routes: data?.map(item => ({key: item.id, title: item.title})),
+        }}
+        renderScene={renderScene}
+        onIndexChange={setIndex}
+        swipeEnabled={false}
+        tabBarPosition="top"
+        renderTabBar={props => (
+          <CustomTabBar {...props} onIndexChange={setIndex} />
+        )}
+      />
+    </SafeAreaView>
   );
 };
 
@@ -694,15 +655,21 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
   },
+  headerContainer: {
+    paddingHorizontal: 20,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 10,
+  },
   innerContainer: {
     marginHorizontal: 16,
   },
   tobTab: {
-    borderWidth: 1,
-    borderColor: '#D9DBE9',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
     borderRadius: 5,
-    paddingVertical: 4,
-    paddingHorizontal: 8,
   },
   tabText: {
     fontSize: 12,
@@ -712,7 +679,7 @@ const styles = StyleSheet.create({
   buttonAction: {
     backgroundColor: COLORS.lendaBlue,
     borderRadius: 12,
-    width: wp(22),
+    width: wp(23),
     height: 35,
     justifyContent: 'center',
   },
@@ -725,8 +692,7 @@ const styles = StyleSheet.create({
   getText: {
     textAlign: 'center',
     color: 'white',
-
-    fontSize: 14,
+    fontSize: hp('1.8'),
     fontWeight: '500',
   },
   tabBar: {

@@ -9,6 +9,7 @@ import {
   Pressable,
 } from 'react-native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {userLogOut} from '../stores/AuthStore';
 import {resetStore} from '../util/redux/store';
@@ -28,6 +29,7 @@ import {
 import { useNavigation } from '@react-navigation/native';
 
 const Tab = createBottomTabNavigator();
+// const Tab = createMaterialBottomTabNavigator();
 
 export default function BottomTabs({ navigation}) {
   const timerId = useRef(false);
@@ -109,11 +111,12 @@ export default function BottomTabs({ navigation}) {
           headerShown: false,
           tabBarShowLabel: true,
           tabBarStyle: styles.tabBar,
-          sceneAnimationEnabled: true,
-          sceneAnimationType: 'shifting',
-          shifting: true,
-          compact: true,
-        }}>
+          // sceneAnimationEnabled: true,
+          // sceneAnimationType: 'shifting',
+          // shifting: true,
+          // compact: true,
+        }}
+        >
         <Tab.Screen
           name="Home"
           component={Homescreen}
@@ -247,7 +250,7 @@ export default function BottomTabs({ navigation}) {
               </>
             ),
             tabBarIcon: ({color, size}) => {
-              return <Icon name="cog" size={size} color={color} />;
+              return <Icon name="menu" size={size} color={color} />;
             },
           }}
           listeners={{
@@ -284,16 +287,16 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   tabBar: {
-    paddingTop: 0,
-    marginTop: 0,
+    // paddingTop: 0,
+    // marginTop: 0,
     height: 58,
-    paddingTop: 5,
-    paddingVertical: 5,
-    borderColor: COLORS.grey,
-    backgroundColor: COLORS.white,
-    // borderTopLeftRadius: 10,
-    // borderTopRightRadius: 10,
     // marginBottom: 1,
+    // paddingTop: 5,
+    // paddingBottom: 5,
+    // borderTopLeftRadius: 16,
+    // borderTopRightRadius: 16,
+    // borderColor: COLORS.grey,
+    // backgroundColor: COLORS.white,
     // shadowColor: COLORS.black,
     // shadowOffset: {
     //   height: 6,
@@ -308,7 +311,6 @@ const styles = StyleSheet.create({
     top: 12,
     alignItems: 'center',
     justifyContent: 'center',
-    
   },
   tabIcon: {
     width: 32,
