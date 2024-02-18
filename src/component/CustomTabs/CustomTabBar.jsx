@@ -1,7 +1,10 @@
 import { FlashList } from '@shopify/flash-list';
 import React, {useState, useRef} from 'react';
-import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {StyleSheet, Text, TouchableOpacity, View, Dimensions, FlatList} from 'react-native';
+import { widthPercentageToDP } from 'react-native-responsive-screen';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+
+const SLIDE_WIDTH = Dimensions.get('window').width * 1;
 
 const data = [
   {id: 'all', title: 'All Loans'},
@@ -64,7 +67,7 @@ const CustomTabBar = ({navigationState, onIndexChange}) => {
           style={styles.nextButtonText}
         />
       </TouchableOpacity>
-      <FlashList
+      <FlatList
         ref={flatListRef}
         data={data}
         renderItem={renderItem}
@@ -97,11 +100,10 @@ const styles = StyleSheet.create({
   tabBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
     height: 50,
-    width: '98%',
+    width: SLIDE_WIDTH,
     paddingHorizontal: 10,
-    // marginTop: 20,
+    marginTop: 8,
   },
   tab: {
     paddingHorizontal: 20,
@@ -109,7 +111,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 40,
-    marginLeft: 45,
+    marginLeft: 55,
   },
   activeTab: {
     borderBottomWidth: 2,
@@ -126,7 +128,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#eee',
     justifyContent: 'center',
     alignItems: 'center',
-    marginLeft: 10,
+    // marginLeft: 10,
     borderRadius: 15,
   },
   nextButtonText: {

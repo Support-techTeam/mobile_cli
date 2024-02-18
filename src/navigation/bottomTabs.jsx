@@ -7,9 +7,11 @@ import {
   Image,
   Text,
   Pressable,
+  Animated,
+  ScrollView,
 } from 'react-native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
+import {createMaterialBottomTabNavigator} from '@react-navigation/material-bottom-tabs';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {userLogOut} from '../stores/AuthStore';
 import {resetStore} from '../util/redux/store';
@@ -26,12 +28,12 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
-import { useNavigation } from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
 
 const Tab = createBottomTabNavigator();
 // const Tab = createMaterialBottomTabNavigator();
 
-export default function BottomTabs({ navigation}) {
+export default function BottomTabs({navigation}) {
   const timerId = useRef(false);
   const [timeForInactivityInSecond] = useState(600);
   const userProfileData = useSelector(state => state.userProfile.profile);
@@ -80,109 +82,113 @@ export default function BottomTabs({ navigation}) {
   );
 
   const handleSignOut = async () => {
-  try{
-    const res = await userLogOut();
-    if (res?.error) {
-      Toast.show({
-        type: 'error',
-        position: 'top',
-        topOffset: 50,
-        text1: res?.title,
-        text2: res?.message,
-        visibilityTime: 5000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
-    } else {
-      await resetStore();
+    try {
+      const res = await userLogOut();
+      if (res?.error) {
+        Toast.show({
+          type: 'error',
+          position: 'top',
+          topOffset: 50,
+          text1: res?.title,
+          text2: res?.message,
+          visibilityTime: 5000,
+          autoHide: true,
+          onPress: () => Toast.hide(),
+        });
+      } else {
+        await resetStore();
+      }
+    } catch (error) {
+      // console.log(error);
     }
-  }catch(error){
-    // console.log(error);
-  }
   };
 
   return (
-    <View style={{flex: 1}} {...panResponder.panHandlers}>
-      <Tab.Navigator
-        initialRouteName="Home"
-        screenOptions={{
-          tabBarActiveTintColor: COLORS.lendaBlue,
-          tabBarInactiveTintColor: COLORS.Secondary,
-          headerShown: false,
-          tabBarShowLabel: true,
-          tabBarStyle: styles.tabBar,
-          // sceneAnimationEnabled: true,
-          // sceneAnimationType: 'shifting',
-          // shifting: true,
-          // compact: true,
-        }}
-        >
-        <Tab.Screen
-          name="Home"
-          component={Homescreen}
-          options={{
-            tabBarLabel: ({focused, position}) => (
-              <>
-                <Text
-                  style={{
-                    color: focused ? COLORS.lendaBlue : COLORS.Secondary,
-                    fontSize: 12,
-                    marginBottom: position === 'beside-icon' ? 0 : 5,
-                    marginLeft: position === 'beside-icon' ? 20 : 0,
-                    marginTop: position === 'beside-icon' ? 3 : 0,
-                  }}>
-                  Home
-                </Text>
-              </>
-            ),
-            tabBarIcon: ({color, size, focused}) => {
-              return <Icon name="home" size={size} color={color} />;
-            },
-          }}
-          listeners={{
-            tabPress: e => opened && e.preventDefault(),
-          }}
-        />
-        {/* {userProfileData && userProfileData?.profileProgress === null ? null : ( */}
-        <Tab.Screen
-          name="Loan"
-          component={LoanStack}
-          options={{
-            tabBarButton: disabledIt,
-            tabBarLabel: ({focused, position}) => (
-              <>
-                <Text
-                  style={{
-                    color: focused ? COLORS.lendaBlue : COLORS.Secondary,
-                    fontSize: 12,
-                    marginBottom: position === 'beside-icon' ? 0 : 5,
-                    marginLeft: position === 'beside-icon' ? 20 : 0,
-                    marginTop: position === 'beside-icon' ? 3 : 0,
-                  }}>
-                  Loan
-                </Text>
-              </>
-            ),
-            tabBarIcon: ({color, size}) => {
-              return (
-                <Image
-                  style={{
-                    width: size,
-                    height: size,
-                    tintColor: color,
-                  }}
-                  source={require('../../assets/icons/loan_icon.png')}
-                />
-              );
-            },
-          }}
-          listeners={{
-            tabPress: e => opened && e.preventDefault(),
-          }}
-        />
-        {/* )} */}
+    <View
+      style={{
+        flex: 1,
+      }}
+      {...panResponder.panHandlers}>
 
-        {/* <Tab.Screen
+        <Tab.Navigator
+          initialRouteName="Home"
+          screenOptions={{
+            tabBarActiveTintColor: COLORS.lendaBlue,
+            tabBarInactiveTintColor: COLORS.Secondary,
+            headerShown: false,
+            tabBarShowLabel: true,
+            tabBarStyle: styles.tabBar,
+            // sceneAnimationEnabled: true,
+            // sceneAnimationType: 'shifting',
+            // shifting: true,
+            // compact: true,
+          }}>
+          <Tab.Screen
+            name="Home"
+            component={Homescreen}
+            options={{
+              tabBarLabel: ({focused, position}) => (
+                <>
+                  <Text
+                    style={{
+                      color: focused ? COLORS.lendaBlue : COLORS.Secondary,
+                      fontSize: 12,
+                      marginBottom: position === 'beside-icon' ? 0 : 5,
+                      marginLeft: position === 'beside-icon' ? 20 : 0,
+                      marginTop: position === 'beside-icon' ? 3 : 0,
+                    }}>
+                    Home
+                  </Text>
+                </>
+              ),
+              tabBarIcon: ({color, size, focused}) => {
+                return <Icon name="home" size={size} color={color} />;
+              },
+            }}
+            listeners={{
+              tabPress: e => opened && e.preventDefault(),
+            }}
+          />
+          {/* {userProfileData && userProfileData?.profileProgress === null ? null : ( */}
+          <Tab.Screen
+            name="Loan"
+            component={LoanStack}
+            options={{
+              tabBarButton: disabledIt,
+              tabBarLabel: ({focused, position}) => (
+                <>
+                  <Text
+                    style={{
+                      color: focused ? COLORS.lendaBlue : COLORS.Secondary,
+                      fontSize: 12,
+                      marginBottom: position === 'beside-icon' ? 0 : 5,
+                      marginLeft: position === 'beside-icon' ? 20 : 0,
+                      marginTop: position === 'beside-icon' ? 3 : 0,
+                    }}>
+                    Loan
+                  </Text>
+                </>
+              ),
+              tabBarIcon: ({color, size}) => {
+                return (
+                  <Image
+                    style={{
+                      width: size,
+                      height: size,
+                      tintColor: color,
+                    }}
+                    source={require('../../assets/icons/loan_icon.png')}
+                  />
+                );
+              },
+            }}
+            listeners={{
+              tabPress: e => opened && e.preventDefault(),
+            }}
+          />
+          {/* )} */}
+
+          {/* <Tab.Screen
           name="Message"
           component={Homescreen}
           options={{
@@ -195,69 +201,69 @@ export default function BottomTabs({ navigation}) {
             ),
           }}
         /> */}
-        <Tab.Screen
-          name="Invest"
-          component={Investscreen}
-          options={{
-            tabBarButton: disabledIt,
-            tabBarLabel: ({focused, position}) => (
-              <>
-                <Text
-                  style={{
-                    color: focused ? COLORS.lendaBlue : COLORS.Secondary,
-                    fontSize: 12,
-                    marginBottom: position === 'beside-icon' ? 0 : 5,
-                    marginLeft: position === 'beside-icon' ? 20 : 0,
-                    marginTop: position === 'beside-icon' ? 3 : 0,
-                  }}>
-                  Invest
-                </Text>
-              </>
-            ),
-            tabBarIcon: ({color, size}) => {
-              return (
-                <Image
-                  style={{
-                    width: size,
-                    height: size,
-                    tintColor: color,
-                  }}
-                  source={require('../../assets/icons/invest_icon.png')}
-                />
-              );
-            },
-          }}
-          listeners={{
-            tabPress: e => opened && e.preventDefault(),
-          }}
-        />
-        <Tab.Screen
-          name="More"
-          component={Morescreens}
-          options={{
-            tabBarLabel: ({focused, position}) => (
-              <>
-                <Text
-                  style={{
-                    color: focused ? COLORS.lendaBlue : COLORS.Secondary,
-                    fontSize: 12,
-                    marginBottom: position === 'beside-icon' ? 0 : 5,
-                    marginLeft: position === 'beside-icon' ? 20 : 0,
-                    marginTop: position === 'beside-icon' ? 3 : 0,
-                  }}>
-                  More
-                </Text>
-              </>
-            ),
-            tabBarIcon: ({color, size}) => {
-              return <Icon name="menu" size={size} color={color} />;
-            },
-          }}
-          listeners={{
-            tabPress: e => opened && e.preventDefault(),
-          }}
-        />
-      </Tab.Navigator>
+          <Tab.Screen
+            name="Invest"
+            component={Investscreen}
+            options={{
+              tabBarButton: disabledIt,
+              tabBarLabel: ({focused, position}) => (
+                <>
+                  <Text
+                    style={{
+                      color: focused ? COLORS.lendaBlue : COLORS.Secondary,
+                      fontSize: 12,
+                      marginBottom: position === 'beside-icon' ? 0 : 5,
+                      marginLeft: position === 'beside-icon' ? 20 : 0,
+                      marginTop: position === 'beside-icon' ? 3 : 0,
+                    }}>
+                    Invest
+                  </Text>
+                </>
+              ),
+              tabBarIcon: ({color, size}) => {
+                return (
+                  <Image
+                    style={{
+                      width: size,
+                      height: size,
+                      tintColor: color,
+                    }}
+                    source={require('../../assets/icons/invest_icon.png')}
+                  />
+                );
+              },
+            }}
+            listeners={{
+              tabPress: e => opened && e.preventDefault(),
+            }}
+          />
+          <Tab.Screen
+            name="More"
+            component={Morescreens}
+            options={{
+              tabBarLabel: ({focused, position}) => (
+                <>
+                  <Text
+                    style={{
+                      color: focused ? COLORS.lendaBlue : COLORS.Secondary,
+                      fontSize: 12,
+                      marginBottom: position === 'beside-icon' ? 0 : 5,
+                      marginLeft: position === 'beside-icon' ? 20 : 0,
+                      marginTop: position === 'beside-icon' ? 3 : 0,
+                    }}>
+                    More
+                  </Text>
+                </>
+              ),
+              tabBarIcon: ({color, size}) => {
+                return <Icon name="menu" size={size} color={color} />;
+              },
+            }}
+            listeners={{
+              tabPress: e => opened && e.preventDefault(),
+            }}
+          />
+        </Tab.Navigator>
     </View>
   );
 }

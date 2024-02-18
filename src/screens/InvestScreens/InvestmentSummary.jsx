@@ -5,7 +5,6 @@ import {
   TouchableOpacity,
   ScrollView,
   Image,
-  FlatList,
 } from 'react-native';
 import React, {useState, useEffect} from 'react';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -63,7 +62,7 @@ const InvestmentSummaryScreen = () => {
 
       <Header
         routeAction={() => navigation.goBack()}
-        heading={`${investment?.investmentName?.toUpperCase()} OVERVIEW`}
+        heading={`INVESTMENT OVERVIEW`}
         disable={false}
       />
       <ScrollView

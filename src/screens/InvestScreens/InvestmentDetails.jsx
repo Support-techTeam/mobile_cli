@@ -8,8 +8,8 @@ import {
 import React, {useState, useEffect} from 'react';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useNavigation, useRoute} from '@react-navigation/native';
-
-import Buttons from '../../component/buttons/Buttons';
+import {Button} from '@rneui/themed';
+// import Buttons from '../../component/buttons/Buttons';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 import {getSingleArmInvestment} from '../../stores/InvestStore';
 import Spinner from 'react-native-loading-spinner-overlay';
@@ -18,6 +18,7 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import {Header} from '../../component/header/Header';
+import COLORS from '../../constants/colors';
 const InvestmentDetails = () => {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
@@ -420,13 +421,13 @@ const InvestmentDetails = () => {
               flexDirection: 'row',
               justifyContent: 'space-evenly',
             }}>
-            <TouchableOpacity
-              style={{
-                marginTop: 10,
-                width: wp(40),
-                fontSize: hp(5),
-                marginHorizontal: 5,
-              }}
+            <Button
+              title="Top Up"
+              buttonStyle={styles.btnStyle}
+              type="solid"
+              raised
+              titleStyle={{color: COLORS.white}}
+              containerStyle={styles.btnContainer}
               disabled={
                 (name === 'Lenda' &&
                   investment?.investmentStatus === 'CLOSED') ||
@@ -449,27 +450,16 @@ const InvestmentDetails = () => {
                     investment: investment,
                   });
                 }
-              }}>
-              <Buttons
-                label={'Top Up'}
-                disabled={
-                  (name === 'Lenda' &&
-                    investment?.investmentStatus === 'CLOSED') ||
-                  (name === 'Arm' && investment?.membershipId === null) ||
-                  (name === 'Arm' && investment?.membershipId === '') ||
-                  (name === 'Arm' && investment?.membershipId === undefined)
-                    ? true
-                    : false
-                }
-              />
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={{
-                marginTop: 10,
-                width: wp(40),
-                fontSize: hp(5),
-                marginHorizontal: 5,
               }}
+            />
+
+            <Button
+              title="Withdraw Funds"
+              buttonStyle={styles.btnStyle}
+              type="solid"
+              raised
+              titleStyle={{color: COLORS.white}}
+              containerStyle={styles.btnContainer}
               disabled={
                 (name === 'Lenda' &&
                   investment?.investmentStatus === 'CLOSED') ||
@@ -493,20 +483,8 @@ const InvestmentDetails = () => {
                     investment: investment,
                   });
                 }
-              }}>
-              <Buttons
-                label={'Redeem'}
-                disabled={
-                  (name === 'Lenda' &&
-                    investment?.investmentStatus === 'CLOSED') ||
-                  (name === 'Arm' && investment?.membershipId === null) ||
-                  (name === 'Arm' && investment?.membershipId === '') ||
-                  (name === 'Arm' && investment?.membershipId === undefined)
-                    ? true
-                    : false
-                }
-              />
-            </TouchableOpacity>
+              }}
+            />
           </View>
         </View>
       </ScrollView>
@@ -562,5 +540,20 @@ const styles = StyleSheet.create({
     fontFamily: 'serif',
     fontSize: 16,
     flexShrink: 1,
+  },
+  btnStyle: {
+    borderRadius: 5,
+    borderColor: COLORS.lendaBlue,
+    paddingHorizontal: 15,
+    backgroundColor: COLORS.lendaBlue,
+  },
+  btnContainer: {
+    marginTop: 10,
+    width: wp(40),
+    fontSize: hp(5),
+    marginHorizontal: 5,
+    borderRadius: 5,
+    borderColor: COLORS.lendaBlue,
+    backgroundColor: COLORS.lendaBlue,
   },
 });
