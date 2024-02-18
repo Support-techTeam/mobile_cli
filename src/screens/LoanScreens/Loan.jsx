@@ -9,9 +9,9 @@ import {
   Dimensions,
   ImageBackground,
 } from 'react-native';
-import React, {useEffect, useState, useRef} from 'react';
+import React, {useEffect, useState, useRef, useCallback} from 'react';
 import {TabView, SceneMap} from 'react-native-tab-view';
-import {useNavigation} from '@react-navigation/native';
+import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import {Skeleton} from '@rneui/base';
 import CustomTabBar from '../../component/CustomTabs/CustomTabBar';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
@@ -34,7 +34,6 @@ import {
 import COLORS from '../../constants/colors';
 import Toast from 'react-native-toast-message';
 import Carousel, {Pagination} from 'react-native-snap-carousel';
-import { useData } from '../../context/DataProvider';
 
 const SLIDE_WIDTH = Dimensions.get('window').width * 0.88;
 const ITEM_WIDTH = SLIDE_WIDTH;
@@ -55,7 +54,6 @@ const Loanscreen = () => {
   const route = useRoute();
   const carouselRef = useRef(null);
   const [slide, setSlide] = useState(0);
-  const { dataStore } = useData();
   //total approvedLoans
   let totalApprovedLoanAmount = approvedLoansData?.reduce(
     (total, loan) => total + (loan?.amount || 0),
@@ -74,34 +72,18 @@ const Loanscreen = () => {
     0,
   );
 
+  useFocusEffect(
+    useCallback(() => {
+      fetchLoanUserData();
+      fetchApprovedLoansData();
+      fetchPendingLoansData();
+      fetchAllLoansData();
+      fetchPaidLoansData();
+      fetchGuarantorData();
+    }, []),
+  );
 
-  useEffect(() => {
-    if (route.name === 'LoanHome') {
-      const unsubscribe = navigation.addListener('focus', async () => {
-        Promise.all([
-          fetchLoanUserData(),
-          fetchApprovedLoansData(),
-          fetchPendingLoansData(),
-          fetchAllLoansData(),
-          fetchPaidLoansData(),
-          fetchGuarantorData(),
-        ]);
-      // setAllLoansData(dataStore?.allLoanData);
-      // setLoanUserDetails(dataStore?.loanUserDetailsData);
-      // setApprovedLoansData(dataStore?.approvedData);
-      // setPendingLoansData(dataStore?.pendingLoanData);
-      // setPaidLoansData(dataStore?.paidLoanData);
-      // setGuarantor(dataStore?.guarantorsData);
-
-      console.log(dataStore);
-      });
-      return unsubscribe;
-    }
-  }, [navigation]);
-
-
-
-  const fetchLoanUserData = async () => {
+  const fetchLoanUserData = useCallback(async () => {
     try {
       setIsLoading(true);
       const response = await getLoanUserDetails();
@@ -112,9 +94,9 @@ const Loanscreen = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
-  const fetchApprovedLoansData = async () => {
+  const fetchApprovedLoansData = useCallback(async () => {
     try {
       setIsLoading(true);
       const response = await getApprovedLoans();
@@ -124,9 +106,9 @@ const Loanscreen = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
-  const fetchPendingLoansData = async () => {
+  const fetchPendingLoansData = useCallback(async () => {
     try {
       setIsLoading(true);
       const response = await getPendingLoans();
@@ -136,8 +118,8 @@ const Loanscreen = () => {
     } finally {
       setIsLoading(false);
     }
-  };
-  const fetchAllLoansData = async () => {
+  }, []);
+  const fetchAllLoansData = useCallback(async () => {
     try {
       setIsLoading(true);
       const response = await getAllLoans();
@@ -148,9 +130,9 @@ const Loanscreen = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
-  const fetchPaidLoansData = async () => {
+  const fetchPaidLoansData = useCallback(async () => {
     try {
       setIsLoading(true);
       const response = await getPaidLoans();
@@ -161,9 +143,9 @@ const Loanscreen = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
-  const fetchGuarantorData = async () => {
+  const fetchGuarantorData = useCallback(async () => {
     try {
       const response = await getGuarantors();
       if (!response?.error) {
@@ -172,7 +154,7 @@ const Loanscreen = () => {
     } catch (error) {
       // Handle error
     }
-  };
+  }, []);
 
   const loadingList = ['string', 'string', 'string', 'string'];
 
@@ -190,7 +172,7 @@ const Loanscreen = () => {
               borderColor: COLORS.lendaComponentBorder,
             }}>
             <Skeleton
-              animation="pulse"
+              animation="wave"
               width={ITEM_WIDTH}
               height={170}
               style={{borderRadius: 15}}
@@ -434,7 +416,7 @@ const Loanscreen = () => {
   const SecondRoute = () => (
     <>
       {isLoading ? (
-     <View style={{flex: 1, marginHorizontal: 15}}>
+        <View style={{flex: 1, marginHorizontal: 15}}>
           <ScrollView
             showsHorizontalScrollIndicator={false}
             showsVerticalScrollIndicator={false}>
@@ -585,7 +567,7 @@ const Loanscreen = () => {
   const ThirdRoute = () => (
     <>
       {isLoading ? (
-   <View style={{flex: 1, marginHorizontal: 15}}>
+        <View style={{flex: 1, marginHorizontal: 15}}>
           <ScrollView
             showsHorizontalScrollIndicator={false}
             showsVerticalScrollIndicator={false}>
@@ -738,7 +720,7 @@ const Loanscreen = () => {
   const fourthRoute = () => (
     <>
       {isLoading ? (
-          <View style={{flex: 1, marginHorizontal: 15}}>
+        <View style={{flex: 1, marginHorizontal: 15}}>
           <ScrollView
             showsHorizontalScrollIndicator={false}
             showsVerticalScrollIndicator={false}>
@@ -957,7 +939,7 @@ const Loanscreen = () => {
     return isLoading ? (
       <View style={[styles.headerContainer]}>
         <Skeleton
-          animation="pulse"
+          animation="wave"
           width={ITEM_WIDTH}
           height={50}
           style={styles.tobTab}
@@ -977,13 +959,13 @@ const Loanscreen = () => {
         <View style={styles.leftView}>
           <View style={{flexDirection: 'row'}}>
             <Skeleton
-              animation="pulse"
+              animation="wave"
               width={70}
               height={20}
               style={styles.tobTab}
             />
             <Skeleton
-              animation="pulse"
+              animation="wave"
               width={70}
               height={20}
               style={styles.tobTab}
@@ -993,7 +975,7 @@ const Loanscreen = () => {
 
         <View style={styles.rightView}>
           <Skeleton
-            animation="pulse"
+            animation="wave"
             width={70}
             height={20}
             style={styles.tobTab}
@@ -1090,6 +1072,7 @@ const Loanscreen = () => {
   };
 
   const renderSlideComponent = () => {
+
     return (
       <>
         <View style={styles.innerContainer}>
@@ -1183,7 +1166,7 @@ const Loanscreen = () => {
   );
 };
 
-export default Loanscreen;
+export default React.memo(Loanscreen);
 
 const styles = StyleSheet.create({
   container: {

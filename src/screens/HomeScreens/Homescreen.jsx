@@ -5,8 +5,9 @@ import {
   RefreshControl,
   ActivityIndicator,
   Platform,
+  Animated,
 } from 'react-native';
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {useNavigation, useFocusEffect} from '@react-navigation/native';
 import {useClipboard} from '@react-native-clipboard/clipboard';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
@@ -148,35 +149,23 @@ const Homescreen = () => {
     }, 3000);
   });
 
-  useEffect(() => {
-    unsubGetWallet();
-    getGuarantorData();
-    getAllLendaInvestments();
-    getAllArmInvestments();
-    unsubGetAllTransactions();
-    unsubGetTransactions();
-  }, []);
-
-  useEffect(() => {
-    unsubCheckPin();
-  }, []);
-
-  // Navigation useEffect Hook
   useFocusEffect(
-    React.useCallback(() => {
-      if (route?.name === 'Home') {
-        unsubGetWallet();
-        unsubGetTransactions();
-        unsubGetLoanAmount();
-        getLoanUserData();
-        getGuarantorData();
-        getAllLendaInvestments();
-        getAllArmInvestments();
-      }
+    useCallback(() => {
+      unsubGetWallet();
+      getGuarantorData();
+      getAllLendaInvestments();
+      getAllArmInvestments();
+      unsubGetAllTransactions();
+      unsubGetTransactions();
     }, []),
   );
 
-  // Timed useEffect
+  useEffect(() => {
+    console.log('check pin');
+    unsubCheckPin();
+  }, [userPin]);
+
+  // // Timed useEffect
   useEffect(() => {
     const interval = setInterval(async () => {
       getAccountWallet()
@@ -937,6 +926,29 @@ const Homescreen = () => {
   const renderMainComponents = () => {
     return (
       <>
+        {isLoading ||
+        isLoadingWallet ||
+        isLoadingTransaction ||
+        isLoadingLoanData ||
+        isLoadingLenda ||
+        isLoadingArm ||
+        isLoadingLoanAmount ? (
+          <ActivityIndicator
+            size="large"
+            color={COLORS.lendaGreen}
+            animating
+            style={{
+              zIndex: 99999,
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+          />
+        ) : null}
         {isSending ? (
           <ActivityIndicator
             size="large"
@@ -988,19 +1000,19 @@ const Homescreen = () => {
     timeOut &&
     userProfileData &&
     userProfileData?.profileProgress !== null && (
-      <SafeAreaView
-        style={{
-          flex: 1,
-          height: hp('100%'),
-          width: wp('100%'),
-          backgroundColor: COLORS.lendaLightGrey,
-          paddingTop: insets.top !== 0 ? insets.top : 18,
-          paddingBottom: insets.bottom !== 0 ? insets.bottom / 2 : 'auto',
-          paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
-          paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
-        }}>
-        {renderMainComponents()}
-      </SafeAreaView>
+        <SafeAreaView
+          style={{
+            flex: 1,
+            height: hp('100%'),
+            width: wp('100%'),
+            backgroundColor: COLORS.lendaLightGrey,
+            paddingTop: insets.top !== 0 ? insets.top : 18,
+            paddingBottom: insets.bottom !== 0 ? insets.bottom / 2 : 'auto',
+            paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
+            paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
+          }}>
+          {renderMainComponents()}
+        </SafeAreaView>
     )
   );
 };

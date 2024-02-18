@@ -5,12 +5,11 @@ import {
   Image,
   TouchableOpacity,
   ScrollView,
-  FlatList,
   Dimensions,
 } from 'react-native';
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {TabView, SceneMap} from 'react-native-tab-view';
-import {useNavigation} from '@react-navigation/native';
+import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import {Skeleton} from '@rneui/base';
 import CustomTabBar from '../../component/CustomTabs/CustomTabBar3';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
@@ -30,7 +29,7 @@ import {
 } from '../../stores/InvestStore';
 import appsFlyer from 'react-native-appsflyer';
 import {IntroSection} from '../../component/homescreen/Intro-Section';
-import { FlashList } from '@shopify/flash-list';
+import {FlashList} from '@shopify/flash-list';
 
 const SLIDE_WIDTH = Dimensions.get('window').width * 0.88;
 const ITEM_WIDTH = SLIDE_WIDTH;
@@ -69,131 +68,128 @@ const Investscreen = () => {
         0,
       );
 
+  useFocusEffect(
+    useCallback(() => {
+      getLoanuserData();
+      getAllLendaInvestments();
+      getAllArmInvestments();
+    }, []),
+  );
+
   useEffect(() => {
     if (route.name === 'Invest') {
-      const unsubscribe = navigation.addListener('focus', async () => {
-        getLoanuserData();
-        getAllLendaInvestments();
-        getAllArmInvestments();
-      });
-      return unsubscribe;
+        const mergedData = [...allArmData, ...allILendaData];
+        setAllInvestmentData(mergedData);
     }
-  }, [navigation]);
-
-  useEffect(() => {
-    getAllLendaInvestments();
-    getAllArmInvestments();
-  }, []);
-
-  useEffect(() => {
-    const mergedData = [...allArmData, ...allILendaData];
-    setAllInvestmentData(mergedData);
   }, [allArmData, allILendaData]);
 
-  const getLoanuserData = async () => {
+  const getLoanuserData = useCallback(async () => {
+    console.log('getLoanuserData');
     try {
       setIsLoading(true);
       const res = await getLoanUserDetails();
-      if (res?.error) {
-      } else {
+      if (!res?.error) {
         setLoanUserDetails(res?.data);
       }
       setIsLoading(false);
     } catch (e) {
       setIsLoading(false);
     }
-  };
+  }, []);
 
-  const getAllLendaInvestments = async () => {
+  const getAllLendaInvestments = useCallback(async () => {
     try {
       setIsLoading(true);
       const res = await getAllLendaInvestment();
-      if (res?.error) {
-      } else {
-        if (res?.data?.length > 0) {
-          setAllLendaData(res?.data);
-        }
+      if (!res?.error && res?.data?.length > 0) {
+        setAllLendaData(res?.data);
       }
       setIsLoading(false);
     } catch (e) {
       setIsLoading(false);
     }
-  };
+  }, []);
 
-  const getAllArmInvestments = async () => {
+  const getAllArmInvestments = useCallback(async () => {
     try {
       setIsLoading(true);
       const res = await getAllArmInvestment();
-      if (res?.error) {
-      } else {
-        if (res?.data?.data?.length > 0) {
-          setAllArmData(res?.data?.data);
-          getSingleArmInvestment(
-            res?.data?.data[0]?.membershipId,
-            res?.data?.data[0]?.productCode,
-          ).then(res => {
-            if (!res?.error) {
-              if (res?.data?.length > 0) {
-                setPortfolioDetail(res?.data?.portfolio[0]?.accountBalance);
-              }
-            }
-          });
+      if (!res?.error && res?.data?.data?.length > 0) {
+        setAllArmData(res?.data?.data);
+        const singleArmInvestmentRes = await getSingleArmInvestment(
+          res?.data?.data[0]?.membershipId,
+          res?.data?.data[0]?.productCode,
+        );
+        if (
+          !singleArmInvestmentRes?.error &&
+          singleArmInvestmentRes?.data?.length > 0
+        ) {
+          setPortfolioDetail(
+            singleArmInvestmentRes?.data?.portfolio[0]?.accountBalance,
+          );
         }
       }
       setIsLoading(false);
     } catch (e) {
       setIsLoading(false);
     }
-  };
-  const isReadyToInvest =
-    loanUserDetails?.armUserBankDetails &&
-    loanUserDetails?.nextOfKinDetails &&
-    loanUserDetails?.loanDocumentDetails &&
-    loanUserDetails?.armUserBankDetails != null &&
-    loanUserDetails?.loanDocumentDetails != null &&
-    loanUserDetails?.nextOfKinDetails != null &&
-    loanUserDetails?.armUserBankDetails?.annualExpectedAnnualIncomeRange !=
-      undefined &&
-    loanUserDetails?.armUserBankDetails?.annualExpectedAnnualIncomeRange !=
-      '' &&
-    loanUserDetails?.armUserBankDetails?.bankAccountName != undefined &&
-    loanUserDetails?.armUserBankDetails?.bankAccountName != '' &&
-    loanUserDetails?.armUserBankDetails?.bankAccountNumber != undefined &&
-    loanUserDetails?.armUserBankDetails?.bankAccountNumber != '' &&
-    loanUserDetails?.armUserBankDetails?.bankCode != undefined &&
-    loanUserDetails?.armUserBankDetails?.bankCode != '' &&
-    loanUserDetails?.armUserBankDetails?.bankName != undefined &&
-    loanUserDetails?.armUserBankDetails?.bankName != '' &&
-    loanUserDetails?.armUserBankDetails?.branchCode != undefined &&
-    loanUserDetails?.armUserBankDetails?.branchCode != '' &&
-    loanUserDetails?.armUserBankDetails?.employmentStatus != undefined &&
-    loanUserDetails?.armUserBankDetails?.employmentStatus != '' &&
-    loanUserDetails?.armUserBankDetails?.expiryDateOfId != undefined &&
-    loanUserDetails?.armUserBankDetails?.expiryDateOfId != '' &&
-    loanUserDetails?.armUserBankDetails?.idType != undefined &&
-    loanUserDetails?.armUserBankDetails?.idType != '' &&
-    loanUserDetails?.armUserBankDetails?.kycLevel != undefined &&
-    loanUserDetails?.armUserBankDetails?.kycLevel != '' &&
-    loanUserDetails?.armUserBankDetails?.maximumSingleInvestmentAmount !=
-      undefined &&
-    loanUserDetails?.armUserBankDetails?.maximumSingleInvestmentAmount != '' &&
-    loanUserDetails?.armUserBankDetails?.maximumSingleRedemptionAmount !=
-      undefined &&
-    loanUserDetails?.armUserBankDetails?.maximumSingleRedemptionAmount != '' &&
-    loanUserDetails?.armUserBankDetails?.reInvestDividends != undefined &&
-    loanUserDetails?.armUserBankDetails?.reInvestDividends != '' &&
-    loanUserDetails?.armUserBankDetails?.utilityBillIdType != undefined &&
-    loanUserDetails?.armUserBankDetails?.utilityBillIdType != null &&
-    loanUserDetails?.armUserBankDetails?.utilityBillIdType != '' &&
-    loanUserDetails?.loanDocumentDetails?.identityCard != undefined &&
-    loanUserDetails?.loanDocumentDetails?.identityCard != null &&
-    loanUserDetails?.loanDocumentDetails?.identityCard != '' &&
-    loanUserDetails?.loanDocumentDetails?.utilityBill != undefined &&
-    loanUserDetails?.loanDocumentDetails?.utilityBill != null &&
-    loanUserDetails?.loanDocumentDetails?.utilityBill != '' &&
-    loanUserDetails?.loanDocumentDetails?.personalPhoto != undefined &&
-    loanUserDetails?.loanDocumentDetails?.personalPhoto != null &&
-    loanUserDetails?.loanDocumentDetails?.personalPhoto != '';
+  }, []);
+
+  const isReadyToInvest = useMemo(() => {
+    console.log('isReadyToInvest');
+    return (
+      loanUserDetails?.armUserBankDetails &&
+      loanUserDetails?.nextOfKinDetails &&
+      loanUserDetails?.loanDocumentDetails &&
+      loanUserDetails?.armUserBankDetails != null &&
+      loanUserDetails?.loanDocumentDetails != null &&
+      loanUserDetails?.nextOfKinDetails != null &&
+      loanUserDetails?.armUserBankDetails?.annualExpectedAnnualIncomeRange !=
+        undefined &&
+      loanUserDetails?.armUserBankDetails?.annualExpectedAnnualIncomeRange !=
+        '' &&
+      loanUserDetails?.armUserBankDetails?.bankAccountName != undefined &&
+      loanUserDetails?.armUserBankDetails?.bankAccountName != '' &&
+      loanUserDetails?.armUserBankDetails?.bankAccountNumber != undefined &&
+      loanUserDetails?.armUserBankDetails?.bankAccountNumber != '' &&
+      loanUserDetails?.armUserBankDetails?.bankCode != undefined &&
+      loanUserDetails?.armUserBankDetails?.bankCode != '' &&
+      loanUserDetails?.armUserBankDetails?.bankName != undefined &&
+      loanUserDetails?.armUserBankDetails?.bankName != '' &&
+      loanUserDetails?.armUserBankDetails?.branchCode != undefined &&
+      loanUserDetails?.armUserBankDetails?.branchCode != '' &&
+      loanUserDetails?.armUserBankDetails?.employmentStatus != undefined &&
+      loanUserDetails?.armUserBankDetails?.employmentStatus != '' &&
+      loanUserDetails?.armUserBankDetails?.expiryDateOfId != undefined &&
+      loanUserDetails?.armUserBankDetails?.expiryDateOfId != '' &&
+      loanUserDetails?.armUserBankDetails?.idType != undefined &&
+      loanUserDetails?.armUserBankDetails?.idType != '' &&
+      loanUserDetails?.armUserBankDetails?.kycLevel != undefined &&
+      loanUserDetails?.armUserBankDetails?.kycLevel != '' &&
+      loanUserDetails?.armUserBankDetails?.maximumSingleInvestmentAmount !=
+        undefined &&
+      loanUserDetails?.armUserBankDetails?.maximumSingleInvestmentAmount !=
+        '' &&
+      loanUserDetails?.armUserBankDetails?.maximumSingleRedemptionAmount !=
+        undefined &&
+      loanUserDetails?.armUserBankDetails?.maximumSingleRedemptionAmount !=
+        '' &&
+      loanUserDetails?.armUserBankDetails?.reInvestDividends != undefined &&
+      loanUserDetails?.armUserBankDetails?.reInvestDividends != '' &&
+      loanUserDetails?.armUserBankDetails?.utilityBillIdType != undefined &&
+      loanUserDetails?.armUserBankDetails?.utilityBillIdType != null &&
+      loanUserDetails?.armUserBankDetails?.utilityBillIdType != '' &&
+      loanUserDetails?.loanDocumentDetails?.identityCard != undefined &&
+      loanUserDetails?.loanDocumentDetails?.identityCard != null &&
+      loanUserDetails?.loanDocumentDetails?.identityCard != '' &&
+      loanUserDetails?.loanDocumentDetails?.utilityBill != undefined &&
+      loanUserDetails?.loanDocumentDetails?.utilityBill != null &&
+      loanUserDetails?.loanDocumentDetails?.utilityBill != '' &&
+      loanUserDetails?.loanDocumentDetails?.personalPhoto != undefined &&
+      loanUserDetails?.loanDocumentDetails?.personalPhoto != null &&
+      loanUserDetails?.loanDocumentDetails?.personalPhoto != ''
+    );
+  }, [loanUserDetails]);
 
   const loadingList = ['string', 'string', 'string'];
   const status = [
@@ -567,7 +563,7 @@ const Investscreen = () => {
     myInvesments: FirstRoute,
   });
 
-  const logAppsFlyer = (event, investmentName, activity, value) => {
+  const logAppsFlyer = useCallback((event, investmentName, activity, value) => {
     const eventName = event;
     const eventValues = {
       investment_type: investmentName,
@@ -586,16 +582,15 @@ const Investscreen = () => {
         // console.error(err);
       },
     );
-  };
+  }, []);
 
   const reanderIntroSection = () => {
     return isLoading ? (
       <View style={[styles.headerContainer]}>
         <Skeleton
-          animation="pulse"
+          animation="wave"
           width={ITEM_WIDTH}
           height={50}
-          style={styles.tobTab}
         />
       </View>
     ) : (
@@ -626,7 +621,6 @@ const Investscreen = () => {
           data={status ? status : []}
           showsHorizontalScrollIndicator={false}
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={{flex: 1, justifyContent: 'center'}}
           horizontal
           renderItem={({item}) => <Slide item={item} />}
         />
@@ -648,7 +642,7 @@ const Investscreen = () => {
   );
 };
 
-export default Investscreen;
+export default React.memo(Investscreen);
 
 const styles = StyleSheet.create({
   container: {
