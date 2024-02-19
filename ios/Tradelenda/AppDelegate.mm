@@ -5,7 +5,7 @@
 #import <RNCPushNotificationIOS.h>
 #import <React/RCTBundleURLProvider.h>
 
-// @import FirebaseCore;
+
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
@@ -23,11 +23,7 @@
   self.initialProps = @{};
   self.moduleName = @"Tradelenda";
 
-
   return [super application:application didFinishLaunchingWithOptions:launchOptions];
-
- 
-
 }
 
 - (NSURL *)sourceURLForBridge:(RCTBridge *)bridge

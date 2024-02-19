@@ -5,7 +5,7 @@ import {
   DarkTheme,
   useNavigationContainerRef,
 } from '@react-navigation/native';
-import {useColorScheme} from 'react-native';
+import {Animated, useColorScheme} from 'react-native';
 import AppStack from './AppStack';
 import AuthStack from './AuthStack';
 // import {auth} from '../util/firebase/firebaseConfig';
@@ -16,6 +16,7 @@ import NetworkScreen from './NetworkError';
 import {useSelector} from 'react-redux';
 // import {networkState} from '../util/redux/networkState/network.slice';
 import {TabContextProvider} from '../context/TabContext';
+import {useData} from '../context/DataProvider';
 
 const AppNavigationContainer = () => {
   const navigationRef = useNavigationContainerRef();
@@ -25,7 +26,7 @@ const AppNavigationContainer = () => {
   const [isLoading, setIsLoading] = useState(true);
   const networkState = useSelector(state => state.networkState.network);
   const [networkStatus, setNetworkStatus] = useState(true);
-
+  const {dataStore, setDataStore} = useData();
   useLayoutEffect(() => {
     if (
       auth().currentUser === undefined ||
@@ -84,6 +85,8 @@ const AppNavigationContainer = () => {
 
     return () => clearInterval(intervalCheck);
   }, []);
+
+
   return (
     <TabContextProvider>
       <NavigationContainer

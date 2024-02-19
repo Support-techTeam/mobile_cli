@@ -36,7 +36,6 @@ import NetworkStatus from './src/util/NetworkService';
 import RNRestart from 'react-native-restart';
 import COLORS from './src/constants/colors';
 import {userLogOut} from './src/stores/AuthStore';
-// import {app, auth} from './src/util/firebase/firebaseConfig';
 import BackgroundTimer from 'react-native-background-timer';
 import {TextColorProvider} from './src/component/TextColorContext';
 import InitializeSDKHandler from './src/component/appFlyer/InitializeSDKHandler';
@@ -48,6 +47,10 @@ import CustomNotification from './src/component/push-notifications/CustomNotific
 import auth from '@react-native-firebase/auth';
 import {requestNotifications} from 'react-native-permissions';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import PinInput from './src/screens/SecurityScreens/PinInput';
+import {DataProvider} from './src/context/DataProvider';
+
+
 
 const inAppUpdates = new SpInAppUpdates(false);
 const deviceInfoEmitter = new NativeEventEmitter(NativeModules.RNDeviceInfo);
@@ -61,7 +64,7 @@ const datadogConfiguration = new DatadogProviderConfiguration(
   'pub8927d4ff6dd483f142a70688c6e5fb7f',
   'prod',
   '6848aa7b-c6b5-4797-b087-8aad30149ece',
-  true, // track User interactions (e.g.: Tap on buttons. You can use 'accessibilityLabel' element property to give tap action the name, otherwise element type will be reported)
+  true, // track User interactions
   true, // track XHR Resources
   true, // track Errors
 );
@@ -78,6 +81,7 @@ let inactiveTime = 0;
 const defaultWaitTime = Platform.select({ios: 120, android: 120});
 let hasLockKey = false;
 let screelLockStatus = false;
+const LOCK_TIMEOUT = 30000; // 1 minute in milliseconds
 
 const requestUserPermission = async () => {
   if (Platform.OS === 'ios') {
@@ -123,6 +127,8 @@ function App() {
   const [statusBarTransition, setStatusBarTransition] = useState(
     TRANSITIONS[0],
   );
+  const [locked, setLocked] = useState(false);
+  const [lastActiveTime, setLastActiveTime] = useState(Date.now());
 
   //update check
   useEffect(() => {
@@ -295,6 +301,50 @@ function App() {
     return unsubscribe;
   }, []);
 
+  useEffect(() => {
+    const handleAppStateChange = nextAppState => {
+      console.log('nextAppState', nextAppState);
+      if (nextAppState === 'background' || nextAppState === 'inactive') {
+        setLastActiveTime(Date.now());
+      } else if (nextAppState === 'active') {
+        const timeSinceLastActive = Date.now() - lastActiveTime;
+        if (timeSinceLastActive > LOCK_TIMEOUT) {
+          setLocked(true);
+          // console.log(locked, 'Set to Lock');
+        }
+      }
+    };
+
+    const interval = setInterval(() => {
+      const timeSinceLastActive = Date.now() - lastActiveTime;
+      if (
+        AppState.currentState === 'active' &&
+        timeSinceLastActive > LOCK_TIMEOUT
+      ) {
+        setLocked(true);
+      }
+    }, 1000);
+
+    const appListener = AppState.addEventListener(
+      'change',
+      handleAppStateChange,
+    );
+
+    return () => {
+      clearInterval(interval);
+      // AppState.removeEventListener('change', handleAppStateChange);
+      appListener.remove();
+    };
+  }, [lastActiveTime]);
+
+  // Check for timeout every second
+
+  const unlockApp = () => {
+    setLocked(false);
+    // console.log(locked, 'Set to UnLock');
+    setLastActiveTime(Date.now());
+  };
+
   const handleNotificationPress = () => {
     setNotification(null);
   };
@@ -355,9 +405,10 @@ function App() {
               showHideTransition={statusBarTransition}
               hidden={hidden}
             />
-            {/*  {isLocked && isLocked === 'true' && hasPin ? (*/}
+            {/* {locked && locked === true ? ( */}
             {false ? (
-              <InputPin />
+              //   <InputPin />
+              <PinInput unlockApp={unlockApp} />
             ) : (
               <View
                 style={styles.container}
@@ -366,21 +417,23 @@ function App() {
                   BackgroundTimer.clearInterval(backgroundTaskInterval);
                 }}>
                 <Provider store={store}>
-                  <PersistGate persistor={persistor} loading={null}>
-                    <TextColorProvider>
-                      <InitializeSDKHandler />
-                      <CustomNotification
-                        isVisible={!!notification}
-                        title={notification?.title}
-                        body={notification?.body}
-                        imageUrl={notification?.android?.imageUrl}
-                        redirectUrl={notification?.android?.redirectUrl}
-                        onPress={handleNotificationPress}
-                      />
-                      <NetworkStatus />
-                      <AppNavigationContainer />
-                    </TextColorProvider>
-                  </PersistGate>
+                  <DataProvider>
+                    <PersistGate persistor={persistor} loading={null}>
+                      <TextColorProvider>
+                        <InitializeSDKHandler />
+                        <CustomNotification
+                          isVisible={!!notification}
+                          title={notification?.title}
+                          body={notification?.body}
+                          imageUrl={notification?.android?.imageUrl}
+                          redirectUrl={notification?.android?.redirectUrl}
+                          onPress={handleNotificationPress}
+                        />
+                        <NetworkStatus />
+                        <AppNavigationContainer />
+                      </TextColorProvider>
+                    </PersistGate>
+                  </DataProvider>
                 </Provider>
               </View>
             )}
@@ -397,6 +450,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
+    backgroundColor: 'rgba(255, 255, 255, 1)',
   },
 });
 

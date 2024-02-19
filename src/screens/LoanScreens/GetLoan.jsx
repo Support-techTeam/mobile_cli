@@ -24,6 +24,7 @@ import {useSelector} from 'react-redux';
 import {getGuarantors} from '../../stores/GuarantorStore';
 import COLORS from '../../constants/colors';
 import appsFlyer from 'react-native-appsflyer';
+import {Header} from '../../component/header/Header';
 
 const durationData = [
   {value: '', label: 'Select Duration'},
@@ -213,27 +214,26 @@ const GetLoan = () => {
     !loanDetails.amount ||
     !loanDetails.loanTenor;
 
-
-    const logAppsFlyer = (event, duration, type, value) => {
-      const eventName = event;
-      const eventValues = {
-        loan_duration: duration,
-        loan_type: type,
-        currency: 'NGN',
-        revenue: value,
-      };
-  
-      appsFlyer.logEvent(
-        eventName,
-        eventValues,
-        res => {
-          // console.log(res);
-        },
-        err => {
-          // console.error(err);
-        },
-      );
+  const logAppsFlyer = (event, duration, type, value) => {
+    const eventName = event;
+    const eventValues = {
+      loan_duration: duration,
+      loan_type: type,
+      currency: 'NGN',
+      revenue: value,
     };
+
+    appsFlyer.logEvent(
+      eventName,
+      eventValues,
+      res => {
+        // console.log(res);
+      },
+      err => {
+        // console.error(err);
+      },
+    );
+  };
 
   const handleCreateLoan = async () => {
     if (guarantors.length !== 0) {
@@ -252,7 +252,12 @@ const GetLoan = () => {
             onPress: () => Toast.hide(),
           });
         } else {
-          logAppsFlyer('loan', loanDetails?.loanTenor, loanDetails?.loanType, loanDetails?.amount);
+          logAppsFlyer(
+            'loan',
+            loanDetails?.loanTenor,
+            loanDetails?.loanType,
+            loanDetails?.amount,
+          );
           Toast.show({
             type: 'success',
             position: 'top',
@@ -311,33 +316,11 @@ const GetLoan = () => {
       }}>
       {pdfmain ? (
         <>
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              marginHorizontal: 15,
-            }}>
-            <TouchableOpacity onPress={() => navigation.goBack()}>
-              <View
-                style={{
-                  borderWidth: 0.5,
-                  borderColor: '#D9DBE9',
-                  borderRadius: 5,
-                }}>
-                <AntDesign name="left" size={24} color="black" />
-              </View>
-            </TouchableOpacity>
-            <View style={styles.HeadView}>
-              <View style={styles.TopView}>
-                <Text style={styles.TextHead}>Terms and Policy Agreement</Text>
-              </View>
-            </View>
-            <View>
-              <Text> </Text>
-            </View>
-          </View>
-          <View style={styles.demark} />
+          <Header
+            routeAction={() => navigation.goBack()}
+            heading={'Terms and Policy Agreement'}
+            disable={false}
+          />
           <Pdf
             trustAllCerts={false}
             source={source2}
