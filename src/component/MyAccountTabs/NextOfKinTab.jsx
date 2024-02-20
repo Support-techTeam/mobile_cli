@@ -30,12 +30,14 @@ const NextOfKin = () => {
     if (res?.error) {
       // TODO: handle error
     } else {
-      setNokDeets(res?.data?.nokDetails);
+      setNokDeets(res?.data?.nextOfKinDetails);
     }
   } catch (error) {
     // TODO: handle error
   }
   };
+
+
 
   return (
     <View style={styles.container}>
