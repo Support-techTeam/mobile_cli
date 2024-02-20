@@ -77,7 +77,7 @@ def reactNativeRoot = new File(["node", "--print", "require.resolve('react-nativ
 project.ext.react = [
         entryfile: 'packages/mobile/index.js',
         root: '../../../../',
-        enablehermes: false,
+        enablehermes: true,
         extrapackagerargs: [ '--minify=false' ], //add this!
 ]
 
@@ -100,8 +100,8 @@ android {
         applicationId 'com.tradelenda.app'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionName "3.0.6"
-        versionCode 40
+        versionName "3.0.7"
+        versionCode 41
         multiDexEnabled true
     }
 

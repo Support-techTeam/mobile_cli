@@ -426,7 +426,7 @@ const InvestmentDetails = () => {
               buttonStyle={styles.btnStyle}
               type="solid"
               raised
-              titleStyle={{color: COLORS.white}}
+              titleStyle={{color: COLORS.white, fontSize: hp(2.2)}}
               containerStyle={styles.btnContainer}
               disabled={
                 (name === 'Lenda' &&
@@ -458,7 +458,7 @@ const InvestmentDetails = () => {
               buttonStyle={styles.btnStyle}
               type="solid"
               raised
-              titleStyle={{color: COLORS.white}}
+              titleStyle={{color: COLORS.white, fontSize: hp(2.2)}}
               containerStyle={styles.btnContainer}
               disabled={
                 (name === 'Lenda' &&
@@ -546,6 +546,7 @@ const styles = StyleSheet.create({
     borderColor: COLORS.lendaBlue,
     paddingHorizontal: 15,
     backgroundColor: COLORS.lendaBlue,
+    fontSize: hp(2.5),
   },
   btnContainer: {
     marginTop: 10,

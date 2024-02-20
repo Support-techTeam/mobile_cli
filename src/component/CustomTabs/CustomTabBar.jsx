@@ -110,8 +110,10 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 40,
-    marginLeft: 55,
+    // marginRight: 30,
+    // marginLeft: 60,
+    alignSelf: 'center',
+    marginHorizontal: 60,
   },
   activeTab: {
     borderBottomWidth: 2,

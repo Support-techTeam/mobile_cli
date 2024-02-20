@@ -166,17 +166,17 @@ const Morescreen = () => {
           </View>
 
           <View>
-            <TouchableOpacity onPress={() => navigation.navigate('Security')}>
+            {/* <TouchableOpacity onPress={() => navigation.navigate('Security')}>
               <CustomView isWallet={true} label="Wallet" />
-            </TouchableOpacity>
+            </TouchableOpacity> */}
 
             <TouchableOpacity onPress={() => navigation.navigate('Security')}>
               <CustomView isSecurity={true} label="Security" />
             </TouchableOpacity>
 
-            <TouchableOpacity onPress={() => navigation.navigate('Security')}>
+            {/* <TouchableOpacity onPress={() => navigation.navigate('Security')}>
               <CustomView isSettings={true} label="Settings" />
-            </TouchableOpacity>
+            </TouchableOpacity> */}
 
             <TouchableOpacity onPress={() => navigation.navigate('MyAccount')}>
               <CustomView isAccount={true} label="Profile" />

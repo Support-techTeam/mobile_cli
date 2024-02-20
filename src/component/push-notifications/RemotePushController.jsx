@@ -10,14 +10,14 @@ const RemotePushController = () => {
     PushNotification.configure({
       // (optional) Called when Token is generated (iOS and Android)
       onRegister: function (token) {
-        console.log('Platform ==>', Platform.OS);
-        console.log('TOKEN:', token);
+        // console.log('Platform ==>', Platform.OS);
+        // console.log('TOKEN:', token);
       },
 
       // (required) Called when a remote or local notification is opened or received
       onNotification: function (notification) {
-        console.log('Platform ==>', Platform.OS);
-        console.log('REMOTE NOTIFICATION ==>', notification);
+        // console.log('Platform ==>', Platform.OS);
+        // console.log('REMOTE NOTIFICATION ==>', notification);
         // required on iOS only
         notification.finish(PushNotificationIOS.FetchResult.NoData);
 

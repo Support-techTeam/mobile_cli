@@ -100,7 +100,7 @@ const userSignUp = async details => {
       );
 
       const newUser = userCredential.user;
-      console.log(userCredential.user);
+      // console.log(userCredential.user);
       if (newUser) {
         await updateProfileData(details.firstname, details.lastname);
       }

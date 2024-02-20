@@ -111,7 +111,7 @@ const TransactionHistory = () => {
       return;
     }
     if (currentPage !== Number(userTransactionsPages)) {
-      console.log('Loading more', currentPage, ' | ', userTransactionsPages);
+      // console.log('Loading more', currentPage, ' | ', userTransactionsPages);
       setIsLoading(true);
       const nextPage = currentPage + 1;
       getAccountTransactions(nextPage, 10)

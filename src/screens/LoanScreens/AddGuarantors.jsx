@@ -50,7 +50,7 @@ const AddGuarantors = () => {
     try {
       setIsLoading(true);
       const res = await createGuarantor(guarantorsDetails);
-      console.log('createGuarantor', res);
+      // console.log('createGuarantor', res);
       if (res?.data?.error) {
         Toast.show({
           type: 'error',

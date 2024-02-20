@@ -303,7 +303,7 @@ function App() {
 
   useEffect(() => {
     const handleAppStateChange = nextAppState => {
-      console.log('nextAppState', nextAppState);
+      // console.log('nextAppState', nextAppState);
       if (nextAppState === 'background' || nextAppState === 'inactive') {
         setLastActiveTime(Date.now());
       } else if (nextAppState === 'active') {

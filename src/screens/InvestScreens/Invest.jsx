@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   ScrollView,
   Dimensions,
+  FlatList,
 } from 'react-native';
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {TabView, SceneMap} from 'react-native-tab-view';
@@ -76,6 +77,13 @@ const Investscreen = () => {
     }, []),
   );
 
+
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     const mergedData = [...allArmData, ...allILendaData];
+  //     setAllInvestmentData(mergedData);
+  //   }, [allArmData, allILendaData]),
+  // );
   useEffect(() => {
     if (route.name === 'Invest') {
         const mergedData = [...allArmData, ...allILendaData];
@@ -84,7 +92,7 @@ const Investscreen = () => {
   }, [allArmData, allILendaData]);
 
   const getLoanuserData = useCallback(async () => {
-    console.log('getLoanuserData');
+    // console.log('getLoanuserData');
     try {
       setIsLoading(true);
       const res = await getLoanUserDetails();
@@ -136,7 +144,6 @@ const Investscreen = () => {
   }, []);
 
   const isReadyToInvest = useMemo(() => {
-    console.log('isReadyToInvest');
     return (
       loanUserDetails?.armUserBankDetails &&
       loanUserDetails?.nextOfKinDetails &&
@@ -617,7 +624,7 @@ const Investscreen = () => {
       }}>
       {renderRootComponents()}
       <View style={styles.innerContainer}>
-        <FlashList
+        <FlatList
           data={status ? status : []}
           showsHorizontalScrollIndicator={false}
           showsVerticalScrollIndicator={false}
@@ -642,7 +649,7 @@ const Investscreen = () => {
   );
 };
 
-export default React.memo(Investscreen);
+export default Investscreen;
 
 const styles = StyleSheet.create({
   container: {

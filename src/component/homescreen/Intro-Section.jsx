@@ -64,6 +64,7 @@ export const IntroSection = props => {
         </TouchableOpacity>
         <TouchableOpacity
          onPress={() => navigation.navigate('NotificationsScreen')}
+         disabled={true}
           style={{
             paddingLeft: 10,
             paddingVertical: 5,
