@@ -161,7 +161,6 @@ const Homescreen = () => {
   );
 
   useEffect(() => {
-    console.log('check pin');
     unsubCheckPin();
   }, [userPin]);
 

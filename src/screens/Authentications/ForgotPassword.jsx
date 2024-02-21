@@ -23,6 +23,9 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
+import {AuthHeader} from '../../component/header/AuthHeader';
+
+const WINDOW_HIGHT = Dimensions.get('window').height;
 
 const ForgotPassword = () => {
   const insets = useSafeAreaInsets();
@@ -117,76 +120,62 @@ const ForgotPassword = () => {
                 overlayColor="rgba(78, 75, 102, 0.7)"
               />
             )}
-            <View style={{marginBottom: 40}}>
+            <View
+              style={{
+                flex: 1,
+                marginBottom: 40,
+                flexDirection: 'column',
+              }}>
               <View>
-                <View style={{alignItems: 'center', paddingHorizontal: 12}}>
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      justifyContent: 'center',
-                      marginTop: 30,
-                    }}>
-                    <View>
-                      <TouchableOpacity
-                        onPress={() => navigation.goBack()}
-                        style={{
-                          borderWidth: 0.5,
-                          borderColor: '#D9DBE9',
-                          borderRadius: 5,
-                          flexDirection: 'row',
-                          justifyContent: 'flex-start',
-                        }}>
-                        <View>
-                          <Icon name="chevron-left" size={30} color="black" />
-                        </View>
-                      </TouchableOpacity>
-                    </View>
-                    <View style={styles.signupView}>
-                      <Image
-                        source={require('../../../assets/images/HeadLogo.png')}
-                        style={{width: 83, height: 32, marginBottom: 24}}
-                      />
-                      <Image
-                        source={require('../../../assets/images/locked.png')}
-                      />
-                      <Text style={styles.signupText}>Forgotten Password?</Text>
-                    </View>
-                  </View>
-                  <View style={styles.signupDetails}>
-                    <Text style={[styles.extraText, {marginBottom: 40}]}>
-                      Please enter your email address to recieve a password
-                      reset link
-                    </Text>
-                  </View>
-                </View>
+                <AuthHeader
+                  routeAction={() => navigation.goBack()}
+                  heading={'Forgotten Password?'}
+                  intro={
+                    'Please enter your email address to recieve a password reset link'
+                  }
+                  disabled={true}
+                  renderImage={
+                    Image.resolveAssetSource(
+                      require('../../../assets/images/locked.png'),
+                    ).uri
+                  }
+                />
               </View>
               <View
-                style={{
-                  paddingTop: 25,
-                  backgroundColor: '#FFFFFF',
-                  borderRadius: 15,
-                  paddingHorizontal: 15,
-                  paddingVertical: 15,
-                  opacity: 0.86,
-                  borderColor: '#D9DBE9',
-                  borderWidth: 2,
-                }}>
-                <Input
-                  onChangeText={text => handleOnchange(text, 'email')}
-                  onFocus={() => handleError(null, 'email')}
-                  iconName="email-outline"
-                  label="Email"
-                  placeholder="Enter your email address"
-                  error={errors.email}
-                  autoCorrect={false}
-                  autoCapitalize="none"
-                  isNeeded={true}
-                />
-                <Button
-                  title="Submit"
-                  onPress={validate}
-                  disabled={!userDetails.email}
-                />
+                style={
+                  {
+                    height: hp('60%'),
+                    justifyContent: 'center',
+                  }
+                }>
+                <View
+                  style={{
+                    paddingTop: 25,
+                    backgroundColor: '#FFFFFF',
+                    borderRadius: 15,
+                    paddingHorizontal: 15,
+                    paddingVertical: 15,
+                    opacity: 0.86,
+                    borderColor: '#D9DBE9',
+                    borderWidth: 2,
+                  }}>
+                  <Input
+                    onChangeText={text => handleOnchange(text, 'email')}
+                    onFocus={() => handleError(null, 'email')}
+                    iconName="email-outline"
+                    label="Email"
+                    placeholder="Enter your email address"
+                    error={errors.email}
+                    autoCorrect={false}
+                    autoCapitalize="none"
+                    isNeeded={true}
+                  />
+                  <Button
+                    title="Submit"
+                    onPress={validate}
+                    disabled={!userDetails.email}
+                  />
+                </View>
               </View>
             </View>
           </ScrollView>

@@ -454,7 +454,7 @@ const InvestmentDetails = () => {
             />
 
             <Button
-              title="Withdraw Funds"
+              title="Withdraw"
               buttonStyle={styles.btnStyle}
               type="solid"
               raised
@@ -547,11 +547,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     backgroundColor: COLORS.lendaBlue,
     fontSize: hp(2.5),
+    height: 50,
   },
   btnContainer: {
     marginTop: 10,
     width: wp(40),
     fontSize: hp(5),
+    height: 50,
     marginHorizontal: 5,
     borderRadius: 5,
     borderColor: COLORS.lendaBlue,

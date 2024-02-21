@@ -10,7 +10,7 @@ import {
   Dimensions,
 } from 'react-native';
 import React, {useState, useEffect} from 'react';
-import { Formik } from 'formik';
+import {Formik} from 'formik';
 import {CheckBox} from '@rneui/themed';
 import {useNavigation} from '@react-navigation/native';
 import Spinner from 'react-native-loading-spinner-overlay';
@@ -27,6 +27,8 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
+import {SIZES} from '../../constants';
+import {AuthHeader} from '../../component/header/AuthHeader';
 
 const SignUp = () => {
   const insets = useSafeAreaInsets();
@@ -249,51 +251,17 @@ const SignUp = () => {
             showsHorizontalScrollIndicator={false}
             showsVerticalScrollIndicator={false}
             style={{
-              paddingHorizontal: 16,
+              paddingHorizontal: SIZES.base,
               marginBottom: hp('2%'),
             }}>
             <View>
-              <View>
-                <View style={{paddingHorizontal: 12}}>
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      justifyContent: 'center',
-                      marginTop: 15,
-                    }}>
-                    <View>
-                      <TouchableOpacity
-                        style={{
-                          alignSelf: 'flex-start',
-                          borderWidth: 0.5,
-                          borderColor: '#D9DBE9',
-                          borderRadius: 5,
-                        }}
-                        onPress={() => navigation.goBack()}>
-                        <View>
-                          <Icon name="chevron-left" size={30} color="black" />
-                        </View>
-                      </TouchableOpacity>
-                    </View>
-                    <View style={styles.signupView}>
-                      <Image
-                        source={require('../../../assets/images/HeadLogo.png')}
-                        style={{width: 83, height: 32, marginBottom: 24}}
-                      />
-                      <Image
-                        source={require('../../../assets/images/locked.png')}
-                      />
-                      <Text style={styles.signupText}>Sign Up</Text>
-                      <View style={styles.signupDetails}>
-                        <Text style={[styles.DetailsText, {marginBottom: 40}]}>
-                          Create an account to get started
-                        </Text>
-                      </View>
-                    </View>
-                  </View>
-                </View>
-              </View>
-
+              <AuthHeader
+                routeAction={() => navigation.goBack()}
+                heading={'SIGN UP'}
+                intro={'Create an account to get started'}
+                disabled={true}
+                renderImage={Image.resolveAssetSource(require('../../../assets/images/locked.png')).uri}
+              />
               <View
                 style={{
                   paddingTop: 25,
@@ -662,7 +630,7 @@ const styles = StyleSheet.create({
   },
   signupText: {
     fontWeight: '700',
-    fontSize: 36,
+    fontSize: SIZES.h3,
     letterSpacing: 1,
   },
   DetailsText: {
