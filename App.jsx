@@ -267,9 +267,8 @@ function App() {
     };
   }, []);
 
-  const colorScheme = useColorScheme();
   // const theme = colorScheme === 'dark' ? {...DefaultTheme} : {...LightTheme};
-  const theme = {...DefaultTheme};
+  const theme = {...LightTheme};
 
   const [notification, setNotification] = useState(null);
 

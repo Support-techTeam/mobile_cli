@@ -33,7 +33,7 @@ const getNetworkProvider = async () => {
           },
         );
         DdLogs.info(
-          `Bill Payment | Get Network Provider | ${auth?.currentUser?.email}`,
+          `Bill Payment | Get Network Provider | ${auth()?.currentUser?.email}`,
           {context: JSON.stringify(response?.data)},
         );
         return {
@@ -44,7 +44,7 @@ const getNetworkProvider = async () => {
         };
       } catch (error) {
         DdLogs.error(
-          `Bill Payment | Get Network Provider | ${auth?.currentUser?.email}`,
+          `Bill Payment | Get Network Provider | ${auth()?.currentUser?.email}`,
           {
             errorMessage: JSON.stringify(error),
           },
@@ -88,7 +88,7 @@ const purchaseAirtime = async data => {
           },
         );
         DdLogs.info(
-          `Bill Payment | Purchase Airtime | ${auth?.currentUser?.email}`,
+          `Bill Payment | Purchase Airtime | ${auth()?.currentUser?.email}`,
           {
             context: JSON.stringify(response?.data),
           },
@@ -101,7 +101,7 @@ const purchaseAirtime = async data => {
         };
       } catch (error) {
         DdLogs.error(
-          `Bill Payment | Purchase Airtime | ${auth?.currentUser?.email}`,
+          `Bill Payment | Purchase Airtime | ${auth()?.currentUser?.email}`,
           {
             errorMessage: JSON.stringify(error),
           },
@@ -144,7 +144,7 @@ const getDataProvider = async () => {
           },
         );
         DdLogs.info(
-          `Bill Payment | Get Network Provider | ${auth?.currentUser?.email}`,
+          `Bill Payment | Get Network Provider | ${auth()?.currentUser?.email}`,
           {
             context: JSON.stringify(response?.data),
           },
@@ -157,7 +157,7 @@ const getDataProvider = async () => {
         };
       } catch (error) {
         DdLogs.error(
-          `Bill Payment | Get Network Provider | ${auth?.currentUser?.email}`,
+          `Bill Payment | Get Network Provider | ${auth()?.currentUser?.email}`,
           {
             errorMessage: JSON.stringify(error),
           },
@@ -200,7 +200,7 @@ const getDataPlanByProvider = async provider => {
           },
         );
         DdLogs.info(
-          `Bill Payment | Get Data Plan | ${auth?.currentUser?.email}`,
+          `Bill Payment | Get Data Plan | ${auth()?.currentUser?.email}`,
           {
             context: JSON.stringify(response?.data),
           },
@@ -213,7 +213,7 @@ const getDataPlanByProvider = async provider => {
         };
       } catch (error) {
         DdLogs.error(
-          `Bill Payment | Get Data Plan | ${auth?.currentUser?.email}`,
+          `Bill Payment | Get Data Plan | ${auth()?.currentUser?.email}`,
           {
             errorMessage: JSON.stringify(error),
           },
@@ -257,7 +257,7 @@ const purchaseDataPlan = async data => {
           },
         );
         DdLogs.info(
-          `Bill Payment | Purchase Data | ${auth?.currentUser?.email}`,
+          `Bill Payment | Purchase Data | ${auth()?.currentUser?.email}`,
           {
             context: JSON.stringify(response?.data),
           },
@@ -270,7 +270,7 @@ const purchaseDataPlan = async data => {
         };
       } catch (error) {
         DdLogs.error(
-          `Bill Payment | Purchase Data | ${auth?.currentUser?.email}`,
+          `Bill Payment | Purchase Data | ${auth()?.currentUser?.email}`,
           {
             errorMessage: JSON.stringify(error),
           },
@@ -313,7 +313,7 @@ const getElectricityProviders = async () => {
           },
         );
         DdLogs.info(
-          `Bill Payment | Get Electricity Provider | ${auth?.currentUser?.email}`,
+          `Bill Payment | Get Electricity Provider | ${auth()?.currentUser?.email}`,
           {
             context: JSON.stringify(response?.data),
           },
@@ -326,7 +326,7 @@ const getElectricityProviders = async () => {
         };
       } catch (error) {
         DdLogs.error(
-          `Bill Payment | Get Electricity Provider | ${auth?.currentUser?.email}`,
+          `Bill Payment | Get Electricity Provider | ${auth()?.currentUser?.email}`,
           {
             errorMessage: JSON.stringify(error),
           },
@@ -370,7 +370,7 @@ const verifyMeter = async data => {
           },
         );
         DdLogs.info(
-          `Bill Payment | Verify Meter | ${auth?.currentUser?.email}`,
+          `Bill Payment | Verify Meter | ${auth()?.currentUser?.email}`,
           {
             context: JSON.stringify(response?.data),
           },
@@ -383,7 +383,7 @@ const verifyMeter = async data => {
         };
       } catch (error) {
         DdLogs.error(
-          `Bill Payment | Verify Meter | ${auth?.currentUser?.email}`,
+          `Bill Payment | Verify Meter | ${auth()?.currentUser?.email}`,
           {
             errorMessage: JSON.stringify(error),
           },
@@ -427,7 +427,7 @@ const purchaseElectricity = async data => {
           },
         );
         DdLogs.info(
-          `Bill Payment | Purchase Power | ${auth?.currentUser?.email}`,
+          `Bill Payment | Purchase Power | ${auth()?.currentUser?.email}`,
           {
             context: JSON.stringify(response?.data),
           },
@@ -440,7 +440,7 @@ const purchaseElectricity = async data => {
         };
       } catch (error) {
         DdLogs.error(
-          `Bill Payment | Purchase Power | ${auth?.currentUser?.email}`,
+          `Bill Payment | Purchase Power | ${auth()?.currentUser?.email}`,
           {
             errorMessage: JSON.stringify(error),
           },
@@ -483,7 +483,7 @@ const getCableTvProvider = async provider => {
           },
         );
         DdLogs.info(
-          `Bill Payment | Get CableTv Provider | ${auth?.currentUser?.email}`,
+          `Bill Payment | Get CableTv Provider | ${auth()?.currentUser?.email}`,
           {
             context: JSON.stringify(response?.data),
           },
@@ -496,7 +496,7 @@ const getCableTvProvider = async provider => {
         };
       } catch (error) {
         DdLogs.error(
-          `Bill Payment | Get CableTv Provider | ${auth?.currentUser?.email}`,
+          `Bill Payment | Get CableTv Provider | ${auth()?.currentUser?.email}`,
           {
             errorMessage: JSON.stringify(error),
           },
@@ -539,7 +539,7 @@ const verifyIUC = async data => {
             headers,
           },
         );
-        DdLogs.info(`Bill Payment | Verify IUC | ${auth?.currentUser?.email}`, {
+        DdLogs.info(`Bill Payment | Verify IUC | ${auth()?.currentUser?.email}`, {
           context: JSON.stringify(response?.data),
         });
         return {
@@ -550,7 +550,7 @@ const verifyIUC = async data => {
         };
       } catch (error) {
         DdLogs.error(
-          `Bill Payment | Verify IUC | ${auth?.currentUser?.email}`,
+          `Bill Payment | Verify IUC | ${auth()?.currentUser?.email}`,
           {
             errorMessage: JSON.stringify(error),
           },
@@ -594,7 +594,7 @@ const renewSubscription = async data => {
           },
         );
         DdLogs.info(
-          `Bill Payment | Renew Subscription | ${auth?.currentUser?.email}`,
+          `Bill Payment | Renew Subscription | ${auth()?.currentUser?.email}`,
           {
             context: JSON.stringify(response?.data),
           },
@@ -607,7 +607,7 @@ const renewSubscription = async data => {
         };
       } catch (error) {
         DdLogs.error(
-          `Bill Payment | Renew Subscription | ${auth?.currentUser?.email}`,
+          `Bill Payment | Renew Subscription | ${auth()?.currentUser?.email}`,
           {
             errorMessage: JSON.stringify(error),
           },
@@ -651,7 +651,7 @@ const updateSubscription = async data => {
           },
         );
         DdLogs.info(
-          `Bill Payment | Update Subscription | ${auth?.currentUser?.email}`,
+          `Bill Payment | Update Subscription | ${auth()?.currentUser?.email}`,
           {
             context: JSON.stringify(response?.data),
           },
@@ -664,7 +664,7 @@ const updateSubscription = async data => {
         };
       } catch (error) {
         DdLogs.error(
-          `Bill Payment | Update Subscription | ${auth?.currentUser?.email}`,
+          `Bill Payment | Update Subscription | ${auth()?.currentUser?.email}`,
           {
             errorMessage: JSON.stringify(error),
           },
@@ -707,7 +707,7 @@ const getAllTransaction = async () => {
           },
         );
         DdLogs.info(
-          `Bill Payment | Get All Transaction | ${auth?.currentUser?.email}`,
+          `Bill Payment | Get All Transaction | ${auth()?.currentUser?.email}`,
           {
             context: JSON.stringify(response?.data),
           },
@@ -720,7 +720,7 @@ const getAllTransaction = async () => {
         };
       } catch (error) {
         DdLogs.error(
-          `Bill Payment | Get All Transaction | ${auth?.currentUser?.email}`,
+          `Bill Payment | Get All Transaction | ${auth()?.currentUser?.email}`,
           {
             errorMessage: JSON.stringify(error),
           },

@@ -6,10 +6,11 @@ import {
   TouchableOpacity,
   ScrollView,
   ActivityIndicator,
+  Animated,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {useSafeAreaInsets, SafeAreaView} from 'react-native-safe-area-context';
-import {resendVerificationEmail, userLogOut} from '../../stores/AuthStore';
+import {resendOTP, userLogOut, verifyOTP} from '../../stores/AuthStore';
 import {useDispatch, useSelector} from 'react-redux';
 import {signUpUser} from '../../util/redux/userAuth/user.auth.slice';
 import auth from '@react-native-firebase/auth';
@@ -18,36 +19,80 @@ import Spinner from 'react-native-loading-spinner-overlay';
 import COLORS from '../../constants/colors';
 import {useRoute} from '@react-navigation/native';
 import {resetStore} from '../../util/redux/store';
+import {
+  CodeField,
+  Cursor,
+  useBlurOnFulfill,
+  useClearByFocusCell,
+} from 'react-native-confirmation-code-field';
+import styles, {
+  ACTIVE_CELL_BG_COLOR,
+  CELL_BORDER_RADIUS,
+  CELL_SIZE,
+  DEFAULT_CELL_BG_COLOR,
+  NOT_EMPTY_CELL_BG_COLOR,
+} from '../../../styles';
+
+const {Value, Text: AnimatedText} = Animated;
+
+const CELL_COUNT = 6;
+
+const animationsColor = [...new Array(CELL_COUNT)].map(() => new Value(0));
+const animationsScale = [...new Array(CELL_COUNT)].map(() => new Value(1));
+const animateCell = ({hasValue, index, isFocused}) => {
+  Animated.parallel([
+    Animated.timing(animationsColor[index], {
+      useNativeDriver: false,
+      toValue: isFocused ? 1 : 0,
+      duration: 150,
+    }),
+    Animated.spring(animationsScale[index], {
+      useNativeDriver: false,
+      toValue: hasValue ? 0 : 1,
+      duration: hasValue ? 200 : 150,
+    }),
+  ]).start();
+};
 
 const Verification = () => {
   const dispatch = useDispatch();
   const user = useSelector(state => state.userAuth.user);
   const insets = useSafeAreaInsets();
   const [isLoading, setIsLoading] = useState(false);
-  // const [isVerified, setIsVerified] = useState(
-  //   JSON.parse(user)?.user?.emailVerified,
-  // );
+  const [isSending, setIsSending] = useState(false);
   let isVerified = auth().currentUser?.emailVerified;
   const [count, setCount] = useState(0);
   const route = useRoute();
 
-  useEffect(() => {
-    const interval = setInterval(async () => {
-      // const userData = auth().currentUser;
-      const userData = auth().currentUser;
-      await userData?.reload();
-      if (userData && userData.emailVerified) {
-        dispatch(signUpUser(JSON.stringify(userData)));
-        isVerified = userData.emailVerified;
-      } else {
-        setCount(count + 1);
-      }
-    }, 5000);
+  const [value, setValue] = useState('');
+  const ref = useBlurOnFulfill({value, cellCount: CELL_COUNT});
+  const [props, getCellOnLayoutHandler] = useClearByFocusCell({
+    value,
+    setValue,
+  });
 
-    if (!isVerified) {
-      return () => clearInterval(interval);
+  const renderCell = ({index, symbol, isFocused}) => {
+    const hasValue = Boolean(symbol);
+
+    setTimeout(() => {
+      animateCell({hasValue, index, isFocused});
+    }, 0);
+
+    return (
+      <AnimatedText
+        key={index}
+        style={[styles.cell_otp, isFocused && styles.focusCell]}
+        onLayout={getCellOnLayoutHandler(index)}>
+        {symbol || (isFocused ? <Cursor /> : null)}
+      </AnimatedText>
+    );
+  };
+
+  useEffect(() => {
+    if (value.length === CELL_COUNT) {
+      handleVerificationData();
     }
-  }, [isVerified == false && route.name === 'Verification' ? count : '']);
+  }, [value]);
 
   const handleSignOut = async () => {
     try {
@@ -71,31 +116,84 @@ const Verification = () => {
 
   const handleResendVerificationEmail = async () => {
     setIsLoading(true);
-    const res = await resendVerificationEmail();
-    if (res?.error) {
-      Toast.show({
-        type: 'error',
-        position: 'top',
-        topOffset: 50,
-        text1: res?.title,
-        text2: res?.message,
-        visibilityTime: 3000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
-    } else {
-      Toast.show({
-        type: 'success',
-        position: 'top',
-        topOffset: 50,
-        text1: res?.title,
-        text2: res?.message,
-        visibilityTime: 3000,
-        autoHide: true,
-        onPress: () => Toast.hide(),
-      });
+    const userData = auth().currentUser;
+    await userData?.reload();
+    const payLoad = {
+      email: userData?.email,
+      firstName: userData?.displayName?.split(' ')[0],
+      phoneNumber: userData?.phoneNumber || '+2340000000000',
+      uuid: userData?.uid,
+    };
+
+    try {
+      const res = await resendOTP(payLoad);
+      if (res?.error) {
+        Toast.show({
+          type: 'error',
+          position: 'top',
+          topOffset: 50,
+          text1: res?.title,
+          text2: res?.message,
+          visibilityTime: 3000,
+          autoHide: true,
+          onPress: () => Toast.hide(),
+        });
+      } else {
+        Toast.show({
+          type: 'success',
+          position: 'top',
+          topOffset: 50,
+          text1: res?.title,
+          text2: res?.message,
+          visibilityTime: 3000,
+          autoHide: true,
+          onPress: () => Toast.hide(),
+        });
+      }
+      setIsLoading(false);
+    } catch (err) {
+      setIsLoading(false);
     }
-    setIsLoading(false);
+  };
+
+  const handleVerificationData = async () => {
+    setIsSending(true);
+    const uid = auth()?.currentUser?.uid;
+    verifyOTP(value, uid)
+      .then(async res => {
+        if (res?.error) {
+          Toast.show({
+            type: 'error',
+            position: 'top',
+            topOffset: 50,
+            text1: 'OTP Verification',
+            text2: res?.message,
+            visibilityTime: 3000,
+            autoHide: true,
+            onPress: () => Toast.hide(),
+          });
+        } else {
+          Toast.show({
+            type: 'success',
+            position: 'top',
+            topOffset: 50,
+            text1: 'OTP Verification',
+            text2: res?.message,
+            visibilityTime: 3000,
+            autoHide: true,
+            onPress: () => Toast.hide(),
+          });
+        }
+
+        setIsSending(false);
+        await auth().currentUser?.reload();
+        const user = auth().currentUser;
+        dispatch(signUpUser(JSON.stringify(user)));
+        isVerified = user?.emailVerified;
+      })
+      .catch(e => {
+        setIsSending(false);
+      });
   };
 
   return (
@@ -118,6 +216,16 @@ const Verification = () => {
           animation="slide"
         />
       )}
+
+      {isSending && (
+        <Spinner
+          textContent={'Verification User...'}
+          textStyle={{color: 'white'}}
+          visible={true}
+          overlayColor="rgba(78, 75, 102, 0.7)"
+          animation="slide"
+        />
+      )}
       <ScrollView
         bounces={false}
         showsHorizontalScrollIndicator={false}
@@ -134,24 +242,33 @@ const Verification = () => {
           </View>
         </View>
         <View style={styles.pinView}>
-          <View style={{paddingVertical: 10}}>
-            <Text style={styles.verify}>
-              Waiting for you to verify your account
+          <View style={[{paddingVertical: 10}]}>
+            <Text style={styles.title_otp}>OTP Verification</Text>
+            <CodeField
+              ref={ref}
+              {...props}
+              value={value}
+              onChangeText={setValue}
+              cellCount={CELL_COUNT}
+              rootStyle={styles.codeFieldRoot}
+              keyboardType="number-pad"
+              textContentType="oneTimeCode"
+              renderCell={renderCell}
+            />
+          </View>
+          <View style={internalStyles.message}>
+            <Text style={internalStyles.messageText}>
+              Please enter the verification code{'\n'}
+              we send to your email address oe phone number
             </Text>
           </View>
-          <View style={styles.message}>
-            <Text style={styles.messageText}>
-              Check your inbox or spam, we’ve sent you a verification mail to
-              complete your registration.
-            </Text>
-          </View>
-          <View style={styles.demark} />
+          <View style={internalStyles.demark} />
 
           <TouchableOpacity
-            style={styles.signUp}
+            style={internalStyles.signUp}
             onPress={handleResendVerificationEmail}>
             {false ? (
-              <View style={styles.signUpactivity}>
+              <View style={internalStyles.signUpactivity}>
                 <ActivityIndicator size="large" color="#fff" />
               </View>
             ) : (
@@ -164,9 +281,11 @@ const Verification = () => {
               </Text>
             )}
           </TouchableOpacity>
-          <TouchableOpacity style={styles.signOut} onPress={handleSignOut}>
+          <TouchableOpacity
+            style={internalStyles.signOut}
+            onPress={handleSignOut}>
             {false ? (
-              <View style={styles.signUpactivity}>
+              <View style={internalStyles.signUpactivity}>
                 <ActivityIndicator size="large" color="#fff" />
               </View>
             ) : (
@@ -187,7 +306,7 @@ const Verification = () => {
 
 export default Verification;
 
-const styles = StyleSheet.create({
+const internalStyles = StyleSheet.create({
   container: {
     flex: 1,
     // paddingTop: statusBarHeight,

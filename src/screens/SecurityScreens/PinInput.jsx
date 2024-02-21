@@ -1,8 +1,4 @@
-/*
 
-Concept: https://dribbble.com/shots/5476562-Forgot-Password-Verification/attachments
-
-*/
 import {Animated, Image, SafeAreaView, Text, View} from 'react-native';
 import React, {useState} from 'react';
 

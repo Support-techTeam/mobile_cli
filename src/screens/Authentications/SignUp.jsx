@@ -15,6 +15,7 @@ import {CheckBox} from '@rneui/themed';
 import {useNavigation} from '@react-navigation/native';
 import Spinner from 'react-native-loading-spinner-overlay';
 import Input from '../../component/inputField/input.component';
+import InputPhone from '../../component/inputField/phone-input.component';
 import KeyboardAvoidingWrapper from '../../component/KeyBoardAvoiding/keyBoardAvoiding';
 import Button from '../../component/buttons/Button';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
@@ -51,6 +52,8 @@ const SignUp = () => {
     firstname: '',
     lastname: '',
     email: '',
+    countryCode: '+234',
+    phoneNumber: '',
     password: '',
     confirmpassword: '',
   });
@@ -59,6 +62,7 @@ const SignUp = () => {
     !inputs.firstname ||
     !inputs.lastname ||
     !inputs.password ||
+    !inputs.phoneNumber ||
     !inputs.email ||
     !inputs.confirmpassword ||
     checked === false ||
@@ -66,6 +70,19 @@ const SignUp = () => {
     error !== '';
 
   const handleSignUp = async () => {
+    if (isNaN(Number(inputs.phoneNumber))){
+      Toast.show({
+        type: 'error',
+        position: 'top',
+        topOffset: 50,
+        text1: 'Input Verificaton',
+        text2: 'Please enter a valid phone number',
+        visibilityTime: 3000,
+        autoHide: true,
+        onPress: () => Toast.hide(),
+      });
+      return;
+    }
     try {
       setIsLoading(true);
       const res = await userSignUp(inputs);
@@ -107,6 +124,11 @@ const SignUp = () => {
       isValid = false;
     } else if (!inputs.email.match(/\S+@\S+\.\S+/)) {
       handleError('Please input a valid email', 'email');
+      isValid = false;
+    }
+
+    if (!inputs.phoneNumber) {
+      handleError('Please input phone number', 'phoneNumber');
       isValid = false;
     }
 
@@ -213,11 +235,12 @@ const SignUp = () => {
     specialValid,
     lengthValid,
     inputs.password.length,
-  ]);
+  ], []);
 
   const handleOnchange = (text, input) => {
     setInputs(prevState => ({...prevState, [input]: text}));
   };
+
   const handleError = (error, input) => {
     setErrors(prevState => ({...prevState, [input]: error}));
   };
@@ -260,7 +283,11 @@ const SignUp = () => {
                 heading={'SIGN UP'}
                 intro={'Create an account to get started'}
                 disabled={true}
-                renderImage={Image.resolveAssetSource(require('../../../assets/images/locked.png')).uri}
+                renderImage={
+                  Image.resolveAssetSource(
+                    require('../../../assets/images/locked.png'),
+                  ).uri
+                }
               />
               <View
                 style={{
@@ -278,6 +305,7 @@ const SignUp = () => {
                     firstname: '',
                     lastname: '',
                     email: '',
+                    phoneNumber: '',
                     password: '',
                     confirmpassword: '',
                   }}
@@ -340,6 +368,20 @@ const SignUp = () => {
                           autoCapitalize="none"
                           autoCorrect={false}
                           isNeeded={true}
+                        />
+
+                        <InputPhone
+                          label="Phone number"
+                          onFocus={() => handleError(null, 'phoneNumber')}
+                          layout="first"
+                          isNeeded={true}
+                          defaultCode="NG"
+                          error={errors.phoneNumber}
+                          codeTextStyle={{color: '#6E7191'}}
+                          defaultValue={inputs?.phoneNumber}
+                          onChangeCountry={(text) => handleOnchange(`+${text?.callingCode[0]}`, 'countryCode')}
+                          onChangeText={(text) => handleOnchange(text, 'phoneNumber')}
+                      
                         />
 
                         <Input

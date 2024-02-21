@@ -21,7 +21,7 @@ const getState = async () => {
   ) {
     try {
       const response = await axiosInstance.get('/address/get-state');
-      DdLogs.info(`Profile | Get State | ${auth?.currentUser?.email}`, {
+      DdLogs.info(`Profile | Get State | ${auth()?.currentUser?.email}`, {
         context: JSON.stringify(response?.data),
       });
       return {
@@ -30,7 +30,7 @@ const getState = async () => {
         message: 'success',
       };
     } catch (error) {
-      DdLogs.error(`Profile | Get State | ${auth?.currentUser?.email}`, {
+      DdLogs.error(`Profile | Get State | ${auth()?.currentUser?.email}`, {
         errorMessage: JSON.stringify(error),
       });
       return {
@@ -58,7 +58,7 @@ const getCity = async cityByState => {
       const response = await axiosInstance.get(
         `/address/get-city/${cityByState}`,
       );
-      DdLogs.info(`Profile | Get City | ${auth?.currentUser?.email}`, {
+      DdLogs.info(`Profile | Get City | ${auth()?.currentUser?.email}`, {
         context: JSON.stringify(response?.data),
       });
       return {
@@ -67,7 +67,7 @@ const getCity = async cityByState => {
         message: 'success',
       };
     } catch (error) {
-      DdLogs.error(`Profile | Get City | ${auth?.currentUser?.email}`, {
+      DdLogs.error(`Profile | Get City | ${auth()?.currentUser?.email}`, {
         errorMessage: JSON.stringify(error),
       });
       return {
@@ -104,7 +104,7 @@ const getProfileDetails = async () => {
         });
         await AsyncStorage.setItem('hasProfile', 'true');
         DdLogs.info(
-          `Profile | Get Profile Detail | ${auth?.currentUser?.email}`,
+          `Profile | Get Profile Detail | ${auth()?.currentUser?.email}`,
           {
             context: JSON.stringify(response?.data),
           },
@@ -116,7 +116,7 @@ const getProfileDetails = async () => {
         };
       } catch (error) {
         DdLogs.error(
-          `Profile | Get Profile Detail | ${auth?.currentUser?.email}`,
+          `Profile | Get Profile Detail | ${auth()?.currentUser?.email}`,
           {
             errorMessage: JSON.stringify(error),
           },
@@ -158,7 +158,7 @@ const createUserProfile = async details => {
         );
         await AsyncStorage.setItem('hasProfile', 'true');
         DdLogs.info(
-          `Profile | Create user Profile | ${auth?.currentUser?.email}`,
+          `Profile | Create user Profile | ${auth()?.currentUser?.email}`,
           {
             context: JSON.stringify(response?.data),
           },
@@ -171,7 +171,7 @@ const createUserProfile = async details => {
         };
       } catch (error) {
         DdLogs.error(
-          `Profile | Create user Profile | ${auth?.currentUser?.email}`,
+          `Profile | Create user Profile | ${auth()?.currentUser?.email}`,
           {
             errorMessage: JSON.stringify(error),
           },
@@ -210,7 +210,7 @@ const checkPin = async () => {
         const response = await axiosInstance.get(`/transaction-pin/check-pin`, {
           headers,
         });
-        DdLogs.info(`Profile | Check Pin | ${auth?.currentUser?.email}`, {
+        DdLogs.info(`Profile | Check Pin | ${auth()?.currentUser?.email}`, {
           context: JSON.stringify(response?.data),
         });
         return {
@@ -220,7 +220,7 @@ const checkPin = async () => {
           message: 'success',
         };
       } catch (error) {
-        DdLogs.error(`Profile | Check Pin | ${auth?.currentUser?.email}`, {
+        DdLogs.error(`Profile | Check Pin | ${auth()?.currentUser?.email}`, {
           errorMessage: JSON.stringify(error),
         });
         return {
@@ -264,7 +264,7 @@ const createTransactionPin = async details => {
 
         if (response?.data?.error) {
           DdLogs.info(
-            `Profile | Create Transaction Pin | ${auth?.currentUser?.email}`,
+            `Profile | Create Transaction Pin | ${auth()?.currentUser?.email}`,
             {
               context: JSON.stringify(response?.data),
             },
@@ -277,7 +277,7 @@ const createTransactionPin = async details => {
           };
         }
         DdLogs.info(
-          `Profile | Create Transaction Pin | ${auth?.currentUser?.email}`,
+          `Profile | Create Transaction Pin | ${auth()?.currentUser?.email}`,
           {
             context: JSON.stringify(response?.data),
           },
@@ -290,7 +290,7 @@ const createTransactionPin = async details => {
         };
       } catch (error) {
         DdLogs.error(
-          `Profile | Create Transaction Pin | ${auth?.currentUser?.email}`,
+          `Profile | Create Transaction Pin | ${auth()?.currentUser?.email}`,
           {
             errorMessage: JSON.stringify(error),
           },
@@ -335,7 +335,7 @@ const changePin = async details => {
         );
         if (response?.data?.error) {
           DdLogs.error(
-            `Profile | Change Transaction Pin | ${auth?.currentUser?.email}`,
+            `Profile | Change Transaction Pin | ${auth()?.currentUser?.email}`,
             {
               errorMessage: JSON.stringify(response?.data),
             },
@@ -348,7 +348,7 @@ const changePin = async details => {
           };
         }
         DdLogs.info(
-          `Profile | Change Transaction Pin | ${auth?.currentUser?.email}`,
+          `Profile | Change Transaction Pin | ${auth()?.currentUser?.email}`,
           {
             context: JSON.stringify(response?.data),
           },
@@ -361,7 +361,7 @@ const changePin = async details => {
         };
       } catch (error) {
         DdLogs.error(
-          `Profile | Change Transaction Pin | ${auth?.currentUser?.email}`,
+          `Profile | Change Transaction Pin | ${auth()?.currentUser?.email}`,
           {
             errorMessage: JSON.stringify(error),
           },

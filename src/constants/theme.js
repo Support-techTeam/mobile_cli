@@ -9,6 +9,8 @@ export const SIZES = {
     radius: 30,
     padding: 10,
     padding2: 12,
+    bottomSpace: 15,
+    highPadding: 20,
 
     // font sizes
     largeTitle: 50,
@@ -16,6 +18,8 @@ export const SIZES = {
     h2: 22,
     h3: 20,
     h4: 18,
+    h5: 16,
+    h6: 14,
     body1: 30,
     body2: 20,
     body3: 16,

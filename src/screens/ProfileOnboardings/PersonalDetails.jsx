@@ -118,13 +118,19 @@ const PersonalDetails = () => {
   const tabBarHeight = useBottomTabBarHeight();
   const user = useSelector(state => state.userAuth.user);
   const dispatch = useDispatch();
-
   const [userDetails, setUserDetails] = useState({
     title: '',
-    email: JSON.parse(user)?.email,
-    firstName: JSON.parse(user)?.displayName?.split(' ')[0],
-    lastName: JSON.parse(user)?.displayName?.split(' ')[1],
-    phoneNumber: '',
+    email: user != undefined || user != null ? JSON.parse(user)?.email : '',
+    firstName:
+      user != undefined || user != null
+        ? JSON.parse(user)?.displayName?.split(' ')[0]
+        : '',
+    lastName:
+      user != undefined || user != null
+        ? JSON.parse(user)?.displayName?.split(' ')[1]
+        : '',
+    phoneNumber:
+      user != undefined || user != null ? JSON.parse(user)?.phoneNumber : '',
     bvn: '',
     nin: '',
     dob: '',
@@ -148,23 +154,43 @@ const PersonalDetails = () => {
     setUserDetails({
       ...userDetails,
       firstName:
-        (user && JSON.parse(user)?.displayName?.split(' ')[1] == undefined) ||
-        JSON.parse(user)?.displayName?.split(' ')[1] == null ||
-        JSON.parse(user)?.displayName?.split(' ')[0] == ''
-          ? ''
-          : JSON.parse(user)?.displayName?.split(' ')[0],
+        user != undefined || user != null
+          ? JSON.parse(user)?.displayName?.split(' ')[1] != undefined ||
+            JSON.parse(user)?.displayName?.split(' ')[1] != null ||
+            JSON.parse(user)?.displayName?.split(' ')[0] != '' ||
+            user == undefined ||
+            user == null
+            ? JSON.parse(user)?.displayName?.split(' ')[0]
+            : ''
+          : '',
       lastName:
-        (user && JSON.parse(user)?.displayName?.split(' ')[1] == undefined) ||
-        JSON.parse(user)?.displayName?.split(' ')[1] == null ||
-        JSON.parse(user)?.displayName?.split(' ')[1] == ''
-          ? ''
-          : JSON.parse(user)?.displayName?.split(' ')[1],
+        user != undefined || user != null
+          ? JSON.parse(user)?.displayName?.split(' ')[1] != undefined ||
+            JSON.parse(user)?.displayName?.split(' ')[1] != null ||
+            JSON.parse(user)?.displayName?.split(' ')[1] != '' ||
+            user == undefined ||
+            user == null
+            ? JSON.parse(user)?.displayName?.split(' ')[1]
+            : ''
+          : '',
       email:
-        (user && JSON.parse(user)?.email == undefined) ||
-        JSON.parse(user)?.email == null ||
-        JSON.parse(user)?.email == ''
-          ? ''
-          : JSON.parse(user)?.email,
+        user != undefined || user != null
+          ? JSON.parse(user)?.email != undefined ||
+            JSON.parse(user)?.email != null ||
+            JSON.parse(user)?.email != ''
+            ? JSON.parse(user)?.email
+            : ''
+          : '',
+      phoneNumber:
+        user != undefined || user != null
+          ? JSON.parse(user)?.phoneNumber != undefined ||
+            JSON.parse(user)?.phoneNumber != null ||
+            JSON.parse(user)?.phoneNumber != '' ||
+            user == undefined ||
+            user == null
+            ? JSON.parse(user)?.phoneNumber
+            : ''
+          : '',
     });
   }, [user]);
 
