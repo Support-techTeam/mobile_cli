@@ -152,7 +152,7 @@ const createUserProfile = async details => {
       };
       try {
         const response = await axiosInstance.post(
-          `/users/create-profile`,
+          `/users/create-profile-web`,
           details,
           {headers},
         );
@@ -383,6 +383,66 @@ const changePin = async details => {
   }
 };
 
+const bvnValidation = async data => {
+  if (
+    store.getState().networkState &&
+    store.getState().networkState.network.isConnected &&
+    store.getState().networkState.network.isInternetReachable
+  ) {
+    await getFirebaseAuthToken();
+    if (token) {
+      headers = {
+        accept: 'application/json',
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      };
+      try {
+        const response = await axiosInstance.post(`/users/validate-bvn`, data, {
+          headers,
+        });
+        console.log(response?.data)
+
+        DdLogs.info(`Profile | BVN Validation| ${auth()?.currentUser?.email}`, {
+          context: JSON.stringify(response?.data),
+        });
+        if (response?.data?.error) {
+          return {
+            title: 'BVN Validation',
+            error: true,
+            data: response?.data?.message,
+            message: response?.data?.message || 'Failed to validate BVN',
+          };
+        }
+        return {
+          title: 'BVN Validation',
+          error: false,
+          data: response?.data?.validateBvnResult,
+          message: response?.data?.message || 'BVN validated successfully',
+        };
+      } catch (error) {
+        DdLogs.error(
+          `Profile | BVN Validation | ${auth()?.currentUser?.email}`,
+          {
+            errorMessage: JSON.stringify(error),
+          },
+        );
+        return {
+          title: 'BVN Validation',
+          error: true,
+          data: null,
+          message: error || 'Failed to validate BVN',
+        };
+      }
+    }
+  } else {
+    return {
+      error: true,
+      data: null,
+      message: 'No Internet Connection',
+    };
+  }
+};
+
 const getFirebaseAuthToken = async () => {
   try {
     const user = auth().currentUser;
@@ -405,4 +465,5 @@ export {
   checkPin,
   createTransactionPin,
   changePin,
+  bvnValidation,
 };

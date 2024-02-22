@@ -194,6 +194,8 @@ const Login = () => {
                   heading={'Log In'}
                   intro={false}
                   disabled={false}
+                  returnRoute={true}
+                  back
                   renderImage={
                     Image.resolveAssetSource(
                       require('../../../assets/images/locked.png'),

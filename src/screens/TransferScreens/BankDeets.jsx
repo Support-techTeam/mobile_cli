@@ -379,6 +379,21 @@ const BankDeets = ({route}) => {
                                     });
                                     return;
                                   } else if (
+                                    userWalletData?.availableBalance ==
+                                      undefined ||
+                                    userWalletData?.availableBalance == null
+                                  ) {
+                                    Toast.show({
+                                      type: 'error',
+                                      position: 'top',
+                                      topOffset: 50,
+                                      text1: 'Wallet Internal Transfer',
+                                      text2: 'Balance not available!',
+                                      visibilityTime: 5000,
+                                      autoHide: true,
+                                      onPress: () => Toast.hide(),
+                                    });
+                                  } else if (
                                     Number(bankDetails?.amount) >
                                     Number(userWalletData?.availableBalance)
                                   ) {
@@ -540,6 +555,21 @@ const BankDeets = ({route}) => {
                                     });
                                     return;
                                   } else if (
+                                    userWalletData?.availableBalance ==
+                                      undefined ||
+                                    userWalletData?.availableBalance == null
+                                  ) {
+                                    Toast.show({
+                                      type: 'error',
+                                      position: 'top',
+                                      topOffset: 50,
+                                      text1: 'Wallet Internal Transfer',
+                                      text2: 'Balance not available!',
+                                      visibilityTime: 5000,
+                                      autoHide: true,
+                                      onPress: () => Toast.hide(),
+                                    });
+                                  }else if (
                                     Number(bankDetails?.amount) >
                                     Number(userWalletData?.availableBalance)
                                   ) {
@@ -661,7 +691,7 @@ const styles = StyleSheet.create({
     width: '100%',
     borderWidth: 0.5,
     borderRadius: 8,
-    borderColor: COLORS.lendaBlue,
+    borderColor: COLORS.lendaComponentBorder,
     padding: 12,
     borderBottomWidth: 0.8,
     shadowColor: '#000',

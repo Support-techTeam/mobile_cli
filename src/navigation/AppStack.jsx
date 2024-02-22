@@ -73,6 +73,9 @@ import auth from '@react-native-firebase/auth';
 // import {auth} from '../util/firebase/firebaseConfig';
 import {getProfileDetails} from '../stores/ProfileStore';
 import {setProfile} from '../util/redux/userProfile/user.profile.slice';
+import Step3 from '../screens/ProfileOnboardings/StepForm/Step3';
+import Step2 from '../screens/ProfileOnboardings/StepForm/Step2';
+import Step1 from '../screens/ProfileOnboardings/StepForm/Step1';
 
 const Stack = createNativeStackNavigator();
 const config = {
@@ -170,6 +173,9 @@ const AppStack = () => {
             component={TransactionHistory}
           />
           <Stack.Screen name="PersonalDetails" component={PersonalDetails} />
+          <Stack.Screen name="Step1" component={Step1} />
+          <Stack.Screen name="Step2" component={Step2} />
+          <Stack.Screen name="Step3" component={Step3} />
           {/* Transfer Screens */}
           <Stack.Screen name="Transfer" component={BankDeets} />
           <Stack.Screen name="Summary" component={Summary} />

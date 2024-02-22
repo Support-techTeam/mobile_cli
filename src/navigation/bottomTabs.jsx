@@ -11,7 +11,6 @@ import {
   ScrollView,
 } from 'react-native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import {createMaterialBottomTabNavigator} from '@react-navigation/material-bottom-tabs';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {userLogOut} from '../stores/AuthStore';
 import {resetStore} from '../util/redux/store';
@@ -123,6 +122,7 @@ export default function BottomTabs({navigation}) {
             shifting: true,
             compact: true,
           }}>
+            
           <Tab.Screen
             name="Home"
             component={Homescreen}
@@ -149,7 +149,7 @@ export default function BottomTabs({navigation}) {
               tabPress: e => opened && e.preventDefault(),
             }}
           />
-          {/* {userProfileData && userProfileData?.profileProgress === null ? null : ( */}
+
           <Tab.Screen
             name="Loan"
             component={LoanStack}
@@ -186,21 +186,7 @@ export default function BottomTabs({navigation}) {
               tabPress: e => opened && e.preventDefault(),
             }}
           />
-          {/* )} */}
 
-          {/* <Tab.Screen
-          name="Message"
-          component={Homescreen}
-          options={{
-            tabBarLabel: '',
-            tabBarItemStyle: {
-              height: 0,
-            },
-            tabBarButton: () => (
-              <AddButton opened={opened} toggleOpened={toggleOpened} />
-            ),
-          }}
-        /> */}
           <Tab.Screen
             name="Invest"
             component={Investscreen}
@@ -237,6 +223,7 @@ export default function BottomTabs({navigation}) {
               tabPress: e => opened && e.preventDefault(),
             }}
           />
+
           <Tab.Screen
             name="More"
             component={Morescreens}

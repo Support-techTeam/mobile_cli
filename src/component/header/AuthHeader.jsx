@@ -10,18 +10,18 @@ import COLORS from '../../constants/colors';
 import {SIZES} from '../../constants';
 
 export const AuthHeader = props => {
-  const {routeAction, heading, intro, disabled, renderImage} = props;
+  const {routeAction, heading, intro, disabled, renderImage, returnRoute} = props;
 
   return (
     <View>
       <View style={styles.container}>
-        <View style={styles.leftView}>
+        {!returnRoute && <View style={styles.leftView}>
           <TouchableOpacity onPress={routeAction}>
             <View style={styles.arrow}>
               <Icon name="chevron-left" size={26} color={COLORS.lendaGrey} />
             </View>
           </TouchableOpacity>
-        </View>
+        </View>}
 
         <View style={styles.rightView}>
           <View style={styles.otherView}>
@@ -90,6 +90,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   leftView: {
+    zIndex: 1000,
     position: 'absolute',
     left: 0,
     top: 0,
@@ -105,7 +106,7 @@ const styles = StyleSheet.create({
   },
   signupText: {
     fontWeight: '800',
-    fontSize: SIZES.h1,
+    fontSize: SIZES.h2,
     letterSpacing: 1,
   },
   DetailsText: {

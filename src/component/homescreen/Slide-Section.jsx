@@ -29,6 +29,7 @@ export const SlideSection = props => {
     guarantor,
     hideBalance,
     toggleHideBalance,
+    toggleFundWallet,
     handleLongPress,
   } = props;
   const navigation = useNavigation();
