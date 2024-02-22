@@ -378,7 +378,7 @@ const MyAccount = () => {
       }
     } catch (e) {}
   };
-
+console.log(orgDetails)
   return (
     <SafeAreaView
       style={{
@@ -395,7 +395,7 @@ const MyAccount = () => {
         disable={false}
       />
       <View style={[styles.innercontainer]}>
-        <Pressable onPress={launchCameraAsync} style={styles.profileHeadView}>
+        <Pressable onPress={launchCameraAsync} style={styles.profileHeadView} disabled={orgDetails === null || orgDetails === undefined ? true : false}>
           <View style={styles.imagesView}>
             {orgDetails?.personalPhoto ? (
               <FastImage
@@ -420,7 +420,7 @@ const MyAccount = () => {
             )}
           </View>
           <View style={styles.pencilView}>
-            <FontAwesome5 name="pen" size={24} color="#fff" />
+            <FontAwesome5 name="pen" size={16} color="#fff" />
           </View>
         </Pressable>
       </View>
