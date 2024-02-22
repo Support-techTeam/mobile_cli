@@ -42,11 +42,22 @@ const NextOfKin = () => {
   return (
     <View style={styles.container}>
       <TouchableOpacity
+      disabled={
+        nokDeets === undefined ||
+        nokDeets === null
+          ? true
+          : false
+      }
         onPress={() =>
           navigation.navigate('NextOfKin', {paramKey: 'myAccount'})
         }
         style={{marginBottom: 20}}>
-        <Buttons label={'Update Next Of Kin Details'} />
+        <Buttons disabled={
+        nokDeets === undefined ||
+        nokDeets === null
+          ? true
+          : false
+      } label={'Update Next Of Kin Details'} />
       </TouchableOpacity>
 
       <ScrollView

@@ -40,14 +40,31 @@ const Personal = () => {
       // TODO: handle error
     }
   };
+
   return (
     <View style={styles.container}>
       <TouchableOpacity
+        disabled={
+          profile === undefined ||
+          profile === null ||
+          profile.profileProgress === null
+            ? true
+            : false
+        }
         onPress={() =>
           navigation.navigate('UpdatePersonalDetails', {paramKey: 'MyAccount'})
         }
         style={{marginBottom: 20}}>
-        <Buttons label={'Update Personal Details'} />
+        <Buttons
+          disabled={
+            profile === undefined ||
+            profile === null ||
+            profile.profileProgress === null
+              ? true
+              : false
+          }
+          label={'Update Personal Details'}
+        />
       </TouchableOpacity>
 
       <ScrollView
