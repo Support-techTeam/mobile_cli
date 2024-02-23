@@ -400,7 +400,6 @@ const bvnValidation = async data => {
         const response = await axiosInstance.post(`/users/validate-bvn`, data, {
           headers,
         });
-        console.log(response?.data)
 
         DdLogs.info(`Profile | BVN Validation| ${auth()?.currentUser?.email}`, {
           context: JSON.stringify(response?.data),

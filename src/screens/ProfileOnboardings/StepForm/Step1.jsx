@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
 } from 'react-native';
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useLayoutEffect} from 'react';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 import KeyboardAvoidingWrapper from '../../../component/KeyBoardAvoiding/keyBoardAvoiding';
 import {
@@ -37,17 +37,28 @@ const Step1 = props => {
   const [totalSteps, setTotalSteps] = useState('');
   const [currentStep, setCurrentStep] = useState('');
   const [text, setText] = useState('');
-  const {next, saveState} = props;
+  const {next, saveState, retrieveState, finish, cancel} = props;
 
-  useEffect(() => {
-    setTotalSteps(props.getTotalSteps());
-    setCurrentStep(props.getCurrentStep());
-  }, []);
 
   const nextStep = () => {
     saveState({accountType: text});
     next();
   };
+
+
+  // const onCancel = () => {
+  //   saveState(null);
+  //   cancel();
+  // }
+
+  useLayoutEffect(() => {
+    setTotalSteps(props.getTotalSteps());
+    setCurrentStep(props.getCurrentStep());
+    if(retrieveState()?.accountType){
+      setText(retrieveState()?.accountType);
+    }
+   }, [])
+ 
 
   return (
     <SafeAreaView

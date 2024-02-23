@@ -378,7 +378,6 @@ const MyAccount = () => {
       }
     } catch (e) {}
   };
-console.log(orgDetails)
   return (
     <SafeAreaView
       style={{

@@ -69,22 +69,22 @@ const AppNavigationContainer = () => {
   }, [networkState]);
 
   //refresh token
-  useEffect(() => {
-    const checkAndRenewToken = async () => {
-      try {
-        const currentUser = auth().currentUser;
-        if (currentUser) {
-          const token = await currentUser.getIdToken(true);
-        } else {
-        }
-      } catch (error) {
-        // console.error('Error renewing token:', error);
-      }
-    };
-    const intervalCheck = setInterval(checkAndRenewToken, 600000);
+  // useEffect(() => {
+  //   const checkAndRenewToken = async () => {
+  //     try {
+  //       const currentUser = auth().currentUser;
+  //       if (currentUser) {
+  //         const token = await currentUser.getIdToken(true);
+  //       } else {
+  //       }
+  //     } catch (error) {
+  //       // console.error('Error renewing token:', error);
+  //     }
+  //   };
+  //   const intervalCheck = setInterval(checkAndRenewToken, 600000);
 
-    return () => clearInterval(intervalCheck);
-  }, []);
+  //   return () => clearInterval(intervalCheck);
+  // }, []);
 
 
   return (

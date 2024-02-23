@@ -9,7 +9,7 @@ import {
   ImageBackground,
   Button,
 } from 'react-native';
-import React, {useEffect, useState, useRef} from 'react';
+import React, {useEffect, useState, useLayoutEffect} from 'react';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 import KeyboardAvoidingWrapper from '../../../component/KeyBoardAvoiding/keyBoardAvoiding';
 import {
@@ -31,21 +31,25 @@ const Step2 = props => {
   const [totalSteps, setTotalSteps] = useState('');
   const [currentStep, setCurrentStep] = useState('');
   const [text, setText] = useState('');
-  const {next, saveState, retrieveState} = props;
+  const {next, saveState, back, retrieveState} = props;
   const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    setTotalSteps(props.getTotalSteps());
-    setCurrentStep(props.getCurrentStep());
-  }, []);
   const nextStep = () => {
     next();
   };
 
   const goBack = () => {
-    const {back} = props;
     back();
   };
+
+  useLayoutEffect(() => {
+    setTotalSteps(props.getTotalSteps());
+    setCurrentStep(props.getCurrentStep());
+    if (retrieveState()?.bvn) {
+      setText(retrieveState()?.bvn);
+    }
+  }, []);
+
 
   const validateBVN = async () => {
     try {
@@ -138,6 +142,7 @@ const Step2 = props => {
                   label="BVN"
                   placeholder="Enter your BVN"
                   keyboardType="numeric"
+                  defaultValue={text ? text : ''}
                   isNeeded={true}
                 />
               </View>
@@ -154,7 +159,9 @@ const Step2 = props => {
                         : false
                     }
                     title={'Validate'}
-                    onPress={() => validateBVN()}
+                    onPress={() => {
+                      validateBVN();
+                    }}
                   />
                 </View>
               </View>

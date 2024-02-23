@@ -28,8 +28,7 @@ const getAccountWallet = async () => {
         const response = await axiosInstance.get(`/loan-wallet/get-wallet`, {
           headers,
         });
-    
-        console.log(response.data, 'response')
+ 
         DdLogs.info(
           `Wallet | Get Account Wallet | ${auth()?.currentUser?.email}`,
           {

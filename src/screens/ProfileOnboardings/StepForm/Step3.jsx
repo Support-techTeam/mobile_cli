@@ -11,7 +11,7 @@ import {
   Dimensions,
   Button,
 } from 'react-native';
-import React, {useEffect, useState, useRef} from 'react';
+import React, {useLayoutEffect, useState, useRef, useEffect} from 'react';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import Spinner from 'react-native-loading-spinner-overlay';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
@@ -50,12 +50,6 @@ const titleData = [
   {value: 'Mr', label: 'Mr'},
   {value: 'Mrs', label: 'Mrs'},
   {value: 'Miss', label: 'Miss'},
-];
-
-const genderData = [
-  {value: '', label: 'Select Gender'},
-  {value: 'Female', label: 'Female'},
-  {value: 'Male', label: 'Male'},
 ];
 
 const stateData = [{value: '', label: 'Select State'}];
@@ -142,7 +136,7 @@ const Step3 = props => {
     nin: '',
     dob: '',
     address: '',
-    country: '',
+    country: 'Nigeria',
     state: '',
     city: '',
     maritalStatus: '',
@@ -158,25 +152,29 @@ const Step3 = props => {
     bvnData: '',
     accountType: 'Personal',
   });
-  // const navigation = useNavigation();
+  const [preDetails, setPreDetails] = useState();
+
   const [totalSteps, setTotalSteps] = useState('');
   const [currentStep, setCurrentStep] = useState('');
-  const [text, setText] = useState('');
-  const {next, saveState, retrieveState} = props;
+  const {next, saveState, back, retrieveState, finish} = props;
   const [verifiedUser, setVerifiedUser] = useState();
   const [bvnData, setBvnData] = useState();
+  const navigation = useNavigation();
 
   const countries = countryList.getData().map(country => ({
     value: country.name,
     label: country.name,
   }));
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     setTotalSteps(props.getTotalSteps());
     setCurrentStep(props.getCurrentStep());
+    if (retrieveState()?.profileData) {
+      setPreDetails(retrieveState()?.profileData);
+    }
   }, []);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     setVerifiedUser({
       accountType: retrieveState()?.accountType,
       bvn: retrieveState()?.bvn,
@@ -188,7 +186,7 @@ const Step3 = props => {
     });
   }, [retrieveState()]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     setBvnData({
       bvn: retrieveState()?.bvn,
       dateOfBirth: retrieveState()?.dateOfBirth,
@@ -201,13 +199,25 @@ const Step3 = props => {
   }, [retrieveState()]);
 
   const goBack = () => {
-    const {back} = props;
     back();
   };
+  const nextStep = () => {
+    next();
+  };
 
-  useEffect(() => {
-    setUserDetails({
-      ...userDetails,
+  const finishStep = () => {
+    saveState(null);
+    finish();
+  };
+  useLayoutEffect(() => {
+    if (preDetails && preDetails?.firstName && preDetails?.lastName) {
+      setUserDetails({...preDetails});
+    }
+  }, [preDetails, retrieveState()]);
+
+  useLayoutEffect(() => {
+    setUserDetails(prevData => ({
+      ...prevData,
       firstName:
         verifiedUser != undefined || verifiedUser != null
           ? verifiedUser?.firstName != undefined ||
@@ -230,14 +240,6 @@ const Step3 = props => {
             JSON.parse(user)?.email != null ||
             JSON.parse(user)?.email != ''
             ? JSON.parse(user)?.email
-            : ''
-          : '',
-      phoneNumber:
-        verifiedUser != undefined || verifiedUser != null
-          ? verifiedUser?.phoneNumber != undefined ||
-            verifiedUser?.phoneNumber != null ||
-            verifiedUser?.phoneNumber != ''
-            ? verifiedUser?.phoneNumber
             : ''
           : '',
       bvn:
@@ -274,10 +276,10 @@ const Step3 = props => {
           : '',
 
       bvnData: bvnData != undefined || bvnData != null ? bvnData : '',
-    });
+    }));
   }, [user, verifiedUser, bvnData]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const platform = Platform.OS;
     if (platform === 'ios') {
       setUserDetails({...userDetails, signedOnDevice: 'ios'});
@@ -402,52 +404,47 @@ const Step3 = props => {
     !userDetails.bvn ||
     !userDetails.nin;
 
-  const showDatePicker = () => {
-    setShow(true);
-  };
-
-  const hideDatePicker = () => {
-    setShow(false);
-  };
-
-  const handleConfirm = selectedDate => {
-    const currentDate = selectedDate || date;
-    const formattedDate = new Date(currentDate).toISOString().split('T')[0];
-    setUserDetails({...userDetails, dob: formattedDate});
-    setShow(false);
-  };
-
   const handleCreateUser = async () => {
-    try {
-      setIsLoading(true);
-      const res = await createUserProfile(userDetails);
-      if (res?.data?.error) {
-        Toast.show({
-          type: 'error',
-          position: 'top',
-          topOffset: 50,
-          text1: res?.data?.title,
-          text2: res?.data?.message,
-          visibilityTime: 5000,
-          autoHide: true,
-          onPress: () => Toast.hide(),
-        });
-      } else {
-        Toast.show({
-          type: 'success',
-          position: 'top',
-          topOffset: 50,
-          text1: res?.data?.title,
-          text2: res?.data?.message,
-          visibilityTime: 3000,
-          autoHide: true,
-          onPress: () => Toast.hide(),
-        });
-        dispatch(setProfile(res?.data));
+    if (userDetails?.accountType === 'Personal') {
+      try {
+        setIsLoading(true);
+        const res = await createUserProfile(userDetails);
+        if (res?.data?.error) {
+          Toast.show({
+            type: 'error',
+            position: 'top',
+            topOffset: 50,
+            text1: res?.data?.title,
+            text2: res?.data?.message,
+            visibilityTime: 5000,
+            autoHide: true,
+            onPress: () => Toast.hide(),
+          });
+        } else {
+          Toast.show({
+            type: 'success',
+            position: 'top',
+            topOffset: 50,
+            text1: res?.data?.title,
+            text2: res?.data?.message,
+            visibilityTime: 3000,
+            autoHide: true,
+            onPress: () => Toast.hide(),
+          });
+          dispatch(setProfile(res?.data));
+          navigation.navigate('Home');
+          finishStep();
+        }
+        setIsLoading(false);
+      } catch (e) {
+        setIsLoading(false);
       }
-      setIsLoading(false);
-    } catch (e) {
-      setIsLoading(false);
+    } else {
+      saveState({
+        profileData: userDetails,
+        routeType: 'onboarding',
+      });
+      nextStep();
     }
   };
 
@@ -461,7 +458,7 @@ const Step3 = props => {
     pickerRef.current.blur();
   }
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const fetchState = async () => {
       try {
         const res = await getState();
@@ -478,9 +475,10 @@ const Step3 = props => {
     };
   }, []);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const stateData =
       state &&
+      state?.length > 0 &&
       state.map((item, index) => {
         return {value: item, label: item, key: index};
       });
@@ -490,15 +488,15 @@ const Step3 = props => {
     }
   }, [state]);
 
-  useEffect(() => {
-    if (userDetails.state !== '') {
-      setCitybyState(state.filter(statee => statee === userDetails.state));
+  useLayoutEffect(() => {
+    if (userDetails.state !== '' && state && state?.length > 0) {
+      setCitybyState(state?.filter(statee => statee === userDetails.state));
     }
   }, [state, userDetails.state]);
 
   const stateCity = cityByState[0];
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const fetchCity = async () => {
       try {
         const res = await getCity(stateCity);
@@ -516,7 +514,7 @@ const Step3 = props => {
     };
   }, [stateCity]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (userDetails.state !== '') {
       const getStateData = getCity(userDetails.state)
         .then(res => {
@@ -529,7 +527,8 @@ const Step3 = props => {
         .catch(err => {});
     }
   }, [userDetails.state]);
-  //22166460050
+  //22202187484
+
   return (
     <>
       {isLoading ? (
@@ -668,7 +667,8 @@ const Step3 = props => {
                     placeholder="Enter your email"
                     error={errors.email}
                     isNeeded={true}
-                    editable={false}
+                    value={userDetails?.email}
+                    editable={user && JSON.parse(user)?.email != undefined ? false : true}
                     defaultValue={user && JSON.parse(user)?.email}
                   />
 
@@ -680,13 +680,9 @@ const Step3 = props => {
                     defaultCode="NG"
                     error={errors.phoneNumber}
                     codeTextStyle={{color: '#6E7191'}}
-                    defaultValue={
-                      userDetails?.phoneNumber &&
-                      Number(userDetails?.phoneNumber)
-                    }
-                    onChangeFormattedText={text =>
-                      setUserDetails({...userDetails, phoneNumber: text})
-                    }
+                    onChangeFormattedText={text => {
+                      setUserDetails({...userDetails, phoneNumber: text});
+                    }}
                   />
 
                   <View style={{marginVertical: 10}}>
@@ -724,6 +720,7 @@ const Step3 = props => {
                       }
                     }}
                     value={userDetails?.nin}
+                    // defaultValue={userDetails?.nin && userDetails?.nin}
                     onFocus={() => handleError(null, 'nin')}
                     iconName="shield-lock-outline"
                     placeholder="Enter your NIN"
@@ -779,6 +776,14 @@ const Step3 = props => {
                       setSelected={text =>
                         setUserDetails({...userDetails, country: text})
                       }
+                      defaultOption={{
+                        value: userDetails?.country
+                          ? userDetails?.country
+                          : 'Nigeria',
+                        key: userDetails?.country
+                          ? userDetails?.country
+                          : 'Nigeria',
+                      }}
                       data={countries}
                       save="value"
                       placeholder="Select your country"
@@ -805,11 +810,11 @@ const Step3 = props => {
                         placeholderStyle={styles.placeholderStyle}
                         selectedTextStyle={styles.selectedTextStyle}
                         data={currentState ? currentState : stateData}
-                        // data={genderData}
                         maxHeight={300}
                         labelField="label"
                         valueField="value"
                         value={userDetails.state}
+                        defaultValue={userDetails?.state && userDetails?.state}
                         onChange={option => {
                           setUserDetails({...userDetails, state: option.value});
                           //Get cities by state
@@ -849,6 +854,7 @@ const Step3 = props => {
                         labelField="label"
                         valueField="value"
                         value={userDetails.city}
+                        defaultValue={userDetails?.city && userDetails?.city}
                         onChange={option => {
                           setUserDetails({...userDetails, city: option.value});
                         }}
@@ -956,6 +962,10 @@ const Step3 = props => {
                         ...userDetails,
                         NoOfDependents: parseInt(text, 10),
                       })
+                    }
+                    defaultValue={
+                      userDetails?.NoOfDependents &&
+                      userDetails?.NoOfDependents
                     }
                     onFocus={() => handleError(null, 'NoOfDependents')}
                     error={errors.NoOfDependents}

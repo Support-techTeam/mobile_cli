@@ -208,12 +208,6 @@ const Homescreen = () => {
     };
   }, []);
 
-  // useEffect(() => {
-  //   if (userProfileData?.profileProgress == 31) {
-  //     NativeModules.DevSettings.reload();
-  //   }
-  // }, []);
-
   useEffect(() => {
     getLoanUserData();
   }, []);
@@ -222,7 +216,6 @@ const Homescreen = () => {
     setIsLoadingWallet(true);
     getAccountWallet()
       .then(res => {
-        console.log(res, res);
         if (res) {
           if (!res?.error) {
             dispatch(setWallet(res?.data?.data?.wallet));

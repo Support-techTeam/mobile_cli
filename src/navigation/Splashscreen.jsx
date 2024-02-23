@@ -19,10 +19,10 @@ const Splashscreen = ({text}) => {
       style={[styles.overlay, {width: '100%', height: '100%'}]}>
       <View style={styles.loaderContainer}>
         
-      <ActivityIndicator size="large" color="#00ff00" animating />
+      {/* <ActivityIndicator size="large" color="#00ff00" animating />
       <Text style={{fontSize: 18, marginTop: 20}}>
           {text ? text : 'Checking authentication...'}
-        </Text>
+        </Text> */}
       </View>
     </ImageBackground>
   );

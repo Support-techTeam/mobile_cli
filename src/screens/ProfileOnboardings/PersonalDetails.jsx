@@ -7,18 +7,19 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
-import COLORS from '../../constants/colors';
 import {useNavigation} from '@react-navigation/native';
 import MultiForm from './StepForm/MultiForm';
 
 import Step1 from './StepForm/Step1';
 import Step2 from './StepForm/Step2';
 import Step3 from './StepForm/Step3';
+import Step4 from './StepForm/Step4';
 
 const allSteps = [
   {name: 'step 1', component: Step1},
   {name: 'step 2', component: Step2},
   {name: 'step 3', component: Step3},
+  {name: 'step 4', component: Step4},
 ];
 
 const PersonalDetails = () => {
