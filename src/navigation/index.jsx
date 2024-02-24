@@ -68,23 +68,27 @@ const AppNavigationContainer = () => {
     }
   }, [networkState]);
 
-  //refresh token
-  // useEffect(() => {
-  //   const checkAndRenewToken = async () => {
-  //     try {
-  //       const currentUser = auth().currentUser;
-  //       if (currentUser) {
-  //         const token = await currentUser.getIdToken(true);
-  //       } else {
-  //       }
-  //     } catch (error) {
-  //       // console.error('Error renewing token:', error);
-  //     }
-  //   };
-  //   const intervalCheck = setInterval(checkAndRenewToken, 600000);
+  // refresh token
+  useEffect(() => {
+    const checkAndRenewToken = async () => {
+      try {
+        const currentUser = auth().currentUser;
+        if (currentUser) {
+          const token = await currentUser.getIdToken(true);
+        } else {
+        }
+      } catch (error) {}
+    };
+    const intervalCheck = setInterval(checkAndRenewToken, 600000);
 
-  //   return () => clearInterval(intervalCheck);
-  // }, []);
+    return () => clearInterval(intervalCheck);
+  }, []);
+
+  useLayoutEffect(() => {
+    setTimeout(() => {
+      setIsLoading(false);
+    },2000);
+}, [])
 
 
   return (
@@ -99,9 +103,8 @@ const AppNavigationContainer = () => {
           const previousRouteName = routeNameRef.current;
           const currentRouteName = navigationRef.getCurrentRoute();
         }}>
-        {isLoading ? (
-          <Splashscreen text="Checking Authentication..." />
-        ) : user ? (
+        {isLoading && <Splashscreen text="Checking Authentication..." />}
+        {user ? (
           networkStatus ? (
             <AppStack />
           ) : (

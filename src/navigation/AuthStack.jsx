@@ -1,10 +1,11 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useLayoutEffect} from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import OnboardingScreen from '../screens/Authentications/OnboardingScreen';
 import Login from '../screens/Authentications/Login';
 import SignUp from '../screens/Authentications/SignUp';
 import ForgotPassword from '../screens/Authentications/ForgotPassword';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Splashscreen from './Splashscreen';
 
 const Stack = createNativeStackNavigator();
 const config = {
@@ -18,8 +19,10 @@ const config = {
     restSpeedThreshold: 0.01,
   },
 };
+
 const AuthStack = () => {
   const [onboardingCompleted, setOnboardingCompleted] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function checkOnboardingState() {
@@ -41,9 +44,18 @@ const AuthStack = () => {
     checkOnboardingState();
   }, []);
 
+  useLayoutEffect(() => {
+      setTimeout(() => {
+        setIsLoading(false);
+      },2000);
+  }, [])
+
   return (
     onboardingCompleted != null && (
       <Stack.Navigator screenOptions={{headerShown: false}}>
+        {isLoading && (
+          <Stack.Screen name="Loading" component={Splashscreen} options={{ headerShown: false }} />
+        )}
         {!onboardingCompleted ? (
           <>
             <Stack.Screen

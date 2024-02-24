@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useLayoutEffect} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 
@@ -91,13 +91,13 @@ const config = {
 };
 const AppStack = () => {
   const dispatch = useDispatch();
-  const userData = useSelector(state => state.userAuth.user);
   const isVerified = auth().currentUser?.emailVerified;
   const userProfileData = useSelector(state => state.userProfile.profile);
   const [timeOut, setTimeOut] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
+  // fetch profile
   useEffect(() => {
-    // fetch profile
     if (auth().currentUser !== null) {
       const fetchState = async () => {
         try {
@@ -124,6 +124,12 @@ const AppStack = () => {
     }, 5000);
   });
 
+  useLayoutEffect(() => {
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 2000);
+  }, []);
+
   return isVerified === undefined && !timeOut ? (
     <Stack.Navigator screenOptions={{headerShown: false}}>
       <Stack.Screen
@@ -140,6 +146,13 @@ const AppStack = () => {
     </Stack.Navigator>
   ) : (
     <Stack.Navigator screenOptions={{headerShown: false}}>
+      {isLoading && (
+        <Stack.Screen
+          name="Loading"
+          component={Splashscreen}
+          options={{headerShown: false}}
+        />
+      )}
       {auth().currentUser &&
       isVerified === false &&
       userProfileData?.profileProgress == null ? (
@@ -255,8 +268,11 @@ const AppStack = () => {
             name="InvestmentRedemption"
             component={InvestmentRedemption}
           />
-          <Stack.Screen name='SupportScreen' component={SupportScreen} />
-          <Stack.Screen name='NotificationsScreen' component={NotificationsScreen} />
+          <Stack.Screen name="SupportScreen" component={SupportScreen} />
+          <Stack.Screen
+            name="NotificationsScreen"
+            component={NotificationsScreen}
+          />
         </>
       )}
     </Stack.Navigator>

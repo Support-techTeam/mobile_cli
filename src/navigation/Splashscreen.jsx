@@ -19,8 +19,8 @@ const Splashscreen = ({text}) => {
       style={[styles.overlay, {width: '100%', height: '100%'}]}>
       <View style={styles.loaderContainer}>
         
-      {/* <ActivityIndicator size="large" color="#00ff00" animating />
-      <Text style={{fontSize: 18, marginTop: 20}}>
+      <ActivityIndicator size="large" color="#00ff00" animating />
+      {/* <Text style={{fontSize: 18, marginTop: 20}}>
           {text ? text : 'Checking authentication...'}
         </Text> */}
       </View>
@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
   },
   loaderContainer: {
     padding: 20,
-    marginTop: hp(35),
+    // marginTop: hp(35),
     borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
