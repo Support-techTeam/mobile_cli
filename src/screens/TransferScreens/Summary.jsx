@@ -18,7 +18,6 @@ const Summary = ({route}) => {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
   const {bankDetails} = route.params;
-  console.log(bankDetails);
   return (
     <SafeAreaView
       style={{

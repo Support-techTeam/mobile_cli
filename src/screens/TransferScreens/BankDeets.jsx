@@ -693,7 +693,6 @@ const BankDeets = ({route}) => {
     );
   };
 
-  console.log(bankDetails);
   return (
     <SafeAreaView
       style={{

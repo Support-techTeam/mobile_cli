@@ -40,7 +40,6 @@ const CustomSearchableDropdown = ({
     }
   }, [searchQuery, beneficiariesData]);
 
-  console.log(transferType);
   const handleItemSelect = item => {
     setBankDetails({
       receiverAccountFirstName: '',
