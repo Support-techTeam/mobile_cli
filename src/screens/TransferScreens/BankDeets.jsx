@@ -136,33 +136,51 @@ const BankDeets = ({route}) => {
               if (prevRoute === 'Nip') {
                 res?.data?.map((beneficiary, i) => {
                   if (beneficiary.beneficiaryType === 'NIP') {
-                    beneficiariesData.push({
-                      name: `${beneficiary?.beneficiaryAccountName?.toUpperCase()} - ${
-                        beneficiary?.beneficiaryAccountNumber
-                      } - ${beneficiary?.beneficiaryBankName?.toUpperCase()}`,
-                      label: beneficiary?.beneficiaryAccountName,
-                      accountName: beneficiary?.beneficiaryAccountName,
-                      bankName: beneficiary.beneficiaryBankName,
-                      type: beneficiary.beneficiaryType,
-                      accountNumber: beneficiary.beneficiaryAccountNumber,
-                      id: i + 1,
-                    });
+                    const exists = beneficiariesData.some(
+                      item =>
+                        item.accountNumber ===
+                          beneficiary.beneficiaryAccountNumber &&
+                        item.bankName === beneficiary.beneficiaryBankName &&
+                        item.accountName === beneficiary.beneficiaryAccountName,
+                    );
+                    if (!exists) {
+                      beneficiariesData.push({
+                        name: `${beneficiary?.beneficiaryAccountName?.toUpperCase()} - ${
+                          beneficiary?.beneficiaryAccountNumber
+                        } - ${beneficiary?.beneficiaryBankName?.toUpperCase()}`,
+                        label: beneficiary?.beneficiaryAccountName,
+                        accountName: beneficiary?.beneficiaryAccountName,
+                        bankName: beneficiary.beneficiaryBankName,
+                        type: beneficiary.beneficiaryType,
+                        accountNumber: beneficiary.beneficiaryAccountNumber,
+                        id: i + 1,
+                      });
+                    }
                   }
                 });
               } else if (prevRoute === 'InternalTransfer') {
                 res?.data?.map((beneficiary, i) => {
                   if (beneficiary.beneficiaryType === 'Internal') {
-                    beneficiariesData.push({
-                      name: `${beneficiary?.beneficiaryAccountName?.toUpperCase()} - ${
-                        beneficiary?.beneficiaryAccountNumber
-                      } - ${beneficiary?.beneficiaryBankName?.toUpperCase()}`,
-                      label: beneficiary?.beneficiaryAccountName,
-                      accountName: beneficiary?.beneficiaryAccountName,
-                      bankName: beneficiary.beneficiaryBankName,
-                      type: beneficiary.beneficiaryType,
-                      accountNumber: beneficiary.beneficiaryAccountNumber,
-                      id: i + 1,
-                    });
+                    const exists = beneficiariesData.some(
+                      item =>
+                        item.accountNumber ===
+                          beneficiary.beneficiaryAccountNumber &&
+                        item.bankName === beneficiary.beneficiaryBankName &&
+                        item.accountName === beneficiary.beneficiaryAccountName,
+                    );
+                    if (!exists) {
+                      beneficiariesData.push({
+                        name: `${beneficiary?.beneficiaryAccountName?.toUpperCase()} - ${
+                          beneficiary?.beneficiaryAccountNumber
+                        } - ${beneficiary?.beneficiaryBankName?.toUpperCase()}`,
+                        label: beneficiary?.beneficiaryAccountName,
+                        accountName: beneficiary?.beneficiaryAccountName,
+                        bankName: beneficiary.beneficiaryBankName,
+                        type: beneficiary.beneficiaryType,
+                        accountNumber: beneficiary.beneficiaryAccountNumber,
+                        id: i + 1,
+                      });
+                    }
                   }
                 });
               }

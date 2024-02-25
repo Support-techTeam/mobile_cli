@@ -40,11 +40,6 @@ import {Center, Checkbox, VStack} from 'native-base';
 
 const {Value, Text: AnimatedText} = Animated;
 const CELL_COUNT = 4;
-const source = {
-  uri: Image.resolveAssetSource(
-    require('../../../assets/security_lock.png').uri,
-  ),
-};
 
 const animationsColor = [...new Array(CELL_COUNT)].map(() => new Value(0));
 const animationsScale = [...new Array(CELL_COUNT)].map(() => new Value(1));

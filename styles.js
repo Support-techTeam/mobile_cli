@@ -18,7 +18,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 8,
     height: CELL_SIZE,
     width: CELL_SIZE,
-    lineHeight: CELL_SIZE - 5,
+    lineHeight: CELL_SIZE,
     ...Platform.select({web: {lineHeight: 65}}),
     fontSize: 30,
     textAlign: 'center',
