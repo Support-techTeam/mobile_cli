@@ -39,10 +39,10 @@ const toastConfig = {
         borderRightWidth: 2,
         backgroundColor: '#28a745',
         flexWrap: 'wrap',
+        height: '100%',
       }}
       contentContainerStyle={{
-        paddingHorizontal: 5,
-        paddingVertical: 5,
+        padding: 5,
         backgroundColor: '#28a745',
         flexWrap: 'wrap',
       }}
@@ -58,7 +58,7 @@ const toastConfig = {
         color: 'white',
         flexWrap: 'wrap',
       }}
-      text2NumberOfLines={4}
+      text2NumberOfLines={10}
     />
   ),
 
@@ -71,6 +71,7 @@ const toastConfig = {
         borderRightColor: '#dc3545',
         borderRightWidth: 2,
         backgroundColor: '#dc3545',
+        height: '100%',
       }}
       contentContainerStyle={{
         paddingHorizontal: 5,
@@ -87,7 +88,7 @@ const toastConfig = {
         fontSize: 12,
         color: 'white',
       }}
-      text2NumberOfLines={4}
+      text2NumberOfLines={10}
     />
   ),
 
@@ -99,6 +100,7 @@ const toastConfig = {
         borderRightColor: '#17a2b8',
         borderRightWidth: 2,
         backgroundColor: '#17a2b8',
+        height: '100%',
       }}
       contentContainerStyle={{
         paddingHorizontal: 5,
@@ -115,7 +117,7 @@ const toastConfig = {
         fontSize: 14,
         color: 'white',
       }}
-      text2NumberOfLines={4}
+      text2NumberOfLines={10}
     />
   ),
 
@@ -127,6 +129,7 @@ const toastConfig = {
         borderRightColor: '#ffc107',
         borderRightWidth: 2,
         backgroundColor: '#ffc107',
+        height: '100%',
       }}
       contentContainerStyle={{
         paddingHorizontal: 5,
@@ -143,7 +146,7 @@ const toastConfig = {
         fontSize: 14,
         color: 'white',
       }}
-      text2NumberOfLines={4}
+      text2NumberOfLines={10}
     />
   ),
 

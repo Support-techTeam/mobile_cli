@@ -52,10 +52,15 @@ const businessRegData = [
   {value: false, label: 'No'},
 ];
 
-const stateData = [{value: '', label: 'Select State'}];
+const stateData = [
+  {value: '', label: 'Select State'},
+  {value: 'Outside Nigeria', label: 'Outside Nigeria'},
+  {value: '', label: 'N/A'},
+];
 
 const cityData = [
   {value: '', label: 'Select LGA'},
+  {value: 'Outside Nigeria', label: 'Outside Nigeria'},
   {value: '', label: 'N/A'},
 ];
 
@@ -147,7 +152,14 @@ const monthlyExpData = [
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
 
-let fetchedCity = [];
+let fetchedCity = [
+  {value: '', label: '...Select LGA'},
+  {value: 'Outside Nigeria', label: 'Outside Nigeria', key: 0},
+];
+let currentState = [
+  {value: '', label: '...Select State'},
+  {value: 'Outside Nigeria', label: 'Outside Nigeria', key: 0},
+];
 
 const BusinessDetails = props => {
   const insets = useSafeAreaInsets();
@@ -155,10 +167,6 @@ const BusinessDetails = props => {
   const [showDate, setShowDate] = useState(false);
   const date = new Date(2000, 0, 1);
   const addressDate = new Date(2000, 0, 1);
-  const [currentState, setCurrentState] = useState(undefined);
-  const [state, setState] = useState();
-  const [cityByState, setCitybyState] = useState([]);
-  const [city, setCity] = useState();
   const [isLoading, setIsLoading] = useState(false);
   const countries = countryList.getData().map(country => ({
     value: country.name,
@@ -214,6 +222,7 @@ const BusinessDetails = props => {
     !businessDetails.businessName ||
     !businessDetails.businessAddress ||
     !businessDetails.state ||
+    !businessDetails.city ||
     !businessDetails.positionInOrg ||
     !businessDetails.totalEmployees ||
     !businessDetails.industry ||
@@ -323,12 +332,21 @@ const BusinessDetails = props => {
     }
   };
 
+  //set State
   useEffect(() => {
     const fetchState = async () => {
       try {
         const res = await getState();
         if (res?.data !== undefined) {
-          setState(res?.data);
+          res?.data &&
+            res?.data?.length > 0 &&
+            res?.data.map((item, index) => {
+              currentState.push({
+                value: item,
+                label: item,
+                key: index + 1,
+              });
+            });
         }
       } catch (error) {
         // console.error(error);
@@ -341,75 +359,16 @@ const BusinessDetails = props => {
     };
   }, []);
 
-  useEffect(() => {
-    const stateData =
-      state &&
-      state.map((item, index) => {
-        return {value: item, label: item, key: index};
-      });
-
-    if (currentState == undefined || currentState == '') {
-      setCurrentState(stateData);
-    }
-  }, [state]);
-
-  useEffect(() => {
-    if (businessDetails?.state !== '' && state !== undefined) {
-      setCitybyState(state?.filter(statee => statee === businessDetails.state));
-    }
-  }, [state, businessDetails.state]);
-
-  const stateCity = cityByState[0];
-
-  useEffect(() => {
-    const fetchCity = async () => {
-      try {
-        const res = await getCity(stateCity);
-        if (res?.data !== undefined) {
-          setCity(res?.data);
-        }
-      } catch (error) {
-        // console.error(error);
-      }
-    };
-
-    fetchCity();
-    return () => {
-      fetchCity();
-    };
-  }, [stateCity]);
-
-  useEffect(() => {
-    if (businessDetails.state !== '') {
-      const getStateData = getCity(businessDetails.state)
-        .then(res => {
-          fetchedCity = [];
-          res?.data &&
-            res?.data?.length > 0 &&
-            res?.data.map((item, index) => {
-              fetchedCity.push({value: item, label: item, key: index});
-            });
-        })
-        .catch(err => {});
-    }
-  }, [businessDetails.state]);
-
-  useEffect(() => {
-    setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 2000);
-  }, []);
-
   return (
     <SafeAreaView
       style={{
         flex: 1,
         backgroundColor: '#fff',
-        paddingTop: insets.top !== 0 ? insets.top : 18,
-        paddingBottom: insets.bottom !== 0 ? insets.bottom / 2 : 'auto',
-        paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
-        paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
+        paddingTop: insets.top !== 0 ? Math.min(insets.top, 10) : 'auto',
+        paddingBottom:
+          insets.bottom !== 0 ? Math.min(insets.bottom, 10) : 'auto',
+        paddingLeft: insets.left !== 0 ? Math.min(insets.left, 10) : 'auto',
+        paddingRight: insets.right !== 0 ? Math.min(insets.right, 10) : 'auto',
       }}>
       {isLoading && (
         <Spinner
@@ -661,7 +620,12 @@ const BusinessDetails = props => {
                 </View>
                 <SelectList
                   setSelected={text =>
-                    setBusinessDetails({...businessDetails, country: text})
+                    setBusinessDetails({
+                      ...businessDetails,
+                      country: text,
+                      state: '',
+                      city: '',
+                    })
                   }
                   defaultOption={{
                     value: businessDetails?.country
@@ -695,25 +659,46 @@ const BusinessDetails = props => {
                     valueField="value"
                     value={businessDetails.state}
                     onChange={option => {
-                      setBusinessDetails({
-                        ...businessDetails,
-                        state: option.value,
-                      });
-                      const getStateData = getCity(option.value)
-                        .then(res => {
-                          fetchedCity = [];
-                          res?.data &&
-                            res?.data.map((item, index) => {
-                              fetchedCity.push({
-                                value: item,
-                                label: item,
-                                key: index,
-                              });
-                            });
-                        })
-                        .catch(err => {
-                          // console.log(err);
+                      if (
+                        userDetails.country === 'Nigeria' &&
+                        option.value === 'Outside Nigeria'
+                      ) {
+                        setBusinessDetails({
+                          ...businessDetails,
+                          state: '',
+                          city: '',
                         });
+
+                        Toast.show({
+                          type: 'warning',
+                          position: 'top',
+                          topOffset: 50,
+                          text1: 'Warning',
+                          text2:
+                            'Option selected is not available for this country',
+                          visibilityTime: 3000,
+                          autoHide: true,
+                          onPress: () => Toast.hide(),
+                        });
+                      } else {
+                        setBusinessDetails({
+                          ...businessDetails,
+                          state: option.value,
+                        });
+                        getCity(option.value)
+                          .then(res => {
+                            fetchedCity = [];
+                            res?.data &&
+                              res?.data.map((item, index) => {
+                                fetchedCity.push({
+                                  value: item,
+                                  label: item,
+                                  key: index,
+                                });
+                              });
+                          })
+                          .catch(err => {});
+                      }
                     }}
                   />
                 </View>
@@ -732,10 +717,32 @@ const BusinessDetails = props => {
                     valueField="value"
                     value={businessDetails.city}
                     onChange={option => {
-                      setBusinessDetails({
-                        ...businessDetails,
-                        city: option.value,
-                      });
+                      if (
+                        userDetails.country === 'Nigeria' &&
+                        option.value === 'Outside Nigeria'
+                      ) {
+                        setBusinessDetails({
+                          ...businessDetails,
+                          city: '',
+                        });
+
+                        Toast.show({
+                          type: 'warning',
+                          position: 'top',
+                          topOffset: 50,
+                          text1: 'Warning',
+                          text2:
+                            'Option selected is not available for this country',
+                          visibilityTime: 3000,
+                          autoHide: true,
+                          onPress: () => Toast.hide(),
+                        });
+                      } else {
+                        setBusinessDetails({
+                          ...businessDetails,
+                          city: option.value,
+                        });
+                      }
                     }}
                   />
                 </View>

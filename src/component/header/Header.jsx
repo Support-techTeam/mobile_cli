@@ -45,6 +45,7 @@ export const Header = props => {
 
 const styles = StyleSheet.create({
   container: {
+    marginTop:20,
     paddingHorizontal: 10,
     height: hp('5%'),
     width: wp('100%'),

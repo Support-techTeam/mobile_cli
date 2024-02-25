@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useEffect, useState, useRef} from 'react';
+import React, {useEffect, useState, useRef, useLayoutEffect} from 'react';
 import {
   Platform,
   StatusBar,
@@ -49,8 +49,7 @@ import {requestNotifications} from 'react-native-permissions';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import PinInput from './src/screens/SecurityScreens/PinInput';
 import {DataProvider} from './src/context/DataProvider';
-
-
+import Splashscreen from './src/navigation/Splashscreen';
 
 const inAppUpdates = new SpInAppUpdates(false);
 const deviceInfoEmitter = new NativeEventEmitter(NativeModules.RNDeviceInfo);
@@ -87,9 +86,7 @@ const requestUserPermission = async () => {
   if (Platform.OS === 'ios') {
     try {
       await requestNotifications(['alert', 'sound', 'badge']);
-    } catch (error) {
-      // console.log('Error requesting push notification permissions:', error);
-    }
+    } catch (error) {}
     const authStatus = await messaging().requestPermission({
       sound: true,
       announcement: true,
@@ -101,9 +98,7 @@ const requestUserPermission = async () => {
       authStatus === messaging.AuthorizationStatus.PROVISIONAL;
 
     if (enabled) {
-      // console.log('Authorization status:', authStatus);
     } else {
-      // console.log('Authorization status:', authStatus);
     }
   } else if (Platform.OS === 'android') {
     try {
@@ -121,6 +116,7 @@ const requestUserPermission = async () => {
     }
   }
 };
+
 function App() {
   const [appState, setAppState] = useState(AppState.currentState);
   const [hidden, setHidden] = useState(false);
@@ -151,11 +147,9 @@ function App() {
           inAppUpdates.startUpdate(updateOptions);
         }
       })
-      .catch(err => {
-        // console.log('Update Err: ', err);
-      });
+      .catch(err => {});
   }, []);
-
+  // Update installation process
   useEffect(() => {
     inAppUpdates.addStatusUpdateListener(onStatusUpdate);
     return () => {
@@ -187,87 +181,87 @@ function App() {
   };
 
   // App State Monitor
-  const logout = async () => {
-    if (auth().currentUser) {
-      try {
-        const logoutResult = await userLogOut();
-        if (!logoutResult?.error) {
-          await resetStore();
-        }
-      } catch (error) {
-        // :TODO
-      }
-    }
-  };
+  // const logout = async () => {
+  //   if (auth().currentUser) {
+  //     try {
+  //       const logoutResult = await userLogOut();
+  //       if (!logoutResult?.error) {
+  //         await resetStore();
+  //       }
+  //     } catch (error) {
+  //       // :TODO
+  //     }
+  //   }
+  // };
 
   let backgroundTaskInterval;
-  useEffect(() => {
-    // Function to handle background task
-    const runBackgroundTask = () => {
-      // console.log('Background task is running');
-      inactiveTimerCallback();
-    };
+  // active lockout logic here
+  // useEffect(() => {
+  //   // Function to handle background task
+  //   const runBackgroundTask = () => {
+  //     // console.log('Background task is running');
+  //     inactiveTimerCallback();
+  //   };
 
-    // Start the background task
-    const startBackgroundTask = () => {
-      // console.log('Starting background task...');
-      backgroundTaskInterval = BackgroundTimer.setInterval(() => {
-        runBackgroundTask();
-      }, 5000);
-    };
+  //   // Start the background task
+  //   const startBackgroundTask = () => {
+  //     // console.log('Starting background task...');
+  //     backgroundTaskInterval = BackgroundTimer.setInterval(() => {
+  //       runBackgroundTask();
+  //     }, 5000);
+  //   };
 
-    // Stop the background task
-    const stopBackgroundTask = () => {
-      // console.log('Stopping background task...');
-      inactiveTime = 0;
-      BackgroundTimer.clearInterval(backgroundTaskInterval);
-    };
+  //   // Stop the background task
+  //   const stopBackgroundTask = () => {
+  //     // console.log('Stopping background task...');
+  //     inactiveTime = 0;
+  //     BackgroundTimer.clearInterval(backgroundTaskInterval);
+  //   };
 
-    // Listen for changes in app state
-    const handleAppStateChange = nextAppState => {
-      // console.log('App state changed:', nextAppState);
-      if (nextAppState === 'active') {
-        // App is in the foreground
-        stopBackgroundTask();
-      } else if (nextAppState === 'background') {
-        // App is in the background
-        startBackgroundTask();
-      }
-    };
+  //   // Listen for changes in app state
+  //   const handleAppStateChange = nextAppState => {
+  //     // console.log('App state changed:', nextAppState);
+  //     if (nextAppState === 'active') {
+  //       // App is in the foreground
+  //       stopBackgroundTask();
+  //     } else if (nextAppState === 'background') {
+  //       // App is in the background
+  //       startBackgroundTask();
+  //     }
+  //   };
 
-    const inactiveTimerCallback = () => {
-      inactiveTime = inactiveTime + 5;
-      if (inactiveTime >= defaultWaitTime) {
-        performAction();
-      }
-    };
-    const performAction = async () => {
-      await logout();
-    };
+  //   const inactiveTimerCallback = () => {
+  //     inactiveTime = inactiveTime + 5;
+  //     if (inactiveTime >= defaultWaitTime) {
+  //       performAction();
+  //     }
+  //   };
+  //   const performAction = async () => {
+  //     await logout();
+  //   };
 
-    // Subscribe to app state changes
-    const appListeener = AppState.addEventListener(
-      'change',
-      handleAppStateChange,
-    );
+  //   // Subscribe to app state changes
+  //   const appListeener = AppState.addEventListener(
+  //     'change',
+  //     handleAppStateChange,
+  //   );
 
-    // Initial setup based on the app's initial state
-    if (AppState.currentState === 'background') {
-      startBackgroundTask();
-    }
+  //   // Initial setup based on the app's initial state
+  //   if (AppState.currentState === 'background') {
+  //     startBackgroundTask();
+  //   }
 
-    if (AppState.currentState === 'active') {
-      stopBackgroundTask();
-    }
+  //   if (AppState.currentState === 'active') {
+  //     stopBackgroundTask();
+  //   }
 
-    // Clean up
-    return () => {
-      appListeener.remove();
-      stopBackgroundTask();
-    };
-  }, []);
+  //   // Clean up
+  //   return () => {
+  //     appListeener.remove();
+  //     stopBackgroundTask();
+  //   };
+  // }, []);
 
-  // const theme = colorScheme === 'dark' ? {...DefaultTheme} : {...LightTheme};
   const theme = {...LightTheme};
 
   const [notification, setNotification] = useState(null);
@@ -300,41 +294,41 @@ function App() {
     return unsubscribe;
   }, []);
 
-  useEffect(() => {
-    const handleAppStateChange = nextAppState => {
-      // console.log('nextAppState', nextAppState);
-      if (nextAppState === 'background' || nextAppState === 'inactive') {
-        setLastActiveTime(Date.now());
-      } else if (nextAppState === 'active') {
-        const timeSinceLastActive = Date.now() - lastActiveTime;
-        if (timeSinceLastActive > LOCK_TIMEOUT) {
-          setLocked(true);
-          // console.log(locked, 'Set to Lock');
-        }
-      }
-    };
+  // useEffect(() => {
+  //   const handleAppStateChange = nextAppState => {
+  //     // console.log('nextAppState', nextAppState);
+  //     if (nextAppState === 'background' || nextAppState === 'inactive') {
+  //       setLastActiveTime(Date.now());
+  //     } else if (nextAppState === 'active') {
+  //       const timeSinceLastActive = Date.now() - lastActiveTime;
+  //       if (timeSinceLastActive > LOCK_TIMEOUT) {
+  //         setLocked(true);
+  //         // console.log(locked, 'Set to Lock');
+  //       }
+  //     }
+  //   };
 
-    const interval = setInterval(() => {
-      const timeSinceLastActive = Date.now() - lastActiveTime;
-      if (
-        AppState.currentState === 'active' &&
-        timeSinceLastActive > LOCK_TIMEOUT
-      ) {
-        setLocked(true);
-      }
-    }, 1000);
+  //   const interval = setInterval(() => {
+  //     const timeSinceLastActive = Date.now() - lastActiveTime;
+  //     if (
+  //       AppState.currentState === 'active' &&
+  //       timeSinceLastActive > LOCK_TIMEOUT
+  //     ) {
+  //       setLocked(true);
+  //     }
+  //   }, 1000);
 
-    const appListener = AppState.addEventListener(
-      'change',
-      handleAppStateChange,
-    );
+  //   const appListener = AppState.addEventListener(
+  //     'change',
+  //     handleAppStateChange,
+  //   );
 
-    return () => {
-      clearInterval(interval);
-      // AppState.removeEventListener('change', handleAppStateChange);
-      appListener.remove();
-    };
-  }, [lastActiveTime]);
+  //   return () => {
+  //     clearInterval(interval);
+  //     // AppState.removeEventListener('change', handleAppStateChange);
+  //     appListener.remove();
+  //   };
+  // }, [lastActiveTime]);
 
   // Check for timeout every second
 
@@ -391,7 +385,6 @@ function App() {
       // saving error
     }
   };
-
   return (
     <SafeAreaProvider style={styles.rootContainer}>
       <PaperProvider theme={theme}>

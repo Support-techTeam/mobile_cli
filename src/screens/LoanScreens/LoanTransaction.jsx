@@ -19,6 +19,7 @@ import ViewShot from 'react-native-view-shot';
 import Share from 'react-native-share';
 import Toast from 'react-native-toast-message';
 import email from 'react-native-email';
+import {Header} from '../../component/header/Header';
 
 const LoanTransactions = ({route}) => {
   const navigation = useNavigation();
@@ -58,13 +59,12 @@ const LoanTransactions = ({route}) => {
 
   const openSendEmail = Id => {
     const text = `Hello, I would like to report a loan transaction, with Transaction ID: ${Id}`;
- 
-      email('support@tradelenda.com', {
-        subject: `Report transaction issue from ${Platform.OS}`,
-        body: `${text}`,
-        checkCanOpen: false, // Call Linking.canOpenURL prior to Linking.openURL
-      }).catch(console.error);
-    
+
+    email('support@tradelenda.com', {
+      subject: `Report transaction issue from ${Platform.OS}`,
+      body: `${text}`,
+      checkCanOpen: false, // Call Linking.canOpenURL prior to Linking.openURL
+    }).catch(console.error);
   };
 
   const shareToSocialMedia = async () => {
@@ -87,10 +87,11 @@ const LoanTransactions = ({route}) => {
       style={{
         flex: 1,
         backgroundColor: '#fff',
-        paddingTop: insets.top !== 0 ? insets.top : 18,
-        paddingBottom: insets.bottom !== 0 ? insets.bottom / 2 : 'auto',
-        paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
-        paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
+        paddingTop: insets.top !== 0 ? Math.min(insets.top, 10) : 'auto',
+        paddingBottom:
+          insets.bottom !== 0 ? Math.min(insets.bottom, 10) : 'auto',
+        paddingLeft: insets.left !== 0 ? Math.min(insets.left, 10) : 'auto',
+        paddingRight: insets.right !== 0 ? Math.min(insets.right, 10) : 'auto',
       }}>
       {isLoading && (
         <Spinner
@@ -100,44 +101,11 @@ const LoanTransactions = ({route}) => {
           overlayColor="rgba(78, 75, 102, 0.7)"
         />
       )}
-      <View
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-        }}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <View
-            style={{
-              borderWidth: 0.5,
-              borderColor: '#D9DBE9',
-              borderRadius: 5,
-              marginLeft: 5,
-            }}>
-            <AntDesign name="left" size={30} color="black" />
-          </View>
-        </TouchableOpacity>
-        <View style={styles.HeadView}>
-          <View style={styles.TopView}>
-            <Text style={styles.TextHead}>Loan Details</Text>
-          </View>
-        </View>
-        <TouchableOpacity
-          onPress={() => {
-            shareToSocialMedia();
-          }}>
-          <View
-            style={{
-              borderWidth: 0.5,
-              borderColor: '#D9DBE9',
-              borderRadius: 5,
-              marginRight: 5,
-            }}>
-            <AntDesign name="sharealt" size={30} color={COLORS.lendaBlue} />
-          </View>
-        </TouchableOpacity>
-      </View>
-      <View style={styles.demark} />
+      <Header
+        routeAction={() => navigation.goBack()}
+        heading={'LOAN DETAILS'}
+        disable={false}
+      />
       <ScrollView
         bounces={false}
         showsHorizontalScrollIndicator={false}

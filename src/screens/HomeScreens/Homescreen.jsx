@@ -891,8 +891,8 @@ const Homescreen = () => {
         {loanUserDetails === undefined ||
         loanUserDetails?.loanDocumentDetails === undefined ? (
           <UpdateProfileBtn
-            title="Complete Account Setup"
-            body="Update your profile details"
+            title="Complete Account Setup !!!"
+            body="Click here to update your profile details"
             image={require('../../../assets/images/badge.png')}
             action={() => navigation.navigate('OnboardingHome')}
           />
@@ -1000,10 +1000,10 @@ const Homescreen = () => {
             height: hp('100%'),
             width: wp('100%'),
             backgroundColor: COLORS.lendaLightGrey,
-            paddingTop: insets.top !== 0 ? insets.top : 18,
-            paddingBottom: insets.bottom !== 0 ? insets.bottom / 2 : 'auto',
-            paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
-            paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
+            paddingTop: insets.top !== 0 ? Math.min(insets.top, 10) : 'auto',
+            paddingBottom: insets.bottom !== 0 ? Math.min(insets.bottom, 10) : 'auto',
+            paddingLeft: insets.left !== 0 ? Math.min(insets.left, 10) : 'auto',
+            paddingRight: insets.right !== 0 ? Math.min(insets.right, 10) : 'auto',
           }}>
           {renderMainComponents()}
         </SafeAreaView>

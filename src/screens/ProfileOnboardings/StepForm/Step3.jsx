@@ -37,10 +37,6 @@ import {
 import {useNavigation} from '@react-navigation/native';
 import {SIZES} from '../../../constants';
 import CustomButton from '../../../component/buttons/CustomButtons';
-import CountryPicker, {
-  getAllCountries,
-  getCallingCode,
-} from 'react-native-country-picker-modal';
 import {SelectList} from 'react-native-dropdown-select-list';
 import COLORS from '../../../constants/colors';
 const countryList = require('country-list');
@@ -52,10 +48,15 @@ const titleData = [
   {value: 'Miss', label: 'Miss'},
 ];
 
-const stateData = [{value: '', label: 'Select State'}];
+const stateData = [
+  {value: '', label: 'Select State'},
+  {value: 'Outside Nigeria', label: 'Outside Nigeria'},
+  {value: '', label: 'N/A'},
+];
 
 const cityData = [
   {value: '', label: 'Select LGA'},
+  {value: 'Outside Nigeria', label: 'Outside Nigeria'},
   {value: '', label: 'N/A'},
 ];
 
@@ -110,18 +111,17 @@ const referralOptionData = [
   {value: 'Others', label: 'Others'},
 ];
 
-let fetchedCity = [];
-
+let fetchedCity = [
+  {value: '', label: '...Select LGA'},
+  {value: 'Outside Nigeria', label: 'Outside Nigeria', key: 0},
+];
+let currentState = [
+  {value: '', label: '...Select State'},
+  {value: 'Outside Nigeria', label: 'Outside Nigeria', key: 0},
+];
 const Step3 = props => {
-  const [show, setShow] = useState(false);
-  const date = new Date(2000, 0, 1);
   const insets = useSafeAreaInsets();
-  const [currentState, setCurrentState] = useState(undefined);
-  const [currentCity, setCurrentCity] = useState(undefined);
   const [errors, setErrors] = useState({});
-  const [state, setState] = useState();
-  const [cityByState, setCitybyState] = useState([]);
-  const [city, setCity] = useState();
   const [isLoading, setIsLoading] = useState(false);
   const tabBarHeight = useBottomTabBarHeight();
   const user = useSelector(state => state.userAuth.user);
@@ -402,6 +402,8 @@ const Step3 = props => {
     !userDetails.address ||
     !userDetails.title ||
     !userDetails.bvn ||
+    !userDetails.city ||
+    !userDetails.state ||
     !userDetails.nin;
 
   const handleCreateUser = async () => {
@@ -448,22 +450,20 @@ const Step3 = props => {
     }
   };
 
-  const pickerRef = useRef();
-
-  function open() {
-    pickerRef.current.focus();
-  }
-
-  function close() {
-    pickerRef.current.blur();
-  }
-
   useLayoutEffect(() => {
     const fetchState = async () => {
       try {
         const res = await getState();
         if (res?.data !== undefined) {
-          setState(res?.data);
+          res?.data &&
+            res?.data?.length > 0 &&
+            res?.data.map((item, index) => {
+              currentState.push({
+                value: item,
+                label: item,
+                key: index + 1,
+              });
+            });
         }
         dispatch(setReduxState(res?.data));
       } catch (error) {}
@@ -474,60 +474,6 @@ const Step3 = props => {
       fetchState();
     };
   }, []);
-
-  useLayoutEffect(() => {
-    const stateData =
-      state &&
-      state?.length > 0 &&
-      state.map((item, index) => {
-        return {value: item, label: item, key: index};
-      });
-
-    if (currentState == undefined || currentState == '') {
-      setCurrentState(stateData);
-    }
-  }, [state]);
-
-  useLayoutEffect(() => {
-    if (userDetails.state !== '' && state && state?.length > 0) {
-      setCitybyState(state?.filter(statee => statee === userDetails.state));
-    }
-  }, [state, userDetails.state]);
-
-  const stateCity = cityByState[0];
-
-  useLayoutEffect(() => {
-    const fetchCity = async () => {
-      try {
-        const res = await getCity(stateCity);
-        if (res?.data !== undefined) {
-          setCity(res?.data);
-        }
-      } catch (error) {
-        // console.error(error);
-      }
-    };
-
-    fetchCity();
-    return () => {
-      fetchCity();
-    };
-  }, [stateCity]);
-
-  useLayoutEffect(() => {
-    if (userDetails.state !== '') {
-      const getStateData = getCity(userDetails.state)
-        .then(res => {
-          fetchedCity = [];
-          res?.data &&
-            res?.data.map((item, index) => {
-              fetchedCity.push({value: item, label: item, key: index});
-            });
-        })
-        .catch(err => {});
-    }
-  }, [userDetails.state]);
-  //22202187484
 
   return (
     <>
@@ -566,10 +512,12 @@ const Step3 = props => {
           style={{
             flex: 1,
             backgroundColor: '#fff',
-            paddingTop: insets.top !== 0 ? insets.top : 18,
-            paddingBottom: insets.bottom !== 0 ? insets.bottom / 2 : 'auto',
-            paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
-            paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
+            paddingTop: insets.top !== 0 ? Math.min(insets.top, 10) : 'auto',
+            paddingBottom:
+              insets.bottom !== 0 ? Math.min(insets.bottom, 10) : 'auto',
+            paddingLeft: insets.left !== 0 ? Math.min(insets.left, 10) : 'auto',
+            paddingRight:
+              insets.right !== 0 ? Math.min(insets.right, 10) : 'auto',
           }}>
           {isLoading && (
             <Spinner
@@ -668,7 +616,11 @@ const Step3 = props => {
                     error={errors.email}
                     isNeeded={true}
                     value={userDetails?.email}
-                    editable={user && JSON.parse(user)?.email != undefined ? false : true}
+                    editable={
+                      user && JSON.parse(user)?.email != undefined
+                        ? false
+                        : true
+                    }
                     defaultValue={user && JSON.parse(user)?.email}
                   />
 
@@ -706,10 +658,11 @@ const Step3 = props => {
                     label="BVN"
                     placeholder="Enter your BVN"
                     error={errors.bvn}
-                    keyboardType="text"
                     isNeeded={true}
                     editable={false}
-                    defaultValue={userDetails?.bvn && userDetails?.bvn}
+                    defaultValue={
+                      userDetails?.bvn && userDetails?.bvn.toString()
+                    }
                   />
 
                   <Input
@@ -720,7 +673,7 @@ const Step3 = props => {
                       }
                     }}
                     value={userDetails?.nin}
-                    // defaultValue={userDetails?.nin && userDetails?.nin}
+                    defaultValue={userDetails?.nin?.toString()}
                     onFocus={() => handleError(null, 'nin')}
                     iconName="shield-lock-outline"
                     placeholder="Enter your NIN"
@@ -774,7 +727,12 @@ const Step3 = props => {
                     </View>
                     <SelectList
                       setSelected={text =>
-                        setUserDetails({...userDetails, country: text})
+                        setUserDetails({
+                          ...userDetails,
+                          country: text,
+                          state: '',
+                          city: '',
+                        })
                       }
                       defaultOption={{
                         value: userDetails?.country
@@ -816,21 +774,48 @@ const Step3 = props => {
                         value={userDetails.state}
                         defaultValue={userDetails?.state && userDetails?.state}
                         onChange={option => {
-                          setUserDetails({...userDetails, state: option.value});
-                          //Get cities by state
-                          const getStateData = getCity(option.value)
-                            .then(res => {
-                              fetchedCity = [];
-                              res?.data &&
-                                res?.data.map((item, index) => {
-                                  fetchedCity.push({
-                                    value: item,
-                                    label: item,
-                                    key: index,
+                          if (
+                            userDetails.country === 'Nigeria' &&
+                            option.value === 'Outside Nigeria'
+                          ) {
+                            setUserDetails({
+                              ...userDetails,
+                              state: '',
+                              city: '',
+                            });
+
+                            Toast.show({
+                              type: 'warning',
+                              position: 'top',
+                              topOffset: 50,
+                              text1: 'Warning',
+                              text2:
+                                'Option selected is not available for this country',
+                              visibilityTime: 3000,
+                              autoHide: true,
+                              onPress: () => Toast.hide(),
+                            });
+                          } else {
+                            setUserDetails({
+                              ...userDetails,
+                              state: option.value,
+                            });
+
+                            //Get cities by state
+                            getCity(option.value)
+                              .then(res => {
+                                res?.data &&
+                                  res?.data?.length > 0 &&
+                                  res?.data.map((item, index) => {
+                                    fetchedCity.push({
+                                      value: item,
+                                      label: item,
+                                      key: index,
+                                    });
                                   });
-                                });
-                            })
-                            .catch(err => {});
+                              })
+                              .catch(err => {});
+                          }
                         }}
                         error={errors.state}
                       />
@@ -856,7 +841,32 @@ const Step3 = props => {
                         value={userDetails.city}
                         defaultValue={userDetails?.city && userDetails?.city}
                         onChange={option => {
-                          setUserDetails({...userDetails, city: option.value});
+                          if (
+                            userDetails.country === 'Nigeria' &&
+                            option.value === 'Outside Nigeria'
+                          ) {
+                            setUserDetails({
+                              ...userDetails,
+                              city: '',
+                            });
+
+                            Toast.show({
+                              type: 'warning',
+                              position: 'top',
+                              topOffset: 50,
+                              text1: 'Warning',
+                              text2:
+                                'Option selected is not available for this country',
+                              visibilityTime: 3000,
+                              autoHide: true,
+                              onPress: () => Toast.hide(),
+                            });
+                          } else {
+                            setUserDetails({
+                              ...userDetails,
+                              city: option.value,
+                            });
+                          }
                         }}
                         error={errors.city}
                       />
@@ -963,10 +973,7 @@ const Step3 = props => {
                         NoOfDependents: parseInt(text, 10),
                       })
                     }
-                    defaultValue={
-                      userDetails?.NoOfDependents &&
-                      userDetails?.NoOfDependents
-                    }
+                    defaultValue={userDetails?.NoOfDependents?.toString()}
                     onFocus={() => handleError(null, 'NoOfDependents')}
                     error={errors.NoOfDependents}
                     keyboardType="numeric"

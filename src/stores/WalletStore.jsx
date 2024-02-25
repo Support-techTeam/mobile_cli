@@ -28,7 +28,7 @@ const getAccountWallet = async () => {
         const response = await axiosInstance.get(`/loan-wallet/get-wallet`, {
           headers,
         });
- 
+
         DdLogs.info(
           `Wallet | Get Account Wallet | ${auth()?.currentUser?.email}`,
           {
@@ -64,7 +64,63 @@ const getAccountWallet = async () => {
     };
   }
 };
+// get-all-beneficiaries
 
+const getBeneficiaries = async () => {
+  if (
+    store.getState().networkState &&
+    store.getState().networkState.network.isConnected &&
+    store.getState().networkState.network.isInternetReachable
+  ) {
+    await getFirebaseAuthToken();
+    if (token) {
+      headers = {
+        accept: 'application/json',
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      };
+      try {
+        const response = await axiosInstance.get(
+          `/beneficiary/get-all-beneficiaries`,
+          {
+            headers,
+          },
+        );
+        DdLogs.info(
+          `Beneficiary | Get Beneficiary | ${auth()?.currentUser?.email}`,
+          {
+            context: JSON.stringify(response?.data),
+          },
+        );
+        return {
+          title: 'Get Beneficiary',
+          error: false,
+          data: response?.data,
+          message: 'success',
+        };
+      } catch (error) {
+        DdLogs.error(
+          `Beneficiary | Get Beneficiary | ${auth()?.currentUser?.email}`,
+          {
+            errorMessage: JSON.stringify(error),
+          },
+        );
+        return {
+          title: 'Get Beneficiary',
+          error: true,
+          data: null,
+          message: error,
+        };
+      }
+    }
+  } else {
+    return {
+      error: true,
+      data: null,
+      message: 'No Internet Connection',
+    };
+  }
+};
 const getAccountTransactions = async (page, limit) => {
   if (
     store.getState().networkState &&
@@ -330,9 +386,12 @@ const createNIPTransfer = async details => {
           {headers},
         );
         if (response?.data?.error) {
-          DdLogs.error(`Wallet | NIP Transfer | ${auth()?.currentUser?.email}`, {
-            errorMessage: JSON.stringify(response?.data),
-          });
+          DdLogs.error(
+            `Wallet | NIP Transfer | ${auth()?.currentUser?.email}`,
+            {
+              errorMessage: JSON.stringify(response?.data),
+            },
+          );
           return {
             title: 'NIP Transfer',
             error: true,
@@ -497,4 +556,5 @@ export {
   createNIPTransfer,
   getAllBankDetails,
   getTransactionsStatement,
+  getBeneficiaries,
 };

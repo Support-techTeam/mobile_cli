@@ -19,6 +19,7 @@ import {
 } from 'react-native-responsive-screen';
 import {Header} from '../../component/header/Header';
 import COLORS from '../../constants/colors';
+import CustomButton from '../../component/buttons/CustomButtons';
 const InvestmentDetails = () => {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
@@ -73,10 +74,11 @@ const InvestmentDetails = () => {
       style={{
         flex: 1,
         backgroundColor: '#fff',
-        paddingTop: insets.top !== 0 ? insets.top : 18,
-        paddingBottom: insets.bottom !== 0 ? insets.bottom : 'auto',
-        paddingLeft: insets.left !== 0 ? insets.left : 'auto',
-        paddingRight: insets.right !== 0 ? insets.right : 'auto',
+        paddingTop: insets.top !== 0 ? Math.min(insets.top, 10) : 'auto',
+        paddingBottom:
+          insets.bottom !== 0 ? Math.min(insets.bottom, 10) : 'auto',
+        paddingLeft: insets.left !== 0 ? Math.min(insets.left, 10) : 'auto',
+        paddingRight: insets.right !== 0 ? Math.min(insets.right, 10) : 'auto',
       }}>
       {isLoading && (
         <Spinner
@@ -421,13 +423,7 @@ const InvestmentDetails = () => {
               flexDirection: 'row',
               justifyContent: 'space-evenly',
             }}>
-            <Button
-              title="Top Up"
-              buttonStyle={styles.btnStyle}
-              type="solid"
-              raised
-              titleStyle={{color: COLORS.white, fontSize: hp(2.2)}}
-              containerStyle={styles.btnContainer}
+            <CustomButton
               disabled={
                 (name === 'Lenda' &&
                   investment?.investmentStatus === 'CLOSED') ||
@@ -451,15 +447,14 @@ const InvestmentDetails = () => {
                   });
                 }
               }}
+              title="Top Up"
+              textStyle={{
+                fontSize: 14,
+                fontWeight: '500',
+              }}
+              buttonStyle={[styles.btnStyle, styles.btnContainer]}
             />
-
-            <Button
-              title="Withdraw"
-              buttonStyle={styles.btnStyle}
-              type="solid"
-              raised
-              titleStyle={{color: COLORS.white, fontSize: hp(2.2)}}
-              containerStyle={styles.btnContainer}
+            <CustomButton
               disabled={
                 (name === 'Lenda' &&
                   investment?.investmentStatus === 'CLOSED') ||
@@ -484,6 +479,12 @@ const InvestmentDetails = () => {
                   });
                 }
               }}
+              title="Withdraw"
+              textStyle={{
+                fontSize: 14,
+                fontWeight: '500',
+              }}
+              buttonStyle={[styles.btnStyle, styles.btnContainer]}
             />
           </View>
         </View>
@@ -496,9 +497,6 @@ export default InvestmentDetails;
 
 const styles = StyleSheet.create({
   container: {
-    // flex: 1,
-    // paddingHorizontal: 16,
-    // backgroundColor: '#fff',
   },
   HeadView: {
     alignItems: 'center',
@@ -547,7 +545,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     backgroundColor: COLORS.lendaBlue,
     fontSize: hp(2.5),
-    height: 50,
+    height: 40,
+    width: '40%',
   },
   btnContainer: {
     marginTop: 10,

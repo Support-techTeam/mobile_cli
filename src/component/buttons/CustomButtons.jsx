@@ -21,10 +21,11 @@ const CustomButton = ({onPress, title, buttonStyle, textStyle, disabled}) => {
 const styles = StyleSheet.create({
   button: {
     backgroundColor: COLORS.lendaBlue,
-
     padding: 10,
     alignItems: 'center',
     borderRadius: SIZES.base,
+    textAlign: 'center',
+    justifyContent: 'center',
   },
   text: {
     color: '#ffffff',

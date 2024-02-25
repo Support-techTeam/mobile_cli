@@ -15,6 +15,9 @@ import {getGuarantors} from '../../stores/GuarantorStore';
 import {getLoanUserDetails} from '../../stores/LoanStore';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import Toast from 'react-native-toast-message';
+import {Header} from '../../component/header/Header';
+import CustomButton from '../../component/buttons/CustomButtons';
+import COLORS from '../../constants/colors';
 
 const Guarantor = () => {
   const navigation = useNavigation();
@@ -88,11 +91,17 @@ const Guarantor = () => {
       style={{
         flex: 1,
         backgroundColor: '#fff',
-        paddingTop: insets.top !== 0 ? insets.top : 18,
-        paddingBottom: insets.bottom !== 0 ? insets.bottom : 'auto',
-        paddingLeft: insets.left !== 0 ? insets.left : 'auto',
-        paddingRight: insets.right !== 0 ? insets.right : 'auto',
+        paddingTop: insets.top !== 0 ? Math.min(insets.top, 10) : 'auto',
+        paddingBottom:
+          insets.bottom !== 0 ? Math.min(insets.bottom, 10) : 'auto',
+        paddingLeft: insets.left !== 0 ? Math.min(insets.left, 10) : 'auto',
+        paddingRight: insets.right !== 0 ? Math.min(insets.right, 10) : 'auto',
       }}>
+      <Header
+        routeAction={() => navigation.goBack()}
+        heading="GUARANTOR"
+        disable={false}
+      />
       {isLoading ? (
         <>
           <View style={styles.innerContainer}>
@@ -173,41 +182,99 @@ const Guarantor = () => {
         </>
       ) : (
         <>
-          <View style={styles.innerContainer}>
-            <View style={{flexDirection: 'row', width: '45%'}}>
+          <View style={[styles.headerContainer]}>
+            <View style={styles.leftView}>
               <View style={{flexDirection: 'row'}}>
-                <TouchableOpacity
-                  onPress={() => navigation.navigate('LoanHome')}>
-                  <View style={[styles.tobTab, {marginRight: 16}]}>
-                    <Text style={styles.tabText}>Loans</Text>
-                  </View>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  onPress={() => navigation.navigate('Guarantor')}>
-                  <View style={styles.tobTab}>
-                    <Text style={[styles.tabText, {color: '#054B99'}]}>
-                      Guarantor
-                    </Text>
-                  </View>
-                </TouchableOpacity>
+                <CustomButton
+                  onPress={() => navigation.navigate('LoanHome')}
+                  title="Loan"
+                  textStyle={{
+                    color: COLORS.lendaBlue,
+                    fontSize: 14,
+                    fontWeight: '500',
+                  }}
+                  buttonStyle={[
+                    styles.tobTab,
+                    {
+                      backgroundColor: COLORS.white,
+                      borderColor: COLORS.lendaBlue,
+                      borderWidth: 1,
+                      borderRadius: 5,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      paddingHorizontal: 15,
+                    },
+                  ]}
+                />
+                <CustomButton
+                  onPress={() => navigation.navigate('Guarantor')}
+                  title="Guarantor"
+                  textStyle={{
+                    color: COLORS.lendaBlue,
+                    fontSize: 14,
+                    fontWeight: '500',
+                  }}
+                  buttonStyle={[
+                    styles.tobTab,
+                    {
+                      backgroundColor: COLORS.white,
+                      borderColor: COLORS.lendaBlue,
+                      borderWidth: 1,
+                      borderRadius: 5,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      paddingHorizontal: 15,
+                    },
+                  ]}
+                />
               </View>
             </View>
-            <TouchableOpacity
-              onPress={() =>
-                navigation.navigate(
-                  `${
-                    loanUserdetails?.loanDocumentDetails
-                      ?.validIdentification === undefined
-                      ? 'OnboardingHome'
-                      : 'GetLoan'
-                  }`,
-                )
-              }>
-              <View style={styles.getLoan}>
-                <Text style={styles.getText}>Get Loan</Text>
-              </View>
-            </TouchableOpacity>
+
+            <View style={styles.rightView}>
+              <CustomButton
+                onPress={() => {
+                  if (guarantors && guarantors?.length <= 0) {
+                    Toast.show({
+                      type: 'warning',
+                      position: 'top',
+                      topOffset: 50,
+                      text1: 'Guarantor Data',
+                      text2: 'Guarantor Data is not available',
+                      visibilityTime: 2000,
+                      autoHide: true,
+                      onPress: () => Toast.hide(),
+                    });
+                  }
+                  navigation.navigate(
+                    `${
+                      loanUserdetails === undefined ||
+                      loanUserdetails?.loanDocumentDetails
+                        ?.validIdentification === undefined
+                        ? 'OnboardingHome'
+                        : guarantors && guarantors?.length > 0
+                        ? 'GetLoan'
+                        : 'AddGuarantors'
+                    }`,
+                  );
+                }}
+                title="Get Loan"
+                textStyle={{
+                  fontSize: 14,
+                  fontWeight: '500',
+                }}
+                buttonStyle={[
+                  styles.tobTab,
+                  {
+                    borderWidth: 1,
+                    borderRadius: 5,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    paddingHorizontal: 15,
+                    borderColor: COLORS.lendaBlue,
+                  },
+                ]}
+              />
+            </View>
           </View>
 
           <View style={{paddingHorizontal: 20}}>
@@ -335,14 +402,14 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   innerContainer: {
+    marginTop: 20,
     marginHorizontal: 20,
   },
   tobTab: {
-    borderWidth: 1,
-    borderColor: '#D9DBE9',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
     borderRadius: 5,
-    paddingVertical: 4,
-    paddingHorizontal: 8,
   },
   tabText: {
     fontSize: 12,
@@ -434,5 +501,26 @@ const styles = StyleSheet.create({
     color: '#054B99',
     fontSize: 16,
     fontWeight: '700',
+  },
+  headerContainer: {
+    paddingHorizontal: 20,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 20,
+  },
+  rightView: {
+    flexGrow: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    gap: 10,
+  },
+  leftView: {
+    flexGrow: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    gap: 10,
   },
 });

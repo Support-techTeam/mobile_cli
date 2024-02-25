@@ -176,7 +176,7 @@ const GetLoan = () => {
     } catch (e) {
       setIsLoading(false);
     }
-  };
+  };  
 
   useEffect(() => {
     const Data =
@@ -240,13 +240,13 @@ const GetLoan = () => {
       try {
         setIsLoading(true);
         const res = await createLoan(loanDetails);
-        if (res?.error) {
+        if (res?.error || res?.data?.error) {
           Toast.show({
             type: 'error',
             position: 'top',
             topOffset: 50,
             text1: res?.title,
-            text2: res?.message,
+            text2: res?.message || res?.data?.message,
             visibilityTime: 5000,
             autoHide: true,
             onPress: () => Toast.hide(),
@@ -263,7 +263,7 @@ const GetLoan = () => {
             position: 'top',
             topOffset: 50,
             text1: res?.title,
-            text2: res?.message,
+            text2: res?.message || res?.data?.message,
             visibilityTime: 3000,
             autoHide: true,
             onPress: () => Toast.hide(),
@@ -309,10 +309,11 @@ const GetLoan = () => {
       style={{
         flex: 1,
         backgroundColor: '#fff',
-        paddingTop: insets.top !== 0 ? insets.top : 18,
-        paddingBottom: insets.bottom !== 0 ? insets.bottom / 2 : 'auto',
-        paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
-        paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
+        paddingTop: insets.top !== 0 ? Math.min(insets.top, 10) : 'auto',
+        paddingBottom:
+          insets.bottom !== 0 ? Math.min(insets.bottom, 10) : 'auto',
+        paddingLeft: insets.left !== 0 ? Math.min(insets.left, 10) : 'auto',
+        paddingRight: insets.right !== 0 ? Math.min(insets.right, 10) : 'auto',
       }}>
       {pdfmain ? (
         <>
@@ -452,34 +453,11 @@ const GetLoan = () => {
                       overlayColor="rgba(78, 75, 102, 0.7)"
                     />
                   )}
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      marginHorizontal: 10,
-                    }}>
-                    <TouchableOpacity
-                      onPress={() => navigation.navigate('Home')}>
-                      <View
-                        style={{
-                          borderWidth: 0.5,
-                          borderColor: '#D9DBE9',
-                          borderRadius: 5,
-                        }}>
-                        <AntDesign name="left" size={30} color="black" />
-                      </View>
-                    </TouchableOpacity>
-                    <View style={styles.HeadView}>
-                      <View style={styles.TopView}>
-                        <Text style={styles.TextHead}>LOAN APPLICATION</Text>
-                      </View>
-                    </View>
-                    <View>
-                      <Text> </Text>
-                    </View>
-                  </View>
-                  <View style={styles.demark} />
+                  <Header
+                    routeAction={() => navigation.navigate('Loan')}
+                    heading={'LOAN APPLICATION'}
+                    disable={false}
+                  />
                   <ImageBackground
                     source={require('../../../assets/signup.png')}
                     resizeMode="stretch"

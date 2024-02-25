@@ -18,13 +18,14 @@ import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 import Buttons from '../../component/buttons/Buttons';
 import Toast from 'react-native-toast-message';
 import {createGuarantor} from '../../stores/GuarantorStore';
+import CustomButton from '../../component/buttons/CustomButtons';
+import {Header} from '../../component/header/Header';
 
 const titleData = [
   {value: '', label: 'Select Title'},
   {value: 'Mr', label: 'Mr'},
   {value: 'Mrs', label: 'Mrs'},
   {value: 'Miss', label: 'Miss'},
-  {value: 'Dr', label: 'Dr'},
 ];
 
 const AddGuarantors = () => {
@@ -89,10 +90,11 @@ const AddGuarantors = () => {
       style={{
         flex: 1,
         backgroundColor: '#fff',
-        paddingTop: insets.top !== 0 ? insets.top : 18,
-        paddingBottom: insets.bottom !== 0 ? insets.bottom / 2 : 'auto',
-        paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
-        paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
+        paddingTop: insets.top !== 0 ? Math.min(insets.top, 10) : 'auto',
+        paddingBottom:
+          insets.bottom !== 0 ? Math.min(insets.bottom, 10) : 'auto',
+        paddingLeft: insets.left !== 0 ? Math.min(insets.left, 10) : 'auto',
+        paddingRight: insets.right !== 0 ? Math.min(insets.right, 10) : 'auto',
       }}>
       {isLoading && (
         <Spinner
@@ -102,33 +104,11 @@ const AddGuarantors = () => {
           overlayColor="rgba(78, 75, 102, 0.7)"
         />
       )}
-      <View
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginHorizontal: 15,
-        }}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <View
-            style={{
-              borderWidth: 0.5,
-              borderColor: '#D9DBE9',
-              borderRadius: 5,
-            }}>
-            <Icon name="chevron-left" size={36} color="black" />
-          </View>
-        </TouchableOpacity>
-        <View style={styles.HeadView}>
-          <View style={styles.TopView}>
-            <Text style={styles.TextHead}>ADD GUARANTORS</Text>
-          </View>
-        </View>
-        <View>
-          <Text> </Text>
-        </View>
-      </View>
-      <View style={styles.demark} />
+      <Header
+        routeAction={() => navigation.goBack()}
+        heading="ADD GUARANTOR"
+        disable={false}
+      />
       <ImageBackground
         source={require('../../../assets/signup.png')}
         resizeMode="stretch"
@@ -240,15 +220,13 @@ const AddGuarantors = () => {
               </View>
             </View>
 
-            <TouchableOpacity
+            <CustomButton
               onPress={() => {
                 handleCreateGuarantor();
               }}
-              disabled={disableit}>
-              <View style={{marginBottom: 20}}>
-                <Buttons label="Save & Continue" disabled={disableit} />
-              </View>
-            </TouchableOpacity>
+              title="Save & Continue"
+              disabled={disableit}
+            />
           </View>
         </ScrollView>
       </ImageBackground>

@@ -3,33 +3,38 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
+  SectionList,
   ScrollView,
 } from 'react-native';
-import React, {useState, useContext, useEffect} from 'react';
+import React, {useState, useCallback, useEffect} from 'react';
 import ToggleSwitch from 'toggle-switch-react-native';
 import {useNavigation, useRoute} from '@react-navigation/native';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import Icon from 'react-native-vector-icons/FontAwesome';
 import {SelectList} from 'react-native-dropdown-select-list';
 import Spinner from 'react-native-loading-spinner-overlay/lib';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
-
-import CustomInput from '../../component/custominput/CustomInput';
 import Input from '../../component/inputField/input.component';
-import CustomDropdown from '../../component/dropDown/dropdown.component';
 import Buttons from '../../component/buttons/Buttons';
-import {Dropdown} from 'react-native-element-dropdown';
 import {useSelector} from 'react-redux';
 import {
   getAllBankDetails,
+  getBeneficiaries,
   verifyBeneficiaryInfo,
   verifyNIPAccountInfo,
 } from '../../stores/WalletStore';
 import Toast from 'react-native-toast-message';
 import COLORS from '../../constants/colors';
+import SearchableDropdown from 'react-native-searchable-dropdown';
+import {Header} from '../../component/header/Header';
+import CustomSearchableDropdown from '../../component/inputField/CustomSearchableDropdown';
 
 const defaultData = [
   {value: '', label: 'Select Option'},
   {value: '', label: 'N/A'},
+];
+
+const beneficiariesData = [
+  {name: '...Select Option', label: '...Select Option', id: 0},
 ];
 
 const BankDeets = ({route}) => {
@@ -41,8 +46,6 @@ const BankDeets = ({route}) => {
   const [isFetching, setIsFetching] = useState(false);
   const [currentBanks, setCurrentBanks] = useState(undefined);
   const [numComplete, setNumComplete] = useState(false);
-  const [isFocus, setIsFocus] = useState(false);
-  // const route = useRoute();
   const [bankDetails, setBankDetails] = useState({
     receiverAccountFirstName: '',
     receiverAccountLastName: '',
@@ -64,48 +67,6 @@ const BankDeets = ({route}) => {
   const [holdersName, setHoldersName] = useState('');
 
   useEffect(() => {
-    if (bankDetails?.toWalletIdAccountNumber?.length === 10) {
-      setHoldersName('');
-      setIsLoading(true);
-      const unsubVerifyBeneficiaryInfo = async () => {
-        try {
-          const res = await verifyBeneficiaryInfo(
-            bankDetails?.toWalletIdAccountNumber,
-          );
-          if (res?.data?.error) {
-            Toast.show({
-              type: 'error',
-              position: 'top',
-              topOffset: 50,
-              text1: res?.title,
-              text2: res?.data?.message,
-              visibilityTime: 5000,
-              autoHide: true,
-              onPress: () => Toast.hide(),
-            });
-            setHoldersName('');
-          } else {
-            setBankDetails({
-              ...bankDetails,
-              amount: 0,
-              narration: '',
-              saveBeneficiary: false,
-              beneficiaryAccountName: res?.data,
-            });
-            setHoldersName(res?.data);
-          }
-        } catch (e) {}
-      };
-
-      setTimeout(() => {
-        setIsLoading(false);
-      }, 3000);
-      unsubVerifyBeneficiaryInfo();
-    } else {
-    }
-  }, [bankDetails?.toWalletIdAccountNumber?.length === 10]);
-
-  useEffect(() => {
     if (prevRoute === 'Nip') {
       handleGetAllBanks();
     }
@@ -113,6 +74,7 @@ const BankDeets = ({route}) => {
 
   useEffect(() => {
     if (route?.name === 'Transfer') {
+      handleGetAllBeneficiaries();
       if (prevRoute === 'Nip') {
         handleGetAllBanks();
       }
@@ -152,7 +114,81 @@ const BankDeets = ({route}) => {
       });
   };
 
+  const handleGetAllBeneficiaries = async () => {
+    beneficiariesData.splice(0);
+    setIsFetching(true);
+    getBeneficiaries()
+      .then(res => {
+        if (res) {
+          if (res?.error) {
+            Toast.show({
+              type: 'error',
+              position: 'top',
+              topOffset: 50,
+              text1: res?.title,
+              text2: res?.data?.message || res?.message,
+              visibilityTime: 5000,
+              autoHide: true,
+              onPress: () => Toast.hide(),
+            });
+          } else {
+            if (res?.data && res?.data.length > 0) {
+              if (prevRoute === 'Nip') {
+                res?.data?.map((beneficiary, i) => {
+                  if (beneficiary.beneficiaryType === 'NIP') {
+                    beneficiariesData.push({
+                      name: `${beneficiary?.beneficiaryAccountName?.toUpperCase()} - ${
+                        beneficiary?.beneficiaryAccountNumber
+                      } - ${beneficiary?.beneficiaryBankName?.toUpperCase()}`,
+                      label: beneficiary?.beneficiaryAccountName,
+                      accountName: beneficiary?.beneficiaryAccountName,
+                      bankName: beneficiary.beneficiaryBankName,
+                      type: beneficiary.beneficiaryType,
+                      accountNumber: beneficiary.beneficiaryAccountNumber,
+                      id: i + 1,
+                    });
+                  }
+                });
+              } else if (prevRoute === 'InternalTransfer') {
+                res?.data?.map((beneficiary, i) => {
+                  if (beneficiary.beneficiaryType === 'Internal') {
+                    beneficiariesData.push({
+                      name: `${beneficiary?.beneficiaryAccountName?.toUpperCase()} - ${
+                        beneficiary?.beneficiaryAccountNumber
+                      } - ${beneficiary?.beneficiaryBankName?.toUpperCase()}`,
+                      label: beneficiary?.beneficiaryAccountName,
+                      accountName: beneficiary?.beneficiaryAccountName,
+                      bankName: beneficiary.beneficiaryBankName,
+                      type: beneficiary.beneficiaryType,
+                      accountNumber: beneficiary.beneficiaryAccountNumber,
+                      id: i + 1,
+                    });
+                  }
+                });
+              }
+            }
+          }
+        }
+      })
+      .catch(error => {})
+      .finally(() => {
+        setIsFetching(false);
+      });
+  };
+
   useEffect(() => {
+    if (prevRoute === 'Nip') {
+      handleGetAccountDetails();
+    }
+  }, [bankDetails?.receiverAccountNumber?.length === 10]);
+
+  useEffect(() => {
+    if (prevRoute === 'InternalTransfer') {
+      handleGetWalletDetails();
+    }
+  }, [bankDetails?.toWalletIdAccountNumber?.length === 10]);
+
+  const handleGetAccountDetails = () => {
     if (
       bankDetails?.receiverAccountNumber?.length === 10 &&
       bankDetails?.receiverBankName !== ''
@@ -180,7 +216,6 @@ const BankDeets = ({route}) => {
               autoHide: true,
               onPress: () => Toast.hide(),
             });
-            setHoldersName('');
           } else {
             setNumComplete(true);
             const [firstPart, ...restParts] = res?.data?.split(/\s(.+)/);
@@ -196,66 +231,71 @@ const BankDeets = ({route}) => {
       };
 
       setTimeout(() => {
-        setIsLoading(false);
+        setIsLoading(false); // Check if mounted
       }, 3000);
       unsubVerifyBeneficiaryInfo();
+
+      return () => {
+        isMounted = false;
+      }; // Cleanup function to set isMounted to false when the component unmounts
     } else {
     }
-  }, [bankDetails?.receiverAccountNumber?.length === 10]);
+  };
 
-  return (
-    <SafeAreaView
-      style={{
-        flex: 1,
-        paddingHorizontal: 16,
-        backgroundColor: '#fff',
-        paddingTop: insets.top !== 0 ? insets.top : 18,
-        paddingBottom: insets.bottom !== 0 ? insets.bottom : 'auto',
-        paddingLeft: insets.left !== 0 ? insets.left : 'auto',
-        paddingRight: insets.right !== 0 ? insets.right : 'auto',
-      }}>
-      {isLoading && (
-        <Spinner
-          textContent={'Loading...'}
-          textStyle={{color: 'white'}}
-          visible={true}
-          overlayColor="rgba(78, 75, 102, 0.7)"
-        />
-      )}
-      <View
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-        }}>
-        <TouchableOpacity
-          onPress={() => {
-            navigation.navigate('Home');
-          }}>
-          <View
-            style={{
-              borderWidth: 0.5,
-              borderColor: '#D9DBE9',
-              borderRadius: 5,
-            }}>
-            <Icon name="chevron-left" size={36} color="black" />
-          </View>
-        </TouchableOpacity>
-        <View style={styles.HeadView}>
-          <View style={styles.TopView}>
-            <Text style={styles.TextHead}>TRANSFER FUND</Text>
-          </View>
-        </View>
+  const handleGetWalletDetails = () => {
+    if (bankDetails?.toWalletIdAccountNumber?.length === 10) {
+      setHoldersName('');
+      setIsLoading(true);
+      const unsubVerifyBeneficiaryInfo = async () => {
+        try {
+          const res = await verifyBeneficiaryInfo(
+            bankDetails?.toWalletIdAccountNumber,
+          );
+          if (res?.data?.error) {
+            Toast.show({
+              type: 'error',
+              position: 'top',
+              topOffset: 50,
+              text1: res?.title,
+              text2: res?.data?.message,
+              visibilityTime: 5000,
+              autoHide: true,
+              onPress: () => Toast.hide(),
+            });
+          } else {
+            setBankDetails({
+              ...bankDetails,
+              amount: 0,
+              narration: '',
+              saveBeneficiary: false,
+              beneficiaryAccountName: res?.data,
+            });
+            setHoldersName(res?.data);
+          }
+        } catch (e) {
+          // Handle error
+        } finally {
+          setIsLoading(false); // Update state only if mounted
+        }
+      };
+      unsubVerifyBeneficiaryInfo();
 
-        <View style={{}}>
-          <Text>{'       '}</Text>
-        </View>
-      </View>
-      <View style={styles.demark} />
-      <ScrollView
-        bounces={false}
-        showsHorizontalScrollIndicator={false}
-        showsVerticalScrollIndicator={false}>
+      return () => {
+        isMounted = false;
+      }; // Cleanup function to set isMounted to false when the component unmounts
+    }
+  };
+
+  const DATA = [
+    {
+      title: 'Main Display',
+      data: ['main'],
+    },
+  ];
+
+  const renderData = () => {
+    return (
+      <View>
         <View style={styles.innerContainer}>
           <Text
             style={{
@@ -269,19 +309,26 @@ const BankDeets = ({route}) => {
 
           {prevRoute === 'InternalTransfer' ? (
             <>
-              <Input
-                onChangeText={text =>
-                  setBankDetails({
-                    ...bankDetails,
-                    toWalletIdAccountNumber: text,
-                  })
-                }
-                label="Wallet Number"
-                placeholder="Enter beneficiary wallet number"
-                keyboardType="numeric"
-                isNeeded={true}
-              />
-
+              <View style={{marginTop: 10}}>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                  }}>
+                  <View style={{flexDirection: 'row'}}>
+                    <Text style={styles.label}>Wallet Number</Text>
+                    <Text style={{color: 'red', marginRight: 10}}>*</Text>
+                  </View>
+                </View>
+                <CustomSearchableDropdown
+                  beneficiariesData={beneficiariesData}
+                  setBankDetails={setBankDetails}
+                  bankDetails={bankDetails}
+                  handleAccountDetails={handleGetWalletDetails}
+                  transferType={prevRoute}
+                />
+              </View>
               <View style={{marginTop: 10}}>
                 {(bankDetails?.toWalletIdAccountNumber).toString().length ===
                   10 && (
@@ -431,181 +478,255 @@ const BankDeets = ({route}) => {
           ) : (
             <>
               <View style={{marginTop: 10}}>
-                <View style={{flexDirection: 'row'}}>
-                  <Text style={styles.droplabel}>Bank Name</Text>
-                  <Text style={{color: 'red', marginRight: 10}}>*</Text>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                  }}>
+                  <View style={{flexDirection: 'row'}}>
+                    <Text style={styles.label}>Account Number</Text>
+                    <Text style={{color: 'red', marginRight: 10}}>*</Text>
+                  </View>
                 </View>
-                <SelectList
-                  setSelected={val =>
-                    setBankDetails({
-                      ...bankDetails,
-                      receiverBankName: val,
-                    })
-                  }
-                  data={currentBanks ? currentBanks : defaultData}
-                  save="value"
-                  placeholder="Select Bank"
-                  boxStyles={styles.inputContainer}
-                  // inputStyles={}
+                <CustomSearchableDropdown
+                  beneficiariesData={beneficiariesData}
+                  setBankDetails={setBankDetails}
+                  bankDetails={bankDetails}
+                  handleAccountDetails={handleGetAccountDetails}
+                  transferType={prevRoute}
                 />
               </View>
 
-              {bankDetails?.receiverBankName !== '' && (
-                <Input
-                  onChangeText={text => {
-                    setBankDetails({
-                      ...bankDetails,
-                      receiverAccountNumber: text,
-                    });
-                  }}
-                  label="Account Number"
-                  placeholder="Enter beneficiary wallet number"
-                  keyboardType="numeric"
-                  isNeeded={true}
-                />
-              )}
-
-              {numComplete && (
+              {bankDetails?.receiverAccountNumber?.length === 10 && (
                 <View style={{marginTop: 10}}>
-                  <Input
-                    label="Account Name"
-                    defaultValue={
-                      bankDetails?.receiverAccountFirstName !== '' &&
-                      bankDetails?.receiverAccountLastName !== ''
-                        ? `${bankDetails?.receiverAccountFirstName}  ${bankDetails?.receiverAccountLastName}`
-                        : ''
+                  <View style={{flexDirection: 'row'}}>
+                    <Text style={styles.droplabel}>Bank Name</Text>
+                    <Text style={{color: 'red', marginRight: 10}}>*</Text>
+                  </View>
+                  <SelectList
+                    key={
+                      bankDetails.receiverBankName &&
+                      bankDetails?.receiverBankName
                     }
-                    disabled
-                    isNeeded={true}
+                    setSelected={val =>
+                      setBankDetails({
+                        ...bankDetails,
+                        receiverBankName: val,
+                      })
+                    }
+                    data={currentBanks ? currentBanks : defaultData}
+                    save="value"
+                    searchPlaceholder="Search for bank"
+                    placeholder={
+                      bankDetails?.receiverBankName
+                        ? bankDetails?.receiverBankName
+                        : 'Select Bank'
+                    }
+                    boxStyles={styles.inputContainer}
+                    closeicon={
+                      <Icon name="times-circle" size={26} color="#000" />
+                    }
+                    dropdownStyles={{
+                      padding: 5,
+                      marginTop: 2,
+                      backgroundColor: COLORS.lendaComponentBg,
+                      borderColor: COLORS.lendaComponentBorder,
+                      borderWidth: 1,
+                      borderRadius: 5,
+                    }}
+                    dropdownItemStyles={{
+                      padding: 5,
+                      marginTop: 2,
+                      backgroundColor: COLORS.lendaComponentBg,
+                      borderColor: COLORS.lendaComponentBorder,
+                      borderWidth: 1,
+                      borderRadius: 5,
+                    }}
                   />
-                  {bankDetails?.receiverAccountFirstName !== '' &&
-                    bankDetails?.receiverAccountLastName !== '' && (
-                      <>
-                        <View
-                          style={{
-                            flexDirection: 'row',
-                            justifyContent: 'space-between',
-                            alignItems: 'center',
-                          }}>
-                          <Text style={{color: '#054B99', fontFamily: 'serif'}}>
-                            Save Beneficiary
-                          </Text>
-                          <ToggleSwitch
-                            isOn={bankDetails.saveBeneficiary}
-                            onColor="#054B99"
-                            offColor="#A0A3BD"
-                            label=""
-                            size="small"
-                            onToggle={value =>
-                              setBankDetails({
-                                ...bankDetails,
-                                saveBeneficiary: value,
-                              })
-                            }
-                          />
-                        </View>
-                        <Input
-                          onChangeText={text =>
-                            setBankDetails({...bankDetails, amount: text})
-                          }
-                          iconName="cash"
-                          label="Amount"
-                          placeholder="Enter Amount"
-                          keyboardType="numeric"
-                          isNeeded={true}
-                          isAirtime={true}
-                          isBalance={
-                            userWalletData &&
-                            userWalletData?.availableBalance
-                              ?.toString()
-                              ?.replace(/\B(?=(\d{3})+\b)/g, ',')
-                          }
-                        />
-
-                        {bankDetails.amount > 0 && (
-                          <>
-                            <Input
-                              onChangeText={text =>
-                                setBankDetails({
-                                  ...bankDetails,
-                                  narration: text,
-                                })
-                              }
-                              iconName="information"
-                              label="Add Narration"
-                              placeholder="Enter transaction narration"
-                              defaultValue={bankDetails?.narration}
-                              isNeeded={true}
-                            />
-                            {bankDetails?.narration.length >= 3 && (
-                              <TouchableOpacity
-                                style={{marginTop: 0}}
-                                disabled={disableit}
-                                onPress={() => {
-                                  if (Number(bankDetails?.amount) <= 0) {
-                                    Toast.show({
-                                      type: 'error',
-                                      position: 'top',
-                                      topOffset: 50,
-                                      text1: 'NIP Transfer',
-                                      text2: 'Invalid amount entered!',
-                                      visibilityTime: 5000,
-                                      autoHide: true,
-                                      onPress: () => Toast.hide(),
-                                    });
-                                    return;
-                                  } else if (
-                                    userWalletData?.availableBalance ==
-                                      undefined ||
-                                    userWalletData?.availableBalance == null
-                                  ) {
-                                    Toast.show({
-                                      type: 'error',
-                                      position: 'top',
-                                      topOffset: 50,
-                                      text1: 'Wallet Internal Transfer',
-                                      text2: 'Balance not available!',
-                                      visibilityTime: 5000,
-                                      autoHide: true,
-                                      onPress: () => Toast.hide(),
-                                    });
-                                  }else if (
-                                    Number(bankDetails?.amount) >
-                                    Number(userWalletData?.availableBalance)
-                                  ) {
-                                    Toast.show({
-                                      type: 'error',
-                                      position: 'top',
-                                      topOffset: 50,
-                                      text1: 'NIP Transfer',
-                                      text2: 'Available balance exceeded!',
-                                      visibilityTime: 5000,
-                                      autoHide: true,
-                                      onPress: () => Toast.hide(),
-                                    });
-                                    return;
-                                  } else {
-                                    navigation.navigate('Summary', {
-                                      bankDetails: bankDetails,
-                                    });
-                                  }
-                                }}>
-                                <Buttons
-                                  label={'Transfer'}
-                                  disabled={disableit}
-                                />
-                              </TouchableOpacity>
-                            )}
-                          </>
-                        )}
-                      </>
-                    )}
                 </View>
               )}
+
+              {bankDetails?.receiverAccountFirstName &&
+                bankDetails?.receiverAccountLastName && (
+                  <View style={{marginTop: 10}}>
+                    <Input
+                      label="Account Name"
+                      defaultValue={
+                        bankDetails?.receiverAccountFirstName !== '' &&
+                        bankDetails?.receiverAccountLastName !== ''
+                          ? `${bankDetails?.receiverAccountFirstName}  ${bankDetails?.receiverAccountLastName}`
+                          : ''
+                      }
+                      disabled
+                      isNeeded={true}
+                    />
+                    {bankDetails?.receiverAccountFirstName !== '' &&
+                      bankDetails?.receiverAccountLastName !== '' && (
+                        <>
+                          <View
+                            style={{
+                              flexDirection: 'row',
+                              justifyContent: 'space-between',
+                              alignItems: 'center',
+                            }}>
+                            <Text
+                              style={{color: '#054B99', fontFamily: 'serif'}}>
+                              Save Beneficiary
+                            </Text>
+                            <ToggleSwitch
+                              isOn={bankDetails.saveBeneficiary}
+                              onColor="#054B99"
+                              offColor="#A0A3BD"
+                              label=""
+                              size="small"
+                              onToggle={value =>
+                                setBankDetails({
+                                  ...bankDetails,
+                                  saveBeneficiary: value,
+                                })
+                              }
+                            />
+                          </View>
+                          <Input
+                            onChangeText={text =>
+                              setBankDetails({...bankDetails, amount: text})
+                            }
+                            iconName="cash"
+                            label="Amount"
+                            placeholder="Enter Amount"
+                            keyboardType="numeric"
+                            isNeeded={true}
+                            isAirtime={true}
+                            isBalance={
+                              userWalletData &&
+                              userWalletData?.availableBalance
+                                ?.toString()
+                                ?.replace(/\B(?=(\d{3})+\b)/g, ',')
+                            }
+                          />
+
+                          {bankDetails.amount > 0 && (
+                            <>
+                              <Input
+                                onChangeText={text =>
+                                  setBankDetails({
+                                    ...bankDetails,
+                                    narration: text,
+                                  })
+                                }
+                                iconName="information"
+                                label="Add Narration"
+                                placeholder="Enter transaction narration"
+                                defaultValue={bankDetails?.narration}
+                                isNeeded={true}
+                              />
+                              {bankDetails?.narration.length >= 3 && (
+                                <TouchableOpacity
+                                  style={{marginTop: 0}}
+                                  disabled={disableit}
+                                  onPress={() => {
+                                    if (Number(bankDetails?.amount) <= 0) {
+                                      Toast.show({
+                                        type: 'error',
+                                        position: 'top',
+                                        topOffset: 50,
+                                        text1: 'NIP Transfer',
+                                        text2: 'Invalid amount entered!',
+                                        visibilityTime: 5000,
+                                        autoHide: true,
+                                        onPress: () => Toast.hide(),
+                                      });
+                                      return;
+                                    } else if (
+                                      userWalletData?.availableBalance ==
+                                        undefined ||
+                                      userWalletData?.availableBalance == null
+                                    ) {
+                                      Toast.show({
+                                        type: 'error',
+                                        position: 'top',
+                                        topOffset: 50,
+                                        text1: 'Wallet Internal Transfer',
+                                        text2: 'Balance not available!',
+                                        visibilityTime: 5000,
+                                        autoHide: true,
+                                        onPress: () => Toast.hide(),
+                                      });
+                                    } else if (
+                                      Number(bankDetails?.amount) >
+                                      Number(userWalletData?.availableBalance)
+                                    ) {
+                                      Toast.show({
+                                        type: 'error',
+                                        position: 'top',
+                                        topOffset: 50,
+                                        text1: 'NIP Transfer',
+                                        text2: 'Available balance exceeded!',
+                                        visibilityTime: 5000,
+                                        autoHide: true,
+                                        onPress: () => Toast.hide(),
+                                      });
+                                      return;
+                                    } else {
+                                      navigation.navigate('Summary', {
+                                        bankDetails: bankDetails,
+                                      });
+                                    }
+                                  }}>
+                                  <Buttons
+                                    label={'Transfer'}
+                                    disabled={disableit}
+                                  />
+                                </TouchableOpacity>
+                              )}
+                            </>
+                          )}
+                        </>
+                      )}
+                  </View>
+                )}
             </>
           )}
         </View>
-      </ScrollView>
+      </View>
+    );
+  };
+
+  console.log(bankDetails);
+  return (
+    <SafeAreaView
+      style={{
+        flex: 1,
+        backgroundColor: '#fff',
+        paddingTop: insets.top !== 0 ? Math.min(insets.top, 10) : 'auto',
+        paddingBottom:
+          insets.bottom !== 0 ? Math.min(insets.bottom, 10) : 'auto',
+        paddingLeft: insets.left !== 0 ? Math.min(insets.left, 10) : 'auto',
+        paddingRight: insets.right !== 0 ? Math.min(insets.right, 10) : 'auto',
+      }}>
+      {isLoading && (
+        <Spinner
+          textContent={'Loading...'}
+          textStyle={{color: 'white'}}
+          visible={true}
+          overlayColor="rgba(78, 75, 102, 0.7)"
+        />
+      )}
+      <Header
+        routeAction={() => navigation.goBack()}
+        heading={'FUNDS TRANSFER'}
+        disable={false}
+      />
+      <SectionList
+        scrollEnabled={true}
+        nestedScrollEnabled={true}
+        keyboardShouldPersistTaps="handled"
+        sections={DATA}
+        ListEmptyComponent={<></>}
+        renderItem={({item}) => renderData()}
+        contentContainerStyle={{flexGrow: 1, paddingHorizontal: 16}}
+      />
     </SafeAreaView>
   );
 };
@@ -701,5 +822,22 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.2,
     shadowRadius: 1.41,
+  },
+  label: {
+    marginVertical: 5,
+    fontSize: 14,
+    color: COLORS.labelColor,
+  },
+  selectInputContainer: {
+    height: 55,
+    backgroundColor: COLORS.light,
+    flexDirection: 'row',
+    paddingHorizontal: 15,
+    width: '100%',
+    borderWidth: 0.5,
+    borderRadius: 8,
+    borderColor: COLORS.lendaComponentBorder,
+    padding: 12,
+    justifyContent: 'center',
   },
 });

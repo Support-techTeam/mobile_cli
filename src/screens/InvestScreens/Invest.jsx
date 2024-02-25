@@ -14,7 +14,6 @@ import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import {Skeleton} from '@rneui/base';
 import CustomTabBar from '../../component/CustomTabs/CustomTabBar3';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
-import {Button} from '@rneui/themed';
 import {getLoanUserDetails} from '../../stores/LoanStore';
 import {useRoute} from '@react-navigation/native';
 import {useSelector} from 'react-redux';
@@ -31,6 +30,7 @@ import {
 import appsFlyer from 'react-native-appsflyer';
 import {IntroSection} from '../../component/homescreen/Intro-Section';
 import {FlashList} from '@shopify/flash-list';
+import CustomButton from '../../component/buttons/CustomButtons';
 
 const SLIDE_WIDTH = Dimensions.get('window').width * 0.88;
 const ITEM_WIDTH = SLIDE_WIDTH;
@@ -77,7 +77,6 @@ const Investscreen = () => {
     }, []),
   );
 
-
   // useFocusEffect(
   //   useCallback(() => {
   //     const mergedData = [...allArmData, ...allILendaData];
@@ -86,8 +85,8 @@ const Investscreen = () => {
   // );
   useEffect(() => {
     if (route.name === 'Invest') {
-        const mergedData = [...allArmData, ...allILendaData];
-        setAllInvestmentData(mergedData);
+      const mergedData = [...allArmData, ...allILendaData];
+      setAllInvestmentData(mergedData);
     }
   }, [allArmData, allILendaData]);
 
@@ -252,8 +251,8 @@ const Investscreen = () => {
         {isLoading ? (
           <View
             style={{
-              width: wp('43.5%'),
-              height: hp('25%'),
+              width: wp(43.5),
+              height: hp(26),
               marginHorizontal: 2,
               borderRadius: 20,
               borderColor: '#F7F7FC',
@@ -298,7 +297,7 @@ const Investscreen = () => {
               </View>
               <View>
                 <Text style={styles.amount}>{item.amount}</Text>
-                <Button
+                <CustomButton
                   onPress={() => {
                     if (item.id == 1) {
                       logAppsFlyer(
@@ -329,15 +328,8 @@ const Investscreen = () => {
                     }
                   }}
                   title={item.buttonText}
-                  type="solid"
-                  raised={true}
-                  titleStyle={styles.getText}
-                  buttonStyle={{
-                    borderRadius: 5,
-                    borderColor: COLORS.lendaBlue,
-                    backgroundColor: COLORS.lendaBlue,
-                  }}
-                  containerStyle={styles.buttonAction}
+                  buttonStyle={{width: '70%'}}
+                  textStyle={{fontSize: 14}}
                 />
               </View>
               <View
@@ -593,12 +585,8 @@ const Investscreen = () => {
 
   const reanderIntroSection = () => {
     return isLoading ? (
-      <View style={[styles.headerContainer]}>
-        <Skeleton
-          animation="wave"
-          width={ITEM_WIDTH}
-          height={50}
-        />
+      <View style={[styles.headerContainer, {justifyContent: 'center'}]}>
+        <Skeleton animation="wave" width={wp(90)} height={50} />
       </View>
     ) : (
       <IntroSection
@@ -617,10 +605,18 @@ const Investscreen = () => {
       style={{
         flex: 1,
         backgroundColor: '#fff',
-        paddingTop: insets.top !== 0 ? insets.top : 18,
-        paddingBottom: insets.bottom !== 0 ? insets.bottom / 2 : 'auto',
-        paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
-        paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
+        paddingTop:
+          insets.top !== 0 ? (insets.top < 10 ? insets.top : 10) : 'auto',
+        paddingBottom:
+          insets.bottom !== 0
+            ? insets.bottom < 10
+              ? insets.bottom
+              : 10
+            : 'auto',
+        paddingLeft:
+          insets.left !== 0 ? (insets.left < 10 ? insets.left : 10) : 'auto',
+        paddingRight:
+          insets.right !== 0 ? (insets.right < 10 ? insets.right : 10) : 'auto',
       }}>
       {renderRootComponents()}
       <View style={styles.innerContainer}>
@@ -628,6 +624,7 @@ const Investscreen = () => {
           data={status ? status : []}
           showsHorizontalScrollIndicator={false}
           showsVerticalScrollIndicator={false}
+          contentContainerStyle={{flex: 1, justifyContent: 'space-evenly'}}
           horizontal
           renderItem={({item}) => <Slide item={item} />}
         />

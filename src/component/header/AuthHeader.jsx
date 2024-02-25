@@ -52,7 +52,7 @@ export const AuthHeader = props => {
 };
 
 const styles = StyleSheet.create({
-  container: {
+  container: {marginTop: 20,
     flex: 1,
     paddingHorizontal: SIZES.base,
     width: wp('100%'),

@@ -34,6 +34,7 @@ import {
 import COLORS from '../../constants/colors';
 import Toast from 'react-native-toast-message';
 import Carousel, {Pagination} from 'react-native-snap-carousel';
+import CustomButton from '../../component/buttons/CustomButtons';
 
 const SLIDE_WIDTH = Dimensions.get('window').width * 0.88;
 const ITEM_WIDTH = SLIDE_WIDTH;
@@ -937,12 +938,16 @@ const Loanscreen = () => {
 
   const reanderIntroSection = () => {
     return isLoading ? (
-      <View style={[styles.headerContainer]}>
+      <View
+        style={[
+          styles.headerContainer,
+          {justifyContent: 'center', width: wp(100), marginHorizontal: 10},
+        ]}>
         <Skeleton
           animation="wave"
-          width={ITEM_WIDTH}
+          width={'100%'}
           height={50}
-          style={styles.tobTab}
+          style={[styles.tobTab, {justifyContent: 'center'}]}
         />
       </View>
     ) : (
@@ -955,7 +960,11 @@ const Loanscreen = () => {
 
   const renderHeaderComponents = () => {
     return isLoading ? (
-      <View style={[styles.headerContainer]}>
+      <View
+        style={[
+          styles.headerContainer,
+          {justifyContent: 'center', width: wp(100), marginHorizontal: 10},
+        ]}>
         <View style={styles.leftView}>
           <View style={{flexDirection: 'row'}}>
             <Skeleton
@@ -986,45 +995,53 @@ const Loanscreen = () => {
       <View style={[styles.headerContainer]}>
         <View style={styles.leftView}>
           <View style={{flexDirection: 'row'}}>
-            <Button
-              onPress={() => navigation.navigate('Loan')}
+            <CustomButton
+              onPress={() => navigation.navigate('LoanHome')}
               title="Loan"
-              type="outline"
-              raised={true}
-              titleStyle={{
+              textStyle={{
                 color: COLORS.lendaBlue,
-                fontSize: 12,
-                fontWeight: '600',
+                fontSize: 14,
+                fontWeight: '500',
               }}
-              buttonStyle={{
-                borderRadius: 5,
-                borderColor: COLORS.lendaBlue,
-                paddingHorizontal: 15,
-              }}
-              containerStyle={styles.tobTab}
+              buttonStyle={[
+                styles.tobTab,
+                {
+                  backgroundColor: COLORS.white,
+                  borderColor: COLORS.lendaBlue,
+                  borderWidth: 1,
+                  borderRadius: 5,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  paddingHorizontal: 15,
+                },
+              ]}
             />
-            <Button
+            <CustomButton
               onPress={() => navigation.navigate('Guarantor')}
               title="Guarantor"
-              type="outline"
-              raised={true}
-              titleStyle={{
+              textStyle={{
                 color: COLORS.lendaBlue,
-                fontSize: 12,
-                fontWeight: '600',
+                fontSize: 14,
+                fontWeight: '500',
               }}
-              buttonStyle={{
-                borderRadius: 5,
-                borderColor: COLORS.lendaBlue,
-                paddingHorizontal: 15,
-              }}
-              containerStyle={styles.tobTab}
+              buttonStyle={[
+                styles.tobTab,
+                {
+                  backgroundColor: COLORS.white,
+                  borderColor: COLORS.lendaBlue,
+                  borderWidth: 1,
+                  borderRadius: 5,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  paddingHorizontal: 15,
+                },
+              ]}
             />
           </View>
         </View>
 
         <View style={styles.rightView}>
-          <Button
+          <CustomButton
             onPress={() => {
               if (guarantor && guarantor?.length <= 0) {
                 Toast.show({
@@ -1051,28 +1068,29 @@ const Loanscreen = () => {
               );
             }}
             title="Get Loan"
-            type="solid"
-            raised={true}
-            titleStyle={{
-              color: COLORS.white,
-              fontSize: 12,
-              fontWeight: '600',
+            textStyle={{
+              fontSize: 14,
+              fontWeight: '500',
             }}
-            buttonStyle={{
-              borderRadius: 5,
-              borderColor: COLORS.lendaBlue,
-              backgroundColor: COLORS.lendaBlue,
-              paddingHorizontal: 20,
-            }}
-            containerStyle={styles.getLoan}
+            buttonStyle={[
+              styles.tobTab,
+              {
+                borderWidth: 1,
+                borderRadius: 5,
+                justifyContent: 'center',
+                alignItems: 'center',
+                paddingHorizontal: 15,
+                borderColor: COLORS.lendaBlue,
+              },
+            ]}
           />
         </View>
       </View>
     );
   };
 
-  const renderSlideComponent = () => {
 
+  const renderSlideComponent = () => {
     return (
       <>
         <View style={styles.innerContainer}>
@@ -1141,10 +1159,18 @@ const Loanscreen = () => {
         height: hp('100%'),
         width: wp('100%'),
         backgroundColor: COLORS.lendaLightGrey,
-        paddingTop: insets.top !== 0 ? insets.top : 18,
-        paddingBottom: insets.bottom !== 0 ? insets.bottom / 2 : 'auto',
-        paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
-        paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
+        paddingTop:
+          insets.top !== 0 ? (insets.top < 10 ? insets.top : 10) : 'auto',
+        paddingBottom:
+          insets.bottom !== 0
+            ? insets.bottom < 10
+              ? insets.bottom
+              : 10
+            : 'auto',
+        paddingLeft:
+          insets.left !== 0 ? (insets.left < 10 ? insets.left : 10) : 'auto',
+        paddingRight:
+          insets.right !== 0 ? (insets.right < 10 ? insets.right : 10) : 'auto',
       }}>
       {/* Intro Component */}
       {renderRootComponents()}
