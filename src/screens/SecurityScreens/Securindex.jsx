@@ -138,7 +138,7 @@ const Securindex = () => {
             padding: 18,
             borderRadius: 12,
           }}
-          onPress={() => navigation.navigate('SetLockPin')}>
+          onPress={() => navigation.navigate('ResetPassword')}>
           <View style={{flexDirection: 'row', alignItems: 'center'}}>
             <View
               style={{

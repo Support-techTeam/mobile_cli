@@ -76,6 +76,7 @@ import {setProfile} from '../util/redux/userProfile/user.profile.slice';
 import Step3 from '../screens/ProfileOnboardings/StepForm/Step3';
 import Step2 from '../screens/ProfileOnboardings/StepForm/Step2';
 import Step1 from '../screens/ProfileOnboardings/StepForm/Step1';
+import ResetPassword from '../screens/Authentications/ResetPassword';
 
 const Stack = createNativeStackNavigator();
 const config = {
@@ -218,6 +219,7 @@ const AppStack = () => {
           <Stack.Screen name="LockPin" component={LockPin} />
           <Stack.Screen name="SetPin" component={TransPin} />
           <Stack.Screen name="ResetPin" component={ResetPin} />
+          <Stack.Screen name="ResetPassword" component={ResetPassword} />
           {/* App Lock */}
           <Stack.Screen name="SetLockPin" component={SetLockPin} />
           <Stack.Screen name="ResetLockPin" component={ResetLockPin} />

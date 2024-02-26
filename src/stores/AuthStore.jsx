@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {BASE_URL, BASE_API_URL} from '../../app.json';
 import {store} from '../util/redux/store';
 import {DdLogs} from '@datadog/mobile-react-native';
-import auth from '@react-native-firebase/auth';
+import auth, {firebase} from '@react-native-firebase/auth';
 import axios from 'axios';
 
 const axiosInstance = axios.create({baseURL: BASE_API_URL});
@@ -292,16 +292,19 @@ const updatePhoneNumber = async (phoneNumber, uuid) => {
       uuid: uuid,
     };
     try {
-      const response = await axiosInstance.post(`/users/update-firebase-phone`, payload, {
-        headers,
-      });
+      const response = await axiosInstance.post(
+        `/users/update-firebase-phone`,
+        payload,
+        {
+          headers,
+        },
+      );
       DdLogs.info(
         `User Verification | Verify OTP | ${auth().currentUser?.email}`,
         {
           context: JSON.stringify(response?.data),
         },
       );
-  
     } catch (error) {
       DdLogs.error(
         `User Verification | Verify OTP | ${auth()?.currentUser?.email}`,
@@ -424,6 +427,40 @@ const getFirebaseAuthToken = async () => {
   }
 };
 
+const userChangePassword = async data => {
+  try {
+    //getuser credentials
+    var user = firebase.auth().currentUser;
+    const cred = firebase.auth.EmailAuthProvider.credential(
+      user.email,
+      data.currentPassword,
+    );
+    // re-auth user
+    const reauthResponse = await user.reauthenticateWithCredential(cred);
+    // update password
+    const updateResponse = await user.updatePassword(data.password);
+    return {
+      title: 'Change Password',
+      error: false,
+      data: user,
+      message: 'Password updated successfully!',
+    };
+  } catch (err) {
+    const errorMsg =
+      err.code === 'auth/user-not-found'
+        ? 'User not found. Please check your email.'
+        : err.code === 'auth/wrong-password'
+        ? 'Incorrect password. Please try again.'
+        : 'An error occurred. Please try again later.';
+    return {
+      title: 'Change Password',
+      error: true,
+      data: null,
+      message: errorMsg,
+    };
+  }
+};
+
 export {
   userLogin,
   userLogOut,
@@ -432,4 +469,5 @@ export {
   forgotPassword,
   verifyOTP,
   resendOTP,
+  userChangePassword,
 };
