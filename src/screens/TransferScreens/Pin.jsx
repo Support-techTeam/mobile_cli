@@ -11,7 +11,6 @@ import {
 import React, {useEffect, useRef, useState} from 'react';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useNavigation} from '@react-navigation/native';
-import Spinner from 'react-native-loading-spinner-overlay/lib';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import Buttons from '../../component/buttons/Buttons';
@@ -36,6 +35,7 @@ import styles, {
 } from '../../../styles';
 import COLORS from '../../constants/colors';
 import {Center, Checkbox} from 'native-base';
+import Loader from '../../component/loader/loader';
 
 const {Value, Text: AnimatedText} = Animated;
 const CELL_COUNT = 4;
@@ -71,7 +71,7 @@ const Pin = ({route}) => {
   });
 
   const disableit = value.length === 4 ? false : true;
-  
+
   const renderCell = ({index, symbol, isFocused}) => {
     const hasValue = Boolean(symbol);
     const animatedCellStyle = {
@@ -287,14 +287,7 @@ const Pin = ({route}) => {
         paddingLeft: insets.left !== 0 ? Math.min(insets.left, 10) : 'auto',
         paddingRight: insets.right !== 0 ? Math.min(insets.right, 10) : 'auto',
       }}>
-      {isLoading && (
-        <Spinner
-          textContent={'Processing Please wait...'}
-          textStyle={{color: 'white'}}
-          visible={true}
-          overlayColor="rgba(78, 75, 102, 0.7)"
-        />
-      )}
+      <Loader visible={isLoading} loadingText={'Processing please wait...'} />
 
       <Header
         routeAction={() => navigation.goBack()}

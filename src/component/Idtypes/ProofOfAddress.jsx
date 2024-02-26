@@ -31,6 +31,7 @@ import Toast from 'react-native-toast-message';
 import Spinner from 'react-native-loading-spinner-overlay/lib';
 import {uploadProgress} from '../../stores/LoanStore';
 import {DdLogs} from '@datadog/mobile-react-native';
+import Loader from '../loader/loader';
 
 const statusBarHeight = getStatusBarHeight();
 
@@ -1156,7 +1157,7 @@ const ProofofAdd = ({
               [document]: `${res?.data?.data?.url}`,
             };
           });
-          
+
           userDocs?.validIdentificationType === undefined
             ? handleCreateDocs()
             : handleUpdateDocs();
@@ -1179,1118 +1180,1130 @@ const ProofofAdd = ({
   };
 
   return (
-    <ScrollView
-      bounces={false}
-      showsHorizontalScrollIndicator={false}
-      showsVerticalScrollIndicator={false}>
-      {isUpdating && (
-        <Spinner
-          textContent={'Please wait...'}
-          textStyle={{color: 'white'}}
-          visible={true}
-          overlayColor="rgba(78, 75, 102, 0.7)"
-        />
-      )}
-      <Modal visible={showConfirmModal}>
-        <View style={styles.modalContainer}>
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              marginHorizontal: 15,
-            }}>
-            <TouchableOpacity>
-              <View
-                style={{
-                  borderWidth: 0.5,
-                  borderColor: '#D9DBE9',
-                  borderRadius: 5,
-                }}>
-                <TouchableOpacity onPress={() => noPhoto()}>
-                  <AntDesign name="left" size={24} color="black" />
-                </TouchableOpacity>
-              </View>
-            </TouchableOpacity>
-            <View style={styles.HeadView}>
-              <View style={styles.TopView}>
-                <Text style={styles.TextHead}>CONFIRM IMAGE</Text>
+    <View>
+      <Loader visible={isUpdating} loadingText={'Please wait...'} />
+
+      <ScrollView
+        bounces={false}
+        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}>
+        <Modal visible={showConfirmModal}>
+          <View style={styles.modalContainer}>
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginHorizontal: 15,
+              }}>
+              <TouchableOpacity>
+                <View
+                  style={{
+                    borderWidth: 0.5,
+                    borderColor: '#D9DBE9',
+                    borderRadius: 5,
+                  }}>
+                  <TouchableOpacity onPress={() => noPhoto()}>
+                    <AntDesign name="left" size={24} color="black" />
+                  </TouchableOpacity>
+                </View>
+              </TouchableOpacity>
+              <View style={styles.HeadView}>
+                <View style={styles.TopView}>
+                  <Text style={styles.TextHead}>CONFIRM IMAGE</Text>
+                </View>
               </View>
             </View>
-          </View>
-          <View style={styles.demark} />
-          <Text style={styles.extraText}>
-            Ensure that your image is clear and, not blurry
-          </Text>
-          <View style={styles.imageContainer}>
-            <Image source={{uri: image}} style={styles.modalImage} />
-          </View>
-          <View style={{paddingHorizontal: 22, marginVertical: 20}}>
-            <TouchableOpacity onPress={confirmPhoto}>
-              <Buttons label="Confirm Photo" />
-            </TouchableOpacity>
-          </View>
-
-          <View style={{paddingHorizontal: 22, marginVertical: 20}}>
-            <TouchableOpacity onPress={retakePhoto1}>
-              <View style={styles.signUpactivity}>
-                <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                  <Feather name="camera" size={25} color="#054B99" />
-                  <Text style={styles.retake}>Retake Photo</Text>
-                </View>
-              </View>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
-
-      <View style={styles.require}>
-        <View>
-          <Text style={styles.Head}>Document Requirements </Text>
-        </View>
-        <View style={{marginBottom: 10}}>
-          {isProof && !isCam && (
-            <>
-              <Text style={styles.textHead}>
-                Take a clear picture or upload a proof of address (utility bill)
-                It must carry the address you entered. Date on utility bill must
-                not be more than 3month before registration
-              </Text>
-              <View style={styles.reqField}>
-                {docsName.utilityBill || userDocs.utilityBill ? (
-                  <>
-                    <View>
-                      <Text>{docsName.utilityBill.name}</Text>
-                    </View>
-                    {fileUrl !== '' && (
-                      <Image
-                        source={{uri: fileUrl}}
-                        style={{
-                          width: '100%',
-                          height: '100%',
-                          resizeMode: 'contain',
-                        }}
-                      />
-                    )}
-                    {fileUrl == '' && userDocs.utilityBill != '' && (
-                      <Image
-                        source={{uri: userDocs.utilityBill}}
-                        style={{
-                          width: '100%',
-                          height: '100%',
-                          resizeMode: 'contain',
-                        }}
-                      />
-                    )}
-                  </>
-                ) : (
-                  <>
-                    <TouchableOpacity
-                      style={{
-                        backgroundColor: '#24348B',
-                        padding: 10,
-                        borderRadius: 5,
-                      }}
-                      onPress={pickDocument1}>
-                      <Entypo
-                        name="upload-to-cloud"
-                        size={30}
-                        color="#FCFCFC"
-                      />
-                    </TouchableOpacity>
-                    <Text style={styles.takeText}>Browse Files</Text>
-                    <Text style={styles.takeText2}>
-                      File format: JPG, JPEG, PNG,PDF | Max File Size 3mb
-                    </Text>
-                  </>
-                )}
-              </View>
-              <TouchableOpacity
-                style={{marginTop: 10}}
-                onPress={s3UploadFunction}>
-                <Buttons
-                  label="Upload"
-                  disabled={docsName.utilityBill === '' || fileUrl === ''}
-                />
+            <View style={styles.demark} />
+            <Text style={styles.extraText}>
+              Ensure that your image is clear and, not blurry
+            </Text>
+            <View style={styles.imageContainer}>
+              <Image source={{uri: image}} style={styles.modalImage} />
+            </View>
+            <View style={{paddingHorizontal: 22, marginVertical: 20}}>
+              <TouchableOpacity onPress={confirmPhoto}>
+                <Buttons label="Confirm Photo" />
               </TouchableOpacity>
-              <TouchableOpacity style={{marginTop: 10}} onPress={pickDocument1}>
-                <Buttons
-                  label="Change Selection"
-                  // disabled={docsName.utilityBill === ''}
-                />
-              </TouchableOpacity>
-              {uploadProgress && uploadProgress > 0 ? (
-                <View
-                  style={{
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    marginTop: 20,
-                  }}>
-                  <Text>{uploadProgress && uploadProgress}% complete</Text>
+            </View>
+
+            <View style={{paddingHorizontal: 22, marginVertical: 20}}>
+              <TouchableOpacity onPress={retakePhoto1}>
+                <View style={styles.signUpactivity}>
+                  <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                    <Feather name="camera" size={25} color="#054B99" />
+                    <Text style={styles.retake}>Retake Photo</Text>
+                  </View>
                 </View>
-              ) : null}
-            </>
-          )}
-          {isProof && isCam && (
-            <>
-              <Text style={styles.textHead}>
-                Take a clear picture or upload a proof of address (utility bill)
-                It must carry the address you entered. Date on utility bill must
-                not be more than 3month before registration
-              </Text>
-              <View style={styles.reqField}>
-                {fileUrl !== '' ? (
-                  <Image
-                    source={{uri: fileUrl}}
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      resizeMode: 'contain',
-                    }}
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+
+        <View style={styles.require}>
+          <View>
+            <Text style={styles.Head}>Document Requirements </Text>
+          </View>
+          <View style={{marginBottom: 10}}>
+            {isProof && !isCam && (
+              <>
+                <Text style={styles.textHead}>
+                  Take a clear picture or upload a proof of address (utility
+                  bill) It must carry the address you entered. Date on utility
+                  bill must not be more than 3month before registration
+                </Text>
+                <View style={styles.reqField}>
+                  {docsName.utilityBill || userDocs.utilityBill ? (
+                    <>
+                      <View>
+                        <Text>{docsName.utilityBill.name}</Text>
+                      </View>
+                      {fileUrl !== '' && (
+                        <Image
+                          source={{uri: fileUrl}}
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            resizeMode: 'contain',
+                          }}
+                        />
+                      )}
+                      {fileUrl == '' && userDocs.utilityBill != '' && (
+                        <Image
+                          source={{uri: userDocs.utilityBill}}
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            resizeMode: 'contain',
+                          }}
+                        />
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      <TouchableOpacity
+                        style={{
+                          backgroundColor: '#24348B',
+                          padding: 10,
+                          borderRadius: 5,
+                        }}
+                        onPress={pickDocument1}>
+                        <Entypo
+                          name="upload-to-cloud"
+                          size={30}
+                          color="#FCFCFC"
+                        />
+                      </TouchableOpacity>
+                      <Text style={styles.takeText}>Browse Files</Text>
+                      <Text style={styles.takeText2}>
+                        File format: JPG, JPEG, PNG,PDF | Max File Size 3mb
+                      </Text>
+                    </>
+                  )}
+                </View>
+                <TouchableOpacity
+                  style={{marginTop: 10}}
+                  onPress={s3UploadFunction}>
+                  <Buttons
+                    label="Upload"
+                    disabled={docsName.utilityBill === '' || fileUrl === ''}
                   />
-                ) : (
-                  <>
-                    <TouchableOpacity
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={{marginTop: 10}}
+                  onPress={pickDocument1}>
+                  <Buttons
+                    label="Change Selection"
+                    // disabled={docsName.utilityBill === ''}
+                  />
+                </TouchableOpacity>
+                {uploadProgress && uploadProgress > 0 ? (
+                  <View
+                    style={{
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      marginTop: 20,
+                    }}>
+                    <Text>{uploadProgress && uploadProgress}% complete</Text>
+                  </View>
+                ) : null}
+              </>
+            )}
+            {isProof && isCam && (
+              <>
+                <Text style={styles.textHead}>
+                  Take a clear picture or upload a proof of address (utility
+                  bill) It must carry the address you entered. Date on utility
+                  bill must not be more than 3month before registration
+                </Text>
+                <View style={styles.reqField}>
+                  {fileUrl !== '' ? (
+                    <Image
+                      source={{uri: fileUrl}}
                       style={{
-                        backgroundColor: '#24348B',
-                        padding: 10,
-                        borderRadius: 5,
+                        width: '100%',
+                        height: '100%',
+                        resizeMode: 'contain',
                       }}
-                      onPress={launchCameraAsync1}>
-                      <FontAwesome name="camera" size={30} color="#FCFCFC" />
-                    </TouchableOpacity>
-                    <Text style={styles.takeText}>Tap to take a photo</Text>
-                  </>
-                )}
-              </View>
-              <TouchableOpacity
-                style={{opacity: 1, marginTop: 10}}
-                onPress={s3UploadFunction}>
-                <Buttons label="Upload" />
-              </TouchableOpacity>
-
-              {uploadProgress && uploadProgress > 0 ? (
-                <View
-                  style={{
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    marginTop: 20,
-                  }}>
-                  <Text>{uploadProgress && uploadProgress}% complete</Text>
+                    />
+                  ) : (
+                    <>
+                      <TouchableOpacity
+                        style={{
+                          backgroundColor: '#24348B',
+                          padding: 10,
+                          borderRadius: 5,
+                        }}
+                        onPress={launchCameraAsync1}>
+                        <FontAwesome name="camera" size={30} color="#FCFCFC" />
+                      </TouchableOpacity>
+                      <Text style={styles.takeText}>Tap to take a photo</Text>
+                    </>
+                  )}
                 </View>
-              ) : null}
-            </>
-          )}
+                <TouchableOpacity
+                  style={{opacity: 1, marginTop: 10}}
+                  onPress={s3UploadFunction}>
+                  <Buttons label="Upload" />
+                </TouchableOpacity>
 
-          {isSeal && !isCam && (
-            <>
-              <Text style={styles.textHead}>
-                Take a clear picture or upload your company seal
-              </Text>
-              <Text style={[styles.textHead, {color: '#054B99'}]}>
-                See samples
-              </Text>
-              <View style={styles.reqField}>
-                {docsName.seal || userDocs.seal ? (
-                  <>
-                    <View>
-                      <Text>{docsName.seal.name}</Text>
-                    </View>
-                    {fileUrl !== '' && (
-                      <Image
-                        source={{uri: fileUrl}}
-                        style={{
-                          width: '100%',
-                          height: '100%',
-                          resizeMode: 'contain',
-                        }}
-                      />
-                    )}
+                {uploadProgress && uploadProgress > 0 ? (
+                  <View
+                    style={{
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      marginTop: 20,
+                    }}>
+                    <Text>{uploadProgress && uploadProgress}% complete</Text>
+                  </View>
+                ) : null}
+              </>
+            )}
 
-                    {userDocs.seal != '' && fileUrl == '' && (
-                      <Image
-                        source={{uri: userDocs.seal}}
+            {isSeal && !isCam && (
+              <>
+                <Text style={styles.textHead}>
+                  Take a clear picture or upload your company seal
+                </Text>
+                <Text style={[styles.textHead, {color: '#054B99'}]}>
+                  See samples
+                </Text>
+                <View style={styles.reqField}>
+                  {docsName.seal || userDocs.seal ? (
+                    <>
+                      <View>
+                        <Text>{docsName.seal.name}</Text>
+                      </View>
+                      {fileUrl !== '' && (
+                        <Image
+                          source={{uri: fileUrl}}
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            resizeMode: 'contain',
+                          }}
+                        />
+                      )}
+
+                      {userDocs.seal != '' && fileUrl == '' && (
+                        <Image
+                          source={{uri: userDocs.seal}}
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            resizeMode: 'contain',
+                          }}
+                        />
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      <TouchableOpacity
                         style={{
-                          width: '100%',
-                          height: '100%',
-                          resizeMode: 'contain',
+                          backgroundColor: '#24348B',
+                          padding: 10,
+                          borderRadius: 5,
                         }}
-                      />
-                    )}
-                  </>
-                ) : (
-                  <>
-                    <TouchableOpacity
-                      style={{
-                        backgroundColor: '#24348B',
-                        padding: 10,
-                        borderRadius: 5,
-                      }}
-                      onPress={pickDocument5}>
-                      <Entypo
-                        name="upload-to-cloud"
-                        size={30}
-                        color="#FCFCFC"
-                      />
-                    </TouchableOpacity>
-                    <Text style={styles.takeText}>Browse Files</Text>
-                    <Text style={styles.takeText2}>
-                      File format: JPG, JPEG, PNG,PDF | Max File Size 3mb
-                    </Text>
-                  </>
-                )}
-              </View>
-              <TouchableOpacity
-                disabled={docsName.seal === '' || fileUrl === ''}
-                style={{marginTop: 10}}
-                onPress={s3UploadFunction}>
-                <Buttons
-                  label="Upload"
+                        onPress={pickDocument5}>
+                        <Entypo
+                          name="upload-to-cloud"
+                          size={30}
+                          color="#FCFCFC"
+                        />
+                      </TouchableOpacity>
+                      <Text style={styles.takeText}>Browse Files</Text>
+                      <Text style={styles.takeText2}>
+                        File format: JPG, JPEG, PNG,PDF | Max File Size 3mb
+                      </Text>
+                    </>
+                  )}
+                </View>
+                <TouchableOpacity
                   disabled={docsName.seal === '' || fileUrl === ''}
-                />
-              </TouchableOpacity>
-              <TouchableOpacity style={{marginTop: 10}} onPress={pickDocument5}>
-                <Buttons
-                  label="Change Selection"
-                  // disabled={docsName.seal === ''}
-                />
-              </TouchableOpacity>
-              {uploadProgress && uploadProgress > 0 ? (
-                <View
-                  style={{
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    marginTop: 20,
-                  }}>
-                  <Text>{uploadProgress && uploadProgress}% complete</Text>
-                </View>
-              ) : null}
-            </>
-          )}
-          {isSeal && isCam && (
-            <>
-              <Text style={styles.textHead}>
-                Take a clear picture or upload a proof of address (utility bill)
-                It must carry the address you entered. Date on utility bill must
-                not be more than 3month before registration
-              </Text>
-              <View style={styles.reqField}>
-                {fileUrl !== '' ? (
-                  <Image
-                    source={{uri: fileUrl}}
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      resizeMode: 'contain',
-                    }}
+                  style={{marginTop: 10}}
+                  onPress={s3UploadFunction}>
+                  <Buttons
+                    label="Upload"
+                    disabled={docsName.seal === '' || fileUrl === ''}
                   />
-                ) : (
-                  <>
-                    <TouchableOpacity
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={{marginTop: 10}}
+                  onPress={pickDocument5}>
+                  <Buttons
+                    label="Change Selection"
+                    // disabled={docsName.seal === ''}
+                  />
+                </TouchableOpacity>
+                {uploadProgress && uploadProgress > 0 ? (
+                  <View
+                    style={{
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      marginTop: 20,
+                    }}>
+                    <Text>{uploadProgress && uploadProgress}% complete</Text>
+                  </View>
+                ) : null}
+              </>
+            )}
+            {isSeal && isCam && (
+              <>
+                <Text style={styles.textHead}>
+                  Take a clear picture or upload a proof of address (utility
+                  bill) It must carry the address you entered. Date on utility
+                  bill must not be more than 3month before registration
+                </Text>
+                <View style={styles.reqField}>
+                  {fileUrl !== '' ? (
+                    <Image
+                      source={{uri: fileUrl}}
                       style={{
-                        backgroundColor: '#24348B',
-                        padding: 10,
-                        borderRadius: 5,
+                        width: '100%',
+                        height: '100%',
+                        resizeMode: 'contain',
                       }}
-                      onPress={launchCameraAsync4}>
-                      <FontAwesome name="camera" size={30} color="#FCFCFC" />
-                    </TouchableOpacity>
-                    <Text style={styles.takeText}>Tap to take a photo</Text>
-                  </>
-                )}
-              </View>
-              <TouchableOpacity
-                style={{opacity: 1, marginTop: 10}}
-                onPress={s3UploadFunction}>
-                <Buttons label="Upload" />
-              </TouchableOpacity>
-              {uploadProgress && uploadProgress > 0 ? (
-                <View
-                  style={{
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    marginTop: 20,
-                  }}>
-                  <Text>{uploadProgress && uploadProgress}% complete</Text>
+                    />
+                  ) : (
+                    <>
+                      <TouchableOpacity
+                        style={{
+                          backgroundColor: '#24348B',
+                          padding: 10,
+                          borderRadius: 5,
+                        }}
+                        onPress={launchCameraAsync4}>
+                        <FontAwesome name="camera" size={30} color="#FCFCFC" />
+                      </TouchableOpacity>
+                      <Text style={styles.takeText}>Tap to take a photo</Text>
+                    </>
+                  )}
                 </View>
-              ) : null}
-            </>
-          )}
-          {isCac && !isCam && (
-            <>
-              <Text style={styles.textHead}>
-                Take a clear picture or upload your CAC
-              </Text>
-              <Text style={[styles.textHead, {color: '#054B99'}]}>
-                See samples
-              </Text>
-              <View style={styles.reqField}>
-                {docsName.cacCertificate || userDocs.cacCertificate ? (
-                  <>
-                    <View>
-                      <Text>{docsName.cacCertificate.name}</Text>
-                    </View>
-                    {fileUrl !== '' && (
-                      <Image
-                        source={{uri: fileUrl}}
-                        style={{
-                          width: '100%',
-                          height: '100%',
-                          resizeMode: 'contain',
-                        }}
-                      />
-                    )}
+                <TouchableOpacity
+                  style={{opacity: 1, marginTop: 10}}
+                  onPress={s3UploadFunction}>
+                  <Buttons label="Upload" />
+                </TouchableOpacity>
+                {uploadProgress && uploadProgress > 0 ? (
+                  <View
+                    style={{
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      marginTop: 20,
+                    }}>
+                    <Text>{uploadProgress && uploadProgress}% complete</Text>
+                  </View>
+                ) : null}
+              </>
+            )}
+            {isCac && !isCam && (
+              <>
+                <Text style={styles.textHead}>
+                  Take a clear picture or upload your CAC
+                </Text>
+                <Text style={[styles.textHead, {color: '#054B99'}]}>
+                  See samples
+                </Text>
+                <View style={styles.reqField}>
+                  {docsName.cacCertificate || userDocs.cacCertificate ? (
+                    <>
+                      <View>
+                        <Text>{docsName.cacCertificate.name}</Text>
+                      </View>
+                      {fileUrl !== '' && (
+                        <Image
+                          source={{uri: fileUrl}}
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            resizeMode: 'contain',
+                          }}
+                        />
+                      )}
 
-                    {userDocs.cacCertificate != '' && fileUrl == '' && (
-                      <Image
-                        source={{uri: userDocs.cacCertificate}}
+                      {userDocs.cacCertificate != '' && fileUrl == '' && (
+                        <Image
+                          source={{uri: userDocs.cacCertificate}}
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            resizeMode: 'contain',
+                          }}
+                        />
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      <TouchableOpacity
                         style={{
-                          width: '100%',
-                          height: '100%',
-                          resizeMode: 'contain',
+                          backgroundColor: '#24348B',
+                          padding: 10,
+                          borderRadius: 5,
                         }}
-                      />
-                    )}
-                  </>
-                ) : (
-                  <>
-                    <TouchableOpacity
-                      style={{
-                        backgroundColor: '#24348B',
-                        padding: 10,
-                        borderRadius: 5,
-                      }}
-                      onPress={pickDocument6}>
-                      <Entypo
-                        name="upload-to-cloud"
-                        size={30}
-                        color="#FCFCFC"
-                      />
-                    </TouchableOpacity>
-                    <Text style={styles.takeText}>Browse Files</Text>
-                    <Text style={styles.takeText2}>
-                      File format: JPG, JPEG, PNG,PDF | Max File Size 3mb
-                    </Text>
-                  </>
-                )}
-              </View>
-              <TouchableOpacity
-                disabled={docsName.cacCertificate === '' || fileUrl === ''}
-                style={{marginTop: 10}}
-                onPress={s3UploadFunction}>
-                <Buttons
+                        onPress={pickDocument6}>
+                        <Entypo
+                          name="upload-to-cloud"
+                          size={30}
+                          color="#FCFCFC"
+                        />
+                      </TouchableOpacity>
+                      <Text style={styles.takeText}>Browse Files</Text>
+                      <Text style={styles.takeText2}>
+                        File format: JPG, JPEG, PNG,PDF | Max File Size 3mb
+                      </Text>
+                    </>
+                  )}
+                </View>
+                <TouchableOpacity
                   disabled={docsName.cacCertificate === '' || fileUrl === ''}
-                  label="Upload"
-                />
-              </TouchableOpacity>
-              <TouchableOpacity style={{marginTop: 10}} onPress={pickDocument6}>
-                <Buttons
-                  label="Change Selection"
-                  // disabled={docsName.cacCertificate === ''}
-                />
-              </TouchableOpacity>
-              {uploadProgress && uploadProgress > 0 ? (
-                <View
-                  style={{
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    marginTop: 20,
-                  }}>
-                  <Text>{uploadProgress && uploadProgress}% complete</Text>
-                </View>
-              ) : null}
-            </>
-          )}
-          {isCac && isCam && (
-            <>
-              <Text style={styles.textHead}>
-                Take a clear picture or upload a proof of address (utility bill)
-                It must carry the address you entered. Date on utility bill must
-                not be more than 3month before registration
-              </Text>
-              <View style={styles.reqField}>
-                {fileUrl !== '' ? (
-                  <Image
-                    source={{uri: fileUrl}}
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      resizeMode: 'contain',
-                    }}
+                  style={{marginTop: 10}}
+                  onPress={s3UploadFunction}>
+                  <Buttons
+                    disabled={docsName.cacCertificate === '' || fileUrl === ''}
+                    label="Upload"
                   />
-                ) : (
-                  <>
-                    <TouchableOpacity
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={{marginTop: 10}}
+                  onPress={pickDocument6}>
+                  <Buttons
+                    label="Change Selection"
+                    // disabled={docsName.cacCertificate === ''}
+                  />
+                </TouchableOpacity>
+                {uploadProgress && uploadProgress > 0 ? (
+                  <View
+                    style={{
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      marginTop: 20,
+                    }}>
+                    <Text>{uploadProgress && uploadProgress}% complete</Text>
+                  </View>
+                ) : null}
+              </>
+            )}
+            {isCac && isCam && (
+              <>
+                <Text style={styles.textHead}>
+                  Take a clear picture or upload a proof of address (utility
+                  bill) It must carry the address you entered. Date on utility
+                  bill must not be more than 3month before registration
+                </Text>
+                <View style={styles.reqField}>
+                  {fileUrl !== '' ? (
+                    <Image
+                      source={{uri: fileUrl}}
                       style={{
-                        backgroundColor: '#24348B',
-                        padding: 10,
-                        borderRadius: 5,
+                        width: '100%',
+                        height: '100%',
+                        resizeMode: 'contain',
                       }}
-                      onPress={launchCameraAsync5}>
-                      <FontAwesome name="camera" size={30} color="#FCFCFC" />
-                    </TouchableOpacity>
-                    <Text style={styles.takeText}>Tap to take a photo</Text>
-                  </>
-                )}
-              </View>
-              <TouchableOpacity
-                style={{opacity: 1, marginTop: 10}}
-                onPress={s3UploadFunction}>
-                <Buttons label="Upload" />
-              </TouchableOpacity>
-              {uploadProgress && uploadProgress > 0 ? (
-                <View
-                  style={{
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    marginTop: 20,
-                  }}>
-                  <Text>{uploadProgress && uploadProgress}% complete</Text>
+                    />
+                  ) : (
+                    <>
+                      <TouchableOpacity
+                        style={{
+                          backgroundColor: '#24348B',
+                          padding: 10,
+                          borderRadius: 5,
+                        }}
+                        onPress={launchCameraAsync5}>
+                        <FontAwesome name="camera" size={30} color="#FCFCFC" />
+                      </TouchableOpacity>
+                      <Text style={styles.takeText}>Tap to take a photo</Text>
+                    </>
+                  )}
                 </View>
-              ) : null}
-            </>
-          )}
-          {isBank && !isCam && (
-            <>
-              <Text style={styles.textHead}>
-                Take a clear picture or upload your a copy of your bank
-                statement{' '}
-              </Text>
-              <Text style={[styles.textHead, {color: '#054B99'}]}>
-                See samples
-              </Text>
-              <Text style={styles.textHead}>
-                Statement of the last 12 month of account
-              </Text>
-              <View style={styles.reqField}>
-                {docsName.bankStatement || userDocs.bankStatement ? (
-                  <>
-                    <View>
-                      <Text>{docsName.bankStatement.name}</Text>
-                    </View>
-                    {fileUrl !== '' && (
-                      <Image
-                        source={{uri: fileUrl}}
+                <TouchableOpacity
+                  style={{opacity: 1, marginTop: 10}}
+                  onPress={s3UploadFunction}>
+                  <Buttons label="Upload" />
+                </TouchableOpacity>
+                {uploadProgress && uploadProgress > 0 ? (
+                  <View
+                    style={{
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      marginTop: 20,
+                    }}>
+                    <Text>{uploadProgress && uploadProgress}% complete</Text>
+                  </View>
+                ) : null}
+              </>
+            )}
+            {isBank && !isCam && (
+              <>
+                <Text style={styles.textHead}>
+                  Take a clear picture or upload your a copy of your bank
+                  statement{' '}
+                </Text>
+                <Text style={[styles.textHead, {color: '#054B99'}]}>
+                  See samples
+                </Text>
+                <Text style={styles.textHead}>
+                  Statement of the last 12 month of account
+                </Text>
+                <View style={styles.reqField}>
+                  {docsName.bankStatement || userDocs.bankStatement ? (
+                    <>
+                      <View>
+                        <Text>{docsName.bankStatement.name}</Text>
+                      </View>
+                      {fileUrl !== '' && (
+                        <Image
+                          source={{uri: fileUrl}}
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            resizeMode: 'contain',
+                          }}
+                        />
+                      )}
+                      {userDocs.bankStatement != '' && fileUrl == '' && (
+                        <Image
+                          source={{uri: userDocs.bankStatement}}
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            resizeMode: 'contain',
+                          }}
+                        />
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      <TouchableOpacity
                         style={{
-                          width: '100%',
-                          height: '100%',
-                          resizeMode: 'contain',
+                          backgroundColor: '#24348B',
+                          padding: 10,
+                          borderRadius: 5,
                         }}
-                      />
-                    )}
-                    {userDocs.bankStatement != '' && fileUrl == '' && (
-                      <Image
-                        source={{uri: userDocs.bankStatement}}
-                        style={{
-                          width: '100%',
-                          height: '100%',
-                          resizeMode: 'contain',
-                        }}
-                      />
-                    )}
-                  </>
-                ) : (
-                  <>
-                    <TouchableOpacity
-                      style={{
-                        backgroundColor: '#24348B',
-                        padding: 10,
-                        borderRadius: 5,
-                      }}
-                      onPress={pickDocument2}>
-                      <Entypo
-                        name="upload-to-cloud"
-                        size={30}
-                        color="#FCFCFC"
-                      />
-                    </TouchableOpacity>
-                    <Text style={styles.takeText}>Browse Files</Text>
-                    <Text style={styles.takeText2}>
-                      File format: JPG, JPEG, PNG,PDF | Max File Size 3mb
-                    </Text>
-                  </>
-                )}
-              </View>
-              <TouchableOpacity
-                disabled={docsName.bankStatement === '' || fileUrl === ''}
-                style={{marginTop: 10}}
-                onPress={s3UploadFunction}>
-                <Buttons
+                        onPress={pickDocument2}>
+                        <Entypo
+                          name="upload-to-cloud"
+                          size={30}
+                          color="#FCFCFC"
+                        />
+                      </TouchableOpacity>
+                      <Text style={styles.takeText}>Browse Files</Text>
+                      <Text style={styles.takeText2}>
+                        File format: JPG, JPEG, PNG,PDF | Max File Size 3mb
+                      </Text>
+                    </>
+                  )}
+                </View>
+                <TouchableOpacity
                   disabled={docsName.bankStatement === '' || fileUrl === ''}
-                  label="Upload"
-                />
-              </TouchableOpacity>
-              <TouchableOpacity style={{marginTop: 10}} onPress={pickDocument2}>
-                <Buttons
-                  label="Change Selection"
-                  // disabled={docsName.bankStatement === ''}
-                />
-              </TouchableOpacity>
-              {uploadProgress && uploadProgress > 0 ? (
-                <View
-                  style={{
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    marginTop: 20,
-                  }}>
-                  <Text>{uploadProgress && uploadProgress}% complete</Text>
-                </View>
-              ) : null}
-            </>
-          )}
-          {isBank && isCam && (
-            <>
-              <Text style={styles.textHead}>
-                Take a clear picture or upload a proof of address (utility bill)
-                It must carry the address you entered. Date on utility bill must
-                not be more than 3month before registration
-              </Text>
-              <View style={styles.reqField}>
-                {fileUrl !== '' ? (
-                  <Image
-                    source={{uri: fileUrl}}
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      resizeMode: 'contain',
-                    }}
+                  style={{marginTop: 10}}
+                  onPress={s3UploadFunction}>
+                  <Buttons
+                    disabled={docsName.bankStatement === '' || fileUrl === ''}
+                    label="Upload"
                   />
-                ) : (
-                  <>
-                    <TouchableOpacity
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={{marginTop: 10}}
+                  onPress={pickDocument2}>
+                  <Buttons
+                    label="Change Selection"
+                    // disabled={docsName.bankStatement === ''}
+                  />
+                </TouchableOpacity>
+                {uploadProgress && uploadProgress > 0 ? (
+                  <View
+                    style={{
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      marginTop: 20,
+                    }}>
+                    <Text>{uploadProgress && uploadProgress}% complete</Text>
+                  </View>
+                ) : null}
+              </>
+            )}
+            {isBank && isCam && (
+              <>
+                <Text style={styles.textHead}>
+                  Take a clear picture or upload a proof of address (utility
+                  bill) It must carry the address you entered. Date on utility
+                  bill must not be more than 3month before registration
+                </Text>
+                <View style={styles.reqField}>
+                  {fileUrl !== '' ? (
+                    <Image
+                      source={{uri: fileUrl}}
                       style={{
-                        backgroundColor: '#24348B',
-                        padding: 10,
-                        borderRadius: 5,
+                        width: '100%',
+                        height: '100%',
+                        resizeMode: 'contain',
                       }}
-                      onPress={launchCameraAsync2}>
-                      <FontAwesome name="camera" size={30} color="#FCFCFC" />
-                    </TouchableOpacity>
-                    <Text style={styles.takeText}>Tap to take a photo</Text>
-                  </>
-                )}
-              </View>
-              <TouchableOpacity
-                style={{opacity: 1, marginTop: 10}}
-                onPress={s3UploadFunction}>
-                <Buttons label="Upload" />
-              </TouchableOpacity>
-              {uploadProgress && uploadProgress > 0 ? (
-                <View
-                  style={{
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    marginTop: 20,
-                  }}>
-                  <Text>{uploadProgress && uploadProgress}% complete</Text>
+                    />
+                  ) : (
+                    <>
+                      <TouchableOpacity
+                        style={{
+                          backgroundColor: '#24348B',
+                          padding: 10,
+                          borderRadius: 5,
+                        }}
+                        onPress={launchCameraAsync2}>
+                        <FontAwesome name="camera" size={30} color="#FCFCFC" />
+                      </TouchableOpacity>
+                      <Text style={styles.takeText}>Tap to take a photo</Text>
+                    </>
+                  )}
                 </View>
-              ) : null}
-            </>
-          )}
-          {isPass && !isCam && (
-            <>
-              <Text style={styles.textHead}>
-                Take a clear picture or upload your Passport{' '}
-              </Text>
-              <Text style={[styles.textHead, {color: '#054B99'}]}>
-                See samples
-              </Text>
-              <Text style={styles.textHead}>
-                Passport size not more than 3MB
-              </Text>
-              <View style={styles.reqField}>
-                {docsName.passport || userDocs.passport ? (
-                  <>
-                    <View>
-                      <Text>{docsName.passport.name}</Text>
-                    </View>
-                    {fileUrl !== '' && (
-                      <Image
-                        source={{uri: fileUrl}}
+                <TouchableOpacity
+                  style={{opacity: 1, marginTop: 10}}
+                  onPress={s3UploadFunction}>
+                  <Buttons label="Upload" />
+                </TouchableOpacity>
+                {uploadProgress && uploadProgress > 0 ? (
+                  <View
+                    style={{
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      marginTop: 20,
+                    }}>
+                    <Text>{uploadProgress && uploadProgress}% complete</Text>
+                  </View>
+                ) : null}
+              </>
+            )}
+            {isPass && !isCam && (
+              <>
+                <Text style={styles.textHead}>
+                  Take a clear picture or upload your Passport{' '}
+                </Text>
+                <Text style={[styles.textHead, {color: '#054B99'}]}>
+                  See samples
+                </Text>
+                <Text style={styles.textHead}>
+                  Passport size not more than 3MB
+                </Text>
+                <View style={styles.reqField}>
+                  {docsName.passport || userDocs.passport ? (
+                    <>
+                      <View>
+                        <Text>{docsName.passport.name}</Text>
+                      </View>
+                      {fileUrl !== '' && (
+                        <Image
+                          source={{uri: fileUrl}}
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            resizeMode: 'contain',
+                          }}
+                        />
+                      )}
+                      {userDocs.passport != '' && fileUrl == '' && (
+                        <Image
+                          source={{uri: userDocs.passport}}
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            resizeMode: 'contain',
+                          }}
+                        />
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      <TouchableOpacity
                         style={{
-                          width: '100%',
-                          height: '100%',
-                          resizeMode: 'contain',
+                          backgroundColor: '#24348B',
+                          padding: 10,
+                          borderRadius: 5,
                         }}
-                      />
-                    )}
-                    {userDocs.passport != '' && fileUrl == '' && (
-                      <Image
-                        source={{uri: userDocs.passport}}
-                        style={{
-                          width: '100%',
-                          height: '100%',
-                          resizeMode: 'contain',
-                        }}
-                      />
-                    )}
-                  </>
-                ) : (
-                  <>
-                    <TouchableOpacity
-                      style={{
-                        backgroundColor: '#24348B',
-                        padding: 10,
-                        borderRadius: 5,
-                      }}
-                      onPress={pickDocument3}>
-                      <Entypo
-                        name="upload-to-cloud"
-                        size={30}
-                        color="#FCFCFC"
-                      />
-                    </TouchableOpacity>
-                    <Text style={styles.takeText}>Browse Files</Text>
-                    <Text style={styles.takeText2}>
-                      File format: JPG, JPEG, PNG,PDF | Max File Size 3mb
-                    </Text>
-                  </>
-                )}
-              </View>
+                        onPress={pickDocument3}>
+                        <Entypo
+                          name="upload-to-cloud"
+                          size={30}
+                          color="#FCFCFC"
+                        />
+                      </TouchableOpacity>
+                      <Text style={styles.takeText}>Browse Files</Text>
+                      <Text style={styles.takeText2}>
+                        File format: JPG, JPEG, PNG,PDF | Max File Size 3mb
+                      </Text>
+                    </>
+                  )}
+                </View>
 
-              <TouchableOpacity
-                disabled={docsName.passport === '' || fileUrl === ''}
-                style={{marginTop: 10}}
-                onPress={s3UploadFunction}>
-                <Buttons
-                  label="Upload"
+                <TouchableOpacity
                   disabled={docsName.passport === '' || fileUrl === ''}
-                />
-              </TouchableOpacity>
-              <TouchableOpacity style={{marginTop: 10}} onPress={pickDocument3}>
-                <Buttons
-                  label="Change Selection"
-                  // disabled={docsName.passport === ''}
-                />
-              </TouchableOpacity>
-              {uploadProgress && uploadProgress > 0 ? (
-                <View
-                  style={{
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    marginTop: 20,
-                  }}>
-                  <Text>{uploadProgress && uploadProgress}% complete</Text>
-                </View>
-              ) : null}
-            </>
-          )}
-          {isPass && isCam && (
-            <>
-              <Text style={styles.textHead}>
-                Take a clear picture or upload a proof of address (utility bill)
-                It must carry the address you entered. Date on utility bill must
-                not be more than 3month before registration
-              </Text>
-              <View style={styles.reqField}>
-                {fileUrl !== '' ? (
-                  <Image
-                    source={{uri: fileUrl}}
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      resizeMode: 'contain',
-                    }}
+                  style={{marginTop: 10}}
+                  onPress={s3UploadFunction}>
+                  <Buttons
+                    label="Upload"
+                    disabled={docsName.passport === '' || fileUrl === ''}
                   />
-                ) : (
-                  <>
-                    <TouchableOpacity
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={{marginTop: 10}}
+                  onPress={pickDocument3}>
+                  <Buttons
+                    label="Change Selection"
+                    // disabled={docsName.passport === ''}
+                  />
+                </TouchableOpacity>
+                {uploadProgress && uploadProgress > 0 ? (
+                  <View
+                    style={{
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      marginTop: 20,
+                    }}>
+                    <Text>{uploadProgress && uploadProgress}% complete</Text>
+                  </View>
+                ) : null}
+              </>
+            )}
+            {isPass && isCam && (
+              <>
+                <Text style={styles.textHead}>
+                  Take a clear picture or upload a proof of address (utility
+                  bill) It must carry the address you entered. Date on utility
+                  bill must not be more than 3month before registration
+                </Text>
+                <View style={styles.reqField}>
+                  {fileUrl !== '' ? (
+                    <Image
+                      source={{uri: fileUrl}}
                       style={{
-                        backgroundColor: '#24348B',
-                        padding: 10,
-                        borderRadius: 5,
+                        width: '100%',
+                        height: '100%',
+                        resizeMode: 'contain',
                       }}
-                      onPress={launchCameraAsync3}>
-                      <FontAwesome name="camera" size={30} color="#FCFCFC" />
-                    </TouchableOpacity>
-                    <Text style={styles.takeText}>Tap to take a photo</Text>
-                  </>
-                )}
-              </View>
-              <TouchableOpacity
-                style={{opacity: 1, marginTop: 10}}
-                onPress={s3UploadFunction}>
-                <Buttons label="Upload" />
-              </TouchableOpacity>
-              {uploadProgress && uploadProgress > 0 ? (
-                <View
-                  style={{
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    marginTop: 20,
-                  }}>
-                  <Text>{uploadProgress && uploadProgress}% complete</Text>
+                    />
+                  ) : (
+                    <>
+                      <TouchableOpacity
+                        style={{
+                          backgroundColor: '#24348B',
+                          padding: 10,
+                          borderRadius: 5,
+                        }}
+                        onPress={launchCameraAsync3}>
+                        <FontAwesome name="camera" size={30} color="#FCFCFC" />
+                      </TouchableOpacity>
+                      <Text style={styles.takeText}>Tap to take a photo</Text>
+                    </>
+                  )}
                 </View>
-              ) : null}
-            </>
-          )}
-          {isSign ? (
-            <>
-              <Text style={styles.textHead}>
-                Draw, take a clear picture or upload your signature{' '}
-              </Text>
-              <Text style={[styles.textHead, {color: '#054B99'}]}>
-                See samples
-              </Text>
-              <View style={styles.reqField}>
-                {docsName.signature || userDocs.signature ? (
-                  <>
-                    <View>
-                      <Text>{docsName.signature.name}</Text>
-                    </View>
-                    {fileUrl !== '' && (
-                      <Image
-                        source={{uri: fileUrl}}
+                <TouchableOpacity
+                  style={{opacity: 1, marginTop: 10}}
+                  onPress={s3UploadFunction}>
+                  <Buttons label="Upload" />
+                </TouchableOpacity>
+                {uploadProgress && uploadProgress > 0 ? (
+                  <View
+                    style={{
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      marginTop: 20,
+                    }}>
+                    <Text>{uploadProgress && uploadProgress}% complete</Text>
+                  </View>
+                ) : null}
+              </>
+            )}
+            {isSign ? (
+              <>
+                <Text style={styles.textHead}>
+                  Draw, take a clear picture or upload your signature{' '}
+                </Text>
+                <Text style={[styles.textHead, {color: '#054B99'}]}>
+                  See samples
+                </Text>
+                <View style={styles.reqField}>
+                  {docsName.signature || userDocs.signature ? (
+                    <>
+                      <View>
+                        <Text>{docsName.signature.name}</Text>
+                      </View>
+                      {fileUrl !== '' && (
+                        <Image
+                          source={{uri: fileUrl}}
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            resizeMode: 'contain',
+                          }}
+                        />
+                      )}
+                      {userDocs.signature != '' && fileUrl == '' && (
+                        <Image
+                          source={{uri: userDocs.signature}}
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            resizeMode: 'contain',
+                          }}
+                        />
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      <TouchableOpacity
                         style={{
-                          width: '100%',
-                          height: '100%',
-                          resizeMode: 'contain',
+                          backgroundColor: '#24348B',
+                          padding: 10,
+                          borderRadius: 5,
                         }}
-                      />
-                    )}
-                    {userDocs.signature != '' && fileUrl == '' && (
-                      <Image
-                        source={{uri: userDocs.signature}}
-                        style={{
-                          width: '100%',
-                          height: '100%',
-                          resizeMode: 'contain',
-                        }}
-                      />
-                    )}
-                  </>
-                ) : (
-                  <>
-                    <TouchableOpacity
-                      style={{
-                        backgroundColor: '#24348B',
-                        padding: 10,
-                        borderRadius: 5,
-                      }}
-                      onPress={pickDocument4}>
-                      <Entypo
-                        name="upload-to-cloud"
-                        size={30}
-                        color="#FCFCFC"
-                      />
-                    </TouchableOpacity>
-                    <Text style={styles.takeText}>Browse Files</Text>
-                    <Text style={styles.takeText2}>
-                      File format: JPG, JPEG, PNG,PDF | Max File Size 3mb
-                    </Text>
-                  </>
-                )}
-              </View>
-              <TouchableOpacity
-                disabled={docsName.signature === '' || fileUrl === ''}
-                style={{marginTop: 10}}
-                onPress={s3UploadFunction}>
-                <Buttons
-                  label="Upload"
+                        onPress={pickDocument4}>
+                        <Entypo
+                          name="upload-to-cloud"
+                          size={30}
+                          color="#FCFCFC"
+                        />
+                      </TouchableOpacity>
+                      <Text style={styles.takeText}>Browse Files</Text>
+                      <Text style={styles.takeText2}>
+                        File format: JPG, JPEG, PNG,PDF | Max File Size 3mb
+                      </Text>
+                    </>
+                  )}
+                </View>
+                <TouchableOpacity
                   disabled={docsName.signature === '' || fileUrl === ''}
-                />
-              </TouchableOpacity>
-              <TouchableOpacity style={{marginTop: 10}} onPress={pickDocument4}>
-                <Buttons
-                  label="Change Selection"
-                  // disabled={docsName.signature === ''}
-                />
-              </TouchableOpacity>
-              {uploadProgress && uploadProgress > 0 ? (
-                <View
-                  style={{
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    marginTop: 20,
-                  }}>
-                  <Text>{uploadProgress && uploadProgress}% complete</Text>
+                  style={{marginTop: 10}}
+                  onPress={s3UploadFunction}>
+                  <Buttons
+                    label="Upload"
+                    disabled={docsName.signature === '' || fileUrl === ''}
+                  />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={{marginTop: 10}}
+                  onPress={pickDocument4}>
+                  <Buttons
+                    label="Change Selection"
+                    // disabled={docsName.signature === ''}
+                  />
+                </TouchableOpacity>
+                {uploadProgress && uploadProgress > 0 ? (
+                  <View
+                    style={{
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      marginTop: 20,
+                    }}>
+                    <Text>{uploadProgress && uploadProgress}% complete</Text>
+                  </View>
+                ) : null}
+              </>
+            ) : null}
+            {isPer && !isCam && (
+              <>
+                <Text style={styles.textHead}>
+                  Take a clear picture or upload your Personal Photo{' '}
+                </Text>
+                <Text style={[styles.textHead, {color: '#054B99'}]}>
+                  See samples
+                </Text>
+                <Text style={styles.textHead}>
+                  Personal Photo size not more than 3MB
+                </Text>
+                <View style={styles.reqField}>
+                  {docsName.personalPhoto || userDocs.personalPhoto ? (
+                    <>
+                      <View>
+                        <Text>{docsName.personalPhoto.name}</Text>
+                      </View>
+                      {fileUrl !== '' && (
+                        <Image
+                          source={{uri: fileUrl}}
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            resizeMode: 'contain',
+                          }}
+                        />
+                      )}
+                      {fileUrl == '' && userDocs.personalPhoto != '' && (
+                        <Image
+                          source={{uri: userDocs.personalPhoto}}
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            resizeMode: 'contain',
+                          }}
+                        />
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      <TouchableOpacity
+                        style={{
+                          backgroundColor: '#24348B',
+                          padding: 10,
+                          borderRadius: 5,
+                        }}
+                        onPress={pickDocument7}>
+                        <Entypo
+                          name="upload-to-cloud"
+                          size={30}
+                          color="#FCFCFC"
+                        />
+                      </TouchableOpacity>
+                      <Text style={styles.takeText}>Browse Files</Text>
+                      <Text style={styles.takeText2}>
+                        File format: JPG, JPEG, PNG,PDF | Max File Size 3mb
+                      </Text>
+                    </>
+                  )}
                 </View>
-              ) : null}
-            </>
-          ) : null}
-          {isPer && !isCam && (
-            <>
-              <Text style={styles.textHead}>
-                Take a clear picture or upload your Personal Photo{' '}
-              </Text>
-              <Text style={[styles.textHead, {color: '#054B99'}]}>
-                See samples
-              </Text>
-              <Text style={styles.textHead}>
-                Personal Photo size not more than 3MB
-              </Text>
-              <View style={styles.reqField}>
-                {docsName.personalPhoto || userDocs.personalPhoto ? (
-                  <>
-                    <View>
-                      <Text>{docsName.personalPhoto.name}</Text>
-                    </View>
-                    {fileUrl !== '' && (
-                      <Image
-                        source={{uri: fileUrl}}
-                        style={{
-                          width: '100%',
-                          height: '100%',
-                          resizeMode: 'contain',
-                        }}
-                      />
-                    )}
-                    {fileUrl == '' && userDocs.personalPhoto != '' && (
-                      <Image
-                        source={{uri: userDocs.personalPhoto}}
-                        style={{
-                          width: '100%',
-                          height: '100%',
-                          resizeMode: 'contain',
-                        }}
-                      />
-                    )}
-                  </>
-                ) : (
-                  <>
-                    <TouchableOpacity
-                      style={{
-                        backgroundColor: '#24348B',
-                        padding: 10,
-                        borderRadius: 5,
-                      }}
-                      onPress={pickDocument7}>
-                      <Entypo
-                        name="upload-to-cloud"
-                        size={30}
-                        color="#FCFCFC"
-                      />
-                    </TouchableOpacity>
-                    <Text style={styles.takeText}>Browse Files</Text>
-                    <Text style={styles.takeText2}>
-                      File format: JPG, JPEG, PNG,PDF | Max File Size 3mb
-                    </Text>
-                  </>
-                )}
-              </View>
 
-              <TouchableOpacity
-                disabled={docsName.personalPhoto === '' || fileUrl === ''}
-                style={{marginTop: 10}}
-                onPress={s3UploadFunction}>
-                <Buttons
-                  label="Upload"
+                <TouchableOpacity
                   disabled={docsName.personalPhoto === '' || fileUrl === ''}
-                />
-              </TouchableOpacity>
-              <TouchableOpacity style={{marginTop: 10}} onPress={pickDocument7}>
-                <Buttons
-                  label="Change Selection"
-                  // disabled={docsName.personalPhoto === ''}
-                />
-              </TouchableOpacity>
-              {uploadProgress && uploadProgress > 0 ? (
-                <View
-                  style={{
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    marginTop: 20,
-                  }}>
-                  <Text>{uploadProgress && uploadProgress}% complete</Text>
-                </View>
-              ) : null}
-            </>
-          )}
-          {isPer && isCam && (
-            <>
-              <Text style={styles.textHead}>
-                Take a clear picture or upload a Personal Photo
-              </Text>
-              <View style={styles.reqField}>
-                {fileUrl !== '' ? (
-                  <Image
-                    source={{uri: fileUrl}}
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      resizeMode: 'contain',
-                    }}
+                  style={{marginTop: 10}}
+                  onPress={s3UploadFunction}>
+                  <Buttons
+                    label="Upload"
+                    disabled={docsName.personalPhoto === '' || fileUrl === ''}
                   />
-                ) : (
-                  <>
-                    <TouchableOpacity
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={{marginTop: 10}}
+                  onPress={pickDocument7}>
+                  <Buttons
+                    label="Change Selection"
+                    // disabled={docsName.personalPhoto === ''}
+                  />
+                </TouchableOpacity>
+                {uploadProgress && uploadProgress > 0 ? (
+                  <View
+                    style={{
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      marginTop: 20,
+                    }}>
+                    <Text>{uploadProgress && uploadProgress}% complete</Text>
+                  </View>
+                ) : null}
+              </>
+            )}
+            {isPer && isCam && (
+              <>
+                <Text style={styles.textHead}>
+                  Take a clear picture or upload a Personal Photo
+                </Text>
+                <View style={styles.reqField}>
+                  {fileUrl !== '' ? (
+                    <Image
+                      source={{uri: fileUrl}}
                       style={{
-                        backgroundColor: '#24348B',
-                        padding: 10,
-                        borderRadius: 5,
+                        width: '100%',
+                        height: '100%',
+                        resizeMode: 'contain',
                       }}
-                      onPress={launchCameraAsync6}>
-                      <FontAwesome name="camera" size={30} color="#FCFCFC" />
-                    </TouchableOpacity>
-                    <Text style={styles.takeText}>Tap to take a photo</Text>
-                  </>
-                )}
-              </View>
-              <TouchableOpacity
-                style={{opacity: 1, marginTop: 10}}
-                onPress={s3UploadFunction}>
-                <Buttons label="Upload" />
-              </TouchableOpacity>
-              {uploadProgress && uploadProgress > 0 ? (
-                <View
-                  style={{
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    marginTop: 20,
-                  }}>
-                  <Text>{uploadProgress && uploadProgress}% complete</Text>
+                    />
+                  ) : (
+                    <>
+                      <TouchableOpacity
+                        style={{
+                          backgroundColor: '#24348B',
+                          padding: 10,
+                          borderRadius: 5,
+                        }}
+                        onPress={launchCameraAsync6}>
+                        <FontAwesome name="camera" size={30} color="#FCFCFC" />
+                      </TouchableOpacity>
+                      <Text style={styles.takeText}>Tap to take a photo</Text>
+                    </>
+                  )}
                 </View>
-              ) : null}
-            </>
-          )}
+                <TouchableOpacity
+                  style={{opacity: 1, marginTop: 10}}
+                  onPress={s3UploadFunction}>
+                  <Buttons label="Upload" />
+                </TouchableOpacity>
+                {uploadProgress && uploadProgress > 0 ? (
+                  <View
+                    style={{
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      marginTop: 20,
+                    }}>
+                    <Text>{uploadProgress && uploadProgress}% complete</Text>
+                  </View>
+                ) : null}
+              </>
+            )}
 
-          {isId && !isCam && (
-            <>
-              <Text style={styles.textHead}>
-                Take a clear picture or upload your Id Card{' '}
-              </Text>
-              <Text style={[styles.textHead, {color: '#054B99'}]}>
-                See samples
-              </Text>
-              <Text style={styles.textHead}>
-                Id Card size not more than 3MB
-              </Text>
-              <View style={styles.reqField}>
-                {docsName.identityCard || userDocs.identityCard ? (
-                  <>
-                    <View>
-                      <Text>{docsName.identityCard.name}</Text>
-                    </View>
-                    {fileUrl !== '' && (
-                      <Image
-                        source={{uri: fileUrl}}
+            {isId && !isCam && (
+              <>
+                <Text style={styles.textHead}>
+                  Take a clear picture or upload your Id Card{' '}
+                </Text>
+                <Text style={[styles.textHead, {color: '#054B99'}]}>
+                  See samples
+                </Text>
+                <Text style={styles.textHead}>
+                  Id Card size not more than 3MB
+                </Text>
+                <View style={styles.reqField}>
+                  {docsName.identityCard || userDocs.identityCard ? (
+                    <>
+                      <View>
+                        <Text>{docsName.identityCard.name}</Text>
+                      </View>
+                      {fileUrl !== '' && (
+                        <Image
+                          source={{uri: fileUrl}}
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            resizeMode: 'contain',
+                          }}
+                        />
+                      )}
+                      {fileUrl == '' && userDocs.identityCard != '' && (
+                        <Image
+                          source={{uri: userDocs.identityCard}}
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            resizeMode: 'contain',
+                          }}
+                        />
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      <TouchableOpacity
                         style={{
-                          width: '100%',
-                          height: '100%',
-                          resizeMode: 'contain',
+                          backgroundColor: '#24348B',
+                          padding: 10,
+                          borderRadius: 5,
                         }}
-                      />
-                    )}
-                    {fileUrl == '' && userDocs.identityCard != '' && (
-                      <Image
-                        source={{uri: userDocs.identityCard}}
-                        style={{
-                          width: '100%',
-                          height: '100%',
-                          resizeMode: 'contain',
-                        }}
-                      />
-                    )}
-                  </>
-                ) : (
-                  <>
-                    <TouchableOpacity
-                      style={{
-                        backgroundColor: '#24348B',
-                        padding: 10,
-                        borderRadius: 5,
-                      }}
-                      onPress={pickDocument8}>
-                      <Entypo
-                        name="upload-to-cloud"
-                        size={30}
-                        color="#FCFCFC"
-                      />
-                    </TouchableOpacity>
-                    <Text style={styles.takeText}>Browse Files</Text>
-                    <Text style={styles.takeText2}>
-                      File format: JPG, JPEG, PNG,PDF | Max File Size 3mb
-                    </Text>
-                  </>
-                )}
-              </View>
+                        onPress={pickDocument8}>
+                        <Entypo
+                          name="upload-to-cloud"
+                          size={30}
+                          color="#FCFCFC"
+                        />
+                      </TouchableOpacity>
+                      <Text style={styles.takeText}>Browse Files</Text>
+                      <Text style={styles.takeText2}>
+                        File format: JPG, JPEG, PNG,PDF | Max File Size 3mb
+                      </Text>
+                    </>
+                  )}
+                </View>
 
-              <TouchableOpacity
-                disabled={docsName.identityCard === '' || fileUrl === ''}
-                style={{marginTop: 10}}
-                onPress={s3UploadFunction}>
-                <Buttons
-                  label="Upload"
+                <TouchableOpacity
                   disabled={docsName.identityCard === '' || fileUrl === ''}
-                />
-              </TouchableOpacity>
-              <TouchableOpacity style={{marginTop: 10}} onPress={pickDocument8}>
-                <Buttons
-                  label="Change Selection"
-                  // disabled={docsName.identityCard === ''}
-                />
-              </TouchableOpacity>
-              {uploadProgress && uploadProgress > 0 ? (
-                <View
-                  style={{
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    marginTop: 20,
-                  }}>
-                  <Text>{uploadProgress && uploadProgress}% complete</Text>
-                </View>
-              ) : null}
-            </>
-          )}
-
-          {isId && isCam && (
-            <>
-              <Text style={styles.textHead}>
-                Take a clear picture or upload an Id Card
-              </Text>
-              <View style={styles.reqField}>
-                {fileUrl !== '' ? (
-                  <Image
-                    source={{uri: fileUrl}}
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      resizeMode: 'contain',
-                    }}
+                  style={{marginTop: 10}}
+                  onPress={s3UploadFunction}>
+                  <Buttons
+                    label="Upload"
+                    disabled={docsName.identityCard === '' || fileUrl === ''}
                   />
-                ) : (
-                  <>
-                    <TouchableOpacity
-                      style={{
-                        backgroundColor: '#24348B',
-                        padding: 10,
-                        borderRadius: 5,
-                      }}
-                      onPress={launchCameraAsync7}>
-                      <FontAwesome name="camera" size={30} color="#FCFCFC" />
-                    </TouchableOpacity>
-                    <Text style={styles.takeText}>Tap to take a photo</Text>
-                  </>
-                )}
-              </View>
-              <TouchableOpacity
-                style={{opacity: 1, marginTop: 10}}
-                onPress={s3UploadFunction}>
-                <Buttons label="Upload" />
-              </TouchableOpacity>
-              {uploadProgress && uploadProgress > 0 ? (
-                <View
-                  style={{
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    marginTop: 20,
-                  }}>
-                  <Text>{uploadProgress && uploadProgress}% complete</Text>
-                </View>
-              ) : null}
-            </>
-          )}
-        </View>
-      </View>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={{marginTop: 10}}
+                  onPress={pickDocument8}>
+                  <Buttons
+                    label="Change Selection"
+                    // disabled={docsName.identityCard === ''}
+                  />
+                </TouchableOpacity>
+                {uploadProgress && uploadProgress > 0 ? (
+                  <View
+                    style={{
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      marginTop: 20,
+                    }}>
+                    <Text>{uploadProgress && uploadProgress}% complete</Text>
+                  </View>
+                ) : null}
+              </>
+            )}
 
-      {image || selectedDocument ? (
-        <View style={styles.remove}>
-          <TouchableOpacity onPress={clearDocument}>
-            <Text style={styles.removeText}>Remove</Text>
-          </TouchableOpacity>
+            {isId && isCam && (
+              <>
+                <Text style={styles.textHead}>
+                  Take a clear picture or upload an Id Card
+                </Text>
+                <View style={styles.reqField}>
+                  {fileUrl !== '' ? (
+                    <Image
+                      source={{uri: fileUrl}}
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        resizeMode: 'contain',
+                      }}
+                    />
+                  ) : (
+                    <>
+                      <TouchableOpacity
+                        style={{
+                          backgroundColor: '#24348B',
+                          padding: 10,
+                          borderRadius: 5,
+                        }}
+                        onPress={launchCameraAsync7}>
+                        <FontAwesome name="camera" size={30} color="#FCFCFC" />
+                      </TouchableOpacity>
+                      <Text style={styles.takeText}>Tap to take a photo</Text>
+                    </>
+                  )}
+                </View>
+                <TouchableOpacity
+                  style={{opacity: 1, marginTop: 10}}
+                  onPress={s3UploadFunction}>
+                  <Buttons label="Upload" />
+                </TouchableOpacity>
+                {uploadProgress && uploadProgress > 0 ? (
+                  <View
+                    style={{
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      marginTop: 20,
+                    }}>
+                    <Text>{uploadProgress && uploadProgress}% complete</Text>
+                  </View>
+                ) : null}
+              </>
+            )}
+          </View>
         </View>
-      ) : null}
-    </ScrollView>
+
+        {image || selectedDocument ? (
+          <View style={styles.remove}>
+            <TouchableOpacity onPress={clearDocument}>
+              <Text style={styles.removeText}>Remove</Text>
+            </TouchableOpacity>
+          </View>
+        ) : null}
+      </ScrollView>
+    </View>
   );
 };
 

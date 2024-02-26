@@ -16,8 +16,8 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import COLORS from '../../constants/colors';
-import Spinner from 'react-native-loading-spinner-overlay';
 import {Header} from '../../component/header/Header';
+import Loader from '../../component/loader/loader';
 
 const listData = [
   {id: '1', text: 'Long term income generation.'},
@@ -46,19 +46,12 @@ const InvestmentSummaryScreen = () => {
         height: hp(100),
         backgroundColor: '#fff',
         paddingTop: insets.top !== 0 ? Math.min(insets.top, 10) : 'auto',
-        paddingBottom: insets.bottom !== 0 ? Math.min(insets.bottom, 10) : 'auto',
+        paddingBottom:
+          insets.bottom !== 0 ? Math.min(insets.bottom, 10) : 'auto',
         paddingLeft: insets.left !== 0 ? Math.min(insets.left, 10) : 'auto',
         paddingRight: insets.right !== 0 ? Math.min(insets.right, 10) : 'auto',
       }}>
-      {isLoading && (
-        <Spinner
-          textContent={'Getting Investment Plans...'}
-          textStyle={{color: 'white'}}
-          visible={true}
-          overlayColor="rgba(78, 75, 102, 0.7)"
-          animation="slide"
-        />
-      )}
+      <Loader visible={isLoading} loadingText={'Getting Investment Plans...'} />
 
       <Header
         routeAction={() => navigation.goBack()}

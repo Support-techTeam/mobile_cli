@@ -11,7 +11,6 @@ import {
 import {Formik} from 'formik';
 import React, {useState, useEffect} from 'react';
 import {useNavigation} from '@react-navigation/native';
-import Spinner from 'react-native-loading-spinner-overlay';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 import KeyboardAvoidingWrapper from '../../component/KeyBoardAvoiding/keyBoardAvoiding';
@@ -167,16 +166,7 @@ const Login = () => {
           paddingRight: insets.right !== 0 ? Math.min(insets.right, 10) : 'auto',
         },
       ]}>
-      <Loader visible={false} />
-      {isLoading && (
-        <Spinner
-          textContent={'Logging in...'}
-          textStyle={{color: 'white'}}
-          visible={true}
-          overlayColor="rgba(78, 75, 102, 0.7)"
-          animation="slide"
-        />
-      )}
+      <Loader visible={isLoading} loadingText={'Logging in...'} />
       <KeyboardAvoidingWrapper>
         <ImageBackground
           source={require('../../../assets/login.png')}

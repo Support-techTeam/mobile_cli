@@ -12,7 +12,6 @@ import {Button} from '@rneui/themed';
 // import Buttons from '../../component/buttons/Buttons';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 import {getSingleArmInvestment} from '../../stores/InvestStore';
-import Spinner from 'react-native-loading-spinner-overlay';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -20,6 +19,7 @@ import {
 import {Header} from '../../component/header/Header';
 import COLORS from '../../constants/colors';
 import CustomButton from '../../component/buttons/CustomButtons';
+import Loader from '../../component/loader/loader';
 const InvestmentDetails = () => {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
@@ -80,15 +80,7 @@ const InvestmentDetails = () => {
         paddingLeft: insets.left !== 0 ? Math.min(insets.left, 10) : 'auto',
         paddingRight: insets.right !== 0 ? Math.min(insets.right, 10) : 'auto',
       }}>
-      {isLoading && (
-        <Spinner
-          textContent={'Getting Investment...'}
-          textStyle={{color: 'white'}}
-          visible={true}
-          overlayColor="rgba(78, 75, 102, 0.7)"
-          animation="slide"
-        />
-      )}
+      <Loader visible={isLoading} loadingText={'Getting investment...'} />
       <Header
         routeAction={() => navigation.goBack()}
         heading={`${name?.toUpperCase()} INVESTMENT DETAILS`}

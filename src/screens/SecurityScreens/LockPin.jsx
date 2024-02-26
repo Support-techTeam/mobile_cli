@@ -4,7 +4,6 @@ import React, {useState, useContext, useEffect} from 'react';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import {useNavigation} from '@react-navigation/native';
 import Buttons from '../../component/buttons/Buttons';
-import Spinner from 'react-native-loading-spinner-overlay';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 
 const LockPin = () => {
@@ -44,12 +43,6 @@ const LockPin = () => {
         paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
         paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
       }}>
-      <Spinner
-        visible={false}
-        textContent={'Locking Pin...'}
-        textStyle={{color: 'white'}}
-        overlayColor="rgba(16, 17, 17, 0.7)"
-      />
 
       <View
         style={{

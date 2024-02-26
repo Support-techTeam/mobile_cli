@@ -10,7 +10,6 @@ import {
 } from 'react-native';
 import React, {useContext, useEffect, useState} from 'react';
 import {useNavigation} from '@react-navigation/native';
-import Spinner from 'react-native-loading-spinner-overlay';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 
 import KeyboardAvoidingWrapper from '../../component/KeyBoardAvoiding/keyBoardAvoiding';
@@ -24,6 +23,7 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import {AuthHeader} from '../../component/header/AuthHeader';
+import Loader from '../../component/loader/loader';
 
 const WINDOW_HIGHT = Dimensions.get('window').height;
 
@@ -102,6 +102,8 @@ const ForgotPassword = () => {
         paddingLeft: insets.left !== 0 ? Math.min(insets.left, 10) : 'auto',
         paddingRight: insets.right !== 0 ? Math.min(insets.right, 10) : 'auto',
       }}>
+        
+      <Loader visible={isLoading} loadingText={'Please wait...'} />
       <KeyboardAvoidingWrapper>
         <ImageBackground
           source={require('../../../assets/forgotPass.png')}
@@ -112,14 +114,7 @@ const ForgotPassword = () => {
             showsHorizontalScrollIndicator={false}
             showsVerticalScrollIndicator={false}
             style={{paddingHorizontal: 16}}>
-            {isLoading && (
-              <Spinner
-                textContent={'Loading...'}
-                textStyle={{color: 'white'}}
-                visible={true}
-                overlayColor="rgba(78, 75, 102, 0.7)"
-              />
-            )}
+            
             <View
               style={{
                 flex: 1,

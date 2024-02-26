@@ -15,7 +15,6 @@ import {useDispatch, useSelector} from 'react-redux';
 import {signUpUser} from '../../util/redux/userAuth/user.auth.slice';
 import auth from '@react-native-firebase/auth';
 import Toast from 'react-native-toast-message';
-import Spinner from 'react-native-loading-spinner-overlay';
 import COLORS from '../../constants/colors';
 import {useRoute} from '@react-navigation/native';
 import {resetStore} from '../../util/redux/store';
@@ -32,6 +31,7 @@ import styles, {
   DEFAULT_CELL_BG_COLOR,
   NOT_EMPTY_CELL_BG_COLOR,
 } from '../../../styles';
+import Loader from '../../component/loader/loader';
 
 const {Value, Text: AnimatedText} = Animated;
 
@@ -203,29 +203,17 @@ const Verification = () => {
         paddingHorizontal: 20,
         backgroundColor: '#fff',
         paddingTop: insets.top !== 0 ? Math.min(insets.top, 10) : 'auto',
-        paddingBottom: insets.bottom !== 0 ? Math.min(insets.bottom, 10) : 'auto',
+        paddingBottom:
+          insets.bottom !== 0 ? Math.min(insets.bottom, 10) : 'auto',
         paddingLeft: insets.left !== 0 ? Math.min(insets.left, 10) : 'auto',
         paddingRight: insets.right !== 0 ? Math.min(insets.right, 10) : 'auto',
       }}>
-      {isLoading && (
-        <Spinner
-          textContent={'Resending Verification Email...'}
-          textStyle={{color: 'white'}}
-          visible={true}
-          overlayColor="rgba(78, 75, 102, 0.7)"
-          animation="slide"
-        />
-      )}
+      <Loader
+        visible={isLoading}
+        loadingText={'Resending Verification Email...'}
+      />
+      <Loader visible={isSending} loadingText={'Verification User...'} />
 
-      {isSending && (
-        <Spinner
-          textContent={'Verification User...'}
-          textStyle={{color: 'white'}}
-          visible={true}
-          overlayColor="rgba(78, 75, 102, 0.7)"
-          animation="slide"
-        />
-      )}
       <ScrollView
         bounces={false}
         showsHorizontalScrollIndicator={false}

@@ -1,5 +1,10 @@
 import React from 'react';
-import {TouchableOpacity, Text, StyleSheet} from 'react-native';
+import {
+  TouchableOpacity,
+  Text,
+  StyleSheet,
+  ActivityIndicator,
+} from 'react-native';
 import COLORS from '../../constants/colors';
 import {SIZES} from '../../constants';
 import {
@@ -7,13 +12,25 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 
-const CustomButton = ({onPress, title, buttonStyle, textStyle, disabled}) => {
+const CustomButton = ({onPress, title, buttonStyle, textStyle, disabled, isLoading=false}) => {
   return (
     <TouchableOpacity
-      style={[styles.button, buttonStyle, {opacity: disabled ? 0.7 : 1}]}
+      style={[
+        styles.button,
+        buttonStyle,
+        {
+          opacity: disabled ? 0.7 : 1,
+          flexDirection: 'row',
+          justifyContent: 'center',
+          textAlign: 'center',
+          gap: 10,
+          alignItems: 'center',
+        },
+      ]}
       onPress={onPress}
       disabled={disabled}>
       <Text style={[styles.text, textStyle]}>{title}</Text>
+      {isLoading && <ActivityIndicator color={'white'} size={20} />}
     </TouchableOpacity>
   );
 };

@@ -1,9 +1,4 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-} from 'react-native';
+import {View, Text, StyleSheet, ScrollView} from 'react-native';
 import React, {useState, useEffect} from 'react';
 import {useNavigation} from '@react-navigation/native';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
@@ -14,14 +9,14 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
-import Spinner from 'react-native-loading-spinner-overlay';
 import Toast from 'react-native-toast-message';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Button from '../../component/buttons/Button';
 import {AuthHeader} from '../../component/header/AuthHeader';
 import {Header} from '../../component/header/Header';
 import COLORS from '../../constants/colors';
-import { userChangePassword } from '../../stores/AuthStore';
+import {userChangePassword} from '../../stores/AuthStore';
+import Loader from '../../component/loader/loader';
 
 const ResetPassword = () => {
   const insets = useSafeAreaInsets();
@@ -43,7 +38,7 @@ const ResetPassword = () => {
   });
 
   const disableit =
-  !inputs.currentPassword ||
+    !inputs.currentPassword ||
     !inputs.password ||
     !inputs.confirmPassword ||
     showPassLogs === true ||
@@ -217,20 +212,13 @@ const ResetPassword = () => {
         heading="CHANGE PASSWORD"
         disable={false}
       />
+      <Loader visible={isLoading} loadingText={'Changing Password...'} />
       <KeyboardAvoidingWrapper>
         <ScrollView
           bounces={false}
           showsHorizontalScrollIndicator={false}
           showsVerticalScrollIndicator={false}
           style={{paddingHorizontal: 16, marginTop: 20}}>
-          {isLoading && (
-            <Spinner
-              textContent={'Changing Password...'}
-              textStyle={{color: 'white'}}
-              visible={true}
-              overlayColor="rgba(78, 75, 102, 0.7)"
-            />
-          )}
           <View
             style={{
               flex: 1,
@@ -243,6 +231,7 @@ const ResetPassword = () => {
             <View
               style={{
                 paddingHorizontal: 15,
+                marginTop: 60,
               }}>
               <Icon
                 name="lock-check"
@@ -282,7 +271,7 @@ const ResetPassword = () => {
                 {({handleChange, handleBlur, values}) => (
                   <View style={{paddingTop: 25}}>
                     <View>
-                    <Input
+                      <Input
                         onChangeText={text => {
                           handleOnchange(text, 'currentPassword');
                           handler(text, 'currentPassword');

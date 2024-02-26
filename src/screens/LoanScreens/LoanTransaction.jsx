@@ -8,7 +8,6 @@ import {
   Platform,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
-import Spinner from 'react-native-loading-spinner-overlay';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useNavigation} from '@react-navigation/native';
@@ -20,6 +19,7 @@ import Share from 'react-native-share';
 import Toast from 'react-native-toast-message';
 import email from 'react-native-email';
 import {Header} from '../../component/header/Header';
+import Loader from '../../component/loader/loader';
 
 const LoanTransactions = ({route}) => {
   const navigation = useNavigation();
@@ -93,14 +93,7 @@ const LoanTransactions = ({route}) => {
         paddingLeft: insets.left !== 0 ? Math.min(insets.left, 10) : 'auto',
         paddingRight: insets.right !== 0 ? Math.min(insets.right, 10) : 'auto',
       }}>
-      {isLoading && (
-        <Spinner
-          textContent={'Fetching loan details...'}
-          textStyle={{color: 'white'}}
-          visible={true}
-          overlayColor="rgba(78, 75, 102, 0.7)"
-        />
-      )}
+      <Loader visible={isLoading} loadingText={'Fetching loan details...'} />
       <Header
         routeAction={() => navigation.goBack()}
         heading={'LOAN DETAILS'}

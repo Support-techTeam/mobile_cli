@@ -13,7 +13,6 @@ import {
 import React, {useContext, useEffect, useState} from 'react';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import {useNavigation, useRoute} from '@react-navigation/native';
-import Spinner from 'react-native-loading-spinner-overlay/lib';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import Input from '../../component/inputField/input.component';
@@ -27,6 +26,7 @@ import {
 } from '../../stores/LoanStore';
 import KeyboardAvoidingWrapper from '../../component/KeyBoardAvoiding/keyBoardAvoiding';
 import data from '../../constants/data.json';
+import Loader from '../../component/loader/loader';
 
 const genderData = [
   {value: '', label: 'Select Gender'},
@@ -214,22 +214,8 @@ const NextOfKin = () => {
         paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
         paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
       }}>
-      {isUpdating && (
-        <Spinner
-          textContent={'Please wait...'}
-          textStyle={{color: 'white'}}
-          visible={true}
-          overlayColor="rgba(78, 75, 102, 0.7)"
-        />
-      )}
-      {isLoading && (
-        <Spinner
-          textContent={'Loading...'}
-          textStyle={{color: 'white'}}
-          visible={true}
-          overlayColor="rgba(78, 75, 102, 0.7)"
-        />
-      )}
+       <Loader visible={isLoading} loadingText={'Please wait...'} />
+       <Loader visible={isUpdating} loadingText={'Please wait...'} />
       <View
         style={{
           flexDirection: 'row',

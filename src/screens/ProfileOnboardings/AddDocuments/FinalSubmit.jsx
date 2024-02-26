@@ -2,7 +2,6 @@ import {View, Text, StyleSheet, TouchableOpacity, FlatList} from 'react-native';
 import React, {useContext, useEffect, useState} from 'react';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import {useNavigation} from '@react-navigation/native';
-import Spinner from 'react-native-loading-spinner-overlay/lib';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import Buttons from '../../../component/buttons/Buttons';
@@ -10,6 +9,7 @@ import {
   createDocumentsDetails,
   updateDocumentsDetails,
 } from '../../../stores/LoanStore';
+import Loader from '../../../component/loader/loader';
 
 const ITEM_HEIGHT = 100;
 
@@ -160,15 +160,8 @@ const FinalSubmit = ({route}) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      {isLoading ||
-        (isUpdating && (
-          <Spinner
-            textContent={'Submitting ...'}
-            textStyle={{color: 'white'}}
-            visible={true}
-            overlayColor="rgba(78, 75, 102, 0.7)"
-          />
-        ))}
+      <Loader visible={isUpdating} loadingText={'Submitting ...'} />
+      <Loader visible={isLoading} loadingText={'Submitting ...'} />
       <View
         style={{
           flexDirection: 'row',

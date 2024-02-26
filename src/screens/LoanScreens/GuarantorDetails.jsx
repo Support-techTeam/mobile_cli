@@ -7,13 +7,13 @@ import {
   ScrollView,
 } from 'react-native';
 import React, {useContext, useEffect, useState} from 'react';
-import Spinner from 'react-native-loading-spinner-overlay';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useNavigation} from '@react-navigation/native';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 import {getGuarantor} from '../../stores/GuarantorStore';
 import {Header} from '../../component/header/Header';
+import Loader from '../../component/loader/loader';
 
 const GuarantorDetails = ({route}) => {
   const navigation = useNavigation();
@@ -61,15 +61,7 @@ const GuarantorDetails = ({route}) => {
         paddingLeft: insets.left !== 0 ? Math.min(insets.left, 10) : 'auto',
         paddingRight: insets.right !== 0 ? Math.min(insets.right, 10) : 'auto',
       }}>
-      {isLoading && (
-        <Spinner
-          textContent={'Loading...'}
-          textStyle={{color: 'white'}}
-          visible={true}
-          overlayColor="rgba(16, 17, 17, 0.7)"
-        />
-      )}
-
+      <Loader visible={isLoading} loadingText={'Please wait...'} />
       <Header
         routeAction={() => navigation.goBack()}
         heading="GUARANTOR DETAILS"

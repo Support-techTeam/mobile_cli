@@ -19,8 +19,8 @@ import {
   getAllLendaProduct,
   getArmProductYield,
 } from '../../stores/InvestStore';
-import Spinner from 'react-native-loading-spinner-overlay';
 import {Header} from '../../component/header/Header';
+import Loader from '../../component/loader/loader';
 
 const InvestmentOptionScreen = () => {
   const insets = useSafeAreaInsets();
@@ -110,15 +110,7 @@ const InvestmentOptionScreen = () => {
         paddingLeft: insets.left !== 0 ? Math.min(insets.left, 10) : 'auto',
         paddingRight: insets.right !== 0 ? Math.min(insets.right, 10) : 'auto',
       }}>
-      {isLoading && (
-        <Spinner
-          textContent={'Getting Investment Plans...'}
-          textStyle={{color: 'white'}}
-          visible={true}
-          overlayColor="rgba(78, 75, 102, 0.7)"
-          animation="slide"
-        />
-      )}
+      <Loader visible={isLoading} loadingText={'Getting investment plans...'} />
       <Header
         routeAction={() => navigation.goBack()}
         heading={header ? header : ''}

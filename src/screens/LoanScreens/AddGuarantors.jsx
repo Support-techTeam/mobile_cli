@@ -8,7 +8,6 @@ import {
 } from 'react-native';
 import React, {useContext, useEffect, useState} from 'react';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import Spinner from 'react-native-loading-spinner-overlay';
 import Input from '../../component/inputField/input.component';
 import CustomDropdown from '../../component/dropDown/dropdown.component';
 import InputPhone from '../../component/inputField/phone-input.component';
@@ -20,6 +19,7 @@ import Toast from 'react-native-toast-message';
 import {createGuarantor} from '../../stores/GuarantorStore';
 import CustomButton from '../../component/buttons/CustomButtons';
 import {Header} from '../../component/header/Header';
+import Loader from '../../component/loader/loader';
 
 const titleData = [
   {value: '', label: 'Select Title'},
@@ -96,14 +96,7 @@ const AddGuarantors = () => {
         paddingLeft: insets.left !== 0 ? Math.min(insets.left, 10) : 'auto',
         paddingRight: insets.right !== 0 ? Math.min(insets.right, 10) : 'auto',
       }}>
-      {isLoading && (
-        <Spinner
-          textContent={'Creating profile...'}
-          textStyle={{color: 'white'}}
-          visible={true}
-          overlayColor="rgba(78, 75, 102, 0.7)"
-        />
-      )}
+      <Loader visible={isLoading} loadingText={'Please wait...'} />
       <Header
         routeAction={() => navigation.goBack()}
         heading="ADD GUARANTOR"

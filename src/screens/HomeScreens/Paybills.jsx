@@ -11,9 +11,9 @@ import React, {useContext, useEffect, useState} from 'react';
 import {getStatusBarHeight} from 'react-native-status-bar-height';
 import {useNavigation} from '@react-navigation/native';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-import Spinner from 'react-native-loading-spinner-overlay/lib';
 import CustomView from '../../component/paybillsview/CustomView';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
+import Loader from '../../component/loader/loader';
 
 const statusBarHeight = getStatusBarHeight();
 const midth = Dimensions.get('window').width;
@@ -40,14 +40,7 @@ const Paybills = () => {
         paddingLeft: insets.left !== 0 ? Math.min(insets.left, 10) : 'auto',
         paddingRight: insets.right !== 0 ? Math.min(insets.right, 10) : 'auto',
       }}>
-      {isLoading && (
-        <Spinner
-          textContent={'Loading...'}
-          textStyle={{color: 'white'}}
-          visible={true} //check
-          overlayColor="rgba(78, 75, 102, 0.7)"
-        />
-      )}
+      <Loader visible={isLoading} loadingText={'Please wait...'} />
       <View>
         <View
           style={{

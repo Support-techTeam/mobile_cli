@@ -1,11 +1,9 @@
 import React, {useRef, useEffect} from 'react';
+import {View, Modal, StyleSheet, Animated} from 'react-native';
 import {
-  View,
-  Modal,
-  StyleSheet,
-  Animated,
-} from 'react-native';
-import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen';
+  heightPercentageToDP,
+  widthPercentageToDP,
+} from 'react-native-responsive-screen';
 import COLORS from '../../constants/colors';
 
 const CustomModal = ({visible, onClose, title, body, footer}) => {
@@ -44,7 +42,7 @@ const CustomModal = ({visible, onClose, title, body, footer}) => {
 
   return (
     <Modal
-      animationType={"none"}
+      animationType={'none'}
       transparent={true}
       visible={visible}
       onRequestClose={onClose}>
@@ -66,7 +64,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
-
   },
   modalContent: {
     backgroundColor: '#fff',
@@ -85,7 +82,7 @@ const styles = StyleSheet.create({
   },
   body: {
     justifyContent: 'center',
-    marginVertical: 15, 
+    marginVertical: 15,
     gap: 10,
     paddingHorizontal: 15,
   },

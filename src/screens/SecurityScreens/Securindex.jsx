@@ -82,7 +82,7 @@ const Securindex = () => {
           <AntDesign name="right" size={24} color="black" />
         </TouchableOpacity>
 
-        <TouchableOpacity
+        {/* <TouchableOpacity
           style={{
             marginBottom: 30,
             flexDirection: 'row',
@@ -126,7 +126,7 @@ const Securindex = () => {
             </View>
           </View>
           <AntDesign name="right" size={24} color="black" />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
 
         <TouchableOpacity
           style={{
@@ -174,7 +174,7 @@ const Securindex = () => {
           <AntDesign name="right" size={24} color="black" />
         </TouchableOpacity>
 
-        <TouchableOpacity
+        {/* <TouchableOpacity
           style={{
             marginBottom: 30,
             flexDirection: 'row',
@@ -218,7 +218,7 @@ const Securindex = () => {
             </View>
           </View>
           <AntDesign name="right" size={24} color="black" />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
 
       </ScrollView>
     </SafeAreaView>

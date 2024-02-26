@@ -77,6 +77,7 @@ import Step3 from '../screens/ProfileOnboardings/StepForm/Step3';
 import Step2 from '../screens/ProfileOnboardings/StepForm/Step2';
 import Step1 from '../screens/ProfileOnboardings/StepForm/Step1';
 import ResetPassword from '../screens/Authentications/ResetPassword';
+import WalletIndex from '../screens/WalletScreens/WalletIndex';
 
 const Stack = createNativeStackNavigator();
 const config = {
@@ -212,6 +213,8 @@ const AppStack = () => {
           <Stack.Screen name="ArmDetails" component={ArmDetails} />
           {/* Settings */}
           <Stack.Screen name="MyAccount" component={MyAccount} />
+          {/* Wallet Options */}
+          <Stack.Screen name="WalletIndex" component={WalletIndex} />
           {/* Security */}
           <Stack.Screen name="Security" component={Securindex} />
           <Stack.Screen name="PinSuccess" component={PinSuccess} />

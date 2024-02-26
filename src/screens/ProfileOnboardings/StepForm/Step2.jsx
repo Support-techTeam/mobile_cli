@@ -23,7 +23,7 @@ import {useBottomTabBarHeight} from '@react-navigation/bottom-tabs';
 import CustomButton from '../../../component/buttons/CustomButtons';
 import Toast from 'react-native-toast-message';
 import {bvnValidation} from '../../../stores/ProfileStore';
-import Spinner from 'react-native-loading-spinner-overlay';
+import Loader from '../../../component/loader/loader';
 
 const Step2 = props => {
   const insets = useSafeAreaInsets();
@@ -49,7 +49,6 @@ const Step2 = props => {
       setText(retrieveState()?.bvn);
     }
   }, []);
-
 
   const validateBVN = async () => {
     try {
@@ -100,18 +99,12 @@ const Step2 = props => {
         flex: 1,
         backgroundColor: '#fff',
         paddingTop: insets.top !== 0 ? Math.min(insets.top, 10) : 'auto',
-        paddingBottom: insets.bottom !== 0 ? Math.min(insets.bottom, 10) : 'auto',
+        paddingBottom:
+          insets.bottom !== 0 ? Math.min(insets.bottom, 10) : 'auto',
         paddingLeft: insets.left !== 0 ? Math.min(insets.left, 10) : 'auto',
         paddingRight: insets.right !== 0 ? Math.min(insets.right, 10) : 'auto',
       }}>
-      {isLoading && (
-        <Spinner
-          textContent={'Validating BVN...'}
-          textStyle={{color: 'white'}}
-          visible={true}
-          overlayColor="rgba(78, 75, 102, 0.7)"
-        />
-      )}
+      <Loader visible={isLoading} loadingText={'Validating BVN...'} />
       <KeyboardAvoidingWrapper>
         <ImageBackground
           source={require('../../../../assets/signup.png')}

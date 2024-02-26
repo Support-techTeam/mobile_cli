@@ -19,7 +19,6 @@ import Input from '../../component/inputField/input.component';
 import CustomDropdown from '../../component/dropDown/dropdown.component';
 import Buttons from '../../component/buttons/Buttons';
 import Toast from 'react-native-toast-message';
-import Spinner from 'react-native-loading-spinner-overlay/lib';
 import {getCity, getState} from '../../stores/ProfileStore';
 import {
   createBusinessDetails,
@@ -27,6 +26,7 @@ import {
   updateBusinessDetails,
 } from '../../stores/LoanStore';
 import KeyboardAvoidingWrapper from '../../component/KeyBoardAvoiding/keyBoardAvoiding';
+import Loader from '../../component/loader/loader';
 
 const businessTypeData = [
   {value: '', label: 'Select type'},
@@ -524,22 +524,8 @@ const BusinessDetails = () => {
         paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
         paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
       }}>
-      {isLoading && (
-        <Spinner
-          textContent={'Loading...'}
-          textStyle={{color: 'white'}}
-          visible={true}
-          overlayColor="rgba(78, 75, 102, 0.7)"
-        />
-      )}
-      {isUpdating && (
-        <Spinner
-          textContent={'Please wait...'}
-          textStyle={{color: 'white'}}
-          visible={true}
-          overlayColor="rgba(78, 75, 102, 0.7)"
-        />
-      )}
+       <Loader visible={isLoading} loadingText={'Please wait...'} />
+       <Loader visible={isLoading} loadingText={'Please wait...'} />
       <View
         style={{
           flexDirection: 'row',

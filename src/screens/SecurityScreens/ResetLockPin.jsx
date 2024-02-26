@@ -11,7 +11,6 @@ import {
 import React, {useState, useContext, useEffect, useRef} from 'react';
 
 import AntDesign from 'react-native-vector-icons/AntDesign';
-import Spinner from 'react-native-loading-spinner-overlay';
 
 import {useNavigation} from '@react-navigation/native';
 import InputPhone from '../../component/inputField/phone-input.component';
@@ -20,6 +19,7 @@ import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import COLORS from '../../constants/colors';
 import {resetPin} from '../../stores/SecurityStore';
+import Loader from '../../component/loader/loader';
 
 const {height, width} = Dimensions.get('window');
 
@@ -87,14 +87,7 @@ const ResetLockPin = () => {
         paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
         paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
       }}>
-      {isLoading && (
-        <Spinner
-          textContent={'Resetting Pin...'}
-          textStyle={{color: 'white'}}
-          visible={true}
-          overlayColor="rgba(78, 75, 102, 0.7)"
-        />
-      )}
+      <Loader visible={isLoading} loadingText={'Resetting Pin...'} />
       <View
         style={{
           flexDirection: 'row',

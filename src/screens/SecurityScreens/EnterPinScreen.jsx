@@ -10,7 +10,6 @@ import {
   ImageBackground,
 } from 'react-native';
 import React, {useState, useContext, useEffect, useRef} from 'react';
-import Spinner from 'react-native-loading-spinner-overlay';
 import Buttons from '../../component/buttons/Buttons';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
@@ -18,6 +17,7 @@ import COLORS from '../../constants/colors';
 import OTPInput from 'react-native-otp-withpaste';
 import {useAsyncStorage} from '@react-native-async-storage/async-storage';
 import {getAllPin, validatePin} from '../../stores/SecurityStore';
+import Loader from '../../component/loader/loader';
 
 const {height, width} = Dimensions.get('window');
 const screenHeight = Dimensions.get('window').height;
@@ -108,12 +108,7 @@ const EnterPin = ({toggleVisibility}) => {
         paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
         paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
       }}>
-      <Spinner
-        textContent={'Unlocking...'}
-        textStyle={{color: 'white'}}
-        visible={isLoading}
-        overlayColor="rgba(78, 75, 102, 0.7)"
-      />
+      <Loader visible={isLoading} loadingText={'Please wait...'} />
       <View
         style={{
           flexDirection: 'row',

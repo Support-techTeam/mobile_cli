@@ -14,7 +14,6 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 import CustomInput from '../../component/custominput/CustomInput';
 import Buttons from '../../component/buttons/Buttons';
 import KeyboardAvoidingWrapper from '../../component/KeyBoardAvoiding/keyBoardAvoiding';
-import Spinner from 'react-native-loading-spinner-overlay/lib';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 import {
   getCableTvProvider,
@@ -28,6 +27,7 @@ import Toast from 'react-native-toast-message';
 import {useSelector} from 'react-redux';
 import {getStatusBarHeight} from 'react-native-status-bar-height';
 import {createAction} from '@reduxjs/toolkit';
+import Loader from '../../component/loader/loader';
 
 const statusBarHeight = getStatusBarHeight();
 const midth = Dimensions.get('window').width;
@@ -141,14 +141,7 @@ const Cable = () => {
         paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
       }}>
       <View style={styles.container}>
-        {isLoading && (
-          <Spinner
-            textContent={'Loading...'}
-            textStyle={{color: 'white'}}
-            visible={true}
-            overlayColor="rgba(16, 17, 17, 0.7)"
-          />
-        )}
+        <Loader visible={isLoading} loadingText={'Please wait...'} />
         <View
           style={{
             flexDirection: 'row',

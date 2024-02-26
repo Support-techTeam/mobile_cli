@@ -13,7 +13,6 @@ import React, {useState, useEffect} from 'react';
 import {Formik} from 'formik';
 import {CheckBox} from '@rneui/themed';
 import {useNavigation} from '@react-navigation/native';
-import Spinner from 'react-native-loading-spinner-overlay';
 import Input from '../../component/inputField/input.component';
 import InputPhone from '../../component/inputField/phone-input.component';
 import KeyboardAvoidingWrapper from '../../component/KeyBoardAvoiding/keyBoardAvoiding';
@@ -30,6 +29,7 @@ import {
 } from 'react-native-responsive-screen';
 import {SIZES} from '../../constants';
 import {AuthHeader} from '../../component/header/AuthHeader';
+import Loader from '../../component/loader/loader';
 
 const SignUp = () => {
   const insets = useSafeAreaInsets();
@@ -70,7 +70,7 @@ const SignUp = () => {
     error !== '';
 
   const handleSignUp = async () => {
-    if (isNaN(Number(inputs.phoneNumber))){
+    if (isNaN(Number(inputs.phoneNumber))) {
       Toast.show({
         type: 'error',
         position: 'top',
@@ -213,29 +213,33 @@ const SignUp = () => {
     }
   };
 
-  useEffect(() => {
-    if (
-      !(
-        lowerValid &&
-        upperValid &&
-        numberValid &&
-        specialValid &&
-        lengthValid
-      ) &&
-      inputs.password.length > 0
-    ) {
-      setShowPassLogs(true);
-    } else {
-      setShowPassLogs(false);
-    }
-  }, [
-    lowerValid,
-    upperValid,
-    numberValid,
-    specialValid,
-    lengthValid,
-    inputs.password.length,
-  ], []);
+  useEffect(
+    () => {
+      if (
+        !(
+          lowerValid &&
+          upperValid &&
+          numberValid &&
+          specialValid &&
+          lengthValid
+        ) &&
+        inputs.password.length > 0
+      ) {
+        setShowPassLogs(true);
+      } else {
+        setShowPassLogs(false);
+      }
+    },
+    [
+      lowerValid,
+      upperValid,
+      numberValid,
+      specialValid,
+      lengthValid,
+      inputs.password.length,
+    ],
+    [],
+  );
 
   const handleOnchange = (text, input) => {
     setInputs(prevState => ({...prevState, [input]: text}));
@@ -251,19 +255,14 @@ const SignUp = () => {
         styles.container,
         {
           paddingTop: insets.top !== 0 ? Math.min(insets.top, 10) : 'auto',
-          paddingBottom: insets.bottom !== 0 ? Math.min(insets.bottom, 10) : 'auto',
+          paddingBottom:
+            insets.bottom !== 0 ? Math.min(insets.bottom, 10) : 'auto',
           paddingLeft: insets.left !== 0 ? Math.min(insets.left, 10) : 'auto',
-          paddingRight: insets.right !== 0 ? Math.min(insets.right, 10) : 'auto',
+          paddingRight:
+            insets.right !== 0 ? Math.min(insets.right, 10) : 'auto',
         },
       ]}>
-      {isLoading && (
-        <Spinner
-          textContent={'Signing Up...'}
-          textStyle={{color: 'white'}}
-          visible={true}
-          overlayColor="rgba(78, 75, 102, 0.7)"
-        />
-      )}
+      <Loader visible={isLoading} loadingText={'Signing Up...'} />
       <KeyboardAvoidingWrapper>
         <ImageBackground
           source={require('../../../assets/signup.png')}
@@ -379,9 +378,15 @@ const SignUp = () => {
                           error={errors.phoneNumber}
                           codeTextStyle={{color: '#6E7191'}}
                           defaultValue={inputs?.phoneNumber}
-                          onChangeCountry={(text) => handleOnchange(`+${text?.callingCode[0]}`, 'countryCode')}
-                          onChangeText={(text) => handleOnchange(text, 'phoneNumber')}
-                      
+                          onChangeCountry={text =>
+                            handleOnchange(
+                              `+${text?.callingCode[0]}`,
+                              'countryCode',
+                            )
+                          }
+                          onChangeText={text =>
+                            handleOnchange(text, 'phoneNumber')
+                          }
                         />
 
                         <Input

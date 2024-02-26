@@ -7,7 +7,6 @@ import {
   TextInput,
 } from 'react-native';
 import React, {useState, useRef, useEffect, useContext} from 'react';
-import Spinner from 'react-native-loading-spinner-overlay';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import {useNavigation} from '@react-navigation/native';
 import Toast from 'react-native-toast-message';
@@ -21,6 +20,7 @@ import {
   updateSubscription,
 } from '../../stores/BillStore';
 import appsFlyer from 'react-native-appsflyer';
+import Loader from '../../component/loader/loader';
 
 const BillPin = ({route}) => {
   const {airtimeDetails, acctNumber, selectedPackageData} = route.params;
@@ -267,14 +267,7 @@ const BillPin = ({route}) => {
         paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
         paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
       }}>
-      {isLoading && (
-        <Spinner
-          textContent={'Processing...'}
-          textStyle={{color: 'white'}}
-          visible={true}
-          overlayColor="rgba(78, 75, 102, 0.7)"
-        />
-      )}
+       <Loader visible={isLoading} loadingText={'Please wait...'} />
       <View
         style={{
           flexDirection: 'row',

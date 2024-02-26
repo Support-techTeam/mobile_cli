@@ -11,7 +11,6 @@ import ToggleSwitch from 'toggle-switch-react-native';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import {SelectList} from 'react-native-dropdown-select-list';
-import Spinner from 'react-native-loading-spinner-overlay/lib';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 import Input from '../../component/inputField/input.component';
 import Buttons from '../../component/buttons/Buttons';
@@ -27,6 +26,7 @@ import COLORS from '../../constants/colors';
 import SearchableDropdown from 'react-native-searchable-dropdown';
 import {Header} from '../../component/header/Header';
 import CustomSearchableDropdown from '../../component/inputField/CustomSearchableDropdown';
+import Loader from '../../component/loader/loader';
 
 const defaultData = [
   {value: '', label: 'Select Option'},
@@ -722,14 +722,7 @@ const BankDeets = ({route}) => {
         paddingLeft: insets.left !== 0 ? Math.min(insets.left, 10) : 'auto',
         paddingRight: insets.right !== 0 ? Math.min(insets.right, 10) : 'auto',
       }}>
-      {isLoading && (
-        <Spinner
-          textContent={'Loading...'}
-          textStyle={{color: 'white'}}
-          visible={true}
-          overlayColor="rgba(78, 75, 102, 0.7)"
-        />
-      )}
+      <Loader visible={isLoading} loadingText={'Loading...'} />
       <Header
         routeAction={() => navigation.goBack()}
         heading={'FUNDS TRANSFER'}

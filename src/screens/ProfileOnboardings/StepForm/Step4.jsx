@@ -15,7 +15,6 @@ import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 import Input from '../../../component/inputField/input.component';
 import CustomDropdown from '../../../component/dropDown/dropdown.component';
 import Toast from 'react-native-toast-message';
-import Spinner from 'react-native-loading-spinner-overlay/lib';
 import {
   createUserProfile,
   getCity,
@@ -32,6 +31,7 @@ import {useNavigation} from '@react-navigation/native';
 import COLORS from '../../../constants/colors';
 const countryList = require('country-list');
 import {SelectList} from 'react-native-dropdown-select-list';
+import Loader from '../../../component/loader/loader';
 
 const businessTypeData = [
   {value: '', label: 'Select type'},
@@ -370,14 +370,7 @@ const BusinessDetails = props => {
         paddingLeft: insets.left !== 0 ? Math.min(insets.left, 10) : 'auto',
         paddingRight: insets.right !== 0 ? Math.min(insets.right, 10) : 'auto',
       }}>
-      {isLoading && (
-        <Spinner
-          textContent={'Loading...'}
-          textStyle={{color: 'white'}}
-          visible={true}
-          overlayColor="rgba(78, 75, 102, 0.7)"
-        />
-      )}
+      <Loader visible={isLoading} loadingText={'Loading...'} />
       <View
         style={{
           flexDirection: 'row',

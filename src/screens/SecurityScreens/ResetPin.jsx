@@ -11,7 +11,6 @@ import {
 import React, {useState, useContext, useEffect, useRef} from 'react';
 
 import AntDesign from 'react-native-vector-icons/AntDesign';
-import Spinner from 'react-native-loading-spinner-overlay';
 
 import {useNavigation} from '@react-navigation/native';
 
@@ -22,6 +21,7 @@ import {changePin} from '../../stores/ProfileStore';
 import Toast from 'react-native-toast-message';
 import COLORS from '../../constants/colors';
 import OTPInput from 'react-native-otp-withpaste';
+import Loader from '../../component/loader/loader';
 
 const {height, width} = Dimensions.get('window');
 const ResetPin = () => {
@@ -82,12 +82,7 @@ const ResetPin = () => {
         paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
         paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
       }}>
-      <Spinner
-        textContent={'Resetting Pin...'}
-        textStyle={{color: 'white'}}
-        visible={isLoading}
-        overlayColor="rgba(78, 75, 102, 0.7)"
-      />
+       <Loader visible={isLoading} loadingText={'Resetting Pin...'} />
       <View
         style={{
           flexDirection: 'row',

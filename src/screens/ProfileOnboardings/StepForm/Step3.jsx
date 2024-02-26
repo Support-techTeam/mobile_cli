@@ -12,8 +12,6 @@ import {
   Button,
 } from 'react-native';
 import React, {useLayoutEffect, useState, useRef, useEffect} from 'react';
-import DateTimePickerModal from 'react-native-modal-datetime-picker';
-import Spinner from 'react-native-loading-spinner-overlay';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 import Input from '../../../component/inputField/input.component';
 import CustomDropdown from '../../../component/dropDown/dropdown.component';
@@ -39,6 +37,7 @@ import {SIZES} from '../../../constants';
 import CustomButton from '../../../component/buttons/CustomButtons';
 import {SelectList} from 'react-native-dropdown-select-list';
 import COLORS from '../../../constants/colors';
+import Loader from '../../../component/loader/loader';
 const countryList = require('country-list');
 
 const titleData = [
@@ -488,11 +487,9 @@ const Step3 = props => {
             paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
             paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
           }}>
-          <Spinner
-            textContent={'Loading Profile Details...'}
-            textStyle={{color: 'white'}}
-            visible={true}
-            overlayColor="rgba(78, 75, 102, 0.7)"
+          <Loader
+            visible={isLoading}
+            loadingText={'Loading Profile Details...'}
           />
           <View
             style={{
@@ -519,14 +516,10 @@ const Step3 = props => {
             paddingRight:
               insets.right !== 0 ? Math.min(insets.right, 10) : 'auto',
           }}>
-          {isLoading && (
-            <Spinner
-              textContent={'Creating user Profile Details...'}
-              textStyle={{color: 'white'}}
-              visible={true}
-              overlayColor="rgba(78, 75, 102, 0.7)"
-            />
-          )}
+          <Loader
+            visible={isLoading}
+            loadingText={'Creating user Profile Details...'}
+          />
           <KeyboardAvoidingWrapper>
             <ImageBackground
               source={require('../../../../assets/signup.png')}

@@ -37,13 +37,13 @@ import COLORS from '../../constants/colors';
 import CustomButton from '../../component/buttons/CustomButtons';
 import VerifyModal from '../../component/modals/verifyModal';
 import Toast from 'react-native-toast-message';
-import Spinner from 'react-native-loading-spinner-overlay/lib';
 import {
   changePin,
   checkPin,
   createTransactionPin,
   resetPin,
 } from '../../stores/ProfileStore';
+import Loader from '../../component/loader/loader';
 
 const CELL_COUNT = 4;
 let message = 'Please wait...';
@@ -374,6 +374,7 @@ const TransPin = () => {
               <CustomButton
                 title={'Create New Pin'}
                 disabled={disableit}
+                isLoading={isLoading}
                 buttonStyle={{marginHorizontal: 0}}
                 onPress={() => handleCreatePin()}
               />
@@ -544,6 +545,7 @@ const TransPin = () => {
             <View style={{marginVertical: 40}}>
               <CustomButton
                 title={'Change Pin'}
+                isLoading={isLoading}
                 buttonStyle={{marginHorizontal: 0}}
                 onPress={handleChangePin}
                 disabled={disableits}
@@ -557,7 +559,7 @@ const TransPin = () => {
 
   const ResetPin = () => {
     return (
-      <VerifyModal visible={showResetPin}>
+      <VerifyModal visible={showResetPin} isLoading={isLoading}>
         <View style={{alignItems: 'center'}}>
           <MaterialCommunityIcons
             name="lock-check"
@@ -613,14 +615,8 @@ const TransPin = () => {
         heading={'TRANSACTION PIN'}
         disable={false}
       />
-      {isLoading && (
-        <Spinner
-          textContent={message}
-          textStyle={{color: 'white'}}
-          visible={true}
-          overlayColor="rgba(78, 75, 102, 0.7)"
-        />
-      )}
+      <Loader vissible={isLoading} loadingText={message} />
+
       <ScrollView
         bounces={false}
         style={{paddingHorizontal: 16, marginVertical: 30, flex: 1}}

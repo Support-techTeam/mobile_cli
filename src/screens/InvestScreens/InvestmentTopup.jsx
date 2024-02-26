@@ -9,7 +9,6 @@ import {
 import React, {useState, useRef} from 'react';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import Spinner from 'react-native-loading-spinner-overlay/lib';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 import Input from '../../component/inputField/input.component';
 import CustomDropdown from '../../component/dropDown/dropdown.component';
@@ -32,6 +31,7 @@ import styles, {
 } from '../../../styles';
 import {Center, Checkbox} from 'native-base';
 import {Header} from '../../component/header/Header';
+import Loader from '../../component/loader/loader';
 
 const {Value, Text: AnimatedText} = Animated;
 const CELL_COUNT = 4;
@@ -148,14 +148,7 @@ const InvestmentTopup = () => {
         paddingLeft: insets.left !== 0 ? Math.min(insets.left, 10) : 'auto',
         paddingRight: insets.right !== 0 ? Math.min(insets.right, 10) : 'auto',
       }}>
-      {isLoading && (
-        <Spinner
-          textContent={'Loading...'}
-          textStyle={{color: 'white'}}
-          visible={true}
-          overlayColor="rgba(78, 75, 102, 0.7)"
-        />
-      )}
+       <Loader visible={isLoading} loadingText={'Please wait...'} />
       <Header
         routeAction={() => navigation.goBack()}
         heading={`${name?.toUpperCase()} INVESTMENT TOP-UP`}

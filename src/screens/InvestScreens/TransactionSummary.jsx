@@ -17,10 +17,10 @@ import {
   topUpArmInvestment,
   topUpLendaInvestment,
 } from '../../stores/InvestStore';
-import Spinner from 'react-native-loading-spinner-overlay';
 import Toast from 'react-native-toast-message';
 import appsFlyer from 'react-native-appsflyer';
 import {Header} from '../../component/header/Header';
+import Loader from '../../component/loader/loader';
 
 const TransactionSummary = () => {
   const insets = useSafeAreaInsets();
@@ -264,19 +264,12 @@ const TransactionSummary = () => {
         paddingLeft: insets.left !== 0 ? Math.min(insets.left, 10) : 'auto',
         paddingRight: insets.right !== 0 ? Math.min(insets.right, 10) : 'auto',
       }}>
-      {isLoading && (
-        <Spinner
-          textContent={
+      <Loader visible={isLoading} loadingText={
             action === 'TOP-UP'
               ? 'Investment Top-Up...'
               : 'Creating Investment...'
-          }
-          textStyle={{color: 'white'}}
-          visible={true}
-          overlayColor="rgba(78, 75, 102, 0.7)"
-          animation="slide"
-        />
-      )}
+          }/>
+     
       <Header
         routeAction={() => navigation.goBack()}
         heading={'INVESTMENT SUMMARY'}

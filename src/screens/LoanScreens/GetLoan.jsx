@@ -11,7 +11,6 @@ import {
 import React, {useContext, useEffect, useState} from 'react';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import {useNavigation} from '@react-navigation/native';
-import Spinner from 'react-native-loading-spinner-overlay';
 import Pdf from 'react-native-pdf';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
@@ -25,6 +24,7 @@ import {getGuarantors} from '../../stores/GuarantorStore';
 import COLORS from '../../constants/colors';
 import appsFlyer from 'react-native-appsflyer';
 import {Header} from '../../component/header/Header';
+import Loader from '../../component/loader/loader';
 
 const durationData = [
   {value: '', label: 'Select Duration'},
@@ -445,14 +445,7 @@ const GetLoan = () => {
                 </>
               ) : (
                 <>
-                  {isLoading && (
-                    <Spinner
-                      textContent={'Loading...'}
-                      textStyle={{color: 'white'}}
-                      visible={true}
-                      overlayColor="rgba(78, 75, 102, 0.7)"
-                    />
-                  )}
+                  <Loader visible={isLoading} loadingText={'Please wait...'} />
                   <Header
                     routeAction={() => navigation.navigate('Loan')}
                     heading={'LOAN APPLICATION'}

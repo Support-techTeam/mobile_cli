@@ -533,6 +533,146 @@ const getTransactionsStatement = async (startDate, endDate) => {
   }
 };
 
+const requestLimitIncrease = async details => {
+  if (
+    store.getState().networkState &&
+    store.getState().networkState.network.isConnected &&
+    store.getState().networkState.network.isInternetReachable
+  ) {
+    await getFirebaseAuthToken();
+    if (token) {
+      headers = {
+        accept: 'application/json',
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      };
+      try {
+        const response = await axiosInstance.post(
+          `/users/user-limit-increase-request`,
+          details,
+          {headers},
+        );
+        if (response?.data?.error) {
+          DdLogs.warn(
+            `Wallet | Limit Increase | ${auth()?.currentUser?.email}`,
+            {
+              errorMessage: JSON.stringify(response?.data),
+            },
+          );
+          return {
+            title: 'Limit Increase',
+            error: true,
+            data: null,
+            message: response?.data?.message,
+          };
+        } else {
+          DdLogs.info(
+            `Wallet | Limit Increase | ${auth()?.currentUser?.email}`,
+            {
+              context: 'No internet Connection',
+            },
+          );
+          return {
+            title: 'Limit Increase',
+            error: false,
+            data: response?.data,
+            message: response?.data?.message,
+          };
+        }
+      } catch (error) {
+        DdLogs.error(
+          `Wallet | Limit Increase | ${auth()?.currentUser?.email}`,
+          {
+            errorMessage: JSON.stringify(error),
+          },
+        );
+        return {
+          title: 'Limit Increase',
+          error: true,
+          data: null,
+          message: error,
+        };
+      }
+    }
+  } else {
+    return {
+      error: true,
+      data: null,
+      message: 'No Internet Connection',
+    };
+  }
+};
+
+const upgradeWallet = async data => {
+  if (
+    store.getState().networkState &&
+    store.getState().networkState.network.isConnected &&
+    store.getState().networkState.network.isInternetReachable
+  ) {
+    await getFirebaseAuthToken();
+    if (token) {
+      headers = {
+        accept: 'application/json',
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      };
+      try {
+        const response = await axiosInstance.post(
+          `/loan-wallet/upgrade-wallet`,
+          data,
+          {headers},
+        );
+        if (response?.data?.error) {
+          DdLogs.warn(
+            `Wallet | Wallet name|type update  | ${auth()?.currentUser?.email}`,
+            {
+              errorMessage: JSON.stringify(response?.data),
+            },
+          );
+          return {
+            title: 'Wallet Upgrade|Downgrade',
+            error: true,
+            data: null,
+            message: response?.data?.message,
+          };
+        } else {
+          DdLogs.info(
+            `Wallet | Wallet name|type update  | ${auth()?.currentUser?.email}`,
+            {
+              context: 'No internet Connection',
+            },
+          );
+          return {
+            title: 'Wallet Upgrade|Downgrade',
+            error: false,
+            data: response?.data,
+            message: response?.data?.message,
+          };
+        }
+      } catch (error) {
+        DdLogs.error(
+          `Wallet | Wallet name|type update  | ${auth()?.currentUser?.email}`,
+          {
+            errorMessage: JSON.stringify(error),
+          },
+        );
+        return {
+          title: 'Wallet Upgrade|Downgrade',
+          error: true,
+          data: null,
+          message: error,
+        };
+      }
+    }
+  } else {
+    return {
+      error: true,
+      data: null,
+      message: 'No Internet Connection',
+    };
+  }
+};
+
 const getFirebaseAuthToken = async () => {
   try {
     const user = auth().currentUser;
@@ -557,4 +697,6 @@ export {
   getAllBankDetails,
   getTransactionsStatement,
   getBeneficiaries,
+  requestLimitIncrease,
+  upgradeWallet,
 };
