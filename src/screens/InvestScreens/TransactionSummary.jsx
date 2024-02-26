@@ -20,6 +20,7 @@ import {
 import Spinner from 'react-native-loading-spinner-overlay';
 import Toast from 'react-native-toast-message';
 import appsFlyer from 'react-native-appsflyer';
+import {Header} from '../../component/header/Header';
 
 const TransactionSummary = () => {
   const insets = useSafeAreaInsets();
@@ -256,10 +257,10 @@ const TransactionSummary = () => {
     <SafeAreaView
       style={{
         flex: 1,
-        paddingHorizontal: 16,
         backgroundColor: '#fff',
         paddingTop: insets.top !== 0 ? Math.min(insets.top, 10) : 'auto',
-        paddingBottom: insets.bottom !== 0 ? Math.min(insets.bottom, 10) : 'auto',
+        paddingBottom:
+          insets.bottom !== 0 ? Math.min(insets.bottom, 10) : 'auto',
         paddingLeft: insets.left !== 0 ? Math.min(insets.left, 10) : 'auto',
         paddingRight: insets.right !== 0 ? Math.min(insets.right, 10) : 'auto',
       }}>
@@ -276,34 +277,15 @@ const TransactionSummary = () => {
           animation="slide"
         />
       )}
-      <View
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-        }}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <View
-            style={{
-              borderWidth: 0.5,
-              borderColor: '#D9DBE9',
-              borderRadius: 5,
-            }}>
-            <Icon name="chevron-left" size={36} color="black" />
-          </View>
-        </TouchableOpacity>
-        <View style={styles.HeadView}>
-          <View style={styles.TopView}>
-            <Text style={styles.TextHead}>INVESTMENT SUMMARY</Text>
-          </View>
-        </View>
-
-        <View style={{}}>
-          <Text>{'       '}</Text>
-        </View>
-      </View>
-      <View style={styles.demark} />
+      <Header
+        routeAction={() => navigation.goBack()}
+        heading={'INVESTMENT SUMMARY'}
+        disable={false}
+      />
       <ScrollView
+        style={{
+          paddingHorizontal: 16,
+        }}
         bounces={false}
         showsHorizontalScrollIndicator={false}
         showsVerticalScrollIndicator={false}>
@@ -339,7 +321,13 @@ const TransactionSummary = () => {
           <View style={styles.detailsView}>
             <Text style={styles.desc}>Investment Amount</Text>
             <Text style={styles.amount}>
-              ₦{investmentAmount?.toString()?.replace(/\B(?=(\d{3})+\b)/g, ',')}
+              {investmentAmount &&
+                new Intl.NumberFormat('en-NG', {
+                  style: 'currency',
+                  currency: 'NGN',
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                }).format(Number(investmentAmount))}
             </Text>
           </View>
 
@@ -360,7 +348,13 @@ const TransactionSummary = () => {
           <View style={[styles.detailsView, {marginTop: 40}]}>
             <Text style={styles.desc}>Total</Text>
             <Text style={[styles.amount, {color: '#054B99'}]}>
-              ₦{investmentAmount?.toString()?.replace(/\B(?=(\d{3})+\b)/g, ',')}
+              {investmentAmount &&
+                new Intl.NumberFormat('en-NG', {
+                  style: 'currency',
+                  currency: 'NGN',
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                }).format(Number(investmentAmount))}
             </Text>
           </View>
           <View style={styles.demark} />

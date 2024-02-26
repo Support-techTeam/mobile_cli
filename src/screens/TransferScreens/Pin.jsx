@@ -34,9 +34,8 @@ import styles, {
   DEFAULT_CELL_BG_COLOR,
   NOT_EMPTY_CELL_BG_COLOR,
 } from '../../../styles';
-import {color} from '@rneui/base';
 import COLORS from '../../constants/colors';
-import {Center, Checkbox, VStack} from 'native-base';
+import {Center, Checkbox} from 'native-base';
 
 const {Value, Text: AnimatedText} = Animated;
 const CELL_COUNT = 4;
@@ -57,16 +56,10 @@ const animateCell = ({hasValue, index, isFocused}) => {
     }),
   ]).start();
 };
-// let hideValue = true;
+
 const Pin = ({route}) => {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
-  const firstInput = useRef();
-  const secondInput = useRef();
-  const thirdInput = useRef();
-  const fourthInput = useRef();
-  const [otp, setOtp] = useState({1: '', 2: '', 3: '', 4: ''});
-  // const disableit = !otp[1] || !otp[2] || !otp[3] || !otp[4];
   const {bankDetails} = route.params;
   const [isLoading, setIsLoading] = useState(false);
   const [value, setValue] = useState('');
@@ -76,7 +69,9 @@ const Pin = ({route}) => {
     value,
     setValue,
   });
+
   const disableit = value.length === 4 ? false : true;
+  
   const renderCell = ({index, symbol, isFocused}) => {
     const hasValue = Boolean(symbol);
     const animatedCellStyle = {

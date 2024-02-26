@@ -286,7 +286,7 @@ const createTransactionPin = async details => {
           title: 'Create Transaction Pin',
           error: false,
           data: null,
-          message: 'success',
+          message: response?.data?.message,
         };
       } catch (error) {
         DdLogs.error(
@@ -334,10 +334,10 @@ const changePin = async details => {
           },
         );
         if (response?.data?.error) {
-          DdLogs.error(
+          DdLogs.info(
             `Profile | Change Transaction Pin | ${auth()?.currentUser?.email}`,
             {
-              errorMessage: JSON.stringify(response?.data),
+              context: JSON.stringify(response?.data),
             },
           );
           return {
@@ -356,8 +356,8 @@ const changePin = async details => {
         return {
           title: 'Change Transaction Pin',
           error: false,
-          data: response?.data,
-          message: 'success',
+          data: null,
+          message: response?.data?.message,
         };
       } catch (error) {
         DdLogs.error(
@@ -368,6 +368,67 @@ const changePin = async details => {
         );
         return {
           title: 'Change Transaction Pin',
+          error: true,
+          data: null,
+          message: `Failed | ${error?.response?.data?.message}`,
+        };
+      }
+    }
+  } else {
+    return {
+      error: true,
+      data: null,
+      message: 'No Internet Connection',
+    };
+  }
+};
+
+const resetPin = async () => {
+  if (
+    store.getState().networkState &&
+    store.getState().networkState.network.isConnected &&
+    store.getState().networkState.network.isInternetReachable
+  ) {
+    await getFirebaseAuthToken();
+    if (token) {
+      headers = {
+        accept: 'application/json',
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      };
+      try {
+        const response = await axiosInstance.get(
+          `/transaction-pin/factory-reset-pin`,
+          {
+            headers,
+          },
+        );
+        if (response?.data?.error) {
+          DdLogs.info(`Profile | Reset Pin | ${auth()?.currentUser?.email}`, {
+            context: JSON.stringify(response?.data),
+          });
+          return {
+            title: 'Reset Pin',
+            error: true,
+            data: null,
+            message: `Failed | ${response?.data?.message}`,
+          };
+        }
+        DdLogs.info(`Profile | Reset Pin | ${auth()?.currentUser?.email}`, {
+          context: JSON.stringify(response?.data),
+        });
+        return {
+          title: 'Reset Pin',
+          error: false,
+          data: null,
+          message: response?.data?.message,
+        };
+      } catch (error) {
+        DdLogs.error(`Profile | Reset Pin | ${auth()?.currentUser?.email}`, {
+          errorMessage: JSON.stringify(error),
+        });
+        return {
+          title: 'Reset Pin',
           error: true,
           data: null,
           message: `Failed | ${error?.response?.data?.message}`,
@@ -465,4 +526,5 @@ export {
   createTransactionPin,
   changePin,
   bvnValidation,
+  resetPin,
 };

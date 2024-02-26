@@ -23,7 +23,8 @@ export default VerifyModal
 const styles = StyleSheet.create({
     modalBackground:{
         flex:1,
-        backgroundColor:'#CED0D9',
+        backgroundColor: 'rgba(0,0,0,0.3)',
+        // backgroundColor:'#CED0D9',
         justifyContent:'center',
         alignItems:'center',
         opacity:1,

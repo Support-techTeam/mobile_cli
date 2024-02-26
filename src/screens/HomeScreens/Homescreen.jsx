@@ -4,8 +4,6 @@ import {
   NativeModules,
   RefreshControl,
   ActivityIndicator,
-  Platform,
-  Animated,
 } from 'react-native';
 import React, {useCallback, useEffect, useState} from 'react';
 import {useNavigation, useFocusEffect} from '@react-navigation/native';

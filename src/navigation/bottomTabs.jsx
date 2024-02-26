@@ -243,7 +243,7 @@ export default function BottomTabs({navigation}) {
                 </>
               ),
               tabBarIcon: ({color, size}) => {
-                return <Icon name="menu" size={size} color={color} />;
+                return <Icon name="view-dashboard" size={size} color={color} />;
               },
             }}
             listeners={{

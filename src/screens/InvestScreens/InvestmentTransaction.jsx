@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   ScrollView,
   TextInput,
+  Animated,
 } from 'react-native';
 import React, {useState, useRef} from 'react';
 import {useNavigation, useRoute} from '@react-navigation/native';
@@ -15,9 +16,23 @@ import Input from '../../component/inputField/input.component';
 import CustomDropdown from '../../component/dropDown/dropdown.component';
 import Buttons from '../../component/buttons/Buttons';
 import {useSelector} from 'react-redux';
-
 import Toast from 'react-native-toast-message';
 import COLORS from '../../constants/colors';
+import {
+  CodeField,
+  Cursor,
+  useBlurOnFulfill,
+  useClearByFocusCell,
+} from 'react-native-confirmation-code-field';
+import styles, {
+  ACTIVE_CELL_BG_COLOR,
+  CELL_BORDER_RADIUS,
+  CELL_SIZE,
+  DEFAULT_CELL_BG_COLOR,
+  NOT_EMPTY_CELL_BG_COLOR,
+} from '../../../styles';
+import {Center, Checkbox} from 'native-base';
+import {Header} from '../../component/header/Header';
 
 const durationData = [
   {value: '', label: 'Select Option'},
@@ -26,19 +41,40 @@ const durationData = [
   {value: '12 Months', label: '12 Months'},
 ];
 
+const {Value, Text: AnimatedText} = Animated;
+const CELL_COUNT = 4;
+
+const animationsColor = [...new Array(CELL_COUNT)].map(() => new Value(0));
+const animationsScale = [...new Array(CELL_COUNT)].map(() => new Value(1));
+const animateCell = ({hasValue, index, isFocused}) => {
+  Animated.parallel([
+    Animated.timing(animationsColor[index], {
+      useNativeDriver: false,
+      toValue: isFocused ? 1 : 0,
+      duration: 150,
+    }),
+    Animated.spring(animationsScale[index], {
+      useNativeDriver: false,
+      toValue: hasValue ? 0 : 1,
+      duration: hasValue ? 200 : 150,
+    }),
+  ]).start();
+};
+
 const InvestmentTransaction = () => {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
   const userWalletData = useSelector(state => state.userProfile.wallet);
   const [isLoading, setIsLoading] = useState(false);
-  const firstInput = useRef();
-  const secondInput = useRef();
-  const thirdInput = useRef();
-  const fourthInput = useRef();
-  const [otp, setOtp] = useState({1: '', 2: '', 3: '', 4: ''});
   const route = useRoute();
   const {name, investment} = route.params;
-
+  const [value, setValue] = useState('');
+  const [hideValue, setHideValue] = useState(true);
+  const ref = useBlurOnFulfill({value, cellCount: CELL_COUNT});
+  const [props, getCellOnLayoutHandler] = useClearByFocusCell({
+    value,
+    setValue,
+  });
   const [investmentDetails, setInvestmentDetails] = useState({
     investmentType: investment?.investmentName,
     investmentTenor: '',
@@ -52,10 +88,7 @@ const InvestmentTransaction = () => {
   });
 
   const disableit =
-    !otp[1] ||
-    !otp[2] ||
-    !otp[3] ||
-    !otp[4] ||
+    value.length < 4 ||
     !investmentDetails.investmentType ||
     !investmentDetails.investmentTenor ||
     investmentDetails.investmentAmount == 0;
@@ -63,14 +96,58 @@ const InvestmentTransaction = () => {
   const disableitarm =
     !armDetails.productCode || armDetails.investmentAmount == 0;
 
+  const renderCell = ({index, symbol, isFocused}) => {
+    const hasValue = Boolean(symbol);
+    const animatedCellStyle = {
+      backgroundColor: hasValue
+        ? animationsScale[index].interpolate({
+            inputRange: [0, 1],
+            outputRange: [NOT_EMPTY_CELL_BG_COLOR, ACTIVE_CELL_BG_COLOR],
+          })
+        : animationsColor[index].interpolate({
+            inputRange: [0, 1],
+            outputRange: [DEFAULT_CELL_BG_COLOR, ACTIVE_CELL_BG_COLOR],
+          }),
+      borderRadius: animationsScale[index].interpolate({
+        inputRange: [0, 1],
+        outputRange: [CELL_SIZE, CELL_BORDER_RADIUS],
+      }),
+      transform: [
+        {
+          scale: animationsScale[index].interpolate({
+            inputRange: [0, 1],
+            outputRange: [0.4, 1],
+          }),
+        },
+      ],
+    };
+
+    setTimeout(() => {
+      animateCell({hasValue, index, isFocused});
+    }, 0);
+
+    return (
+      <AnimatedText
+        key={index}
+        style={
+          hideValue
+            ? [styles.cell, animatedCellStyle]
+            : [styles.cell, isFocused && styles.focusCell]
+        }
+        onLayout={getCellOnLayoutHandler(index)}>
+        {symbol || (isFocused ? <Cursor /> : null)}
+      </AnimatedText>
+    );
+  };
+
   return (
     <SafeAreaView
       style={{
         flex: 1,
-        paddingHorizontal: 16,
         backgroundColor: '#fff',
         paddingTop: insets.top !== 0 ? Math.min(insets.top, 10) : 'auto',
-        paddingBottom: insets.bottom !== 0 ? Math.min(insets.bottom, 10) : 'auto',
+        paddingBottom:
+          insets.bottom !== 0 ? Math.min(insets.bottom, 10) : 'auto',
         paddingLeft: insets.left !== 0 ? Math.min(insets.left, 10) : 'auto',
         paddingRight: insets.right !== 0 ? Math.min(insets.right, 10) : 'auto',
       }}>
@@ -82,44 +159,18 @@ const InvestmentTransaction = () => {
           overlayColor="rgba(78, 75, 102, 0.7)"
         />
       )}
-      <View
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-        }}>
-        <TouchableOpacity
-          onPress={() => {
-            navigation.goBack();
-          }}>
-          <View
-            style={{
-              borderWidth: 0.5,
-              borderColor: '#D9DBE9',
-              borderRadius: 5,
-            }}>
-            <Icon name="chevron-left" size={36} color="black" />
-          </View>
-        </TouchableOpacity>
-        <View style={styles.HeadView}>
-          <View style={styles.TopView}>
-            <Text style={styles.TextHead}>
-              {name === 'Arm' ? 'ARM INVESTMENT' : 'LENDA INVESTMENT'}
-            </Text>
-          </View>
-        </View>
-
-        <View style={{}}>
-          <Text>{'       '}</Text>
-        </View>
-      </View>
-      <View style={styles.demark} />
+      <Header
+        routeAction={() => navigation.goBack()}
+        heading={name === 'Arm' ? 'ARM INVESTMENT' : 'LENDA INVESTMENT'}
+        disable={false}
+      />
       <ScrollView
         bounces={false}
+        style={{paddingHorizontal: 0}}
         showsHorizontalScrollIndicator={false}
         showsVerticalScrollIndicator={false}>
         {name === 'Arm' ? (
-          <View style={styles.innerContainer}>
+          <View style={internalStyles.innerContainer}>
             <View style={{marginTop: 10}}>
               <Input
                 onChangeText={text =>
@@ -221,7 +272,7 @@ const InvestmentTransaction = () => {
             </View>
           </View>
         ) : (
-          <View style={styles.innerContainer}>
+          <View style={internalStyles.innerContainer}>
             <CustomDropdown
               label="Investment Tenor"
               isNeeded={true}
@@ -291,72 +342,40 @@ const InvestmentTransaction = () => {
                 style={{
                   color: '#4E4B66',
                   fontWeight: '500',
-                  marginBottom: 10,
                 }}>
                 Transaction Pin <Text style={{color: COLORS.googleRed}}>*</Text>
               </Text>
-              <View style={styles.pinView}>
-                <View style={styles.otpContainer}>
-                  <View style={styles.otpBox}>
-                    <TextInput
-                      style={styles.otpText}
-                      keyboardType="number-pad"
-                      maxLength={1}
-                      ref={firstInput}
-                      onChangeText={text => {
-                        setOtp({...otp, 1: text});
-                        text && secondInput.current.focus();
-                      }}
-                      secureTextEntry={true}
-                    />
-                  </View>
-                  <View style={styles.otpBox}>
-                    <TextInput
-                      style={styles.otpText}
-                      keyboardType="number-pad"
-                      maxLength={1}
-                      ref={secondInput}
-                      onChangeText={text => {
-                        setOtp({...otp, 2: text});
-                        text
-                          ? thirdInput.current.focus()
-                          : firstInput.current.focus();
-                      }}
-                      secureTextEntry={true}
-                    />
-                  </View>
-                  <View style={styles.otpBox}>
-                    <TextInput
-                      style={styles.otpText}
-                      keyboardType="number-pad"
-                      maxLength={1}
-                      ref={thirdInput}
-                      onChangeText={text => {
-                        setOtp({...otp, 3: text});
-                        text
-                          ? fourthInput.current.focus()
-                          : secondInput.current.focus();
-                      }}
-                      secureTextEntry={true}
-                    />
-                  </View>
-                  <View style={styles.otpBox}>
-                    <TextInput
-                      style={styles.otpText}
-                      keyboardType="number-pad"
-                      maxLength={1}
-                      ref={fourthInput}
-                      onChangeText={text => {
-                        setOtp({...otp, 4: text});
-                        !text && thirdInput.current.focus();
-                      }}
-                      secureTextEntry={true}
-                    />
-                  </View>
+              <View style={internalStyles.pinView}>
+                <View style={internalStyles.otpContainer}>
+                  <CodeField
+                    ref={ref}
+                    {...props}
+                    value={value}
+                    onChangeText={setValue}
+                    cellCount={CELL_COUNT}
+                    rootStyle={styles.codeFieldRoot}
+                    keyboardType="number-pad"
+                    textContentType="oneTimeCode"
+                    renderCell={renderCell}
+                  />
+                </View>
+                <View style={{marginVertical: 25}}>
+                  <Center>
+                    <Checkbox
+                      size="md"
+                      colorScheme="info"
+                      defaultIsChecked={!hideValue}
+                      onChange={state => {
+                        setHideValue(!state);
+                      }}>
+                      Show transaction pin
+                    </Checkbox>
+                  </Center>
                 </View>
               </View>
+
               <TouchableOpacity
-                style={{marginTop: 40}}
+                style={{marginTop: 0}}
                 disabled={disableit}
                 onPress={() => {
                   if (Number(investmentDetails?.investmentAmount) <= 0) {
@@ -419,13 +438,13 @@ const InvestmentTransaction = () => {
                   } else {
                     setInvestmentDetails({
                       ...investmentDetails,
-                      transactionPin: `${otp[1] + otp[2] + otp[3] + otp[4]}`,
+                      transactionPin: value,
                     });
 
                     navigation.navigate('TransactionSummary', {
                       name: name,
                       ...investmentDetails,
-                      transactionPin: `${otp[1] + otp[2] + otp[3] + otp[4]}`,
+                      transactionPin: value,
                     });
                   }
                 }}>
@@ -441,7 +460,7 @@ const InvestmentTransaction = () => {
 
 export default InvestmentTransaction;
 
-const styles = StyleSheet.create({
+const internalStyles = StyleSheet.create({
   pick: {
     marginBottom: 10,
     backgroundColor: '#fffff',
@@ -516,7 +535,6 @@ const styles = StyleSheet.create({
     width: '100%',
     justifyContent: 'space-evenly',
     alignItems: 'center',
-    marginVertical: 5,
   },
   otpBox: {
     borderRadius: 5,
