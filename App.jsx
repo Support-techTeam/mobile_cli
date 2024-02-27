@@ -9,11 +9,12 @@ import {
   LogBox,
   useColorScheme,
   PermissionsAndroid,
-  NativeEventEmitter,
+  DeviceEventEmitter,
+  NativeAppEventEmitter,
   NativeModules,
 } from 'react-native';
 import SpInAppUpdates, {IAUUpdateKind} from 'sp-react-native-in-app-updates';
-import {version, SCREELOCK_CODE, SCREENLOCK_STATUS} from './app.json';
+import {version} from './app.json';
 import Toast from 'react-native-toast-message';
 import AppCenter from 'appcenter';
 import Analytics from 'appcenter-analytics';
@@ -29,14 +30,10 @@ import {Provider} from 'react-redux';
 import {PersistGate} from 'redux-persist/integration/react';
 import {persistor, resetStore, store} from './src/util/redux/store';
 import {LightTheme} from './src/constants/lightTheme';
-import {DarkTheme} from './src/constants/darkTheme';
-import {DefaultTheme} from 'react-native-paper';
-import InputPin from './src/screens/SecurityScreens/PinInput';
 import NetworkStatus from './src/util/NetworkService';
 import RNRestart from 'react-native-restart';
 import COLORS from './src/constants/colors';
 import {userLogOut} from './src/stores/AuthStore';
-import BackgroundTimer from 'react-native-background-timer';
 import {TextColorProvider} from './src/component/TextColorContext';
 import InitializeSDKHandler from './src/component/appFlyer/InitializeSDKHandler';
 import DeviceInfo from 'react-native-device-info';
@@ -47,12 +44,10 @@ import CustomNotification from './src/component/push-notifications/CustomNotific
 import auth from '@react-native-firebase/auth';
 import {requestNotifications} from 'react-native-permissions';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import PinInput from './src/screens/SecurityScreens/PinInput';
 import {DataProvider} from './src/context/DataProvider';
-import Splashscreen from './src/navigation/Splashscreen';
 
 const inAppUpdates = new SpInAppUpdates(false);
-const deviceInfoEmitter = new NativeEventEmitter(NativeModules.RNDeviceInfo);
+// const deviceInfoEmitter = new NativeEventEmitter(NativeModules.RNDeviceInfo);
 LogBox.ignoreAllLogs();
 
 AppCenter.setLogLevel(AppCenter.LogLevel.VERBOSE);
@@ -76,12 +71,7 @@ datadogConfiguration.nativeCrashReportEnabled = true;
 datadogConfiguration.sampleRate = 80;
 const TRANSITIONS = ['fade', 'slide', 'none'];
 
-let inactiveTime = 0;
-const defaultWaitTime = Platform.select({ios: 120, android: 120});
-let hasLockKey = false;
-let screelLockStatus = false;
-const LOCK_TIMEOUT = 30000; // 1 minute in milliseconds
-
+const TIMEOUT_DURATION = 120000;
 const requestUserPermission = async () => {
   if (Platform.OS === 'ios') {
     try {
@@ -118,13 +108,10 @@ const requestUserPermission = async () => {
 };
 
 function App() {
-  const [appState, setAppState] = useState(AppState.currentState);
   const [hidden, setHidden] = useState(false);
   const [statusBarTransition, setStatusBarTransition] = useState(
     TRANSITIONS[0],
   );
-  const [locked, setLocked] = useState(false);
-  const [lastActiveTime, setLastActiveTime] = useState(Date.now());
 
   //update check
   useEffect(() => {
@@ -180,87 +167,95 @@ function App() {
     }
   };
 
+  useEffect(() => {
+    // FingerprintScanner
+    // .isSensorAvailable()
+    // .then(biometryType => { console.log(Platform.OS, biometryType)})
+    // .catch(error => console.log(Platform.OS, error.message));
+    // let isCancelled = false;
+    // FingerprintScanner.authenticate({
+    //   title: 'Unlock App',
+    //   subTitle: 'Scan your fingerprint to unlock',
+    //   description: 'Touch the fingerprint sensor',
+    //   cancelButton: 'Cancel',
+    // })
+    //   .then(() => {
+    //     if (!isCancelled) {
+    //       console.log('Fingerprint authentication successful');
+    //       // Handle successful authentication
+    //     }
+    //   })
+    //   .catch(error => {
+    //     if (!isCancelled) {
+    //       if (error.name === 'SystemCancel') {
+    //         console.log('Authentication was canceled by the system');
+    //         // Handle cancellation by the system
+    //       } else {
+    //         console.log('Fingerprint authentication failed', error);
+    //         // Handle other authentication failures
+    //       }
+    //     }
+    //   });
+    // return () => {
+    //   isCancelled = true;
+    //   FingerprintScanner.release();
+    // };
+  }, []);
+
   // App State Monitor
-  // const logout = async () => {
-  //   if (auth().currentUser) {
-  //     try {
-  //       const logoutResult = await userLogOut();
-  //       if (!logoutResult?.error) {
-  //         await resetStore();
-  //       }
-  //     } catch (error) {
-  //       // :TODO
-  //     }
-  //   }
-  // };
+  const logout = async () => {
+    if (auth().currentUser) {
+      try {
+        const logoutResult = await userLogOut();
+        if (!logoutResult?.error) {
+          await resetStore();
+        }
+      } catch (error) {
+        // :TODO
+      }
+    }
+  };
 
-  let backgroundTaskInterval;
-  // active lockout logic here
-  // useEffect(() => {
-  //   // Function to handle background task
-  //   const runBackgroundTask = () => {
-  //     // console.log('Background task is running');
-  //     inactiveTimerCallback();
-  //   };
+  useEffect(() => {
+    const handleAppStateChange = async nextAppState => {
+      if (nextAppState === 'background') {
+        // setIsLoading(true);
+        // Save current time in AsyncStorage when app goes to background
+        await AsyncStorage.setItem(
+          'backgroundTime',
+          new Date().getTime().toString(),
+        );
+      } else if (nextAppState === 'active') {
+        // Check time difference when app returns to active state
+        const backgroundTime = await AsyncStorage.getItem('backgroundTime');
+        if (backgroundTime) {
+          const currentTime = new Date().getTime();
+          const timeDifference = currentTime - parseInt(backgroundTime);
 
-  //   // Start the background task
-  //   const startBackgroundTask = () => {
-  //     // console.log('Starting background task...');
-  //     backgroundTaskInterval = BackgroundTimer.setInterval(() => {
-  //       runBackgroundTask();
-  //     }, 5000);
-  //   };
+          if (timeDifference > TIMEOUT_DURATION) {
+            // Lock the user if more than 120,000 seconds have passed
+            await AsyncStorage.removeItem('backgroundTime');
+            await logout();
+            // Perform user lock actions
+          } else {
+            // Clear stored time if less than 120,000 seconds have passed
+            await AsyncStorage.removeItem('backgroundTime');
+          }
+        }
+      }
+      // setIsLoading(false);
+    };
+    // Subscribe to app state changes
+    const appStateSubscription = AppState.addEventListener(
+      'change',
+      handleAppStateChange,
+    );
 
-  //   // Stop the background task
-  //   const stopBackgroundTask = () => {
-  //     // console.log('Stopping background task...');
-  //     inactiveTime = 0;
-  //     BackgroundTimer.clearInterval(backgroundTaskInterval);
-  //   };
-
-  //   // Listen for changes in app state
-  //   const handleAppStateChange = nextAppState => {
-  //     // console.log('App state changed:', nextAppState);
-  //     if (nextAppState === 'active') {
-  //       // App is in the foreground
-  //       stopBackgroundTask();
-  //     } else if (nextAppState === 'background') {
-  //       // App is in the background
-  //       startBackgroundTask();
-  //     }
-  //   };
-
-  //   const inactiveTimerCallback = () => {
-  //     inactiveTime = inactiveTime + 5;
-  //     if (inactiveTime >= defaultWaitTime) {
-  //       performAction();
-  //     }
-  //   };
-  //   const performAction = async () => {
-  //     await logout();
-  //   };
-
-  //   // Subscribe to app state changes
-  //   const appListeener = AppState.addEventListener(
-  //     'change',
-  //     handleAppStateChange,
-  //   );
-
-  //   // Initial setup based on the app's initial state
-  //   if (AppState.currentState === 'background') {
-  //     startBackgroundTask();
-  //   }
-
-  //   if (AppState.currentState === 'active') {
-  //     stopBackgroundTask();
-  //   }
-
-  //   // Clean up
-  //   return () => {
-  //     appListeener.remove();
-  //     stopBackgroundTask();
-  //   };
-  // }, []);
+    return () => {
+      // Remove the app state change listener when the component unmounts
+      appStateSubscription.remove();
+    };
+  }, []);
 
   const theme = {...LightTheme};
 
@@ -283,6 +278,7 @@ function App() {
       });
 
     const unsubscribe = messaging().onMessage(async remoteMessage => {
+      console.log('Listening');
       // console.log(remoteMessage.notification);
       const {title, body, android} = remoteMessage.notification;
       const {clickAction, smallIcon, imageUrl, redirectUrl} = android;
@@ -293,51 +289,7 @@ function App() {
 
     return unsubscribe;
   }, []);
-
-  // useEffect(() => {
-  //   const handleAppStateChange = nextAppState => {
-  //     // console.log('nextAppState', nextAppState);
-  //     if (nextAppState === 'background' || nextAppState === 'inactive') {
-  //       setLastActiveTime(Date.now());
-  //     } else if (nextAppState === 'active') {
-  //       const timeSinceLastActive = Date.now() - lastActiveTime;
-  //       if (timeSinceLastActive > LOCK_TIMEOUT) {
-  //         setLocked(true);
-  //         // console.log(locked, 'Set to Lock');
-  //       }
-  //     }
-  //   };
-
-  //   const interval = setInterval(() => {
-  //     const timeSinceLastActive = Date.now() - lastActiveTime;
-  //     if (
-  //       AppState.currentState === 'active' &&
-  //       timeSinceLastActive > LOCK_TIMEOUT
-  //     ) {
-  //       setLocked(true);
-  //     }
-  //   }, 1000);
-
-  //   const appListener = AppState.addEventListener(
-  //     'change',
-  //     handleAppStateChange,
-  //   );
-
-  //   return () => {
-  //     clearInterval(interval);
-  //     // AppState.removeEventListener('change', handleAppStateChange);
-  //     appListener.remove();
-  //   };
-  // }, [lastActiveTime]);
-
-  // Check for timeout every second
-
-  const unlockApp = () => {
-    setLocked(false);
-    // console.log(locked, 'Set to UnLock');
-    setLastActiveTime(Date.now());
-  };
-
+  
   const handleNotificationPress = () => {
     setNotification(null);
   };
@@ -385,6 +337,7 @@ function App() {
       // saving error
     }
   };
+  
   return (
     <SafeAreaProvider style={styles.rootContainer}>
       <PaperProvider theme={theme}>
@@ -397,38 +350,28 @@ function App() {
               showHideTransition={statusBarTransition}
               hidden={hidden}
             />
-            {/* {locked && locked === true ? ( */}
-            {false ? (
-              //   <InputPin />
-              <PinInput unlockApp={unlockApp} />
-            ) : (
-              <View
-                style={styles.container}
-                onTouchStart={() => {
-                  inactiveTime = 0;
-                  BackgroundTimer.clearInterval(backgroundTaskInterval);
-                }}>
-                <Provider store={store}>
-                  <DataProvider>
-                    <PersistGate persistor={persistor} loading={null}>
-                      <TextColorProvider>
-                        <InitializeSDKHandler />
-                        <CustomNotification
-                          isVisible={!!notification}
-                          title={notification?.title}
-                          body={notification?.body}
-                          imageUrl={notification?.android?.imageUrl}
-                          redirectUrl={notification?.android?.redirectUrl}
-                          onPress={handleNotificationPress}
-                        />
-                        <NetworkStatus />
-                        <AppNavigationContainer />
-                      </TextColorProvider>
-                    </PersistGate>
-                  </DataProvider>
-                </Provider>
-              </View>
-            )}
+
+            <View style={styles.container}>
+              <Provider store={store}>
+                <DataProvider>
+                  <PersistGate persistor={persistor} loading={null}>
+                    <TextColorProvider>
+                      <InitializeSDKHandler />
+                      <CustomNotification
+                        isVisible={!!notification}
+                        title={notification?.title}
+                        body={notification?.body}
+                        imageUrl={notification?.android?.imageUrl}
+                        redirectUrl={notification?.android?.redirectUrl}
+                        onPress={handleNotificationPress}
+                      />
+                      <NetworkStatus />
+                      <AppNavigationContainer />
+                    </TextColorProvider>
+                  </PersistGate>
+                </DataProvider>
+              </Provider>
+            </View>
           </DatadogProvider>
         </Portal>
       </PaperProvider>

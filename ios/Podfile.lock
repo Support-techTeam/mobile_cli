@@ -457,8 +457,6 @@ PODS:
   - react-native-appsflyer (6.12.2):
     - AppsFlyerFramework (= 6.12.2)
     - React
-  - react-native-background-timer (2.4.1):
-    - React-Core
   - react-native-blob-util (0.19.1):
     - React-Core
   - react-native-document-picker (9.0.1):
@@ -680,7 +678,6 @@ DEPENDENCIES:
   - React-jsinspector (from `../node_modules/react-native/ReactCommon/jsinspector`)
   - React-logger (from `../node_modules/react-native/ReactCommon/logger`)
   - react-native-appsflyer (from `../node_modules/react-native-appsflyer`)
-  - react-native-background-timer (from `../node_modules/react-native-background-timer`)
   - react-native-blob-util (from `../node_modules/react-native-blob-util`)
   - react-native-document-picker (from `../node_modules/react-native-document-picker`)
   - react-native-fingerprint-scanner (from `../node_modules/react-native-fingerprint-scanner`)
@@ -813,8 +810,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/logger"
   react-native-appsflyer:
     :path: "../node_modules/react-native-appsflyer"
-  react-native-background-timer:
-    :path: "../node_modules/react-native-background-timer"
   react-native-blob-util:
     :path: "../node_modules/react-native-blob-util"
   react-native-document-picker:
@@ -964,7 +959,6 @@ SPEC CHECKSUMS:
   React-jsinspector: aaed4cf551c4a1c98092436518c2d267b13a673f
   React-logger: da1ebe05ae06eb6db4b162202faeafac4b435e77
   react-native-appsflyer: 202a3a36d7fabe9f36198b45f952b1a91f9b27a0
-  react-native-background-timer: 17ea5e06803401a379ebf1f20505b793ac44d0fe
   react-native-blob-util: af2dc91365bfde33f61389cbd0c692af9a4a97cb
   react-native-document-picker: 2b8f18667caee73a96708a82b284a4f40b30a156
   react-native-fingerprint-scanner: ac6656f18c8e45a7459302b84da41a44ad96dbbe
@@ -1008,7 +1002,7 @@ SPEC CHECKSUMS:
   RNFlashList: 4b4b6b093afc0df60ae08f9cbf6ccd4c836c667a
   RNFS: 4ac0f0ea233904cb798630b3c077808c06931688
   RNKeychain: a65256b6ca6ba6976132cc4124b238a5b13b3d9c
-  RNPermissions: 718d35e73b6bd786fe0e8b0e3e3d1b67c627eca3
+  RNPermissions: 6dbf8b319b841caea7a1feb46019cfcc2b404fab
   RNScreens: 3c5b9f4a9dcde752466854b6109b79c0e205dad3
   RNShare: df09e4d08ce0b50e32e2b6b9ec0249d7fdc06960
   RNSVG: ed492aaf3af9ca01bc945f7a149d76d62e73ec82
@@ -1018,6 +1012,6 @@ SPEC CHECKSUMS:
   SocketRocket: f32cd54efbe0f095c4d7594881e52619cfe80b17
   Yoga: 3efc43e0d48686ce2e8c60f99d4e6bd349aff981
 
-PODFILE CHECKSUM: a10c87b2bbb9d9595a1fc09ab0c5fe1390456670
+PODFILE CHECKSUM: 1c99847a513f56b93d91541e61d4ebbf56584c92
 
 COCOAPODS: 1.15.0

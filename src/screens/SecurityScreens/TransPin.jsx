@@ -559,7 +559,7 @@ const TransPin = () => {
 
   const ResetPin = () => {
     return (
-      <VerifyModal visible={showResetPin} isLoading={isLoading}>
+      <VerifyModal visible={showResetPin}>
         <View style={{alignItems: 'center'}}>
           <MaterialCommunityIcons
             name="lock-check"

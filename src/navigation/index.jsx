@@ -53,8 +53,6 @@ const AppNavigationContainer = () => {
         }, 4000);
       }
     });
-
-    // Clean up the listener when the component unmounts
     return unsubscribe;
   }, []);
 

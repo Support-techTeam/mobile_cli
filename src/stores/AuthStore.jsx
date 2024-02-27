@@ -4,6 +4,7 @@ import {store} from '../util/redux/store';
 import {DdLogs} from '@datadog/mobile-react-native';
 import auth, {firebase} from '@react-native-firebase/auth';
 import axios from 'axios';
+import {storeSensitiveData} from './SecurityStore';
 
 const axiosInstance = axios.create({baseURL: BASE_API_URL});
 let token = null;
@@ -25,6 +26,9 @@ const userLogin = async (email, password) => {
       await AsyncStorage.setItem('hasUser', 'true');
       await AsyncStorage.setItem('userEmail', email);
       DdLogs.info(`User | Login | ${email}`, {context: JSON.stringify(user)});
+      // store email and password
+      const username = email;
+      await storeSensitiveData(username, password);
       return {
         user: user,
         title: 'Account Login',
@@ -111,6 +115,11 @@ const userSignUp = async details => {
         await updatePhoneNumber(formatPhoneNumber, newUser?.uid);
         await updateProfileData(details.firstname, details.lastname);
       }
+
+      // store email and password
+      const username = details.email.trim();
+      const password = details.password.trim();
+      await storeSensitiveData(username, password);
 
       await getFirebaseAuthToken();
 
@@ -433,12 +442,18 @@ const userChangePassword = async data => {
     var user = firebase.auth().currentUser;
     const cred = firebase.auth.EmailAuthProvider.credential(
       user.email,
-      data.currentPassword,
+      data.currentPassword.trim(),
     );
     // re-auth user
     const reauthResponse = await user.reauthenticateWithCredential(cred);
     // update password
-    const updateResponse = await user.updatePassword(data.password);
+    const updateResponse = await user.updatePassword(data.password.trim());
+
+    // store email and password
+    const username = user.email.trim();
+    const password= data.password;
+    await storeSensitiveData(username, password);
+
     return {
       title: 'Change Password',
       error: false,

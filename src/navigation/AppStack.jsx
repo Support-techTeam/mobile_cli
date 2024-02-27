@@ -40,13 +40,6 @@ import {
 import FinalSubmit from '../screens/ProfileOnboardings/AddDocuments/FinalSubmit';
 import Securindex from '../screens/SecurityScreens/Securindex';
 import TransPin from '../screens/SecurityScreens/TransPin';
-import PinCon from '../screens/SecurityScreens/PinCon';
-import PinSuccess from '../screens/SecurityScreens/PinSuccess';
-import LockPin from '../screens/SecurityScreens/LockPin';
-import ResetPin from '../screens/SecurityScreens/ResetPin';
-import SetLockPin from '../screens/SecurityScreens/SetPinScreen';
-import ResetLockPin from '../screens/SecurityScreens/ResetLockPin';
-import ChangeLockPin from '../screens/SecurityScreens/ChangeLockPin';
 import {Airtime, Homescreen, Paybills} from '../screens/HomeScreens';
 import AirtimeConfirm from '../screens/paybills/AirtimeConfirm';
 import BillPin from '../screens/paybills/billPin';
@@ -217,17 +210,8 @@ const AppStack = () => {
           <Stack.Screen name="WalletIndex" component={WalletIndex} />
           {/* Security */}
           <Stack.Screen name="Security" component={Securindex} />
-          <Stack.Screen name="PinSuccess" component={PinSuccess} />
-          <Stack.Screen name="PinCon" component={PinCon} />
-          <Stack.Screen name="LockPin" component={LockPin} />
           <Stack.Screen name="SetPin" component={TransPin} />
-          <Stack.Screen name="ResetPin" component={ResetPin} />
           <Stack.Screen name="ResetPassword" component={ResetPassword} />
-          {/* App Lock */}
-          <Stack.Screen name="SetLockPin" component={SetLockPin} />
-          <Stack.Screen name="ResetLockPin" component={ResetLockPin} />
-          {/* <Stack.Screen name="EnterPin" component={EnterPin} /> */}
-          <Stack.Screen name="ChangeLockPin" component={ChangeLockPin} />
           {/* Documents */}
           <Stack.Screen name="ValidIdentity" component={ValidIdentity} />
           <Stack.Screen name="ProofOfAddress" component={ProofOfAddress} />

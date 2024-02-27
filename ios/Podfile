@@ -102,7 +102,7 @@ target 'Tradelenda' do
   # 'Calendars',
   'Camera',
   # 'Contacts',
-  # 'FaceID',
+  'FaceID',
   # 'LocationAccuracy',
   # 'LocationAlways',
   # 'LocationWhenInUse',

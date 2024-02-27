@@ -110,79 +110,86 @@ const WalletIndex = () => {
 
   useFocusEffect(
     useCallback(() => {
-      getAccountWallet()
-        .then(res => {
-          if (!res?.data?.error) {
-            const wallet = res?.data?.data?.wallet;
-            const accountDetails = res?.data?.data?.accountDetails;
-            setWalletData({
-              walletAccount: wallet?.walletIdAccountNumber,
-              accountName: `${accountDetails?.firstName} ${accountDetails?.lastName}`,
-              type: `${wallet?.type.toUpperCase()} ACCOUNT`,
-              accountStatus:
-                !wallet?.PNC &&
-                !wallet?.PND &&
-                wallet?.active &&
-                !accountDetails?.blacklist
-                  ? true
-                  : false,
-              singleLimit: wallet?.transactionLimit
-                ? new Intl.NumberFormat('en-NG', {
-                    style: 'currency',
-                    currency: 'NGN',
-                    maximumFractionDigits: 2,
-                    minimumFractionDigits: 2,
-                  }).format(Number(wallet?.transactionLimit))
-                : '₦0.00',
-              dailyLimit: wallet?.dailyTransactionLimit
-                ? new Intl.NumberFormat('en-NG', {
-                    style: 'currency',
-                    currency: 'NGN',
-                    maximumFractionDigits: 2,
-                    minimumFractionDigits: 2,
-                  }).format(Number(wallet?.dailyTransactionLimit))
-                : '₦0.00',
-              balance: wallet?.walletIdAccountNumber
-                ? new Intl.NumberFormat('en-NG', {
-                    style: 'currency',
-                    currency: 'NGN',
-                    maximumFractionDigits: 2,
-                    minimumFractionDigits: 2,
-                  }).format(Number(wallet?.walletIdAccountNumber))
-                : '₦0.00',
-            });
-          } else {
-            setWalletData({
-              walletAccount: '0000000000',
-              accountName: '______ ______',
-              accountStatus: false,
-              type: '______ ______',
-              singleLimit: new Intl.NumberFormat('en-NG', {
-                style: 'currency',
-                currency: 'NGN',
-                maximumFractionDigits: 2,
-                minimumFractionDigits: 2,
-              }).format(0),
-              dailyLimit: new Intl.NumberFormat('en-NG', {
-                style: 'currency',
-                currency: 'NGN',
-                maximumFractionDigits: 2,
-                minimumFractionDigits: 2,
-              }).format(0),
-              balance: new Intl.NumberFormat('en-NG', {
-                style: 'currency',
-                currency: 'NGN',
-                maximumFractionDigits: 2,
-                minimumFractionDigits: 2,
-              }).format(0),
-            });
-          }
-        })
-        .catch(error => {
-          console.log('WalletIndex', error);
-        });
+      async function fetchData() {
+        await getUserWalletData();
+      };
+      fetchData();
     }, []),
   );
+
+  const getUserWalletData = async () => {
+    getAccountWallet()
+    .then(res => {
+      if (!res?.data?.error) {
+        const wallet = res?.data?.data?.wallet;
+        const accountDetails = res?.data?.data?.accountDetails;
+        setWalletData({
+          walletAccount: wallet?.walletIdAccountNumber,
+          accountName: `${accountDetails?.firstName} ${accountDetails?.lastName}`,
+          type: `${wallet?.type.toUpperCase()} ACCOUNT`,
+          accountStatus:
+            !wallet?.PNC &&
+            !wallet?.PND &&
+            wallet?.active &&
+            !accountDetails?.blacklist
+              ? true
+              : false,
+          singleLimit: wallet?.transactionLimit
+            ? new Intl.NumberFormat('en-NG', {
+                style: 'currency',
+                currency: 'NGN',
+                maximumFractionDigits: 2,
+                minimumFractionDigits: 2,
+              }).format(Number(wallet?.transactionLimit))
+            : '₦0.00',
+          dailyLimit: wallet?.dailyTransactionLimit
+            ? new Intl.NumberFormat('en-NG', {
+                style: 'currency',
+                currency: 'NGN',
+                maximumFractionDigits: 2,
+                minimumFractionDigits: 2,
+              }).format(Number(wallet?.dailyTransactionLimit))
+            : '₦0.00',
+          balance: wallet?.walletIdAccountNumber
+            ? new Intl.NumberFormat('en-NG', {
+                style: 'currency',
+                currency: 'NGN',
+                maximumFractionDigits: 2,
+                minimumFractionDigits: 2,
+              }).format(Number(wallet?.walletIdAccountNumber))
+            : '₦0.00',
+        });
+      } else {
+        setWalletData({
+          walletAccount: '0000000000',
+          accountName: '______ ______',
+          accountStatus: false,
+          type: '______ ______',
+          singleLimit: new Intl.NumberFormat('en-NG', {
+            style: 'currency',
+            currency: 'NGN',
+            maximumFractionDigits: 2,
+            minimumFractionDigits: 2,
+          }).format(0),
+          dailyLimit: new Intl.NumberFormat('en-NG', {
+            style: 'currency',
+            currency: 'NGN',
+            maximumFractionDigits: 2,
+            minimumFractionDigits: 2,
+          }).format(0),
+          balance: new Intl.NumberFormat('en-NG', {
+            style: 'currency',
+            currency: 'NGN',
+            maximumFractionDigits: 2,
+            minimumFractionDigits: 2,
+          }).format(0),
+        });
+      }
+    })
+    .catch(error => {
+      // console.log('WalletIndex', error);
+    });
+  }
 
   useFocusEffect(
     useCallback(() => {
@@ -283,7 +290,7 @@ const WalletIndex = () => {
       await handleUpgrade(payload);
     }
 
-    if (walletData?.type === 'Business') {
+    if (walletData?.type === 'BUSINESS ACCOUNT') {
       const payload = {
         walletIdAccountNumber: walletData?.walletAccount,
         firstName: walletData?.accountName?.split(' ')[0],
@@ -292,7 +299,7 @@ const WalletIndex = () => {
       await handleUpgrade(payload);
     }
 
-    if (walletData?.type === 'Merchant') {
+    if (walletData?.type === 'MERCHANT ACCOUNT') {
       const payload = {
         walletIdAccountNumber: walletData?.walletAccount,
         firstName: walletData?.accountName?.split(' ')[0],
@@ -328,6 +335,7 @@ const WalletIndex = () => {
           autoHide: true,
           onPress: () => Toast.hide(),
         });
+        await getUserWalletData();
       }
       setIsLoading(false);
       toggleAccountUpgrade();

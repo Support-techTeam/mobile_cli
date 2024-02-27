@@ -80,6 +80,8 @@
 	<string>$(PRODUCT_NAME) needs permission to save and select photos of documents to complete forms and applications.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>$(PRODUCT_NAME) needs permission to save and select photos of documents to complete forms and applications.</string>
+	<key>NSFaceIDUsageDescription</key>
+	<string>$(PRODUCT_NAME) requires FaceID access to allows you quick and secure access.</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>AntDesign.ttf</string>

@@ -7,10 +7,11 @@ import {
   Image,
   ImageBackground,
   Dimensions,
+  Platform,
 } from 'react-native';
 import {Formik} from 'formik';
-import React, {useState, useEffect} from 'react';
-import {useNavigation} from '@react-navigation/native';
+import React, {useState, useEffect, useCallback} from 'react';
+import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 import KeyboardAvoidingWrapper from '../../component/KeyBoardAvoiding/keyBoardAvoiding';
@@ -29,6 +30,13 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import {AuthHeader} from '../../component/header/AuthHeader';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import FingerprintScanner from 'react-native-fingerprint-scanner';
+import {
+  decryptData,
+  retrieveSenditiveData,
+  hasSensitiveData,
+} from '../../stores/SecurityStore';
 
 const Login = () => {
   const insets = useSafeAreaInsets();
@@ -37,13 +45,50 @@ const Login = () => {
   const [error, setError] = useState('');
   const [errors, setErrors] = React.useState({});
   const [isLoading, setIsLoading] = useState(false);
-
   const [userDetails, setUserDetails] = useState({
     email: '',
     password: '',
   });
-
   const dispatch = useDispatch();
+  const [isFingerPrintAvailable, setIsFingerPrintAvailable] = useState(false);
+
+  //check availability
+  useFocusEffect(
+    useCallback(() => {
+      FingerprintScanner.isSensorAvailable()
+        .then(async () => {
+          const biometricState = await retrieveBiometricState();
+
+          //user enabled biometric
+          if (biometricState) {
+            //check if credentials is available
+            const hasService = await hasSensitiveData();
+            if (hasService) {
+              const credential = await retrieveSenditiveData();
+              //chack that username and password is available
+              if (
+                credential.username !== '' &&
+                credential.username !== undefined &&
+                credential.password !== '' &&
+                credential.password !== undefined
+              ) {
+                setIsFingerPrintAvailable(true);
+              }
+            } else {
+              setIsFingerPrintAvailable(false);
+            }
+          } else {
+            setIsFingerPrintAvailable(false);
+          }
+        })
+        .catch(() => {
+          setIsFingerPrintAvailable(false);
+        })
+        .finally(() => {
+          FingerprintScanner.release();
+        });
+    }, []),
+  );
 
   const getUSerStorage = async () => {
     const emaill = await AsyncStorage.getItem('userEmail');
@@ -68,6 +113,82 @@ const Login = () => {
   //   }
   // };
 
+  const retrieveBiometricState = async () => {
+    try {
+      const value = await AsyncStorage.getItem('fingerprintState');
+      if (value !== null) {
+        // console.log(value);
+        return JSON.parse(value);
+      }
+      return null;
+    } catch (error) {
+      // console.log('Error retrieving toggle state:', error);
+      return null;
+    }
+  };
+
+  const handleFingerprintLogin = async () => {
+    FingerprintScanner.authenticate({
+      title: 'Log in with Fingerprint',
+      description: 'Place your finger on the sensor',
+    })
+      .then(async result => {
+        if (result) {
+          const cred = await getCredentials();
+          const decryptedPass = await decryptData(cred.password);
+          try {
+            setIsLoading(true);
+            const res = await userLogin(cred.username, decryptedPass);
+            if (res?.error) {
+              Toast.show({
+                type: 'error',
+                position: 'top',
+                topOffset: 50,
+                text1: res?.title,
+                text2: res?.message,
+                visibilityTime: 5000,
+                autoHide: true,
+                onPress: () => Toast.hide(),
+              });
+            } else {
+              Toast.show({
+                type: 'success',
+                position: 'top',
+                topOffset: 50,
+                text1: res?.title,
+                text2: res?.message,
+                visibilityTime: 3000,
+                autoHide: true,
+                onPress: () => Toast.hide(),
+              });
+              dispatch(signInUser(JSON.stringify(res?.user)));
+              fetchProfileData();
+            }
+            setIsLoading(false);
+          } catch (e) {
+            setIsLoading(false);
+          }
+        }
+      })
+      .catch(error => {})
+      .finally(() => {
+        FingerprintScanner.release();
+      });
+  };
+
+  const getCredentials = async () => {
+    try {
+      const hasService = await hasSensitiveData();
+      if (hasService) {
+        const credentials = await retrieveSenditiveData();
+        if (credentials) {
+          return credentials;
+        } else {
+        }
+      }
+    } catch (error) {}
+  };
+
   useEffect(() => {
     setUserDetails({
       email: userMail && userMail === null ? '' : userMail,
@@ -81,6 +202,7 @@ const Login = () => {
     try {
       setIsLoading(true);
       const {email, password} = userDetails;
+      // await storeSensitiveData(email, password);
       const res = await userLogin(email, password);
       if (res?.error) {
         Toast.show({
@@ -161,9 +283,11 @@ const Login = () => {
         styles.container,
         {
           paddingTop: insets.top !== 0 ? Math.min(insets.top, 10) : 'auto',
-          paddingBottom: insets.bottom !== 0 ? Math.min(insets.bottom, 10) : 'auto',
+          paddingBottom:
+            insets.bottom !== 0 ? Math.min(insets.bottom, 10) : 'auto',
           paddingLeft: insets.left !== 0 ? Math.min(insets.left, 10) : 'auto',
-          paddingRight: insets.right !== 0 ? Math.min(insets.right, 10) : 'auto',
+          paddingRight:
+            insets.right !== 0 ? Math.min(insets.right, 10) : 'auto',
         },
       ]}>
       <Loader visible={isLoading} loadingText={'Logging in...'} />
@@ -301,6 +425,23 @@ const Login = () => {
                       </Text>
                     </View>
                   </TouchableOpacity>
+
+                  {isFingerPrintAvailable && (
+                    <TouchableOpacity
+                      onPress={handleFingerprintLogin}
+                      style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        marginTop: 19,
+                      }}>
+                      <Icon
+                        name="fingerprint"
+                        size={60}
+                        color={COLORS.lendaBlue}
+                      />
+                    </TouchableOpacity>
+                  )}
                 </View>
               </View>
             </View>

@@ -41,7 +41,7 @@ const animateCell = ({hasValue, index, isFocused}) => {
   ]).start();
 };
 
-const PinInput = () => {
+const PinInput = ({unlockApp}) => {
   const [value, setValue] = useState('');
   const [hideValue, setHideValue] = useState(true);
   const ref = useBlurOnFulfill({value, cellCount: CELL_COUNT});
@@ -112,7 +112,7 @@ const PinInput = () => {
         textContentType="oneTimeCode"
         renderCell={renderCell}
       />
-      <View style={styles.nextButton} onTouchStart={() => setHideValue(!hideValue)}>
+      <View style={styles.nextButton} onTouchStart={() => unlockApp()}>
         <Text style={styles.nextButtonText}>Verify</Text>
       </View>
     </SafeAreaView>
