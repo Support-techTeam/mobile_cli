@@ -40,14 +40,11 @@ import {
 import FinalSubmit from '../screens/ProfileOnboardings/AddDocuments/FinalSubmit';
 import Securindex from '../screens/SecurityScreens/Securindex';
 import TransPin from '../screens/SecurityScreens/TransPin';
-import {Airtime, Homescreen, Paybills} from '../screens/HomeScreens';
-import AirtimeConfirm from '../screens/paybills/AirtimeConfirm';
+import {Paybills} from '../screens/HomeScreens';
 import BillPin from '../screens/paybills/billPin';
+import AirtimeConfirm from '../screens/paybills/AirtimeConfirm';
 import StatusFailed from '../screens/paybills/StatusFailed';
 import StatusPage from '../screens/paybills/StausPage';
-import GetData from '../screens/paybills/GetData';
-import Electric from '../screens/paybills/ElectricityBills';
-import Cable from '../screens/paybills/Cable';
 import {
   InvestmentOption,
   InvestmentSummary,
@@ -71,6 +68,7 @@ import Step2 from '../screens/ProfileOnboardings/StepForm/Step2';
 import Step1 from '../screens/ProfileOnboardings/StepForm/Step1';
 import ResetPassword from '../screens/Authentications/ResetPassword';
 import WalletIndex from '../screens/WalletScreens/WalletIndex';
+import Overview from '../screens/paybills/Overview';
 
 const Stack = createNativeStackNavigator();
 const config = {
@@ -226,10 +224,7 @@ const AppStack = () => {
           <Stack.Screen name="Others" component={Others} />
           {/* Bill payment */}
           <Stack.Screen name="Paybills" component={Paybills} />
-          <Stack.Screen name="airtime" component={Airtime} />
-          <Stack.Screen name="data_bundle" component={GetData} />
-          <Stack.Screen name="electricity" component={Electric} />
-          <Stack.Screen name="cable_tv" component={Cable} />
+          <Stack.Screen name="Overview" component={Overview} />
           <Stack.Screen name="AirtimeConfirm" component={AirtimeConfirm} />
           <Stack.Screen name="BillPin" component={BillPin} />
           <Stack.Screen name="StatusFailed" component={StatusFailed} />

@@ -1,5 +1,12 @@
-import {View, StyleSheet, ScrollView, ActivityIndicator} from 'react-native';
-import React, {useEffect, useState} from 'react';
+import {
+  View,
+  Image,
+  Text,
+  StyleSheet,
+  ScrollView,
+  ActivityIndicator,
+} from 'react-native';
+import React, {useEffect, useState, Component} from 'react';
 import {useNavigation} from '@react-navigation/native';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 import {Header} from '../../component/header/Header';
@@ -8,6 +15,190 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import COLORS from '../../constants/colors';
+import Timeline from 'react-native-timeline-flatlist';
+
+const data = [
+  {
+    time: '09:00',
+    title: 'Archery Training',
+    description:
+      'The Beginner Archery and Beginner Crossbow course does not require you to bring any equipment, since everything you need will be provided for the course. ',
+    lineColor: '#009688',
+    viewed: false,
+  },
+  {
+    time: '10:45',
+    title: 'Play Badminton',
+    description:
+      'Badminton is a racquet sport played using racquets to hit a shuttlecock across a net.',
+    viewed: false,
+  },
+  {time: '12:00', title: 'Lunch'},
+  {
+    time: '14:00',
+    title: 'Watch Soccer',
+    description:
+      'Team sport played between two teams of eleven players with a spherical ball. ',
+    lineColor: '#009688',
+    viewed: true,
+  },
+  {
+    time: '16:30',
+    title: 'Go to Fitness center',
+    description: 'Look out for the Best Gym & Fitness Centers around me :)',
+    viewed: true,
+  },
+  {
+    time: '09:00',
+    title: 'Archery Training',
+    description:
+      'The Beginner Archery and Beginner Crossbow course does not require you to bring any equipment, since everything you need will be provided for the course. ',
+    lineColor: '#009688',
+    viewed: false,
+  },
+  {
+    time: '10:45',
+    title: 'Play Badminton',
+    description:
+      'Badminton is a racquet sport played using racquets to hit a shuttlecock across a net.',
+    viewed: false,
+  },
+  {time: '12:00', title: 'Lunch'},
+  {
+    time: '14:00',
+    title: 'Watch Soccer',
+    description:
+      'Team sport played between two teams of eleven players with a spherical ball. ',
+    lineColor: '#009688',
+    viewed: true,
+  },
+  {
+    time: '16:30',
+    title: 'Go to Fitness center',
+    description: 'Look out for the Best Gym & Fitness Centers around me :)',
+    viewed: true,
+  },
+  {
+    time: '09:00',
+    title: 'Archery Training',
+    description:
+      'The Beginner Archery and Beginner Crossbow course does not require you to bring any equipment, since everything you need will be provided for the course. ',
+    lineColor: '#009688',
+    viewed: false,
+  },
+  {
+    time: '10:45',
+    title: 'Play Badminton',
+    description:
+      'Badminton is a racquet sport played using racquets to hit a shuttlecock across a net.',
+    viewed: false,
+  },
+  {time: '12:00', title: 'Lunch'},
+  {
+    time: '14:00',
+    title: 'Watch Soccer',
+    description:
+      'Team sport played between two teams of eleven players with a spherical ball. ',
+    lineColor: '#009688',
+    viewed: true,
+  },
+  {
+    time: '16:30',
+    title: 'Go to Fitness center',
+    description: 'Look out for the Best Gym & Fitness Centers around me :)',
+    viewed: true,
+  },
+  {
+    time: '09:00',
+    title: 'Archery Training',
+    description:
+      'The Beginner Archery and Beginner Crossbow course does not require you to bring any equipment, since everything you need will be provided for the course. ',
+    lineColor: '#009688',
+    viewed: false,
+  },
+  {
+    time: '10:45',
+    title: 'Play Badminton',
+    description:
+      'Badminton is a racquet sport played using racquets to hit a shuttlecock across a net.',
+    viewed: false,
+  },
+  {time: '12:00', title: 'Lunch'},
+  {
+    time: '14:00',
+    title: 'Watch Soccer',
+    description:
+      'Team sport played between two teams of eleven players with a spherical ball. ',
+    lineColor: '#009688',
+    viewed: true,
+  },
+  {
+    time: '16:30',
+    title: 'Go to Fitness center',
+    description: 'Look out for the Best Gym & Fitness Centers around me :)',
+    viewed: true,
+  },
+  {
+    time: '09:00',
+    title: 'Archery Training',
+    description:
+      'The Beginner Archery and Beginner Crossbow course does not require you to bring any equipment, since everything you need will be provided for the course. ',
+    lineColor: '#009688',
+    viewed: false,
+  },
+  {
+    time: '10:45',
+    title: 'Play Badminton',
+    description:
+      'Badminton is a racquet sport played using racquets to hit a shuttlecock across a net.',
+    viewed: false,
+  },
+  {time: '12:00', title: 'Lunch'},
+  {
+    time: '14:00',
+    title: 'Watch Soccer',
+    description:
+      'Team sport played between two teams of eleven players with a spherical ball. ',
+    lineColor: '#009688',
+    viewed: true,
+  },
+  {
+    time: '16:30',
+    title: 'Go to Fitness center',
+    description: 'Look out for the Best Gym & Fitness Centers around me :)',
+    viewed: true,
+  },
+  {
+    time: '09:00',
+    title: 'Archery Training',
+    description:
+      'The Beginner Archery and Beginner Crossbow course does not require you to bring any equipment, since everything you need will be provided for the course. ',
+    lineColor: '#009688',
+    viewed: false,
+  },
+  {
+    time: '10:45',
+    title: 'Play Badminton',
+    description:
+      'Badminton is a racquet sport played using racquets to hit a shuttlecock across a net.',
+    viewed: false,
+  },
+  {time: '12:00', title: 'Lunch'},
+  {
+    time: '14:00',
+    title: 'Watch Soccer',
+    description:
+      'Team sport played between two teams of eleven players with a spherical ball. ',
+    lineColor: '#009688',
+    viewed: true,
+  },
+  {
+    time: '16:30',
+    title: 'Go to Fitness center',
+    description: 'Look out for the Best Gym & Fitness Centers around me :)',
+    viewed: true,
+  },
+];
 
 const NotificationsScreen = () => {
   const insets = useSafeAreaInsets();
@@ -20,15 +211,51 @@ const NotificationsScreen = () => {
     }, 5000);
   }, []);
 
+  function renderDetail(rowData, sectionID, rowID) {
+    let title = <Text style={[styles.title]}>{rowData.title}</Text>;
+    var desc = null;
+    if (rowData.description)
+      desc = (
+        <View style={styles.descriptionContainer}>
+          <Text style={[styles.textDescription]}>{rowData.description}</Text>
+        </View>
+      );
+
+    return (
+      <View style={{flex: 1}}>
+        {title}
+        {desc}
+      </View>
+    );
+  }
+
+  const RenderEmptyItem = () => {
+    return (
+      <View style={styles.transHistory}>
+        <View
+          style={{
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginHorizontal: 20,
+            marginVertical: hp('15%'),
+          }}>
+          <Image source={require('../../../assets/images/Group.png')} />
+          <Text style={styles.noTrans}>No transaction data available!</Text>
+        </View>
+      </View>
+    );
+  };
+
   return (
     <SafeAreaView
       style={{
         flex: 1,
         backgroundColor: '#fff',
-        paddingTop: insets.top !== 0 ? insets.top : 18,
-        paddingBottom: insets.bottom !== 0 ? insets.bottom / 2 : 'auto',
-        paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
-        paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
+        paddingTop: insets.top !== 0 ? Math.min(insets.top, 10) : 'auto',
+        paddingBottom:
+          insets.bottom !== 0 ? Math.min(insets.bottom, 10) : 'auto',
+        paddingLeft: insets.left !== 0 ? Math.min(insets.left, 10) : 'auto',
+        paddingRight: insets.right !== 0 ? Math.min(insets.right, 10) : 'auto',
       }}>
       <Header
         routeAction={() => navigation.goBack()}
@@ -52,6 +279,30 @@ const NotificationsScreen = () => {
           }}
         />
       )}
+      <View style={styles.container}>
+        <Timeline
+          style={styles.list}
+          data={[]}
+          circleSize={20}
+          circleColor="rgb(45,156,219)"
+          lineColor="rgb(45,156,219)"
+          timeContainerStyle={{minWidth: 52, marginTop: 0}}
+          timeStyle={{
+            textAlign: 'center',
+            backgroundColor: '#ff9797',
+            color: 'white',
+            padding: 5,
+            borderRadius: 13,
+          }}
+          descriptionStyle={{color: 'gray'}}
+          options={{
+            style: {paddingTop: 5}
+          }}
+          innerCircle={'dot'}
+          renderDetail={renderDetail}
+          columnFormat='single-column-left'
+        />
+      </View>
     </SafeAreaView>
   );
 };
@@ -61,149 +312,28 @@ export default NotificationsScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 16,
-    backgroundColor: '#fff',
+    paddingHorizontal: 20,
+    backgroundColor: 'white',
   },
-  intro: {
-    paddingVertical: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginVertical: 10,
-    // width: wp('90%'),
-    backgroundColor: COLORS.lendaComponentBg,
-    borderRadius: 10,
-    borderColor: COLORS.lendaComponentBorder,
-    borderWidth: 0.3,
-    height: hp('22%'),
-  },
-  footer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginVertical: 10,
-    width: wp('90%'),
-    backgroundColor: COLORS.lendaComponentBg,
-    borderRadius: 10,
-    borderColor: COLORS.lendaComponentBorder,
-    borderWidth: 0.3,
-    height: 'auto',
-    paddingVertical: 10,
-  },
-  footerBody: {
-    paddingHorizontal: 10,
-    width: wp('90%'),
-    marginVertical: 4,
-  },
-  footerView: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderColor: '#D9DBE9',
-  },
-  details: {
-    paddingVertical: 10,
-    backgroundColor: COLORS.lendaComponentBg,
-    borderRadius: 10,
-    borderColor: COLORS.lendaComponentBorder,
-    borderWidth: 0.3,
-  },
-  detailsView: {
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderColor: '#D9DBE9',
-    gap: 15,
-  },
-  body: {
-    paddingHorizontal: 10,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginBottom: 10,
-  },
-  rightView: {
-    flexGrow: 1,
+  list: {
     flex: 1,
-    flexDirection: 'row',
-    // alignItems: 'flex-end',
-    justifyContent: 'flex-end',
-    textAlign: 'right',
-  },
-  leftView: {
-    flexGrow: 1,
-    flex: 1,
-    alignItems: 'flex-start',
-    justifyContent: 'flex-start',
-    textAlign: 'left',
-  },
-  statusView: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 5,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  status: {
-    height: 12,
-    width: 12,
-    borderRadius: 20,
-    marginRight: 10,
-  },
-  HeadView: {
-    alignItems: 'center',
-  },
-  TopView: {
-    justifyContent: 'space-between',
-  },
-  TextHead: {
-    fontWeight: '700',
-    fontSize: 16,
-    lineHeight: 20,
-    letterSpacing: 0.5,
-  },
-  demark: {
-    width: '100%',
-    height: 1,
-    borderRadius: 1,
-    backgroundColor: '#D9DBE9',
-    marginTop: 10,
-  },
-  titleView: {
-    flexGrow: 1,
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderColor: '#D9DBE9',
+    marginTop: 20,
   },
   title: {
-    fontWeight: '800',
-    fontSize: 28,
-    color: '#14142B',
-  },
-  infotext: {
-    color: '#6E7191',
-    marginBottom: 4,
-    fontSize: hp('1.8%'),
-    textAlign: 'left',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  values: {
-    fontSize: hp('1.8%'),
-    color: '#000',
-    fontWeight: '600',
-    textAlign: 'right',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  report: {
-    color: COLORS.lendaBlue,
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: 'bold',
-    lineHeight: 24,
-    letterSpacing: 0.5,
   },
-  reportdesc: {
-    color: '#6E7191',
-    fontSize: 12,
-    lineHeight: 18,
+  descriptionContainer: {
+    flexDirection: 'row',
+    paddingRight: 50,
+  },
+  image: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+  },
+  textDescription: {
+    marginLeft: 10,
+    color: 'black',
   },
 });

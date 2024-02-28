@@ -7,7 +7,7 @@ const COLORS = {
   darkBlue: '#7978B5',
   red: 'red',
   lendaBlue: '#054a99',
-  lendaLightBlue: '#05a67d',
+  lendaLightBlue: '#1D5E98',
   lendaOrange: '#f9ad26',
   lendaLightOrange: '#d5c67a',
   lendaGreen: '#05a67d',
