@@ -282,7 +282,7 @@ const NotificationsScreen = () => {
       <View style={styles.container}>
         <Timeline
           style={styles.list}
-          data={[]}
+          data={data}
           circleSize={20}
           circleColor="rgb(45,156,219)"
           lineColor="rgb(45,156,219)"

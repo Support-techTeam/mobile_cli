@@ -22,7 +22,7 @@ const ITEM_WIDTH = SLIDE_WIDTH - 30;
 export const IntroSection = props => {
   const {userProfileData, loanUserDetails} = props;
   const navigation = useNavigation();
-  // console.log(Platform.OS, loanUserDetails?.loanDocumentDetails)
+
   return (
     <View style={styles.container}>
       <View style={styles.leftView}>
@@ -64,7 +64,7 @@ export const IntroSection = props => {
         </TouchableOpacity>
         <TouchableOpacity
          onPress={() => navigation.navigate('NotificationsScreen')}
-        //  disabled={true}
+         disabled={true}
           style={{
             paddingLeft: 10,
             paddingVertical: 5,
