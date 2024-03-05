@@ -3,11 +3,12 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  Modal,
+  // Modal,
   Image,
   TouchableOpacity,
   Alert,
   PermissionsAndroid,
+  ActivityIndicator,
 } from 'react-native';
 import React, {useCallback, useContext, useEffect, useState} from 'react';
 // import ImagePicker from 'react-native-image-picker';
@@ -32,6 +33,9 @@ import Spinner from 'react-native-loading-spinner-overlay/lib';
 import {uploadProgress} from '../../stores/LoanStore';
 import {DdLogs} from '@datadog/mobile-react-native';
 import Loader from '../loader/loader';
+import COLORS from '../../constants/colors';
+import {Button, Modal} from 'native-base';
+import {heightPercentageToDP} from 'react-native-responsive-screen';
 
 const statusBarHeight = getStatusBarHeight();
 
@@ -951,6 +955,7 @@ const ProofofAdd = ({
   const confirmPhoto = () => {
     setShowConfirmModal(false);
   };
+
   const noPhoto = () => {
     setImage(null);
     setShowConfirmModal(false);
@@ -1181,14 +1186,103 @@ const ProofofAdd = ({
 
   return (
     <View>
-      <Loader visible={isUpdating} loadingText={'Please wait...'} />
-
       <ScrollView
         bounces={false}
         showsHorizontalScrollIndicator={false}
         showsVerticalScrollIndicator={false}>
-        <Modal visible={showConfirmModal}>
-          <View style={styles.modalContainer}>
+        {isUpdating && (
+          <View
+            style={{
+              backgroundColor: 'rgba(0,0,0,0.5)',
+              zIndex: 99999,
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+            <View
+              style={{
+                height: 70,
+                backgroundColor: COLORS.white,
+                marginHorizontal: 50,
+                borderRadius: 5,
+                flexDirection: 'row',
+                alignItems: 'center',
+                paddingHorizontal: 20,
+              }}>
+              <ActivityIndicator size="large" color={COLORS.blue} animating />
+              <Text style={{marginLeft: 10, fontSize: 16}}>Please wait...</Text>
+            </View>
+          </View>
+        )}
+        {/* <Modal visible={showConfirmModal}> */}
+        <Modal
+          isOpen={showConfirmModal}
+          onClose={() => showConfirmModal(false)}>
+          <Modal.Content minWidth="90%" minHeight="70%">
+            <Modal.CloseButton />
+            <Modal.Header>CONFIRM IMAGE</Modal.Header>
+            <Modal.Body minHeight="70%">
+              <Text
+                style={{
+                  marginVertical: 7,
+                  textAlign: 'center',
+                  fontWeight: '400',
+                  lineHeight: 18,
+                  color: '#14142B',
+                }}>
+                Ensure that your image is clear and, not blurry
+              </Text>
+              <View
+                style={{
+                  backgroundColor: '#14142B',
+                  alignItems: 'center',
+                }}>
+                <View
+                  style={{
+                    backgroundColor: '#14142B',
+                    height: 'auto',
+                    width: '100%',
+                    alignItems: 'center',
+                    paddingHorizontal: 15,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}>
+                  <Image
+                    source={{uri: image}}
+                    style={{
+                      width: '100%',
+                      height: heightPercentageToDP('50%'),
+                      resizeMode: 'contain',
+                      marginVertical: 10,
+                    }}
+                  />
+                </View>
+              </View>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button.Group space={2}>
+                <Button
+                  variant="ghost"
+                  colorScheme="blueGray"
+                  onPress={() => {
+                    retakePhoto1();
+                  }}>
+                  Retake Photo
+                </Button>
+                <Button
+                  onPress={() => {
+                    confirmPhoto();
+                  }}>
+                  Confirm Image
+                </Button>
+              </Button.Group>
+            </Modal.Footer>
+          </Modal.Content>
+          {/* <View style={styles.modalContainer}>
             <View
               style={{
                 flexDirection: 'row',
@@ -1237,7 +1331,7 @@ const ProofofAdd = ({
                 </View>
               </TouchableOpacity>
             </View>
-          </View>
+          </View> */}
         </Modal>
 
         <View style={styles.require}>

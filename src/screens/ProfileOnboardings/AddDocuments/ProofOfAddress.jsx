@@ -5,6 +5,8 @@ import {useNavigation, useRoute} from '@react-navigation/native';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 import {TabView, SceneMap, TabBar} from 'react-native-tab-view';
 import ProofofAdd from '../../../component/Idtypes/ProofOfAddress';
+import { Header } from '../../../component/header/Header';
+import COLORS from '../../../constants/colors';
 
 const ITEM_HEIGHT = 100;
 
@@ -90,37 +92,18 @@ const ProofOfAddress = () => {
       style={{
         flex: 1,
         backgroundColor: '#fff',
-        paddingTop: insets.top !== 0 ? insets.top : 18,
-        paddingBottom: insets.bottom !== 0 ? insets.bottom / 2 : 'auto',
-        paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
-        paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
+        paddingTop: insets.top !== 0 ? Math.min(insets.top, 10) : 'auto',
+        paddingBottom:
+          insets.bottom !== 0 ? Math.min(insets.bottom, 10) : 'auto',
+        paddingLeft: insets.left !== 0 ? Math.min(insets.left, 10) : 'auto',
+        paddingRight: insets.right !== 0 ? Math.min(insets.right, 10) : 'auto',
       }}>
-      <View
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginHorizontal: 15,
-        }}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <View
-            style={{
-              borderWidth: 0.5,
-              borderColor: '#D9DBE9',
-              borderRadius: 5,
-            }}>
-            <AntDesign name="left" size={24} color="black" />
-          </View>
-        </TouchableOpacity>
-        <View style={styles.HeadView}>
-          <View style={styles.TopView}>
-            <Text style={styles.TextHead}>UPLOAD DOCUMENT</Text>
-          </View>
-        </View>
-        <View>
-          <Text> </Text>
-        </View>
-      </View>
+
+       <Header
+        routeAction={() => navigation.goBack()}
+        heading={'DOCUMENT UPLOAD'}
+        disable={false}
+      />
 
       <View style={styles.form}>
         <Text style={styles.header}>Upload Proof of Address</Text>
@@ -220,7 +203,7 @@ const styles = StyleSheet.create({
     color: 'white',
   },
   activeTab: {
-    backgroundColor: '#054B99',
+    backgroundColor: COLORS.lendaBlue,
   },
   tabText2: {
     fontFamily: 'serif',

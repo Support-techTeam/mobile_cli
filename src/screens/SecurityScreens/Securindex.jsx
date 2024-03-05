@@ -180,7 +180,7 @@ const Securindex = () => {
               // disabled={disableits}
             />
             <CustomButton
-              title={'Cancle'}
+              title={'Cancel'}
               buttonStyle={{
                 marginHorizontal: 0,
                 backgroundColor: 'white',

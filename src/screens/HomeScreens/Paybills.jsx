@@ -61,7 +61,7 @@ const Paybills = () => {
       ),
     },
     {
-      title: 'Data Buldle Purchase',
+      title: 'Data Bundle Purchase',
       image: require('../../../assets/images/databuy.png'),
       content: (
         <Fragment>
