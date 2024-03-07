@@ -12,6 +12,8 @@ import {
   DeviceEventEmitter,
   NativeAppEventEmitter,
   NativeModules,
+  Button,
+  Alert,
 } from 'react-native';
 import SpInAppUpdates, {IAUUpdateKind} from 'sp-react-native-in-app-updates';
 import {version} from './app.json';
@@ -37,17 +39,22 @@ import {userLogOut} from './src/stores/AuthStore';
 import {TextColorProvider} from './src/component/TextColorContext';
 import InitializeSDKHandler from './src/component/appFlyer/InitializeSDKHandler';
 import DeviceInfo from 'react-native-device-info';
-import PushNotification from 'react-native-push-notification';
 import RemotePushController from './src/component/push-notifications/RemotePushController';
-import messaging from '@react-native-firebase/messaging';
+import messaging, {firebase} from '@react-native-firebase/messaging';
 import CustomNotification from './src/component/push-notifications/CustomNotification';
 import auth from '@react-native-firebase/auth';
-import {requestNotifications} from 'react-native-permissions';
+import {
+  request,
+  PERMISSIONS,
+  requestNotifications,
+} from 'react-native-permissions';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {DataProvider} from './src/context/DataProvider';
+import {Settings} from 'react-native-fbsdk-next';
+import notifee from '@notifee/react-native';
+import BackgroundFetch from 'react-native-background-fetch';
 
 const inAppUpdates = new SpInAppUpdates(false);
-// const deviceInfoEmitter = new NativeEventEmitter(NativeModules.RNDeviceInfo);
 LogBox.ignoreAllLogs();
 
 AppCenter.setLogLevel(AppCenter.LogLevel.VERBOSE);
@@ -72,10 +79,17 @@ datadogConfiguration.sampleRate = 80;
 const TRANSITIONS = ['fade', 'slide', 'none'];
 
 const TIMEOUT_DURATION = 120000;
+
 const requestUserPermission = async () => {
   if (Platform.OS === 'ios') {
     try {
-      await requestNotifications(['alert', 'sound', 'badge']);
+      const {status, settings} = await requestNotifications([
+        'alert',
+        'sound',
+        'badge',
+      ]);
+      // console.log("Notification permissions status:", status);
+      // console.log("Notification settings:", settings);
     } catch (error) {}
     const authStatus = await messaging().requestPermission({
       sound: true,
@@ -107,11 +121,25 @@ const requestUserPermission = async () => {
   }
 };
 
+const requestNotificationPermission = async () => {
+  if (Platform.OS === 'ios') {
+    await request(PERMISSIONS.IOS.NOTIFICATIONS);
+  }
+};
+
 function App() {
   const [hidden, setHidden] = useState(false);
   const [statusBarTransition, setStatusBarTransition] = useState(
     TRANSITIONS[0],
   );
+  const [notification, setNotification] = useState(null);
+  // const {BackgroundFetch} = NativeModules;
+  //Facebook SDK integration
+  useEffect(() => {
+    Settings.setAppID('225305113437958');
+    Settings.setAdvertiserTrackingEnabled(true);
+    Settings.initializeSDK();
+  }, []);
 
   //update check
   useEffect(() => {
@@ -167,41 +195,6 @@ function App() {
     }
   };
 
-  useEffect(() => {
-    // FingerprintScanner
-    // .isSensorAvailable()
-    // .then(biometryType => { console.log(Platform.OS, biometryType)})
-    // .catch(error => console.log(Platform.OS, error.message));
-    // let isCancelled = false;
-    // FingerprintScanner.authenticate({
-    //   title: 'Unlock App',
-    //   subTitle: 'Scan your fingerprint to unlock',
-    //   description: 'Touch the fingerprint sensor',
-    //   cancelButton: 'Cancel',
-    // })
-    //   .then(() => {
-    //     if (!isCancelled) {
-    //       console.log('Fingerprint authentication successful');
-    //       // Handle successful authentication
-    //     }
-    //   })
-    //   .catch(error => {
-    //     if (!isCancelled) {
-    //       if (error.name === 'SystemCancel') {
-    //         console.log('Authentication was canceled by the system');
-    //         // Handle cancellation by the system
-    //       } else {
-    //         console.log('Fingerprint authentication failed', error);
-    //         // Handle other authentication failures
-    //       }
-    //     }
-    //   });
-    // return () => {
-    //   isCancelled = true;
-    //   FingerprintScanner.release();
-    // };
-  }, []);
-
   // App State Monitor
   const logout = async () => {
     if (auth().currentUser) {
@@ -216,69 +209,121 @@ function App() {
     }
   };
 
-  useEffect(() => {
-    const handleAppStateChange = async nextAppState => {
-      if (nextAppState === 'background') {
-        // setIsLoading(true);
-        // Save current time in AsyncStorage when app goes to background
-        await AsyncStorage.setItem(
-          'backgroundTime',
-          new Date().getTime().toString(),
-        );
-      } else if (nextAppState === 'active') {
-        // Check time difference when app returns to active state
-        const backgroundTime = await AsyncStorage.getItem('backgroundTime');
-        if (backgroundTime) {
-          const currentTime = new Date().getTime();
-          const timeDifference = currentTime - parseInt(backgroundTime);
+  // App state check
+  // useEffect(() => {
+  //   const handleAppStateChange = async nextAppState => {
+  //     if (nextAppState === 'background') {
+  //       // console.log('App is in background || inactive', nextAppState);
+  //       // setIsLoading(true);
+  //       // Save current time in AsyncStorage when app goes to background
+  //       await AsyncStorage.setItem(
+  //         'backgroundTime',
+  //         new Date().getTime().toString(),
+  //       );
+  //     } else if (nextAppState === 'active') {
+  //       // console.log('App is active', nextAppState);
+  //       // Check time difference when app returns to active state
+  //       const backgroundTime = await AsyncStorage.getItem('backgroundTime');
+  //       if (backgroundTime) {
+  //         const currentTime = new Date().getTime();
+  //         const timeDifference = currentTime - parseInt(backgroundTime);
 
-          if (timeDifference > TIMEOUT_DURATION) {
-            // Lock the user if more than 120,000 seconds have passed
-            await AsyncStorage.removeItem('backgroundTime');
-            await logout();
-            // Perform user lock actions
-          } else {
-            // Clear stored time if less than 120,000 seconds have passed
-            await AsyncStorage.removeItem('backgroundTime');
-          }
-        }
-      }
-      // setIsLoading(false);
+  //         if (timeDifference > TIMEOUT_DURATION) {
+  //           // Lock the user if more than 120,000 seconds have passed
+  //           await AsyncStorage.removeItem('backgroundTime');
+  //           // console.log('App is Logged Out');
+  //           await logout();
+  //           // Perform user lock actions
+  //         } else {
+  //           // Clear stored time if less than 120,000 seconds have passed
+  //           await AsyncStorage.removeItem('backgroundTime');
+  //         }
+  //       }
+  //     }
+  //   };
+  //   // Subscribe to app state changes
+
+  //   const appStateSubscription = AppState.addEventListener(
+  //     'change',
+  //     handleAppStateChange,
+  //   );
+
+  //   return () => {
+  //     // Remove the app state change listener when the component unmounts
+  //     try {
+  //       appStateSubscription.remove();
+  //     } catch (e) {}
+  //   };
+  // }, []);
+
+  useEffect(() => {
+    const handleAppState = async nextAppState => {
+      console.log('nextAppState', nextAppState);
+      handleAppStateChange(nextAppState);
     };
-    // Subscribe to app state changes
+
     const appStateSubscription = AppState.addEventListener(
       'change',
-      handleAppStateChange,
+      handleAppState,
     );
 
     return () => {
-      // Remove the app state change listener when the component unmounts
-      appStateSubscription.remove();
+      try {
+        appStateSubscription.remove();
+      } catch (err) {}
     };
   }, []);
 
-  const theme = {...LightTheme};
+  const handleAppStateChange = async nextAppState => {
+    if (nextAppState === 'background') {
+      // Save current time in AsyncStorage when app goes to background
+      await AsyncStorage.setItem(
+        'backgroundTime',
+        new Date().getTime().toString(),
+      );
+    } else if (nextAppState === 'active') {
+      const backgroundTime = await AsyncStorage.getItem('backgroundTime');
+      if (backgroundTime) {
+        const currentTime = new Date().getTime();
+        const timeDifference = (currentTime - parseInt(backgroundTime)) / 1000; // Convert to seconds
 
-  const [notification, setNotification] = useState(null);
+        // console.log('timeDifference', timeDifference);
+        if (timeDifference > 120) {
+          // 2 minutes = 120 seconds
+          // Lock the user if more than 2 minutes have passed
+          await AsyncStorage.removeItem('backgroundTime');
+          await logout(); // Perform logout operation
+        } else {
+          // Clear stored time if less than 2 minutes have passed
+          await AsyncStorage.removeItem('backgroundTime');
+        }
+      }
+    }
+  };
+
+  const theme = {...LightTheme};
 
   useEffect(() => {
     requestUserPermission();
+    requestNotificationPermission();
     getDeviceInfo();
   }, []);
 
+  // push notification
   useEffect(() => {
     messaging()
       .getToken()
       .then(fid => {
-        // console.log('FCM message:', Platform.OS);
-        // console.log('Firebase Installation ID:', fid);
+        console.log('FCM message:', Platform.OS);
+        console.log('Firebase Installation ID:', fid);
       })
       .catch(error => {
         // console.error('Error getting Firebase Installation ID:', error);
       });
 
     const unsubscribe = messaging().onMessage(async remoteMessage => {
-      console.log('Listening');
+      onMessageReceived(remoteMessage);
+      // console.log('Listening');
       // console.log(remoteMessage.notification);
       const {title, body, android} = remoteMessage.notification;
       const {clickAction, smallIcon, imageUrl, redirectUrl} = android;
@@ -289,7 +334,42 @@ function App() {
 
     return unsubscribe;
   }, []);
-  
+
+  // push notification
+  useEffect(() => {
+    const onMessageReceived = async remoteMessage => {
+      console.log('Background/Quit Notification:', remoteMessage);
+      // Handle background/quit notifications
+      const {title, body, android} = remoteMessage.notification;
+      const {clickAction, smallIcon, imageUrl, redirectUrl} = android;
+      // console.log('Img', imageUrl);
+      // console.log('And', android);
+      setNotification({title, body, android});
+    };
+
+    const unsubscribeForeground = messaging().onMessage(onMessageReceived);
+
+    const handleAppStateChange = nextAppState => {
+      if (Platform.OS === 'ios' && nextAppState === 'active') {
+        unsubscribeBackground && unsubscribeBackground();
+        unsubscribeBackground =
+          messaging().setBackgroundMessageHandler(onMessageReceived);
+      }
+    };
+
+    let unsubscribeBackground;
+
+    const appListener = AppState.addEventListener(
+      'change',
+      handleAppStateChange,
+    );
+
+    return () => {
+      unsubscribeForeground();
+      appListener.remove();
+    };
+  }, []);
+
   const handleNotificationPress = () => {
     setNotification(null);
   };
@@ -337,7 +417,12 @@ function App() {
       // saving error
     }
   };
-  
+
+  function onMessageReceived(message) {
+    console.log('message', message);
+    notifee.displayNotification(JSON.parse(message.data.notifee));
+  }
+
   return (
     <SafeAreaProvider style={styles.rootContainer}>
       <PaperProvider theme={theme}>

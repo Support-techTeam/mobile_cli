@@ -100,8 +100,8 @@ android {
         applicationId 'com.tradelenda.app'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionName "3.0.7"
-        versionCode 41
+        versionName "3.0.8"
+        versionCode 42
         multiDexEnabled true
     }
 
@@ -247,6 +247,7 @@ dependencies {
     implementation("com.android.installreferrer:installreferrer:2.2")
     implementation project(':react-native-push-notification')
     implementation('com.google.android.play:integrity:1.3.0')
+    implementation('com.facebook.android:facebook-android-sdk:latest.release')
 
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}")
     debugImplementation("com.facebook.flipper:flipper-network-plugin:${FLIPPER_VERSION}") {
