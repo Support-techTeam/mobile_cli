@@ -9,6 +9,7 @@ const CustomView = ({
   isWallet,
   isSecurity,
   isSettings,
+  isAccount,
   isSupport,
   isRate,
 }) => {
@@ -28,21 +29,22 @@ const CustomView = ({
           )}
           {isSettings && (
             <View style={styles.icon}>
+              <Icon name="cog" size={24} color="#054B99" />
+            </View>
+          )}
+          {isAccount && (
+            <View style={styles.icon}>
               <Icon name="account" size={24} color="#054B99" />
             </View>
           )}
           {isSupport && (
             <View style={styles.icon}>
-              <MaterialCommunityIcons
-                name="chat-question"
-                size={24}
-                color="#054B99"
-              />
+              <Icon name="chat-question" size={24} color="#054B99" />
             </View>
           )}
           {isRate && (
             <View style={styles.icon}>
-              <EntypoIcon name="star" size={24} color="#F4B740" />
+              <Icon name="star" size={24} color="#F4B740" />
             </View>
           )}
           <Text style={styles.pageText}>{label}</Text>
@@ -67,7 +69,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     justifyContent: 'space-between',
     alignItems: 'center',
-    borderRadius: 20,
+    borderRadius: 10,
   },
   pageText: {
     fontFamily: 'serif',

@@ -12,54 +12,33 @@ import {useNavigation} from '@react-navigation/native';
 
 import Buttons from '../../component/buttons/Buttons';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
+import {Header} from '../../component/header/Header';
 
 const Summary = ({route}) => {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
   const {bankDetails} = route.params;
-
   return (
     <SafeAreaView
       style={{
         flex: 1,
-        paddingHorizontal: 16,
         backgroundColor: '#fff',
-        paddingTop: insets.top !== 0 ? insets.top : 18,
-        paddingBottom: insets.bottom !== 0 ? insets.bottom : 'auto',
-        paddingLeft: insets.left !== 0 ? insets.left : 'auto',
-        paddingRight: insets.right !== 0 ? insets.right : 'auto',
+        paddingTop: insets.top !== 0 ? Math.min(insets.top, 10) : 'auto',
+        paddingBottom:
+          insets.bottom !== 0 ? Math.min(insets.bottom, 10) : 'auto',
+        paddingLeft: insets.left !== 0 ? Math.min(insets.left, 10) : 'auto',
+        paddingRight: insets.right !== 0 ? Math.min(insets.right, 10) : 'auto',
       }}>
-      <View
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-        }}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <View
-            style={{
-              borderWidth: 0.5,
-              borderColor: '#D9DBE9',
-              borderRadius: 5,
-            }}>
-            <Icon name="chevron-left" size={36} color="black" />
-          </View>
-        </TouchableOpacity>
-        <View style={styles.HeadView}>
-          <View style={styles.TopView}>
-            <Text style={styles.TextHead}>PAYMENT SUMMARY</Text>
-          </View>
-        </View>
-
-        <View style={{}}>
-          <Text>{'       '}</Text>
-        </View>
-      </View>
-      <View style={styles.demark} />
+      <Header
+        routeAction={() => navigation.goBack()}
+        heading={'TRANSFER SUMMARY'}
+        disable={false}
+      />
       <ScrollView
         bounces={false}
         showsHorizontalScrollIndicator={false}
-        showsVerticalScrollIndicator={false}>
+        showsVerticalScrollIndicator={false}
+        style={{paddingHorizontal: 16}}>
         <View style={{padding: 16}}>
           {bankDetails?.receiverAccountNumber === '' ? (
             <View style={styles.detailsView}>
@@ -97,17 +76,19 @@ const Summary = ({route}) => {
           <View style={styles.detailsView}>
             <Text style={styles.desc}>Amount</Text>
             <Text style={styles.amount}>
-              ₦
-              {bankDetails?.amount
-                ?.toString()
-                ?.replace(/\B(?=(\d{3})+\b)/g, ',')}
+              {bankDetails?.amount && new Intl.NumberFormat('en-NG', {
+                style: 'currency',
+                currency: 'NGN',
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              }).format(bankDetails?.amount)}
             </Text>
           </View>
 
-          {/* <View style={styles.detailsView}>
+          <View style={styles.detailsView}>
             <Text style={styles.desc}>Transaction Fee</Text>
-            <Text style={styles.amount}>₦52.00</Text>
-          </View> */}
+            <Text style={styles.amount}>₦0.00</Text>
+          </View>
 
           <View style={styles.detailsView}>
             <Text style={styles.desc}>Note</Text>
@@ -120,10 +101,13 @@ const Summary = ({route}) => {
           <View style={[styles.detailsView, {marginTop: 40}]}>
             <Text style={styles.desc}>Total</Text>
             <Text style={[styles.amount, {color: '#054B99'}]}>
-              ₦
-              {bankDetails?.amount
-                ?.toString()
-                ?.replace(/\B(?=(\d{3})+\b)/g, ',')}
+              
+              {bankDetails?.amount && new Intl.NumberFormat('en-NG', {
+                style: 'currency',
+                currency: 'NGN',
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              }).format(bankDetails?.amount)}
             </Text>
           </View>
           <View style={styles.demark} />
@@ -145,9 +129,7 @@ export default Summary;
 
 const styles = StyleSheet.create({
   container: {
-    // flex: 1,
-    // paddingHorizontal: 16,
-    // backgroundColor: '#fff',
+    flex: 1,
   },
   HeadView: {
     alignItems: 'center',
@@ -157,7 +139,7 @@ const styles = StyleSheet.create({
   },
   TextHead: {
     fontWeight: '700',
-    fontSize: 16,
+    fontSize: 14,
     lineHeight: 20,
     letterSpacing: 0.5,
   },
@@ -176,18 +158,25 @@ const styles = StyleSheet.create({
   },
   desc: {
     color: '#4E4B66',
-
     fontWeight: '500',
     fontSize: 14,
+    justifyContent: 'flex-start',
+    alignItems: 'flex-start',
+    textAlign: 'left',
+    alignSelf: 'flex-start',
   },
   amount: {
     fontFamily: 'serif',
-    fontSize: 16,
+    fontSize: 14,
   },
   nameComponent: {
+    flexShrink: 1,
+    justifyContent: 'flex-start',
+    alignItems: 'flex-start',
+    alignSelf: 'flex-start',
     textAlign: 'right',
     fontFamily: 'serif',
-    fontSize: 16,
+    fontSize: 14,
     flexShrink: 1,
   },
 });

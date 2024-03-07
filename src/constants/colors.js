@@ -7,7 +7,7 @@ const COLORS = {
   darkBlue: '#7978B5',
   red: 'red',
   lendaBlue: '#054a99',
-  lendaLightBlue: '#05a67d',
+  lendaLightBlue: '#1D5E98',
   lendaOrange: '#f9ad26',
   lendaLightOrange: '#d5c67a',
   lendaGreen: '#05a67d',
@@ -46,5 +46,9 @@ const COLORS = {
   amazonOrange: '#FF9900',
   floatingGray: '#F4F4F4',
   textLight: '#fff',
+  lendaGrey: '#6E7191',
+  lendaLightGrey: '#FCFCFC',
+  lendaComponentBg: '#fff',
+  lendaComponentBorder: '#D9DBE9',
 };
 export default COLORS;

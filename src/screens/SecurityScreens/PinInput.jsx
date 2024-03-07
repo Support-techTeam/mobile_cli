@@ -1,204 +1,122 @@
+
+import {Animated, Image, SafeAreaView, Text, View} from 'react-native';
+import React, {useState} from 'react';
+
 import {
-  Dimensions,
-  FlatList,
-  Text,
-  View,
-  ImageBackground,
-  Pressable,
-  StyleSheet,
-  Animated,
-  Easing,
-} from 'react-native';
-import Ionicons from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useState, useEffect, useRef} from 'react';
+  CodeField,
+  Cursor,
+  useBlurOnFulfill,
+  useClearByFocusCell,
+} from 'react-native-confirmation-code-field';
 
-const {width, height} = Dimensions.get('window');
+import styles, {
+  ACTIVE_CELL_BG_COLOR,
+  CELL_BORDER_RADIUS,
+  CELL_SIZE,
+  DEFAULT_CELL_BG_COLOR,
+  NOT_EMPTY_CELL_BG_COLOR,
+} from './styles';
 
-const dialPad = [1, 2, 3, 4, 5, 6, 7, 8, 9, '', 0, 'del'];
-const dialPadSize = width * 0.2;
-const pinLength = 6;
+const {Value, Text: AnimatedText} = Animated;
 
-export default function PinInput() {
-  const [pinCode, setPinCode] = useState([]);
+const CELL_COUNT = 4;
+const source = {
+  uri: 'https://user-images.githubusercontent.com/4661784/56352614-4631a680-61d8-11e9-880d-86ecb053413d.png',
+};
 
-  useEffect(() => {
-    if (pinCode.length === pinLength) {
-      startShakeAnimation();
-    }
-  }, [pinCode]);
+const animationsColor = [...new Array(CELL_COUNT)].map(() => new Value(0));
+const animationsScale = [...new Array(CELL_COUNT)].map(() => new Value(1));
+const animateCell = ({hasValue, index, isFocused}) => {
+  Animated.parallel([
+    Animated.timing(animationsColor[index], {
+      useNativeDriver: false,
+      toValue: isFocused ? 1 : 0,
+      duration: 150,
+    }),
+    Animated.spring(animationsScale[index], {
+      useNativeDriver: false,
+      toValue: hasValue ? 0 : 1,
+      duration: hasValue ? 200 : 150,
+    }),
+  ]).start();
+};
 
-  const shakeAnimationValue = useRef(new Animated.Value(0)).current;
-
-  const startShakeAnimation = () => {
-    Animated.sequence([
-      Animated.timing(shakeAnimationValue, {
-        toValue: 10,
-        duration: 100,
-        easing: Easing.linear,
-        useNativeDriver: true,
-      }),
-      Animated.timing(shakeAnimationValue, {
-        toValue: -10,
-        duration: 100,
-        easing: Easing.linear,
-        useNativeDriver: true,
-      }),
-      Animated.timing(shakeAnimationValue, {
-        toValue: 20,
-        duration: 100,
-        easing: Easing.linear,
-        useNativeDriver: true,
-      }),
-      Animated.timing(shakeAnimationValue, {
-        toValue: -20,
-        duration: 100,
-        easing: Easing.linear,
-        useNativeDriver: true,
-      }),
-      Animated.timing(shakeAnimationValue, {
-        toValue: 10,
-        duration: 100,
-        easing: Easing.linear,
-        useNativeDriver: true,
-      }),
-      Animated.timing(shakeAnimationValue, {
-        toValue: -10,
-        duration: 100,
-        easing: Easing.linear,
-        useNativeDriver: true,
-      }),
-      Animated.timing(shakeAnimationValue, {
-        toValue: 0,
-        duration: 100,
-        easing: Easing.linear,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  };
-
-  const interpolatedTranslateX = shakeAnimationValue.interpolate({
-    inputRange: [-1, 1],
-    outputRange: ['-5px', '5px'],
+const PinInput = ({unlockApp}) => {
+  const [value, setValue] = useState('');
+  const [hideValue, setHideValue] = useState(true);
+  const ref = useBlurOnFulfill({value, cellCount: CELL_COUNT});
+  const [props, getCellOnLayoutHandler] = useClearByFocusCell({
+    value,
+    setValue,
   });
 
-  const animatedStyle = {
-    transform: [{translateX: shakeAnimationValue}],
-  };
+  const renderCell = ({index, symbol, isFocused}) => {
+    const hasValue = Boolean(symbol);
+    const animatedCellStyle = {
+      backgroundColor: hasValue
+        ? animationsScale[index].interpolate({
+            inputRange: [0, 1],
+            outputRange: [NOT_EMPTY_CELL_BG_COLOR, ACTIVE_CELL_BG_COLOR],
+          })
+        : animationsColor[index].interpolate({
+            inputRange: [0, 1],
+            outputRange: [DEFAULT_CELL_BG_COLOR, ACTIVE_CELL_BG_COLOR],
+          }),
+      borderRadius: animationsScale[index].interpolate({
+        inputRange: [0, 1],
+        outputRange: [CELL_SIZE, CELL_BORDER_RADIUS],
+      }),
+      transform: [
+        {
+          scale: animationsScale[index].interpolate({
+            inputRange: [0, 1],
+            outputRange: [0.4, 1],
+          }),
+        },
+      ],
+    };
 
-  const DialPad = ({onPress}) => {
+    // Run animation on next event loop tik
+    // Because we need first return new style prop and then animate this value
+    setTimeout(() => {
+      animateCell({hasValue, index, isFocused});
+    }, 0);
+
     return (
-      <View style={{height: 420}}>
-        <FlatList
-          data={dialPad}
-          numColumns={3}
-          style={{flexGrow: 1}}
-          keyExtractor={(_, index) => index.toString()}
-          scrollEnabled={false}
-          columnWrapperStyle={{gap: 30}}
-          contentContainerStyle={{gap: 30}}
-          renderItem={({item}) => {
-            return (
-              <Pressable
-                onPress={() => onPress(item)}
-                disabled={item === ''}
-                style={({pressed}) => [
-                  {
-                    backgroundColor: pressed ? 'rgb(210, 230, 255)' : 'white',
-                  },
-                ]}>
-                <View
-                  style={{
-                    width: dialPadSize,
-                    height: dialPadSize,
-                    borderRadius: dialPadSize / 2,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}>
-                  {item === 'del' ? (
-                    <Ionicons
-                      name="backspace-outline"
-                      size={dialPadSize / 2}
-                      color="black"
-                    />
-                  ) : item === '' ? (
-                    <Ionicons
-                      name="fingerprint-off"
-                      size={dialPadSize / 2}
-                      color="black"
-                    />
-                  ) : (
-                    <Text
-                      style={{
-                        fontSize: dialPadSize / 2,
-                        color: 'black',
-                      }}>
-                      {item}
-                    </Text>
-                  )}
-                </View>
-              </Pressable>
-            );
-          }}
-        />
-      </View>
+      <AnimatedText
+        key={index}
+        style={hideValue ? [styles.cell, animatedCellStyle] : [styles.cell, isFocused && styles.focusCell]}
+        onLayout={getCellOnLayoutHandler(index)}>
+        {symbol || (isFocused ? <Cursor /> : null)}
+      </AnimatedText>
     );
   };
 
   return (
-    <View
-      style={{
-        flex: 1,
-        backgroundColor: 'white',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}>
-      <Text
-        style={{
-          fontSize: 24,
-          fontWeight: 'bold',
-          textAlign: 'center',
-          marginBottom: 42,
-          color: 'black',
-        }}>
-        Login with Passcode
+    <SafeAreaView style={styles.root}>
+      <Text style={styles.title}>Verification</Text>
+      <Image style={styles.icon} source={source} />
+      <Text style={styles.subTitle}>
+        Please enter the verification code{'\n'}
+        we send to your email address
       </Text>
-      <Animated.View style={[animatedStyle]}>
-        <View
-          style={{
-            flexDirection: 'row',
-            gap: 20,
-            marginBottom: 40,
-            height: 30,
-            alignItems: 'flex-end',
-          }}>
-          {[...Array(pinLength).keys()].map(index => {
-            const isSelected = !!pinCode[index];
 
-            return (
-              <View
-                key={index}
-                style={{
-                  width: 22,
-                  height: isSelected ? 22 : 2,
-                  borderRadius: 22,
-                  backgroundColor: 'black',
-                }}
-              />
-            );
-          })}
-        </View>
-      </Animated.View>
-      <DialPad
-        onPress={item => {
-          if (item === 'del') {
-            setPinCode(prevCode => prevCode.slice(0, prevCode.length - 1));
-          } else if (typeof item === 'number') {
-            if (pinCode.length < pinLength) {
-              setPinCode(prevCode => [...prevCode, item.toString()]);
-            }
-          }
-        }}
+      <CodeField
+        ref={ref}
+        {...props}
+        value={value}
+        onChangeText={setValue}
+        cellCount={CELL_COUNT}
+        rootStyle={styles.codeFieldRoot}
+        keyboardType="number-pad"
+        textContentType="oneTimeCode"
+        renderCell={renderCell}
       />
-    </View>
+      <View style={styles.nextButton} onTouchStart={() => unlockApp()}>
+        <Text style={styles.nextButtonText}>Verify</Text>
+      </View>
+    </SafeAreaView>
   );
-}
+};
+
+export default PinInput;

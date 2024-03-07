@@ -5,7 +5,7 @@ import {
   DarkTheme,
   useNavigationContainerRef,
 } from '@react-navigation/native';
-import {useColorScheme} from 'react-native';
+import {Animated, useColorScheme} from 'react-native';
 import AppStack from './AppStack';
 import AuthStack from './AuthStack';
 // import {auth} from '../util/firebase/firebaseConfig';
@@ -16,15 +16,17 @@ import NetworkScreen from './NetworkError';
 import {useSelector} from 'react-redux';
 // import {networkState} from '../util/redux/networkState/network.slice';
 import {TabContextProvider} from '../context/TabContext';
+import {useData} from '../context/DataProvider';
 
 const AppNavigationContainer = () => {
   const navigationRef = useNavigationContainerRef();
   const routeNameRef = useRef();
   const scheme = useColorScheme();
-  const [user, setUser] = useState();
+  const [user, setUser] = useState(undefined);
   const [isLoading, setIsLoading] = useState(true);
   const networkState = useSelector(state => state.networkState.network);
-
+  const [networkStatus, setNetworkStatus] = useState(true);
+  const {dataStore, setDataStore} = useData();
   useLayoutEffect(() => {
     if (
       auth().currentUser === undefined ||
@@ -37,21 +39,34 @@ const AppNavigationContainer = () => {
 
   //auth state change listener
   useLayoutEffect(() => {
+    setIsLoading(true);
     const unsubscribe = auth().onAuthStateChanged(currentUser => {
       if (currentUser) {
         setUser(currentUser);
-        setIsLoading(false);
+        setTimeout(() => {
+          setIsLoading(false);
+        }, 4000);
       } else {
         setUser(null);
-        setIsLoading(false);
+        setTimeout(() => {
+          setIsLoading(false);
+        }, 4000);
       }
     });
-
-    // Clean up the listener when the component unmounts
     return unsubscribe;
   }, []);
 
-  //refresh token
+  useLayoutEffect(() => {
+    if (networkState) {
+      setNetworkStatus(
+        networkState?.isConnected && networkState?.isInternetReachable
+          ? true
+          : false,
+      );
+    }
+  }, [networkState]);
+
+  // refresh token
   useEffect(() => {
     const checkAndRenewToken = async () => {
       try {
@@ -60,14 +75,20 @@ const AppNavigationContainer = () => {
           const token = await currentUser.getIdToken(true);
         } else {
         }
-      } catch (error) {
-        // console.error('Error renewing token:', error);
-      }
+      } catch (error) {}
     };
     const intervalCheck = setInterval(checkAndRenewToken, 600000);
-    
+
     return () => clearInterval(intervalCheck);
   }, []);
+
+  useLayoutEffect(() => {
+    setTimeout(() => {
+      setIsLoading(false);
+    },2000);
+}, [])
+
+
   return (
     <TabContextProvider>
       <NavigationContainer
@@ -80,12 +101,9 @@ const AppNavigationContainer = () => {
           const previousRouteName = routeNameRef.current;
           const currentRouteName = navigationRef.getCurrentRoute();
         }}>
-        {isLoading ? (
-          <Splashscreen text="Checking Authentication..." />
-        ) : user ? (
-          networkState &&
-          networkState?.isConnected &&
-          networkState?.isInternetReachable ? (
+        {isLoading && <Splashscreen text="Checking Authentication..." />}
+        {user ? (
+          networkStatus ? (
             <AppStack />
           ) : (
             <NetworkScreen />

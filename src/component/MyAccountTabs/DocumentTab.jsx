@@ -36,9 +36,15 @@ const Document = () => {
   return (
     <View style={styles.container}>
       <TouchableOpacity
+        disabled={docsDeets === undefined || docsDeets === null ? true : false}
         onPress={() => navigation.navigate('ValidIdentity')}
         style={{marginBottom: 20}}>
-        <Buttons label={'Update Documents'} />
+        <Buttons
+          disabled={
+            docsDeets === undefined || docsDeets === null ? true : false
+          }
+          label={'Update Documents'}
+        />
       </TouchableOpacity>
 
       <ScrollView

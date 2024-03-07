@@ -5,8 +5,6 @@ import {
   TouchableOpacity,
   Image,
   Pressable,
-  Alert,
-  PermissionsAndroid,
   Platform,
 } from 'react-native';
 import React, {useState, useEffect} from 'react';
@@ -30,6 +28,8 @@ import {
   updateDocumentsDetails,
   createUploadDocument,
 } from '../../stores/LoanStore';
+import FastImage from 'react-native-fast-image';
+import {Header} from '../../component/header/Header';
 
 const MyAccount = () => {
   const [image, setImage] = useState(null);
@@ -285,6 +285,7 @@ const MyAccount = () => {
 
   const navigation = useNavigation();
   const [orgDetails, setOrgDetails] = useState([]);
+
   const [routes] = useState([
     {key: 'personal', title: 'Personal'},
     {key: 'business', title: 'Business'},
@@ -354,6 +355,7 @@ const MyAccount = () => {
     });
   }, [orgDetails, navigation]);
 
+
   useEffect(() => {
     // if (route.name !== '') {
     const unsubscribe = navigation.addListener('focus', async () => {
@@ -381,55 +383,44 @@ const MyAccount = () => {
       style={{
         flex: 1,
         backgroundColor: '#fff',
-        paddingTop: insets.top !== 0 ? insets.top : 18,
-        paddingBottom: insets.bottom !== 0 ? insets.bottom / 2 : 'auto',
-        paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
-        paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
+        paddingTop: insets.top !== 0 ? Math.min(insets.top, 10) : 'auto',
+        paddingBottom:
+          insets.bottom !== 0 ? Math.min(insets.bottom, 10) : 'auto',
+        paddingLeft: insets.left !== 0 ? Math.min(insets.left, 10) : 'auto',
+        paddingRight: insets.right !== 0 ? Math.min(insets.right, 10) : 'auto',
       }}>
-      <View
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginHorizontal: 15,
-        }}>
-        <TouchableOpacity onPress={() => navigation.navigate('Home')}>
-          <View
-            style={{
-              borderWidth: 0.5,
-              borderColor: '#D9DBE9',
-              borderRadius: 5,
-            }}>
-            <AntDesign name="left" size={24} color="black" />
-          </View>
-        </TouchableOpacity>
-        <View>
-          <View>
-            <Text style={styles.TextHead}>My Account</Text>
-          </View>
-        </View>
-        <View>
-          <Text> </Text>
-        </View>
-      </View>
-      <View style={styles.demark} />
+      <Header
+        routeAction={() => navigation.goBack()}
+        heading="PROFILE SETTINGS"
+        disable={false}
+      />
       <View style={[styles.innercontainer]}>
-        <Pressable onPress={launchCameraAsync} style={styles.profileHeadView}>
+        <Pressable onPress={launchCameraAsync} style={styles.profileHeadView} disabled={orgDetails === null || orgDetails === undefined ? true : false}>
           <View style={styles.imagesView}>
             {orgDetails?.personalPhoto ? (
-              <Image
-                source={{uri: orgDetails?.personalPhoto}}
+              <FastImage
                 style={{width: 80, height: 80}}
+                source={{
+                  uri: orgDetails?.personalPhoto,
+                  priority: FastImage.priority.normal,
+                }}
+                resizeMode={FastImage.resizeMode.cover}
               />
             ) : (
-              <Image
+              <FastImage
                 style={{width: 80, height: 80}}
-                source={require('../../../assets/images/guarantorProfile.png')}
+                source={{
+                  uri: Image.resolveAssetSource(
+                    require('../../../assets/images/guarantorProfile.png'),
+                  ).uri,
+                  priority: FastImage.priority.normal,
+                }}
+                resizeMode={FastImage.resizeMode.cover}
               />
             )}
           </View>
           <View style={styles.pencilView}>
-            <FontAwesome5 name="pen" size={24} color="#fff" />
+            <FontAwesome5 name="pen" size={16} color="#fff" />
           </View>
         </Pressable>
       </View>

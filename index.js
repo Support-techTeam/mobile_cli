@@ -8,11 +8,17 @@ import {NativeBaseProvider, extendTheme} from 'native-base';
 import networkService from './src/util/NetworkService';
 import RemotePushController from './src/component/push-notifications/RemotePushController';
 import messaging from '@react-native-firebase/messaging';
+import notifee from '@notifee/react-native';
 
 // Register background handler
 messaging().setBackgroundMessageHandler(async remoteMessage => {
   // console.log('Message handled in the background!', remoteMessage);
 });
+
+function onMessageReceived(message) {
+  console.log('message', message);
+  notifee.displayNotification(JSON.parse(message.data.notifee));
+}
 
 // Initialize network service
 // const network = new networkService();
@@ -39,10 +45,10 @@ const toastConfig = {
         borderRightWidth: 2,
         backgroundColor: '#28a745',
         flexWrap: 'wrap',
+        height: '100%',
       }}
       contentContainerStyle={{
-        paddingHorizontal: 5,
-        paddingVertical: 5,
+        padding: 5,
         backgroundColor: '#28a745',
         flexWrap: 'wrap',
       }}
@@ -58,7 +64,7 @@ const toastConfig = {
         color: 'white',
         flexWrap: 'wrap',
       }}
-      text2NumberOfLines={4}
+      text2NumberOfLines={10}
     />
   ),
 
@@ -71,6 +77,7 @@ const toastConfig = {
         borderRightColor: '#dc3545',
         borderRightWidth: 2,
         backgroundColor: '#dc3545',
+        height: '100%',
       }}
       contentContainerStyle={{
         paddingHorizontal: 5,
@@ -87,7 +94,7 @@ const toastConfig = {
         fontSize: 12,
         color: 'white',
       }}
-      text2NumberOfLines={4}
+      text2NumberOfLines={10}
     />
   ),
 
@@ -99,6 +106,7 @@ const toastConfig = {
         borderRightColor: '#17a2b8',
         borderRightWidth: 2,
         backgroundColor: '#17a2b8',
+        height: '100%',
       }}
       contentContainerStyle={{
         paddingHorizontal: 5,
@@ -115,7 +123,7 @@ const toastConfig = {
         fontSize: 14,
         color: 'white',
       }}
-      text2NumberOfLines={4}
+      text2NumberOfLines={10}
     />
   ),
 
@@ -127,6 +135,7 @@ const toastConfig = {
         borderRightColor: '#ffc107',
         borderRightWidth: 2,
         backgroundColor: '#ffc107',
+        height: '100%',
       }}
       contentContainerStyle={{
         paddingHorizontal: 5,
@@ -143,7 +152,7 @@ const toastConfig = {
         fontSize: 14,
         color: 'white',
       }}
-      text2NumberOfLines={4}
+      text2NumberOfLines={10}
     />
   ),
 

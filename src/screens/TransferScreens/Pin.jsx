@@ -1,36 +1,122 @@
 import {
   View,
   Text,
+  Animated,
   StyleSheet,
   TextInput,
   ScrollView,
   TouchableOpacity,
+  Image,
 } from 'react-native';
 import React, {useEffect, useRef, useState} from 'react';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useNavigation} from '@react-navigation/native';
-import Spinner from 'react-native-loading-spinner-overlay/lib';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
-
 import Buttons from '../../component/buttons/Buttons';
 import {
   createInternalTransfer,
   createNIPTransfer,
 } from '../../stores/WalletStore';
 import appsFlyer from 'react-native-appsflyer';
+import {Header} from '../../component/header/Header';
+import {
+  CodeField,
+  Cursor,
+  useBlurOnFulfill,
+  useClearByFocusCell,
+} from 'react-native-confirmation-code-field';
+import styles, {
+  ACTIVE_CELL_BG_COLOR,
+  CELL_BORDER_RADIUS,
+  CELL_SIZE,
+  DEFAULT_CELL_BG_COLOR,
+  NOT_EMPTY_CELL_BG_COLOR,
+} from '../../../styles';
+import COLORS from '../../constants/colors';
+import {Center, Checkbox} from 'native-base';
+import Loader from '../../component/loader/loader';
+
+const {Value, Text: AnimatedText} = Animated;
+const CELL_COUNT = 4;
+
+const animationsColor = [...new Array(CELL_COUNT)].map(() => new Value(0));
+const animationsScale = [...new Array(CELL_COUNT)].map(() => new Value(1));
+const animateCell = ({hasValue, index, isFocused}) => {
+  Animated.parallel([
+    Animated.timing(animationsColor[index], {
+      useNativeDriver: false,
+      toValue: isFocused ? 1 : 0,
+      duration: 150,
+    }),
+    Animated.spring(animationsScale[index], {
+      useNativeDriver: false,
+      toValue: hasValue ? 0 : 1,
+      duration: hasValue ? 200 : 150,
+    }),
+  ]).start();
+};
 
 const Pin = ({route}) => {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
-  const firstInput = useRef();
-  const secondInput = useRef();
-  const thirdInput = useRef();
-  const fourthInput = useRef();
-  const [otp, setOtp] = useState({1: '', 2: '', 3: '', 4: ''});
-  const disableit = !otp[1] || !otp[2] || !otp[3] || !otp[4];
   const {bankDetails} = route.params;
   const [isLoading, setIsLoading] = useState(false);
+  const [value, setValue] = useState('');
+  const [hideValue, setHideValue] = useState(true);
+  const ref = useBlurOnFulfill({value, cellCount: CELL_COUNT});
+  const [props, getCellOnLayoutHandler] = useClearByFocusCell({
+    value,
+    setValue,
+  });
+
+  const disableit = value.length === 4 ? false : true;
+
+  const renderCell = ({index, symbol, isFocused}) => {
+    const hasValue = Boolean(symbol);
+    const animatedCellStyle = {
+      backgroundColor: hasValue
+        ? animationsScale[index].interpolate({
+            inputRange: [0, 1],
+            outputRange: [NOT_EMPTY_CELL_BG_COLOR, ACTIVE_CELL_BG_COLOR],
+          })
+        : animationsColor[index].interpolate({
+            inputRange: [0, 1],
+            outputRange: [DEFAULT_CELL_BG_COLOR, ACTIVE_CELL_BG_COLOR],
+          }),
+      borderRadius: animationsScale[index].interpolate({
+        inputRange: [0, 1],
+        outputRange: [CELL_SIZE, CELL_BORDER_RADIUS],
+      }),
+      transform: [
+        {
+          scale: animationsScale[index].interpolate({
+            inputRange: [0, 1],
+            outputRange: [0.4, 1],
+          }),
+        },
+      ],
+    };
+
+    // Run animation on next event loop tik
+    // Because we need first return new style prop and then animate this value
+    setTimeout(() => {
+      animateCell({hasValue, index, isFocused});
+    }, 0);
+
+    return (
+      <AnimatedText
+        key={index}
+        style={
+          hideValue
+            ? [styles.cell, animatedCellStyle]
+            : [styles.cell, isFocused && styles.focusCell]
+        }
+        onLayout={getCellOnLayoutHandler(index)}>
+        {symbol || (isFocused ? <Cursor /> : null)}
+      </AnimatedText>
+    );
+  };
 
   const [transferDetails, setTransferDetails] = useState({});
   const [internalTransferDetails, setInternalTransferDetails] = useState({});
@@ -63,9 +149,9 @@ const Pin = ({route}) => {
         bankDetails?.saveBeneficiary === undefined
           ? false
           : bankDetails?.saveBeneficiary,
-      transactionPin: `${otp[1] + otp[2] + otp[3] + otp[4]}`,
+      transactionPin: value,
     });
-  }, [bankDetails, otp]);
+  }, [bankDetails, value]);
 
   useEffect(() => {
     setInternalTransferDetails({
@@ -92,9 +178,9 @@ const Pin = ({route}) => {
         bankDetails?.saveBeneficiary === undefined
           ? false
           : bankDetails?.saveBeneficiary,
-      transactionPin: `${otp[1] + otp[2] + otp[3] + otp[4]}`,
+      transactionPin: value,
     });
-  }, [bankDetails, otp]);
+  }, [bankDetails, value]);
 
   const logAppsFlyer = (event, serviceType, value) => {
     const eventName = event;
@@ -133,7 +219,11 @@ const Pin = ({route}) => {
             onPress: () => Toast.hide(),
           });
         } else {
-          logAppsFlyer('Transfer', 'Internal Transfer', transferDetails?.amount);
+          logAppsFlyer(
+            'Transfer',
+            'Internal Transfer',
+            transferDetails?.amount,
+          );
           Toast.show({
             type: 'success',
             position: 'top',
@@ -162,7 +252,11 @@ const Pin = ({route}) => {
             onPress: () => Toast.hide(),
           });
         } else {
-          logAppsFlyer('Transfer', 'NIP Transfer', internalTransferDetails?.amount);
+          logAppsFlyer(
+            'Transfer',
+            'NIP Transfer',
+            internalTransferDetails?.amount,
+          );
           Toast.show({
             type: 'success',
             position: 'top',
@@ -186,114 +280,68 @@ const Pin = ({route}) => {
     <SafeAreaView
       style={{
         flex: 1,
-        paddingHorizontal: 20,
         backgroundColor: '#ffffff',
-        paddingTop: insets.top !== 0 ? insets.top : 18,
-        paddingBottom: insets.bottom !== 0 ? insets.bottom : 'auto',
-        paddingLeft: insets.left !== 0 ? insets.left : 'auto',
-        paddingRight: insets.right !== 0 ? insets.right : 'auto',
+        paddingTop: insets.top !== 0 ? Math.min(insets.top, 10) : 'auto',
+        paddingBottom:
+          insets.bottom !== 0 ? Math.min(insets.bottom, 10) : 'auto',
+        paddingLeft: insets.left !== 0 ? Math.min(insets.left, 10) : 'auto',
+        paddingRight: insets.right !== 0 ? Math.min(insets.right, 10) : 'auto',
       }}>
-      {isLoading && (
-        <Spinner
-          textContent={'Processing Please wait...'}
-          textStyle={{color: 'white'}}
-          visible={true}
-          overlayColor="rgba(78, 75, 102, 0.7)"
-        />
-      )}
+      <Loader visible={isLoading} loadingText={'Processing please wait...'} />
 
-      <View
+      <Header
+        routeAction={() => navigation.goBack()}
+        heading={'TRANSACTION PIN'}
+        disable={false}
+      />
+
+      <ScrollView
+        bounces={false}
+        showsVerticalScrollIndicator={false}
         style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'center',
+          paddingHorizontal: 16,
         }}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <View
-            style={{
-              borderWidth: 0.5,
-              borderColor: '#D9DBE9',
-              borderRadius: 5,
-            }}>
-            <Icon name="chevron-left" size={36} color="black" />
-          </View>
-        </TouchableOpacity>
-        <View style={styles.HeadView}>
-          <View style={styles.TopView}>
-            <Text style={styles.TextHead}>Enter your transaction pin</Text>
-          </View>
+        <Text style={styles.title}>{''}</Text>
+        <Icon
+          name="lock-check"
+          size={60}
+          color={COLORS.lendaGreen}
+          style={{marginLeft: 'auto', marginRight: 'auto'}}
+        />
+        <Text style={styles.subTitle}>
+          Please enter your transaction pin{'\n'}
+          to authorize this transfer
+        </Text>
+
+        <CodeField
+          ref={ref}
+          {...props}
+          value={value}
+          onChangeText={setValue}
+          cellCount={CELL_COUNT}
+          rootStyle={styles.codeFieldRoot}
+          keyboardType="number-pad"
+          textContentType="oneTimeCode"
+          renderCell={renderCell}
+        />
+        <View style={{marginVertical: 25}}>
+          <Center>
+            <Checkbox
+              size="md"
+              colorScheme="info"
+              defaultIsChecked={!hideValue}
+              onChange={state => {
+                setHideValue(!state);
+              }}>
+              Show transaction pin
+            </Checkbox>
+          </Center>
         </View>
 
-        <View style={{}}>
-          <Text>{'       '}</Text>
-        </View>
-      </View>
-      <View style={styles.demark} />
-
-      <ScrollView bounces={false} showsVerticalScrollIndicator={false}>
-        <View style={styles.pinView}>
-          <View style={styles.otpContainer}>
-            <View style={styles.otpBox}>
-              <TextInput
-                style={styles.otpText}
-                keyboardType="number-pad"
-                maxLength={1}
-                ref={firstInput}
-                onChangeText={text => {
-                  setOtp({...otp, 1: text});
-                  text && secondInput.current.focus();
-                }}
-                secureTextEntry={true}
-              />
-            </View>
-            <View style={styles.otpBox}>
-              <TextInput
-                style={styles.otpText}
-                keyboardType="number-pad"
-                maxLength={1}
-                ref={secondInput}
-                onChangeText={text => {
-                  setOtp({...otp, 2: text});
-                  text
-                    ? thirdInput.current.focus()
-                    : firstInput.current.focus();
-                }}
-                secureTextEntry={true}
-              />
-            </View>
-            <View style={styles.otpBox}>
-              <TextInput
-                style={styles.otpText}
-                keyboardType="number-pad"
-                maxLength={1}
-                ref={thirdInput}
-                onChangeText={text => {
-                  setOtp({...otp, 3: text});
-                  text
-                    ? fourthInput.current.focus()
-                    : secondInput.current.focus();
-                }}
-                secureTextEntry={true}
-              />
-            </View>
-            <View style={styles.otpBox}>
-              <TextInput
-                style={styles.otpText}
-                keyboardType="number-pad"
-                maxLength={1}
-                ref={fourthInput}
-                onChangeText={text => {
-                  setOtp({...otp, 4: text});
-                  !text && thirdInput.current.focus();
-                }}
-                secureTextEntry={true}
-              />
-            </View>
-          </View>
-        </View>
-
-        <TouchableOpacity onPress={handleTransfer}>
-          <Buttons label={'Submit'} disabled={disableit} />
+        <TouchableOpacity
+          onPress={handleTransfer}
+          style={{marginBottom: 20, marginHorizontal: 20}}>
+          <Buttons label={'Verify'} disabled={disableit} />
         </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
@@ -302,7 +350,7 @@ const Pin = ({route}) => {
 
 export default Pin;
 
-const styles = StyleSheet.create({
+const internalStyles = StyleSheet.create({
   container: {
     // flex: 1,
     // paddingHorizontal: 20,
@@ -370,5 +418,14 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  checkboxContainer: {
+    // Styles for the touchable opacity
+    marginTop: 10,
+    marginLeft: 'auto',
+    marginRight: 'auto',
+  },
+  checkboxLabel: {
+    // Label styles
   },
 });

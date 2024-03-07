@@ -7,12 +7,13 @@ import {
   ScrollView,
 } from 'react-native';
 import React, {useContext, useEffect, useState} from 'react';
-import Spinner from 'react-native-loading-spinner-overlay';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useNavigation} from '@react-navigation/native';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 import {getGuarantor} from '../../stores/GuarantorStore';
+import {Header} from '../../component/header/Header';
+import Loader from '../../component/loader/loader';
 
 const GuarantorDetails = ({route}) => {
   const navigation = useNavigation();
@@ -54,53 +55,20 @@ const GuarantorDetails = ({route}) => {
       style={{
         flex: 1,
         backgroundColor: '#fff',
-        paddingHorizontal: 16,
-        paddingTop: insets.top !== 0 ? insets.top : 18,
-        paddingBottom: insets.bottom !== 0 ? insets.bottom / 2 : 'auto',
-        paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
-        paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
+        paddingTop: insets.top !== 0 ? Math.min(insets.top, 10) : 'auto',
+        paddingBottom:
+          insets.bottom !== 0 ? Math.min(insets.bottom, 10) : 'auto',
+        paddingLeft: insets.left !== 0 ? Math.min(insets.left, 10) : 'auto',
+        paddingRight: insets.right !== 0 ? Math.min(insets.right, 10) : 'auto',
       }}>
-      {isLoading && (
-        <Spinner
-          textContent={'Loading...'}
-          textStyle={{color: 'white'}}
-          visible={true}
-          overlayColor="rgba(16, 17, 17, 0.7)"
-        />
-      )}
-      <View
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-        }}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <View
-            style={{
-              borderWidth: 0.5,
-              borderColor: '#D9DBE9',
-              borderRadius: 5,
-            }}>
-            <AntDesign name="left" size={28} color="black" />
-          </View>
-        </TouchableOpacity>
-        <View style={styles.HeadView}>
-          <View style={styles.TopView}>
-            <Text style={styles.TextHead}>Guarantor Details</Text>
-          </View>
-        </View>
-        <TouchableOpacity>
-          <View
-            style={{
-              borderWidth: 0.5,
-              borderColor: '#D9DBE9',
-              borderRadius: 5,
-            }}
-          />
-        </TouchableOpacity>
-      </View>
-      <View style={styles.demark} />
+      <Loader visible={isLoading} loadingText={'Please wait...'} />
+      <Header
+        routeAction={() => navigation.goBack()}
+        heading="GUARANTOR DETAILS"
+        disable={false}
+      />
       <ScrollView
+        style={{paddingHorizontal: 16}}
         bounces={false}
         showsHorizontalScrollIndicator={false}
         showsVerticalScrollIndicator={false}>

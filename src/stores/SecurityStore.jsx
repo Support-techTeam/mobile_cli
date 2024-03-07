@@ -1,175 +1,80 @@
-import Realm from 'realm';
+import React from 'react';
 import CryptoJS from 'crypto-js';
-const LockSchema = {
-  name: 'AppLock',
-  properties: {
-    id: 'int',
-    userId: 'string',
-    hashedPin: 'string',
-    mobileNumber: 'string',
-    createdAt: 'string',
-  },
+import * as Keychain from 'react-native-keychain';
+// Encryption key (should be securely stored)
+
+const service = 'com.tradelenda-alias';
+const encryptionKey = 'tradelenda';
+
+// Encrypt password
+const encryptData = async data => {
+  return CryptoJS.AES.encrypt(data, encryptionKey).toString();
 };
 
-const realm = new Realm({schema: [LockSchema]});
+// Decrypt data
+const decryptData = async encryptedData => {
+  return CryptoJS.AES.decrypt(encryptedData, encryptionKey).toString(
+    CryptoJS.enc.Utf8,
+  );
+};
 
-// Create a new task and insert it into the database
-const createLockPin = async details => {
+//set keychain to service
+const storeSensitiveData = async (username, unsecurePassword) => {
+
+  const password = await encryptData(unsecurePassword);
   try {
-    const isPinExisting = realm.objects('AppLock');
-    if (isPinExisting.length < 1) {
-      const md5Hash = CryptoJS.MD5(details.pin).toString();
-      const data = realm.write(() => {
-        realm.create('AppLock', {
-          id: 1,
-          userId: details.userId,
-          hashedPin: md5Hash,
-          mobileNumber: details.mobileNumber,
-          createdAt: new Date().toLocaleDateString(),
-        });
-      });
-      return {
-        error: false,
-        title: 'Create Pin',
-        data: data,
-        message: 'Created Successfully',
-      };
-    } else {
-      return {
-        error: true,
-        title: 'Create Pin',
-        data: null,
-        message: `Error Pin already Exist`,
-      };
-    }
-  } catch (e) {
-    return {
-      error: true,
-      title: 'Create Pin',
-      data: e,
-      message: `Error validating PIN: ${e}`,
-    };
+    const dataStore = await Keychain.setInternetCredentials(
+      service,
+      username,
+      password,
+    );
+    return dataStore;
+  } catch (err) {
+    return err?.message;
   }
 };
 
-const getAllPin = async () => {
+const retrieveSenditiveData = async () => {
   try {
-    const allData = realm.objects('AppLock');
-    if (allData.length > 0) {
-      return {
-        error: false,
-        title: 'Get All Pin',
-        data: allData,
-        message: 'Retrieved Successfully',
-      };
-    } else {
-      return {
-        error: true,
-        title: 'Check Pin',
-        data: null,
-        message: `Error validating PIN`,
-      };
-    }
-  } catch (e) {
-    return {
-      error: true,
-      title: 'Check Pin',
-      data: null,
-      message: `Error validating PIN: ${e}`,
-    };
+    const credentials = await Keychain.getInternetCredentials(service);
+    return credentials;
+  } catch (err) {
+    return err?.message;
   }
 };
 
-const validatePin = async pin => {
+const hasSensitiveData = async () => {
   try {
-    const md5Hash = CryptoJS.MD5(pin).toString();
-    const userData = realm
-      .objects('AppLock')
-      .filtered(`hashedPin == $0`, md5Hash);
-
-    if (userData.length > 0) {
-      return {
-        error: false,
-        title: 'Check Pin',
-        data: null,
-        message: 'Verified Successfully',
-      };
-    } else {
-      return {
-        error: true,
-        title: 'Check Pin',
-        data: null,
-        message: `Error validating PIN`,
-      };
-    }
-  } catch (error) {
-    return {
-      error: true,
-      title: 'Check Pin',
-      data: null,
-      message: `Error validating PIN: ${error}`,
-    };
+    const hasService = await Keychain.hasInternetCredentials(service);
+    return hasService;
+  } catch (err) {
+    return err?.message;
   }
 };
 
-const changeCurrentPin = async (userId, oldPin, newPin) => {
-  const hashedNewPin = CryptoJS.MD5(newPin).toString();
-  const hashedOldPin = CryptoJS.MD5(oldPin).toString();
-
-  const dataUpdate = realm
-    .objects('AppLock')
-    .filtered(`userId == $0 && hashedPin == $1`, userId, hashedOldPin);
-  if (dataUpdate.length > 0) {
-    realm.write(() => {
-      dataUpdate[0].hashedPin = hashedNewPin;
-    });
-    return {
-      error: false,
-      title: 'Update Pin',
-      data: null,
-      message: 'Updated Successfully',
-    };
-  } else {
-    return {
-      error: true,
-      title: 'Update Pin',
-      data: null,
-      message: `Wrong Old Pin`,
-    };
-  }
-};
-
-const resetPin = async mobileNumber => {
+const deleteSensitiveData = async () => {
   try {
-    realm.write(() => {
-      const dataToDelete = realm
-        .objects('AppLock')
-        .filtered('mobileNumber == $0', mobileNumber);
-      if (dataToDelete.length > 0) {
-        realm.delete(dataToDelete);
-      } else {
-        return {
-          error: true,
-          title: 'Reset Pin',
-          data: null,
-          message: `No Data Available`,
-        };
-      }
-    });
-    return {
-      error: false,
-      title: 'Reset Pin',
-      data: null,
-      message: 'Reset Successfully',
-    };
-  } catch (e) {
-    return {
-      error: true,
-      title: 'Reset Pin',
-      data: null,
-      message: `Invalid mobile number: ${e}`,
-    };
+    const res = await Keychain.resetInternetCredentials(service);
+    return res;
+  } catch (err) {
+    return err?.message;
   }
 };
 
-export {createLockPin, validatePin, changeCurrentPin, resetPin, getAllPin};
+// // Usage example
+// const password = 'userPassword123';
+// const encryptedPassword = encryptPassword(password);
+// console.log('Encrypted Password:', encryptedPassword);
+
+// const decryptedPassword = decryptPassword(encryptedPassword);
+// console.log('Decrypted Password:', decryptedPassword);
+// // console.log('Decrypted Password:', decryptedPassword);
+
+export {
+  encryptData,
+  decryptData,
+  storeSensitiveData,
+  retrieveSenditiveData,
+  hasSensitiveData,
+  deleteSensitiveData,
+};

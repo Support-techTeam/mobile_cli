@@ -14,7 +14,6 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 import CustomInput from '../../component/custominput/CustomInput';
 import Buttons from '../../component/buttons/Buttons';
 import KeyboardAvoidingWrapper from '../../component/KeyBoardAvoiding/keyBoardAvoiding';
-import Spinner from 'react-native-loading-spinner-overlay/lib';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 import {getNetworkProvider} from '../../stores/BillStore';
 import Input from '../../component/inputField/input.component';
@@ -22,6 +21,7 @@ import CustomDropdown from '../../component/dropDown/dropdown.component';
 import InputPhone from '../../component/inputField/phone-input.component';
 import Toast from 'react-native-toast-message';
 import {useSelector} from 'react-redux';
+import Loader from '../../component/loader/loader';
 
 const midth = Dimensions.get('window').width;
 const networkData = [
@@ -86,20 +86,13 @@ const Airtime = () => {
       style={{
         flex: 1,
         backgroundColor: '#fff',
-        paddingTop: insets.top !== 0 ? insets.top : 18,
-        paddingBottom: insets.bottom !== 0 ? insets.bottom / 2 : 'auto',
-        paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
-        paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
+        paddingTop: insets.top !== 0 ? Math.min(insets.top, 10) : 'auto',
+        paddingBottom: insets.bottom !== 0 ? Math.min(insets.bottom, 10) : 'auto',
+        paddingLeft: insets.left !== 0 ? Math.min(insets.left, 10) : 'auto',
+        paddingRight: insets.right !== 0 ? Math.min(insets.right, 10) : 'auto',
       }}>
       <View style={styles.container}>
-        {isLoading && (
-          <Spinner
-            textContent={'Loading...'}
-            textStyle={{color: 'white'}}
-            visible={true}
-            overlayColor="rgba(16, 17, 17, 0.7)"
-          />
-        )}
+        <Loader visible={isLoading} loadingText={'Please wait...'} />
 
         <View
           style={{

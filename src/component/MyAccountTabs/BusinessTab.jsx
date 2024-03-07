@@ -36,11 +36,15 @@ const Business = () => {
   return (
     <View style={styles.container}>
       <TouchableOpacity
+        disabled={orgDeets === undefined || orgDeets === null ? true : false}
         onPress={() =>
           navigation.navigate('BusinessDetails', {paramKey: 'myAccount'})
         }
         style={{marginBottom: 20}}>
-        <Buttons label={'Update Business Details'} />
+        <Buttons
+          disabled={orgDeets === undefined || orgDeets === null ? true : false}
+          label={'Update Business Details'}
+        />
       </TouchableOpacity>
 
       <ScrollView

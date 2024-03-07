@@ -26,7 +26,7 @@ import {
 import Toast from 'react-native-toast-message';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import {request, PERMISSIONS, openSettings} from 'react-native-permissions';
-import Spinner from 'react-native-loading-spinner-overlay';
+import Loader from '../../../component/loader/loader';
 
 const ITEM_HEIGHT = 100;
 
@@ -400,14 +400,7 @@ const Others = () => {
         paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
         paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
       }}>
-      {isUpdating && (
-        <Spinner
-          textContent={'Please wait...'}
-          textStyle={{color: 'white'}}
-          visible={true}
-          overlayColor="rgba(78, 75, 102, 0.7)"
-        />
-      )}
+      <Loader visible={isUpdating} loadingText={'Please wait...'} />
       <View
         style={{
           flexDirection: 'row',

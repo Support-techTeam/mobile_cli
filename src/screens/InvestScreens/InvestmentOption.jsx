@@ -7,7 +7,6 @@ import {
   Image,
 } from 'react-native';
 import React, {useState, useEffect} from 'react';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 import {
@@ -20,14 +19,14 @@ import {
   getAllLendaProduct,
   getArmProductYield,
 } from '../../stores/InvestStore';
-import Spinner from 'react-native-loading-spinner-overlay';
+import {Header} from '../../component/header/Header';
+import Loader from '../../component/loader/loader';
 
 const InvestmentOptionScreen = () => {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
   const [data, setData] = useState([]);
   const [yieldData, setYieldData] = useState();
-  const [isScrolling, setIsScrolling] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const route = useRoute();
   const {name, header} = route.params;
@@ -106,44 +105,17 @@ const InvestmentOptionScreen = () => {
         flex: 1,
         height: hp(100),
         backgroundColor: '#fff',
-        paddingTop: insets.top !== 0 ? insets.top : 18,
-        paddingBottom: insets.bottom !== 0 ? insets.bottom / 2 : 'auto',
-        paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
-        paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
+        paddingTop: insets.top !== 0 ? Math.min(insets.top, 10) : 'auto',
+        paddingBottom: insets.bottom !== 0 ? Math.min(insets.bottom, 10) : 'auto',
+        paddingLeft: insets.left !== 0 ? Math.min(insets.left, 10) : 'auto',
+        paddingRight: insets.right !== 0 ? Math.min(insets.right, 10) : 'auto',
       }}>
-      {isLoading && (
-        <Spinner
-          textContent={'Getting Investment Plans...'}
-          textStyle={{color: 'white'}}
-          visible={true}
-          overlayColor="rgba(78, 75, 102, 0.7)"
-          animation="slide"
-        />
-      )}
-      <View
-        style={{
-          width: wp(90),
-          marginHorizontal: 10,
-          flexDirection: 'row',
-          alignItems: 'center',
-        }}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <View
-            style={{
-              borderWidth: 0.5,
-              borderColor: '#D9DBE9',
-              borderRadius: 5,
-            }}>
-            <Icon name="chevron-left" size={36} color="black" />
-          </View>
-        </TouchableOpacity>
-        <View style={styles.HeadView}>
-          <View style={styles.TopView}>
-            <Text style={styles.TextHead}>{header}</Text>
-          </View>
-        </View>
-      </View>
-      <View style={styles.demark} />
+      <Loader visible={isLoading} loadingText={'Getting investment plans...'} />
+      <Header
+        routeAction={() => navigation.goBack()}
+        heading={header ? header : ''}
+        disable={false}
+      />
 
       <ScrollView
         bounces={false}
@@ -194,15 +166,12 @@ const InvestmentOptionScreen = () => {
                   <TouchableOpacity
                     key={i}
                     style={{marginHorizontal: 15}}
-                    onPress={
-                      isScrolling
-                        ? null
-                        : () =>
-                            navigation.navigate('InvestmentSummary', {
-                              yieldValue: yieldData?.yield ?? 0.0,
-                              name: name,
-                              investment: item,
-                            })
+                    onPress={() =>
+                      navigation.navigate('InvestmentSummary', {
+                        yieldValue: yieldData?.yield ? yieldData?.yield : '0.0',
+                        name: name,
+                        investment: item,
+                      })
                     }>
                     <View style={styles.PanelItemContainer}>
                       <View
@@ -276,7 +245,7 @@ const InvestmentOptionScreen = () => {
                                     minimumFractionDigits: 2,
                                     maximumFractionDigits: 2,
                                   }).format(
-                                    Number(item.minimumInvestmentAmount),
+                                    Number(item?.minimumInvestmentAmount),
                                   )
                                 : '0.00'
                             }`
@@ -287,7 +256,7 @@ const InvestmentOptionScreen = () => {
                                     style: 'decimal',
                                     minimumFractionDigits: 2,
                                     maximumFractionDigits: 2,
-                                  }).format(Number(item.amountRange.minAmount))
+                                  }).format(Number(item?.amountRange?.minAmount))
                                 : '0.00'}
                             </>
                           )}
@@ -305,7 +274,7 @@ const InvestmentOptionScreen = () => {
                                   style: 'decimal',
                                   minimumFractionDigits: 2,
                                   maximumFractionDigits: 2,
-                                }).format(Number(item.amountRange.maxAmount))
+                                }).format(Number(item?.amountRange?.maxAmount))
                               : '0.00'}
                           </Text>
                         )}

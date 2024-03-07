@@ -11,6 +11,7 @@ import {getStatusBarHeight} from 'react-native-status-bar-height';
 import {useNavigation} from '@react-navigation/native';
 import Pdf from 'react-native-pdf';
 import Buttons from '../../component/buttons/Buttons';
+import {Header} from '../../component/header/Header';
 
 const source = {uri: 'https://tradelenda.com/LOAN%20POLICY.pdf', cache: true};
 
@@ -24,34 +25,12 @@ const Termspolicy = () => {
   const [showBut, setShowBut] = useState(false);
   return (
     <View style={styles.container}>
-      <View
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginHorizontal: 15,
-          marginTop: 30,
-        }}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <View
-            style={{
-              borderWidth: 0.5,
-              borderColor: '#D9DBE9',
-              borderRadius: 5,
-            }}>
-            <Icon name="chevron-left" size={36} color="black" />
-          </View>
-        </TouchableOpacity>
-        <View style={styles.HeadView}>
-          <View style={styles.TopView}>
-            <Text style={styles.TextHead}>Terms and Policy Agreement</Text>
-          </View>
-        </View>
-        <View>
-          <Text> </Text>
-        </View>
-      </View>
-      <View style={styles.demark} />
+      <Header
+        routeAction={() => navigation.goBack()}
+        heading={'Terms and Policy Agreement'}
+        disable={false}
+      />
+
       <Pdf
         trustAllCerts={false}
         source={source}
@@ -106,7 +85,6 @@ const styles = StyleSheet.create({
     paddingTop: 30,
   },
   TextHead: {
-    
     fontWeight: '700',
     fontSize: 16,
     lineHeight: 24,

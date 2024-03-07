@@ -34,7 +34,7 @@ const getAllLoans = async () => {
             headers,
           },
         );
-        DdLogs.info(`Loans | Get All Loans | ${auth?.currentUser?.email}`, {
+        DdLogs.info(`Loans | Get All Loans | ${auth()?.currentUser?.email}`, {
           context: JSON.stringify(response?.data),
         });
         return {
@@ -44,7 +44,7 @@ const getAllLoans = async () => {
           message: 'success',
         };
       } catch (error) {
-        DdLogs.error(`Loans | Get All Loans | ${auth?.currentUser?.email}`, {
+        DdLogs.error(`Loans | Get All Loans | ${auth()?.currentUser?.email}`, {
           errorMessage: JSON.stringify(error),
         });
         return {
@@ -81,7 +81,7 @@ const getApprovedLoans = async () => {
           headers,
         });
         DdLogs.info(
-          `Loans | Get Approved Loans | ${auth?.currentUser?.email}`,
+          `Loans | Get Approved Loans | ${auth()?.currentUser?.email}`,
           {
             context: JSON.stringify(response?.data),
           },
@@ -94,7 +94,7 @@ const getApprovedLoans = async () => {
         };
       } catch (error) {
         DdLogs.error(
-          `Loans | Get Approved Loans | ${auth?.currentUser?.email}`,
+          `Loans | Get Approved Loans | ${auth()?.currentUser?.email}`,
           {
             errorMessage: JSON.stringify(error),
           },
@@ -132,7 +132,7 @@ const getPaidLoans = async () => {
         const response = await axiosInstance.get(`/loans/paid-loans/list`, {
           headers,
         });
-        DdLogs.info(`Loans | Get Paid Loans | ${auth?.currentUser?.email}`, {
+        DdLogs.info(`Loans | Get Paid Loans | ${auth()?.currentUser?.email}`, {
           context: JSON.stringify(response?.data),
         });
         return {
@@ -142,7 +142,7 @@ const getPaidLoans = async () => {
           message: 'success',
         };
       } catch (error) {
-        DdLogs.error(`Loans | Get Paid Loans | ${auth?.currentUser?.email}`, {
+        DdLogs.error(`Loans | Get Paid Loans | ${auth()?.currentUser?.email}`, {
           errorMessage: JSON.stringify(error),
         });
         return {
@@ -178,7 +178,7 @@ const getPendingLoans = async () => {
         const response = await axiosInstance.get(`/loans/pending-loans/list`, {
           headers,
         });
-        DdLogs.info(`Loans | Get Pending Loans | ${auth?.currentUser?.email}`, {
+        DdLogs.info(`Loans | Get Pending Loans | ${auth()?.currentUser?.email}`, {
           context: JSON.stringify(response?.data),
         });
         return {
@@ -189,7 +189,7 @@ const getPendingLoans = async () => {
         };
       } catch (error) {
         DdLogs.error(
-          `Loans | Get Pending Loans | ${auth?.currentUser?.email}`,
+          `Loans | Get Pending Loans | ${auth()?.currentUser?.email}`,
           {
             errorMessage: JSON.stringify(error),
           },
@@ -231,7 +231,7 @@ const getLoansAmount = async () => {
             headers,
           },
         );
-        DdLogs.info(`Loans | Get Loans Amount | ${auth?.currentUser?.email}`, {
+        DdLogs.info(`Loans | Get Loans Amount | ${auth()?.currentUser?.email}`, {
           context: JSON.stringify(response?.data),
         });
         return {
@@ -241,7 +241,7 @@ const getLoansAmount = async () => {
           message: 'success',
         };
       } catch (error) {
-        DdLogs.error(`Loans | Get Loans Amount | ${auth?.currentUser?.email}`, {
+        DdLogs.error(`Loans | Get Loans Amount | ${auth()?.currentUser?.email}`, {
           errorMessage: JSON.stringify(error),
         });
         return {
@@ -279,7 +279,7 @@ const getDuration = async () => {
           headers,
         });
         DdLogs.info(
-          `Loans | Get Loans Duration | ${auth?.currentUser?.email}`,
+          `Loans | Get Loans Duration | ${auth()?.currentUser?.email}`,
           {
             context: JSON.stringify(response?.data),
           },
@@ -292,7 +292,7 @@ const getDuration = async () => {
         };
       } catch (error) {
         DdLogs.error(
-          `Loans | Get Loans Duration | ${auth?.currentUser?.email}`,
+          `Loans | Get Loans Duration | ${auth()?.currentUser?.email}`,
           {
             errorMessage: JSON.stringify(error),
           },
@@ -332,7 +332,7 @@ const getLoanUserDetails = async () => {
           headers,
         });
         DdLogs.info(
-          `Loans | Get User Loan Details | ${auth?.currentUser?.email}`,
+          `Loans | Get User Loan Details | ${auth()?.currentUser?.email}`,
           {
             context: JSON.stringify(response?.data),
           },
@@ -345,7 +345,7 @@ const getLoanUserDetails = async () => {
         };
       } catch (error) {
         DdLogs.error(
-          `Loans | Get User Loan Details | ${auth?.currentUser?.email}`,
+          `Loans | Get User Loan Details | ${auth()?.currentUser?.email}`,
           {
             errorMessage: JSON.stringify(error),
           },
@@ -384,7 +384,7 @@ const getLoanById = async id => {
         const response = await axiosInstance.get(`/loans/get-loan/${id}`, {
           headers,
         });
-        DdLogs.info(`Loans | Get Single Loan | ${auth?.currentUser?.email}`, {
+        DdLogs.info(`Loans | Get Single Loan | ${auth()?.currentUser?.email}`, {
           context: JSON.stringify(response?.data),
         });
         return {
@@ -394,7 +394,7 @@ const getLoanById = async id => {
           message: 'success',
         };
       } catch (error) {
-        DdLogs.error(`Loans | Get Single Loan | ${auth?.currentUser?.email}`, {
+        DdLogs.error(`Loans | Get Single Loan | ${auth()?.currentUser?.email}`, {
           errorMessage: JSON.stringify(error),
         });
         return {
@@ -434,7 +434,7 @@ const getLoanDetails = async (amount, tenor) => {
             headers,
           },
         );
-        DdLogs.info(`Loans | Get Loan Details | ${auth?.currentUser?.email}`, {
+        DdLogs.info(`Loans | Get Loan Details | ${auth()?.currentUser?.email}`, {
           context: JSON.stringify(response?.data),
         });
         return {
@@ -444,7 +444,7 @@ const getLoanDetails = async (amount, tenor) => {
           message: 'success',
         };
       } catch (error) {
-        DdLogs.error(`Loans | Get Loan Details | ${auth?.currentUser?.email}`, {
+        DdLogs.error(`Loans | Get Loan Details | ${auth()?.currentUser?.email}`, {
           errorMessage: JSON.stringify(error),
         });
         return {
@@ -485,7 +485,7 @@ const createLoan = async details => {
             headers,
           },
         );
-        DdLogs.info(`Loans | Create Loan | ${auth?.currentUser?.email}`, {
+        DdLogs.info(`Loans | Create Loan | ${auth()?.currentUser?.email}`, {
           context: JSON.stringify(response?.data),
         });
         return {
@@ -495,7 +495,7 @@ const createLoan = async details => {
           message: "Loan request successful. You'll be redirected shortly!,",
         };
       } catch (error) {
-        DdLogs.error(`Loans | Create Loan | ${auth?.currentUser?.email}`, {
+        DdLogs.error(`Loans | Create Loan | ${auth()?.currentUser?.email}`, {
           errorMessage: JSON.stringify(error),
         });
         return {
@@ -537,7 +537,7 @@ const createUserProfile = async details => {
           },
         );
         await AsyncStorage.setItem('hasStarted', '1');
-        DdLogs.info(`Loans | Create Profile | ${auth?.currentUser?.email}`, {
+        DdLogs.info(`Loans | Create Profile | ${auth()?.currentUser?.email}`, {
           context: JSON.stringify(response?.data),
         });
         return {
@@ -547,7 +547,7 @@ const createUserProfile = async details => {
           message: 'Profile data stored successfully',
         };
       } catch (error) {
-        DdLogs.error(`Loans | Create Profile | ${auth?.currentUser?.email}`, {
+        DdLogs.error(`Loans | Create Profile | ${auth()?.currentUser?.email}`, {
           errorMessage: JSON.stringify(error),
         });
         return {
@@ -590,7 +590,7 @@ const createBusinessDetails = async details => {
         );
         await AsyncStorage.setItem('hasStarted', '2');
         DdLogs.info(
-          `Loans | Create Business Details | ${auth?.currentUser?.email}`,
+          `Loans | Create Business Details | ${auth()?.currentUser?.email}`,
           {
             context: JSON.stringify(response?.data),
           },
@@ -603,7 +603,7 @@ const createBusinessDetails = async details => {
         };
       } catch (error) {
         DdLogs.error(
-          `Loans | Create Business Details | ${auth?.currentUser?.email}`,
+          `Loans | Create Business Details | ${auth()?.currentUser?.email}`,
           {
             errorMessage: JSON.stringify(error),
           },
@@ -648,7 +648,7 @@ const createNextOfKin = async details => {
         );
         await AsyncStorage.setItem('hasStarted', '3');
         DdLogs.info(
-          `Loans | Create Next Of Kin | ${auth?.currentUser?.email}`,
+          `Loans | Create Next Of Kin | ${auth()?.currentUser?.email}`,
           {
             context: JSON.stringify(response?.data),
           },
@@ -661,7 +661,7 @@ const createNextOfKin = async details => {
         };
       } catch (error) {
         DdLogs.error(
-          `Loans | Create Next Of Kin | ${auth?.currentUser?.email}`,
+          `Loans | Create Next Of Kin | ${auth()?.currentUser?.email}`,
           {
             errorMessage: JSON.stringify(error),
           },
@@ -706,7 +706,7 @@ const createBankDetails = async details => {
         );
         await AsyncStorage.setItem('hasStarted', '4');
         DdLogs.info(
-          `Loans | Create Bank Details | ${auth?.currentUser?.email}`,
+          `Loans | Create Bank Details | ${auth()?.currentUser?.email}`,
           {
             context: JSON.stringify(response?.data),
           },
@@ -719,7 +719,7 @@ const createBankDetails = async details => {
         };
       } catch (error) {
         DdLogs.error(
-          `Loans | Create Bank Details | ${auth?.currentUser?.email}`,
+          `Loans | Create Bank Details | ${auth()?.currentUser?.email}`,
           {
             errorMessage: JSON.stringify(error),
           },
@@ -763,7 +763,7 @@ const createDocumentsDetails = async details => {
           },
         );
         DdLogs.info(
-          `Loans | Create Document Details | ${auth?.currentUser?.email}`,
+          `Loans | Create Document Details | ${auth()?.currentUser?.email}`,
           {
             context: JSON.stringify(response?.data),
           },
@@ -776,7 +776,7 @@ const createDocumentsDetails = async details => {
         };
       } catch (error) {
         DdLogs.error(
-          `Loans | Create Document Details | ${auth?.currentUser?.email}`,
+          `Loans | Create Document Details | ${auth()?.currentUser?.email}`,
           {
             errorMessage: JSON.stringify(error),
           },
@@ -804,11 +804,24 @@ const createUploadDocument = async (details, documentName) => {
     store.getState().networkState.network.isConnected &&
     store.getState().networkState.network.isInternetReachable
   ) {
-    if (auth?.currentUser?.stsTokenManager?.accessToken) {
+    await getFirebaseAuthToken();
+    if (token) {
       headers = {
         accept: 'application/json',
-        Authorization: `Bearer ${auth().currentUser?.stsTokenManager?.accessToken}`,
+        Authorization: `Bearer ${token}`,
         'Content-Type': 'multipart/form-data',
+      };
+
+      const config = {
+        onUploadProgress: progressEvent => {
+          if (progressEvent.total) {
+            const progress = Math.round(
+              (progressEvent.loaded / progressEvent.total) * 100,
+            );
+            uploadProgress = progress;
+          }
+        },
+        headers,
       };
       try {
         const formData = new FormData();
@@ -817,24 +830,15 @@ const createUploadDocument = async (details, documentName) => {
         const response = await axiosInstance.post(
           `/loan-details/upload/${documentName}`,
           formData,
-          {
-            headers,
-            onUploadProgress: progressEvent => {
-              if (progressEvent.total) {
-                const progress = Math.round(
-                  (progressEvent.loaded / progressEvent.total) * 100,
-                );
-                uploadProgress = progress;
-              }
-            },
-          },
+          config,
         );
+
         uploadProgress = 0;
-        DdLogs.info(`Loans | Document Upload | ${auth?.currentUser?.email}`, {
+        DdLogs.info(`Loans | Document Upload | ${auth()?.currentUser?.email}`, {
           context: JSON.stringify(response?.data),
         });
 
-        if(response?.data?.error){
+        if (response?.data?.error) {
           return {
             title: 'Document Upload ',
             error: true,
@@ -851,7 +855,7 @@ const createUploadDocument = async (details, documentName) => {
       } catch (error) {
         // uploadPerroress = 0;
         DdLogs.error(`Loans | Document Upload |errorntUser?.email}`, {
-          context: JSON.stringify(response?.data),
+          context: JSON.stringify(error),
         });
         return {
           title: 'Document Upload ',
@@ -892,7 +896,7 @@ const updatePersonalDetails = async details => {
           await AsyncStorage.setItem('hasStarted', '1');
         }
 
-        DdLogs.info(`Loans | Update Profile | ${auth?.currentUser?.email}`, {
+        DdLogs.info(`Loans | Update Profile | ${auth()?.currentUser?.email}`, {
           context: JSON.stringify(response?.data),
         });
         return {
@@ -902,7 +906,7 @@ const updatePersonalDetails = async details => {
           message: 'Profile data stored successfully',
         };
       } catch (error) {
-        DdLogs.error(`Loans | Update Profile | ${auth?.currentUser?.email}`, {
+        DdLogs.error(`Loans | Update Profile | ${auth()?.currentUser?.email}`, {
           errorMessage: JSON.stringify(error),
         });
         return {
@@ -948,7 +952,7 @@ const updateBusinessDetails = async details => {
           await AsyncStorage.setItem('hasStarted', '2');
         }
         DdLogs.info(
-          `Loans | Update Business Details | ${auth?.currentUser?.email}`,
+          `Loans | Update Business Details | ${auth()?.currentUser?.email}`,
           {
             context: JSON.stringify(response?.data),
           },
@@ -961,7 +965,7 @@ const updateBusinessDetails = async details => {
         };
       } catch (error) {
         DdLogs.error(
-          `Loans | Update Business Details | ${auth?.currentUser?.email}`,
+          `Loans | Update Business Details | ${auth()?.currentUser?.email}`,
           {
             errorMessage: JSON.stringify(error),
           },
@@ -1009,7 +1013,7 @@ const updateNokDetails = async details => {
           await AsyncStorage.setItem('hasStarted', '3');
         }
         DdLogs.info(
-          `Loans | Update Next Of Kin | ${auth?.currentUser?.email}`,
+          `Loans | Update Next Of Kin | ${auth()?.currentUser?.email}`,
           {
             context: JSON.stringify(response?.data),
           },
@@ -1022,7 +1026,7 @@ const updateNokDetails = async details => {
         };
       } catch (error) {
         DdLogs.error(
-          `Loans | Update Next Of Kin | ${auth?.currentUser?.email}`,
+          `Loans | Update Next Of Kin | ${auth()?.currentUser?.email}`,
           {
             errorMessage: JSON.stringify(error),
           },
@@ -1070,7 +1074,7 @@ const updateBankDetails = async details => {
           await AsyncStorage.setItem('hasStarted', '4');
         }
         DdLogs.info(
-          `Loans | Update Bank Details | ${auth?.currentUser?.email}`,
+          `Loans | Update Bank Details | ${auth()?.currentUser?.email}`,
           {
             context: JSON.stringify(response?.data),
           },
@@ -1083,7 +1087,7 @@ const updateBankDetails = async details => {
         };
       } catch (error) {
         DdLogs.error(
-          `Loans | Update Bank Details | ${auth?.currentUser?.email}`,
+          `Loans | Update Bank Details | ${auth()?.currentUser?.email}`,
           {
             errorMessage: JSON.stringify(error),
           },
@@ -1127,7 +1131,7 @@ const updateDocumentsDetails = async details => {
           },
         );
         DdLogs.info(
-          `Loans | Update Document Details | ${auth?.currentUser?.email}`,
+          `Loans | Update Document Details | ${auth()?.currentUser?.email}`,
           {
             context: JSON.stringify(response?.data),
           },
@@ -1141,7 +1145,7 @@ const updateDocumentsDetails = async details => {
         };
       } catch (error) {
         DdLogs.error(
-          `Loans | Update Document Details | ${auth?.currentUser?.email}`,
+          `Loans | Update Document Details | ${auth()?.currentUser?.email}`,
           {
             errorMessage: JSON.stringify(error),
           },
@@ -1186,7 +1190,7 @@ const createArmDetails = async details => {
         );
         await AsyncStorage.setItem('hasStarted', '5');
         DdLogs.info(
-          `Loans | Create ARM Details | ${auth?.currentUser?.email}`,
+          `Loans | Create ARM Details | ${auth()?.currentUser?.email}`,
           {
             context: JSON.stringify(response?.data),
           },
@@ -1199,7 +1203,7 @@ const createArmDetails = async details => {
         };
       } catch (error) {
         DdLogs.error(
-          `Loans | Create ARM Details | ${auth?.currentUser?.email}`,
+          `Loans | Create ARM Details | ${auth()?.currentUser?.email}`,
           {
             errorMessage: JSON.stringify(error),
           },

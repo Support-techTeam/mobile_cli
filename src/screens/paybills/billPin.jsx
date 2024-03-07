@@ -4,14 +4,13 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
-  TextInput,
+  Animated,
 } from 'react-native';
 import React, {useState, useRef, useEffect, useContext} from 'react';
-import Spinner from 'react-native-loading-spinner-overlay';
-import AntDesign from 'react-native-vector-icons/AntDesign';
 import {useNavigation} from '@react-navigation/native';
 import Toast from 'react-native-toast-message';
 import Buttons from '../../component/buttons/Buttons';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 import {
   purchaseAirtime,
@@ -21,35 +20,117 @@ import {
   updateSubscription,
 } from '../../stores/BillStore';
 import appsFlyer from 'react-native-appsflyer';
+import Loader from '../../component/loader/loader';
+import {Header} from '../../component/header/Header';
+import {
+  CodeField,
+  Cursor,
+  useBlurOnFulfill,
+  useClearByFocusCell,
+} from 'react-native-confirmation-code-field';
+import styles, {
+  ACTIVE_CELL_BG_COLOR,
+  CELL_BORDER_RADIUS,
+  CELL_SIZE,
+  DEFAULT_CELL_BG_COLOR,
+  NOT_EMPTY_CELL_BG_COLOR,
+} from '../../../styles';
+import COLORS from '../../constants/colors';
+import {Center, Checkbox} from 'native-base';
+
+
+const {Value, Text: AnimatedText} = Animated;
+const CELL_COUNT = 4;
+
+const animationsColor = [...new Array(CELL_COUNT)].map(() => new Value(0));
+const animationsScale = [...new Array(CELL_COUNT)].map(() => new Value(1));
+const animateCell = ({hasValue, index, isFocused}) => {
+  Animated.parallel([
+    Animated.timing(animationsColor[index], {
+      useNativeDriver: false,
+      toValue: isFocused ? 1 : 0,
+      duration: 150,
+    }),
+    Animated.spring(animationsScale[index], {
+      useNativeDriver: false,
+      toValue: hasValue ? 0 : 1,
+      duration: hasValue ? 200 : 150,
+    }),
+  ]).start();
+};
 
 const BillPin = ({route}) => {
   const {airtimeDetails, acctNumber, selectedPackageData} = route.params;
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
   const [isLoading, setIsLoading] = useState(false);
-  const firstInput = useRef();
-  const secondInput = useRef();
-  const thirdInput = useRef();
-  const fourthInput = useRef();
-  const [otp, setOtp] = useState({f: '', s: '', t: '', fo: ''});
-  const disableit = !otp.f || !otp.s || !otp.t || !otp.fo;
+  const [value, setValue] = useState('');
+  const [hideValue, setHideValue] = useState(true);
+  const ref = useBlurOnFulfill({value, cellCount: CELL_COUNT});
+  const [props, getCellOnLayoutHandler] = useClearByFocusCell({
+    value,
+    setValue,
+  });
 
-  const [pinString, setPinString] = useState('');
-  useEffect(() => {
-    setPinString(`${otp.f + otp.s + otp.t + otp.fo}`);
-  }, [otp]);
+  const disableit = value.length === 4 ? false : true;
+
+  const renderCell = ({index, symbol, isFocused}) => {
+    const hasValue = Boolean(symbol);
+    const animatedCellStyle = {
+      backgroundColor: hasValue
+        ? animationsScale[index].interpolate({
+            inputRange: [0, 1],
+            outputRange: [NOT_EMPTY_CELL_BG_COLOR, ACTIVE_CELL_BG_COLOR],
+          })
+        : animationsColor[index].interpolate({
+            inputRange: [0, 1],
+            outputRange: [DEFAULT_CELL_BG_COLOR, ACTIVE_CELL_BG_COLOR],
+          }),
+      borderRadius: animationsScale[index].interpolate({
+        inputRange: [0, 1],
+        outputRange: [CELL_SIZE, CELL_BORDER_RADIUS],
+      }),
+      transform: [
+        {
+          scale: animationsScale[index].interpolate({
+            inputRange: [0, 1],
+            outputRange: [0.4, 1],
+          }),
+        },
+      ],
+    };
+
+    // Run animation on next event loop tik
+    // Because we need first return new style prop and then animate this value
+    setTimeout(() => {
+      animateCell({hasValue, index, isFocused});
+    }, 0);
+
+    return (
+      <AnimatedText
+        key={index}
+        style={
+          hideValue
+            ? [styles.cell, animatedCellStyle]
+            : [styles.cell, isFocused && styles.focusCell]
+        }
+        onLayout={getCellOnLayoutHandler(index)}>
+        {symbol || (isFocused ? <Cursor /> : null)}
+      </AnimatedText>
+    );
+  };
 
   const details = {
     serviceType: airtimeDetails.network,
     amount: Number(airtimeDetails.amount),
     phone: airtimeDetails.number,
-    transactionPin: pinString,
+    transactionPin: value,
   };
   const dataDetails = {
     serviceType: airtimeDetails.network,
     amount: Number(airtimeDetails.amount),
     phone: airtimeDetails.number,
-    transactionPin: pinString,
+    transactionPin: value,
     DataCode: airtimeDetails.package,
   };
 
@@ -57,14 +138,14 @@ const BillPin = ({route}) => {
     serviceType: airtimeDetails.network,
     amount: Number(airtimeDetails.amount),
     phone: airtimeDetails.number,
-    transactionPin: pinString,
+    transactionPin: value,
     meterNumber: airtimeDetails.meter,
   };
   const cableDetails = {
     serviceType: airtimeDetails.network,
     amount: Number(airtimeDetails.amount),
     phone: airtimeDetails.number,
-    transactionPin: pinString,
+    transactionPin: value,
     variationCode: airtimeDetails.variationCode,
     cardNumber: airtimeDetails.cardNumber,
   };
@@ -110,7 +191,12 @@ const BillPin = ({route}) => {
             navigation.navigate('StatusFailed');
           }, 1000);
         } else {
-          logAppsFlyer('bill_purchase', details?.serviceType, details?.phone, details?.amount);
+          logAppsFlyer(
+            'bill_purchase',
+            details?.serviceType,
+            details?.phone,
+            details?.amount,
+          );
           Toast.show({
             type: 'success',
             position: 'top',
@@ -150,7 +236,12 @@ const BillPin = ({route}) => {
             navigation.navigate('StatusFailed');
           }, 1000);
         } else {
-          logAppsFlyer('bill_purchase', dataDetails?.serviceType, dataDetails?.phone, dataDetails?.amount);
+          logAppsFlyer(
+            'bill_purchase',
+            dataDetails?.serviceType,
+            dataDetails?.phone,
+            dataDetails?.amount,
+          );
           Toast.show({
             type: 'success',
             position: 'top',
@@ -190,7 +281,12 @@ const BillPin = ({route}) => {
             navigation.navigate('StatusFailed');
           }, 1000);
         } else {
-          logAppsFlyer('bill_purchase', powerDetails?.serviceType, powerDetails?.phone, powerDetails?.amount);
+          logAppsFlyer(
+            'bill_purchase',
+            powerDetails?.serviceType,
+            powerDetails?.phone,
+            powerDetails?.amount,
+          );
           Toast.show({
             type: 'success',
             position: 'top',
@@ -235,7 +331,12 @@ const BillPin = ({route}) => {
             navigation.navigate('StatusFailed');
           }, 1000);
         } else {
-          logAppsFlyer('bill_purchase', cableDetails?.serviceType, cableDetails?.phone, cableDetails?.amount);
+          logAppsFlyer(
+            'bill_purchase',
+            cableDetails?.serviceType,
+            cableDetails?.phone,
+            cableDetails?.amount,
+          );
           Toast.show({
             type: 'success',
             position: 'top',
@@ -262,130 +363,66 @@ const BillPin = ({route}) => {
       style={{
         flex: 1,
         backgroundColor: '#fff',
-        paddingTop: insets.top !== 0 ? insets.top : 18,
-        paddingBottom: insets.bottom !== 0 ? insets.bottom / 2 : 'auto',
-        paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
-        paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
+        paddingTop: insets.top !== 0 ? Math.min(insets.top, 10) : 'auto',
+        paddingBottom:
+          insets.bottom !== 0 ? Math.min(insets.bottom, 10) : 'auto',
+        paddingLeft: insets.left !== 0 ? Math.min(insets.left, 10) : 'auto',
+        paddingRight: insets.right !== 0 ? Math.min(insets.right, 10) : 'auto',
       }}>
-      {isLoading && (
-        <Spinner
-          textContent={'Processing...'}
-          textStyle={{color: 'white'}}
-          visible={true}
-          overlayColor="rgba(78, 75, 102, 0.7)"
-        />
-      )}
-      <View
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-        }}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <View
-            style={{
-              borderWidth: 0.5,
-              borderColor: '#D9DBE9',
-              borderRadius: 5,
-            }}>
-            <AntDesign name="left" size={24} color="black" />
-          </View>
-        </TouchableOpacity>
-        <View style={styles.HeadView}>
-          <View style={styles.TopView}>
-            <Text style={styles.TextHead}>Enter PIN</Text>
-          </View>
-        </View>
+      <Loader visible={isLoading} loadingText={'Please wait...'} />
+      <Header
+        routeAction={() => navigation.goBack()}
+        heading="TRANSACTION PIN"
+        disable={false}
+      />
 
-        <View style={{}}>
-          <Text>{'       '}</Text>
-        </View>
-      </View>
-      <View style={styles.demark} />
       <ScrollView
         bounces={false}
-        showsHorizontalScrollIndicator={false}
         showsVerticalScrollIndicator={false}
         style={{
-          marginHorizontal: 15,
+          paddingHorizontal: 16,
         }}>
-        <View
-          style={{
-            marginHorizontal: 20,
-            marginTop: 40,
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}>
-          <Text style={{color: '#14142B', fontSize: 16}}>
-            Enter your transaction pin
-          </Text>
-        </View>
-        <View style={styles.pinView}>
-          <View style={styles.otpContainer}>
-            <View style={styles.otpBox}>
-              <TextInput
-                style={styles.otpText}
-                keyboardType="number-pad"
-                maxLength={1}
-                ref={firstInput}
-                onChangeText={text => {
-                  setOtp({...otp, f: text});
-                  text && secondInput.current.focus();
-                }}
-                secureTextEntry={true}
-              />
-            </View>
-            <View style={styles.otpBox}>
-              <TextInput
-                style={styles.otpText}
-                keyboardType="number-pad"
-                maxLength={1}
-                ref={secondInput}
-                onChangeText={text => {
-                  setOtp({...otp, s: text});
-                  text
-                    ? thirdInput.current.focus()
-                    : firstInput.current.focus();
-                }}
-                secureTextEntry={true}
-              />
-            </View>
-            <View style={styles.otpBox}>
-              <TextInput
-                style={styles.otpText}
-                keyboardType="number-pad"
-                maxLength={1}
-                ref={thirdInput}
-                onChangeText={text => {
-                  setOtp({...otp, t: text});
-                  text
-                    ? fourthInput.current.focus()
-                    : secondInput.current.focus();
-                }}
-                secureTextEntry={true}
-              />
-            </View>
-            <View style={styles.otpBox}>
-              <TextInput
-                style={styles.otpText}
-                keyboardType="number-pad"
-                maxLength={1}
-                ref={fourthInput}
-                onChangeText={text => {
-                  setOtp({...otp, fo: text});
-                  !text && thirdInput.current.focus();
-                }}
-                secureTextEntry={true}
-              />
-            </View>
-          </View>
+        <Text style={styles.title}>{''}</Text>
+        <Icon
+          name="lock-check"
+          size={60}
+          color={COLORS.lendaGreen}
+          style={{marginLeft: 'auto', marginRight: 'auto'}}
+        />
+        <Text style={styles.subTitle}>
+          Please enter your transaction pin{'\n'}
+          to authorize this transfer
+        </Text>
+
+        <CodeField
+          ref={ref}
+          {...props}
+          value={value}
+          onChangeText={setValue}
+          cellCount={CELL_COUNT}
+          rootStyle={styles.codeFieldRoot}
+          keyboardType="number-pad"
+          textContentType="oneTimeCode"
+          renderCell={renderCell}
+        />
+        <View style={{marginVertical: 25}}>
+          <Center>
+            <Checkbox
+              size="md"
+              colorScheme="info"
+              defaultIsChecked={!hideValue}
+              onChange={state => {
+                setHideValue(!state);
+              }}>
+              Show transaction pin
+            </Checkbox>
+          </Center>
         </View>
 
         <TouchableOpacity
-          style={{marginTop: 40}}
-          disabled={disableit}
-          onPress={createPayment}>
-          <Buttons label={'Submit'} disabled={disableit} />
+          onPress={createPayment}
+          style={{marginBottom: 20, marginHorizontal: 20}}>
+          <Buttons label={'Verify'} disabled={disableit} />
         </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
@@ -394,7 +431,7 @@ const BillPin = ({route}) => {
 
 export default BillPin;
 
-const styles = StyleSheet.create({
+const internalStyles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: 16,

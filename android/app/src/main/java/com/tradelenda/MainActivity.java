@@ -13,7 +13,8 @@ public class MainActivity extends ReactActivity {
     protected void onCreate(Bundle savedInstanceState) {
        try {
         SplashScreen.show(this);
-        super.onCreate(savedInstanceState);
+        // super.onCreate(savedInstanceState);
+         super.onCreate(null);
       } catch (Exception e) {
           // e.printStackTrace();
           // Handle the exception here, if needed
