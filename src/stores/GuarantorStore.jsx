@@ -32,7 +32,7 @@ const createGuarantor = async data => {
           headers,
         });
         DdLogs.info(
-          `Guarantors | Create Guarantor | ${auth?.currentUser?.email}`,
+          `Guarantors | Create Guarantor | ${auth()?.currentUser?.email}`,
           {
             context: JSON.stringify(response?.data),
           },
@@ -46,7 +46,7 @@ const createGuarantor = async data => {
         };
       } catch (error) {
         DdLogs.error(
-          `Guarantors | Create Guarantor | ${auth?.currentUser?.email}`,
+          `Guarantors | Create Guarantor | ${auth()?.currentUser?.email}`,
           {
             errorMessage: JSON.stringify(error),
           },
@@ -86,7 +86,7 @@ const getGuarantors = async () => {
           headers,
         });
         DdLogs.info(
-          `Guarantors | Get Guarantors | ${auth?.currentUser?.email}`,
+          `Guarantors | Get Guarantors | ${auth()?.currentUser?.email}`,
           {
             context: JSON.stringify(response?.data),
           },
@@ -99,7 +99,7 @@ const getGuarantors = async () => {
         };
       } catch (error) {
         DdLogs.error(
-          `Guarantors | Get Guarantors | ${auth?.currentUser?.email}`,
+          `Guarantors | Get Guarantors | ${auth()?.currentUser?.email}`,
           {
             errorMessage: JSON.stringify(error),
           },
@@ -139,7 +139,7 @@ const getGuarantor = async id => {
           headers,
         });
         DdLogs.info(
-          `Guarantors | Get Guarantor | ${auth?.currentUser?.email}`,
+          `Guarantors | Get Guarantor | ${auth()?.currentUser?.email}`,
           {
             context: JSON.stringify(response?.data),
           },
@@ -152,7 +152,7 @@ const getGuarantor = async id => {
         };
       } catch (error) {
         DdLogs.error(
-          `Guarantors | Get Guarantor | ${auth?.currentUser?.email}`,
+          `Guarantors | Get Guarantor | ${auth()?.currentUser?.email}`,
           {
             errorMessage: JSON.stringify(error),
           },
@@ -195,7 +195,7 @@ const sendOtp = async data => {
             headers,
           },
         );
-        DdLogs.info(`Guarantors | Send Otp | ${auth?.currentUser?.email}`, {
+        DdLogs.info(`Guarantors | Send Otp | ${auth()?.currentUser?.email}`, {
           context: JSON.stringify(response?.data),
         });
         return {
@@ -206,7 +206,7 @@ const sendOtp = async data => {
             'We have sent your guarantor a mail. You will be navigated shortly!',
         };
       } catch (error) {
-        DdLogs.error(`Guarantors | Send Otp | ${auth?.currentUser?.email}`, {
+        DdLogs.error(`Guarantors | Send Otp | ${auth()?.currentUser?.email}`, {
           errorMessage: JSON.stringify(error),
         });
         return {

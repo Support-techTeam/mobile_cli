@@ -1,6 +1,10 @@
+import { FlashList } from '@shopify/flash-list';
 import React, {useState, useRef} from 'react';
-import {FlatList, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {StyleSheet, Text, TouchableOpacity, View, Dimensions, FlatList} from 'react-native';
+import { widthPercentageToDP } from 'react-native-responsive-screen';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+
+const SLIDE_WIDTH = Dimensions.get('window').width * 1;
 
 const data = [
   {id: 'all', title: 'All Loans'},
@@ -96,18 +100,20 @@ const styles = StyleSheet.create({
   tabBar: {
     flexDirection: 'row',
     alignItems: 'center',
-
     height: 50,
-    width: '100%',
-    marginTop: 20,
+    width: SLIDE_WIDTH,
+    paddingHorizontal: 10,
+    marginTop: 8,
   },
   tab: {
     paddingHorizontal: 20,
     paddingVertical: 10,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 40,
-    marginLeft: 45,
+    // marginRight: 30,
+    // marginLeft: 60,
+    alignSelf: 'center',
+    marginHorizontal: 60,
   },
   activeTab: {
     borderBottomWidth: 2,
@@ -124,7 +130,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#eee',
     justifyContent: 'center',
     alignItems: 'center',
-    marginLeft: 10,
+    // marginLeft: 10,
     borderRadius: 15,
   },
   nextButtonText: {

@@ -8,15 +8,18 @@ import {
 import React, {useState, useEffect} from 'react';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useNavigation, useRoute} from '@react-navigation/native';
-
-import Buttons from '../../component/buttons/Buttons';
+import {Button} from '@rneui/themed';
+// import Buttons from '../../component/buttons/Buttons';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 import {getSingleArmInvestment} from '../../stores/InvestStore';
-import Spinner from 'react-native-loading-spinner-overlay';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
+import {Header} from '../../component/header/Header';
+import COLORS from '../../constants/colors';
+import CustomButton from '../../component/buttons/CustomButtons';
+import Loader from '../../component/loader/loader';
 const InvestmentDetails = () => {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
@@ -70,53 +73,26 @@ const InvestmentDetails = () => {
     <SafeAreaView
       style={{
         flex: 1,
-        paddingHorizontal: 16,
         backgroundColor: '#fff',
-        paddingTop: insets.top !== 0 ? insets.top : 18,
-        paddingBottom: insets.bottom !== 0 ? insets.bottom : 'auto',
-        paddingLeft: insets.left !== 0 ? insets.left : 'auto',
-        paddingRight: insets.right !== 0 ? insets.right : 'auto',
+        paddingTop: insets.top !== 0 ? Math.min(insets.top, 10) : 'auto',
+        paddingBottom:
+          insets.bottom !== 0 ? Math.min(insets.bottom, 10) : 'auto',
+        paddingLeft: insets.left !== 0 ? Math.min(insets.left, 10) : 'auto',
+        paddingRight: insets.right !== 0 ? Math.min(insets.right, 10) : 'auto',
       }}>
-      {isLoading && (
-        <Spinner
-          textContent={'Getting Investment...'}
-          textStyle={{color: 'white'}}
-          visible={true}
-          overlayColor="rgba(78, 75, 102, 0.7)"
-          animation="slide"
-        />
-      )}
-      <View
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-        }}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <View
-            style={{
-              borderWidth: 0.5,
-              borderColor: '#D9DBE9',
-              borderRadius: 5,
-            }}>
-            <Icon name="chevron-left" size={36} color="black" />
-          </View>
-        </TouchableOpacity>
-        <View style={styles.HeadView}>
-          <View style={styles.TopView}>
-            <Text style={styles.TextHead}>INVESTMENT DETAILS</Text>
-          </View>
-        </View>
-
-        <View style={{}}>
-          <Text>{'       '}</Text>
-        </View>
-      </View>
-      <View style={styles.demark} />
+      <Loader visible={isLoading} loadingText={'Getting investment...'} />
+      <Header
+        routeAction={() => navigation.goBack()}
+        heading={`${name?.toUpperCase()} INVESTMENT DETAILS`}
+        disable={false}
+      />
       <ScrollView
         bounces={false}
         showsHorizontalScrollIndicator={false}
-        showsVerticalScrollIndicator={false}>
+        showsVerticalScrollIndicator={false}
+        style={{
+          paddingHorizontal: 10,
+        }}>
         <View style={{padding: 16}}>
           <View style={styles.detailsView}>
             <Text style={styles.desc}>Investment</Text>
@@ -439,13 +415,7 @@ const InvestmentDetails = () => {
               flexDirection: 'row',
               justifyContent: 'space-evenly',
             }}>
-            <TouchableOpacity
-              style={{
-                marginTop: 10,
-                width: wp(40),
-                fontSize: hp(5),
-                marginHorizontal: 5,
-              }}
+            <CustomButton
               disabled={
                 (name === 'Lenda' &&
                   investment?.investmentStatus === 'CLOSED') ||
@@ -468,27 +438,15 @@ const InvestmentDetails = () => {
                     investment: investment,
                   });
                 }
-              }}>
-              <Buttons
-                label={'Top Up'}
-                disabled={
-                  (name === 'Lenda' &&
-                    investment?.investmentStatus === 'CLOSED') ||
-                  (name === 'Arm' && investment?.membershipId === null) ||
-                  (name === 'Arm' && investment?.membershipId === '') ||
-                  (name === 'Arm' && investment?.membershipId === undefined)
-                    ? true
-                    : false
-                }
-              />
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={{
-                marginTop: 10,
-                width: wp(40),
-                fontSize: hp(5),
-                marginHorizontal: 5,
               }}
+              title="Top Up"
+              textStyle={{
+                fontSize: 14,
+                fontWeight: '500',
+              }}
+              buttonStyle={[styles.btnStyle, styles.btnContainer]}
+            />
+            <CustomButton
               disabled={
                 (name === 'Lenda' &&
                   investment?.investmentStatus === 'CLOSED') ||
@@ -512,20 +470,14 @@ const InvestmentDetails = () => {
                     investment: investment,
                   });
                 }
-              }}>
-              <Buttons
-                label={'Redeem'}
-                disabled={
-                  (name === 'Lenda' &&
-                    investment?.investmentStatus === 'CLOSED') ||
-                  (name === 'Arm' && investment?.membershipId === null) ||
-                  (name === 'Arm' && investment?.membershipId === '') ||
-                  (name === 'Arm' && investment?.membershipId === undefined)
-                    ? true
-                    : false
-                }
-              />
-            </TouchableOpacity>
+              }}
+              title="Withdraw"
+              textStyle={{
+                fontSize: 14,
+                fontWeight: '500',
+              }}
+              buttonStyle={[styles.btnStyle, styles.btnContainer]}
+            />
           </View>
         </View>
       </ScrollView>
@@ -537,9 +489,6 @@ export default InvestmentDetails;
 
 const styles = StyleSheet.create({
   container: {
-    // flex: 1,
-    // paddingHorizontal: 16,
-    // backgroundColor: '#fff',
   },
   HeadView: {
     alignItems: 'center',
@@ -581,5 +530,24 @@ const styles = StyleSheet.create({
     fontFamily: 'serif',
     fontSize: 16,
     flexShrink: 1,
+  },
+  btnStyle: {
+    borderRadius: 5,
+    borderColor: COLORS.lendaBlue,
+    paddingHorizontal: 15,
+    backgroundColor: COLORS.lendaBlue,
+    fontSize: hp(2.5),
+    height: 40,
+    width: '40%',
+  },
+  btnContainer: {
+    marginTop: 10,
+    width: wp(40),
+    fontSize: hp(5),
+    height: 50,
+    marginHorizontal: 5,
+    borderRadius: 5,
+    borderColor: COLORS.lendaBlue,
+    backgroundColor: COLORS.lendaBlue,
   },
 });

@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useLayoutEffect} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 
@@ -8,6 +8,7 @@ import PersonalDetails from '../screens/ProfileOnboardings/PersonalDetails';
 import Splashscreen from './Splashscreen';
 import BottomTabs from './bottomTabs';
 import TransactionScreen from '../screens/HomeScreens/TransactionScreen';
+import TransactionHistory from '../screens/HomeScreens/TransactionHistory';
 import BankDeets from '../screens/TransferScreens/BankDeets';
 import Summary from '../screens/TransferScreens/Summary';
 import Pin from '../screens/TransferScreens/Pin';
@@ -39,21 +40,11 @@ import {
 import FinalSubmit from '../screens/ProfileOnboardings/AddDocuments/FinalSubmit';
 import Securindex from '../screens/SecurityScreens/Securindex';
 import TransPin from '../screens/SecurityScreens/TransPin';
-import PinCon from '../screens/SecurityScreens/PinCon';
-import PinSuccess from '../screens/SecurityScreens/PinSuccess';
-import LockPin from '../screens/SecurityScreens/LockPin';
-import ResetPin from '../screens/SecurityScreens/ResetPin';
-import SetLockPin from '../screens/SecurityScreens/SetPinScreen';
-import ResetLockPin from '../screens/SecurityScreens/ResetLockPin';
-import ChangeLockPin from '../screens/SecurityScreens/ChangeLockPin';
-import {Airtime, Homescreen, Paybills} from '../screens/HomeScreens';
-import AirtimeConfirm from '../screens/paybills/AirtimeConfirm';
+import {Paybills} from '../screens/HomeScreens';
 import BillPin from '../screens/paybills/billPin';
+import AirtimeConfirm from '../screens/paybills/AirtimeConfirm';
 import StatusFailed from '../screens/paybills/StatusFailed';
 import StatusPage from '../screens/paybills/StausPage';
-import GetData from '../screens/paybills/GetData';
-import Electric from '../screens/paybills/ElectricityBills';
-import Cable from '../screens/paybills/Cable';
 import {
   InvestmentOption,
   InvestmentSummary,
@@ -63,6 +54,8 @@ import {
   InvestmentTopup,
   InvestmentRedemption,
 } from '../screens/InvestScreens';
+import SupportScreen from '../screens/MoreScreens/SupportScreen';
+import NotificationsScreen from '../screens/MoreScreens/NotificationsScreen';
 //Pending
 
 // import BeneficiaryList from '../screens/TransferScreens/BeneficiaryList';
@@ -70,6 +63,12 @@ import auth from '@react-native-firebase/auth';
 // import {auth} from '../util/firebase/firebaseConfig';
 import {getProfileDetails} from '../stores/ProfileStore';
 import {setProfile} from '../util/redux/userProfile/user.profile.slice';
+import Step3 from '../screens/ProfileOnboardings/StepForm/Step3';
+import Step2 from '../screens/ProfileOnboardings/StepForm/Step2';
+import Step1 from '../screens/ProfileOnboardings/StepForm/Step1';
+import ResetPassword from '../screens/Authentications/ResetPassword';
+import WalletIndex from '../screens/WalletScreens/WalletIndex';
+import Overview from '../screens/paybills/Overview';
 
 const Stack = createNativeStackNavigator();
 const config = {
@@ -85,13 +84,13 @@ const config = {
 };
 const AppStack = () => {
   const dispatch = useDispatch();
-  const userData = useSelector(state => state.userAuth.user);
   const isVerified = auth().currentUser?.emailVerified;
   const userProfileData = useSelector(state => state.userProfile.profile);
   const [timeOut, setTimeOut] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
+  // fetch profile
   useEffect(() => {
-    // fetch profile
     if (auth().currentUser !== null) {
       const fetchState = async () => {
         try {
@@ -117,7 +116,13 @@ const AppStack = () => {
       setTimeOut(true);
     }, 5000);
   });
-  
+
+  useLayoutEffect(() => {
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 2000);
+  }, []);
+
   return isVerified === undefined && !timeOut ? (
     <Stack.Navigator screenOptions={{headerShown: false}}>
       <Stack.Screen
@@ -134,7 +139,16 @@ const AppStack = () => {
     </Stack.Navigator>
   ) : (
     <Stack.Navigator screenOptions={{headerShown: false}}>
-      {auth().currentUser && isVerified === false && userProfileData?.profileProgress == null ? (
+      {isLoading && (
+        <Stack.Screen
+          name="Loading"
+          component={Splashscreen}
+          options={{headerShown: false}}
+        />
+      )}
+      {auth().currentUser &&
+      isVerified === false &&
+      userProfileData?.profileProgress == null ? (
         <Stack.Screen
           name="Verification"
           component={Verification}
@@ -160,7 +174,14 @@ const AppStack = () => {
             }}
           />
           <Stack.Screen name="Transaction" component={TransactionScreen} />
+          <Stack.Screen
+            name="TransactionHistory"
+            component={TransactionHistory}
+          />
           <Stack.Screen name="PersonalDetails" component={PersonalDetails} />
+          <Stack.Screen name="Step1" component={Step1} />
+          <Stack.Screen name="Step2" component={Step2} />
+          <Stack.Screen name="Step3" component={Step3} />
           {/* Transfer Screens */}
           <Stack.Screen name="Transfer" component={BankDeets} />
           <Stack.Screen name="Summary" component={Summary} />
@@ -183,18 +204,12 @@ const AppStack = () => {
           <Stack.Screen name="ArmDetails" component={ArmDetails} />
           {/* Settings */}
           <Stack.Screen name="MyAccount" component={MyAccount} />
+          {/* Wallet Options */}
+          <Stack.Screen name="WalletIndex" component={WalletIndex} />
           {/* Security */}
           <Stack.Screen name="Security" component={Securindex} />
-          <Stack.Screen name="PinSuccess" component={PinSuccess} />
-          <Stack.Screen name="PinCon" component={PinCon} />
-          <Stack.Screen name="LockPin" component={LockPin} />
           <Stack.Screen name="SetPin" component={TransPin} />
-          <Stack.Screen name="ResetPin" component={ResetPin} />
-          {/* App Lock */}
-          <Stack.Screen name="SetLockPin" component={SetLockPin} />
-          <Stack.Screen name="ResetLockPin" component={ResetLockPin} />
-          {/* <Stack.Screen name="EnterPin" component={EnterPin} /> */}
-          <Stack.Screen name="ChangeLockPin" component={ChangeLockPin} />
+          <Stack.Screen name="ResetPassword" component={ResetPassword} />
           {/* Documents */}
           <Stack.Screen name="ValidIdentity" component={ValidIdentity} />
           <Stack.Screen name="ProofOfAddress" component={ProofOfAddress} />
@@ -209,10 +224,7 @@ const AppStack = () => {
           <Stack.Screen name="Others" component={Others} />
           {/* Bill payment */}
           <Stack.Screen name="Paybills" component={Paybills} />
-          <Stack.Screen name="airtime" component={Airtime} />
-          <Stack.Screen name="data_bundle" component={GetData} />
-          <Stack.Screen name="electricity" component={Electric} />
-          <Stack.Screen name="cable_tv" component={Cable} />
+          <Stack.Screen name="Overview" component={Overview} />
           <Stack.Screen name="AirtimeConfirm" component={AirtimeConfirm} />
           <Stack.Screen name="BillPin" component={BillPin} />
           <Stack.Screen name="StatusFailed" component={StatusFailed} />
@@ -239,6 +251,11 @@ const AppStack = () => {
           <Stack.Screen
             name="InvestmentRedemption"
             component={InvestmentRedemption}
+          />
+          <Stack.Screen name="SupportScreen" component={SupportScreen} />
+          <Stack.Screen
+            name="NotificationsScreen"
+            component={NotificationsScreen}
           />
         </>
       )}

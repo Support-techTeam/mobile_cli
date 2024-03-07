@@ -1,32 +1,15 @@
-/* eslint-disable react/no-unstable-nested-components */
 import {
-  View,
-  Text,
   StyleSheet,
   ScrollView,
-  TouchableOpacity,
-  Dimensions,
-  Image,
-  ImageBackground,
-  Pressable,
-  TouchableWithoutFeedback,
-  ToastAndroid,
   NativeModules,
   RefreshControl,
+  ActivityIndicator,
 } from 'react-native';
-import React, {useEffect, useRef, useState} from 'react';
-import {Actionsheet, Modal, Center, Button as Btn} from 'native-base';
-import {Button} from 'react-native-paper';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import OctaIcon from 'react-native-vector-icons/Octicons';
-import EntypoIcon from 'react-native-vector-icons/Entypo';
-import FontIcon from 'react-native-vector-icons/FontAwesome';
+import React, {useCallback, useEffect, useState} from 'react';
 import {useNavigation, useFocusEffect} from '@react-navigation/native';
 import {useClipboard} from '@react-native-clipboard/clipboard';
-import Spinner from 'react-native-loading-spinner-overlay/lib';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 import COLORS from '../../constants/colors';
-import LinearGradient from 'react-native-linear-gradient';
 import {useSelector, useDispatch} from 'react-redux';
 import Toast from 'react-native-toast-message';
 import {
@@ -42,7 +25,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
-import Carousel from 'react-native-snap-carousel';
+
 import {getGuarantors} from '../../stores/GuarantorStore';
 import {
   getAllArmInvestment,
@@ -51,21 +34,27 @@ import {
   getLendaTransactionsStatement,
   getSingleArmInvestment,
 } from '../../stores/InvestStore';
-import DateTimePickerModal from 'react-native-modal-datetime-picker';
-import Input from '../../component/inputField/input.component';
 import {
   getTransactionsStatement,
   getAccountWallet,
   getAccountTransactions,
 } from '../../stores/WalletStore';
+import {IntroSection} from '../../component/homescreen/Intro-Section';
+import {SlideSection} from '../../component/homescreen/Slide-Section';
+import {ItemsSection} from '../../component/homescreen/Items-Section';
+import {SingleTransactionSection} from '../../component/homescreen/Single-Transaction-Section';
+import {LendaStatementModal} from '../../component/modals/LendaStatementModal';
+import {ArmStatementModal} from '../../component/modals/ArmStatementModal';
+import {WalletStatementModal} from '../../component/modals/WalletStatementModal';
+import {UpdateProfileBtn} from '../../component/homescreen/Update-Profile-Btn';
+import {FundWalletSection} from '../../component/homescreen/FundWallet-Section';
+import {MakeTransferSection} from '../../component/homescreen/MakeTransferSection';
 
-const {width} = Dimensions.get('window');
 const Homescreen = () => {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
   const [isMakeTransferVisible, setIsMakeTransferVisible] = useState(false);
   const [isFundWalletVisible, setIsFundWalletVisible] = useState(false);
-  const [isAllTransactionVisible, setIsAllTransactionVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isSending, setIsSending] = useState(false);
   const [isLoadingWallet, setIsLoadingWallet] = useState(false);
@@ -75,9 +64,6 @@ const Homescreen = () => {
   const [isLoadingArm, setIsLoadingArm] = useState(false);
   const [isLoadingLoanAmount, setIsLoadingLoanAmount] = useState(false);
   const [isLoadingPullDown, setIsLoadingPullDown] = useState(false);
-  const [isPrevious, setPrevious] = useState(false);
-  const [isNext, setNext] = useState(false);
-  const [isFetching, setIsFetching] = useState(false);
   //Redux Calls
   const userProfileData = useSelector(state => state.userProfile.profile);
   const userWalletData = useSelector(state => state.userProfile.wallet);
@@ -92,12 +78,10 @@ const Homescreen = () => {
   const route = useRoute();
   const [loanUserDetails, setLoanUserDetails] = useState(undefined);
   const [userPin, setUserPin] = useState(true);
-  const [isScrolling, setIsScrolling] = useState(false);
   const [guarantor, setGuarantor] = useState([]);
   const dispatch = useDispatch();
   const [allArmData, setAllArmData] = useState([]);
   const [allILendaData, setAllLendaData] = useState([]);
-  // const [investmentDetail, setInvestmentDetail] = useState([]);
   const [portfolioDetail, setPortfolioDetail] = useState(0);
   // Modal Codes
   // Wallet
@@ -125,48 +109,17 @@ const Homescreen = () => {
     startDate: new Date().toISOString().split('T')[0],
     endDate: new Date().toISOString().split('T')[0],
   });
+  const [hideBalance, setHideBalance] = useState(true);
+  const toggleHideBalance = () => {
+    setHideBalance(!hideBalance);
+  };
+
   const toggleMakeTransfer = () => {
     setIsMakeTransferVisible(!isMakeTransferVisible);
   };
 
   const toggleFundWallet = () => {
     setIsFundWalletVisible(!isFundWalletVisible);
-  };
-
-  const toggleAllTransaction = async () => {
-    setIsAllTransactionVisible(!isAllTransactionVisible);
-    setIsFetching(true);
-    getAccountTransactions(0, 10)
-      .then(res => {
-        if (res) {
-          if (!res?.error) {
-            setCurrentPage(0);
-            if (
-              res?.data?.transactions?.transaction !== undefined &&
-              res?.data?.transactions?.transaction !== null
-            ) {
-              setAllUserTransactionsData(res?.data?.transactions?.transaction);
-              setUserTransactionsPages(res?.data?.transactions?.maxPages);
-              setUserTransactionsTotal(res?.data?.transactions?.count);
-            }
-          } else {
-            Toast.show({
-              type: 'error',
-              position: 'top',
-              topOffset: 50,
-              text1: res?.title,
-              text2: res?.message,
-              visibilityTime: 5000,
-              autoHide: true,
-              onPress: () => Toast.hide(),
-            });
-          }
-        }
-      })
-      .catch(error => {})
-      .finally(() => {
-        setIsFetching(false);
-      });
   };
 
   //total ARM Investment
@@ -194,35 +147,22 @@ const Homescreen = () => {
     }, 3000);
   });
 
-  useEffect(() => {
-    unsubGetWallet();
-    getGuarantorData();
-    getAllLendaInvestments();
-    getAllArmInvestments();
-    unsubGetAllTransactions();
-    unsubGetTransactions();
-  }, []);
-
-  useEffect(() => {
-    unsubCheckPin();
-  }, []);
-
-  // Navigation useEffect Hook
   useFocusEffect(
-    React.useCallback(() => {
-      if (route?.name === 'Home') {
-        unsubGetWallet();
-        unsubGetTransactions();
-        unsubGetLoanAmount();
-        getLoanUserData();
-        getGuarantorData();
-        getAllLendaInvestments();
-        getAllArmInvestments();
-      }
+    useCallback(() => {
+      unsubGetWallet();
+      getGuarantorData();
+      getAllLendaInvestments();
+      getAllArmInvestments();
+      unsubGetAllTransactions();
+      unsubGetTransactions();
     }, []),
   );
 
-  // Timed useEffect
+  useEffect(() => {
+    unsubCheckPin();
+  }, [userPin]);
+
+  // // Timed useEffect
   useEffect(() => {
     const interval = setInterval(async () => {
       getAccountWallet()
@@ -264,12 +204,6 @@ const Homescreen = () => {
     return () => {
       clearInterval(interval);
     };
-  }, []);
-
-  useEffect(() => {
-    if (userProfileData?.profileProgress == 31) {
-      NativeModules.DevSettings.reload();
-    }
   }, []);
 
   useEffect(() => {
@@ -470,72 +404,6 @@ const Homescreen = () => {
     }
   };
 
-  const handleGetPreviousPage = async () => {
-    if (currentPage !== 0) {
-      setPrevious(true);
-      const prevPage = currentPage - 1;
-      getAccountTransactions(prevPage, 10)
-        .then(res => {
-          if (res) {
-            if (!res?.error) {
-              setCurrentPage(currentPage - 1);
-              setAllUserTransactionsData(res?.data?.transactions?.transaction);
-              setUserTransactionsPages(res?.data?.transactions?.maxPages);
-              setUserTransactionsTotal(res?.data?.transactions?.count);
-            } else {
-              Toast.show({
-                type: 'error',
-                position: 'top',
-                topOffset: 50,
-                text1: res?.title,
-                text2: res?.message,
-                visibilityTime: 5000,
-                autoHide: true,
-                onPress: () => Toast.hide(),
-              });
-            }
-          }
-        })
-        .catch(e => {})
-        .finally(() => {
-          setPrevious(false);
-        });
-    }
-  };
-
-  const handleGetNextPage = async () => {
-    if (currentPage !== Number(userTransactionsPages)) {
-      setNext(true);
-      const nextPage = currentPage + 1;
-      getAccountTransactions(nextPage, 10)
-        .then(res => {
-          if (res) {
-            if (!res?.error) {
-              setCurrentPage(nextPage);
-              setAllUserTransactionsData(res?.data?.transactions?.transaction);
-              setUserTransactionsPages(res?.data?.transactions?.maxPages);
-              setUserTransactionsTotal(res?.data?.transactions?.count);
-            } else {
-              Toast.show({
-                type: 'error',
-                position: 'top',
-                topOffset: 50,
-                text1: res?.title,
-                text2: res?.message,
-                visibilityTime: 5000,
-                autoHide: true,
-                onPress: () => Toast.hide(),
-              });
-            }
-          }
-        })
-        .catch(e => {})
-        .finally(() => {
-          setNext(false);
-        });
-    }
-  };
-
   const getLoanUserData = async () => {
     setIsLoadingLoanData(true);
     getLoanUserDetails()
@@ -558,286 +426,6 @@ const Homescreen = () => {
       .finally(() => {
         setIsLoadingLoanData(false);
       });
-  };
-
-  const carouselRef = useRef(null);
-
-  const slides = [
-    {
-      id: '3',
-      title: 'My investment',
-      balance:
-        Number(portfolioDetail) !== 0
-          ? new Intl.NumberFormat('en-US', {
-              style: 'decimal',
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            }).format(Number(portfolioDetail) + totalLendaAmount)
-          : new Intl.NumberFormat('en-US', {
-              style: 'decimal',
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            }).format(totalArmAmount + totalLendaAmount),
-      button: 'View investment',
-      extra: '',
-      image: require('../../../assets/icons/wallet_background.png'),
-    },
-    {
-      id: '2',
-      title: 'Loan balance',
-      balance: `${
-        userLoanAmount?.totalLoanAmount === undefined
-          ? '0.00'
-          : `${
-              userLoanAmount?.totalLoanAmount === 0
-                ? '0.00'
-                : new Intl.NumberFormat('en-US', {
-                    style: 'decimal',
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  }).format(userLoanAmount?.totalLoanAmount)
-            }`
-      }`,
-      button: 'Get loan',
-      extra: 'Loan details',
-    },
-    {
-      id: '1',
-      title: 'Wallet balance',
-      balance:
-        userWalletData &&
-        userWalletData?.availableBalance &&
-        userWalletData?.availableBalance !== null &&
-        userWalletData?.availableBalance !== undefined
-          ? new Intl.NumberFormat('en-US', {
-              style: 'decimal',
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            }).format(userWalletData?.availableBalance)
-          : '0.00',
-      accountName:
-        userWalletData && userWalletData?.walletIdAccountNumber
-          ? userWalletData?.walletIdAccountNumber
-          : 'N/A',
-      button: 'Fund wallet',
-      extra: '',
-      image: require('../../../assets/icons/wallet_background.png'),
-    },
-  ];
-
-  const Slide = ({item}) => {
-    const [hideBalance, setHideBalance] = useState(true);
-    const toggleHideBalance = () => {
-      setHideBalance(!hideBalance);
-    };
-
-    return (
-      <LinearGradient
-        colors={
-          item.title === 'Wallet balance'
-            ? ['#F7F7FC', '#F7F7FC']
-            : item.title === 'Loan balance'
-            ? ['#010C4D', '#0384FF']
-            : ['#06A75D', '#06A76B']
-        }
-        start={
-          item.title === 'Wallet balance'
-            ? {x: 0.01, y: 0}
-            : item.title === 'Loan balance'
-            ? {x: 0, y: 0}
-            : {x: 0.01, y: 0}
-        }
-        end={
-          item.title === 'Wallet balance'
-            ? {x: 0.5, y: 0.5}
-            : item.title === 'Loan balance'
-            ? {x: 1, y: 1}
-            : {x: 0.5, y: 0.5}
-        }
-        angle={114}
-        style={[
-          styles.gradient,
-          {
-            borderWidth: item.title === 'Wallet balance' ? 1 : 0,
-            borderColor:
-              item.title === 'Wallet balance' ? '#b7d8fd' : '#ffffff',
-          },
-        ]}>
-        <ImageBackground
-          source={require('../../../assets/icons/wallet_background.png')}>
-          <View style={{marginVertical: 10, marginHorizontal: 18}}>
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-              }}>
-              {item.title === 'Wallet balance' && (
-                <View style={styles.card}>
-                  <EntypoIcon name="wallet" size={24} color="#054B99" />
-                  <Text style={styles.wallet}>{item.title}</Text>
-                </View>
-              )}
-
-              {item.title === 'Loan balance' && (
-                <View style={styles.card}>
-                  <Icon name="poll" size={24} color="white" />
-                  <Text style={[styles.wallet, {color: '#fff'}]}>
-                    {item.title}
-                  </Text>
-                </View>
-              )}
-
-              {item.title === 'My investment' && (
-                <View style={styles.card}>
-                  <Icon name="poll" size={24} color="white" />
-                  <Text style={[styles.wallet, {color: '#fff'}]}>
-                    {item.title}
-                  </Text>
-                </View>
-              )}
-
-              <FontIcon
-                size={25}
-                color={item.title === 'Wallet balance' ? '#054B99' : '#FFFFFF'}
-                name={hideBalance ? 'eye' : 'eye-slash'}
-                onPress={toggleHideBalance}
-              />
-            </View>
-
-            <Text
-              style={[
-                styles.prices,
-                {
-                  color:
-                    item.title === 'Wallet balance' ? '#054B99' : '#FFFFFF',
-                },
-              ]}>
-              {hideBalance ? '₦******' : `₦${item.balance}`}
-            </Text>
-
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-              }}>
-              {item.button === 'Get loan' && (
-                <TouchableOpacity
-                  onPress={() => {
-                    if (guarantor && guarantor.length <= 0) {
-                      Toast.show({
-                        type: 'warning',
-                        position: 'top',
-                        topOffset: 50,
-                        text1: 'Guarantor Data',
-                        text2: 'Guarantor Data is not available',
-                        visibilityTime: 2000,
-                        autoHide: true,
-                        onPress: () => Toast.hide(),
-                      });
-                    }
-                    navigation.navigate(
-                      `${
-                        loanUserDetails === undefined ||
-                        loanUserDetails?.loanDocumentDetails
-                          ?.validIdentification === undefined
-                          ? 'OnboardingHome'
-                          : guarantor && guarantor.length > 0
-                          ? 'GetLoan'
-                          : 'AddGuarantors'
-                      }`,
-                    );
-                  }}
-                  style={styles.fundView}>
-                  <Text style={styles.FundButton}>{item.button}</Text>
-                </TouchableOpacity>
-              )}
-
-              {item.button === 'View investment' && (
-                <TouchableOpacity
-                  onPress={() => {
-                    navigation.navigate('Invest');
-                  }}
-                  style={styles.fundView}>
-                  <Text style={styles.FundButton}>{item.button}</Text>
-                </TouchableOpacity>
-              )}
-
-              {item.button === 'Fund wallet' && (
-                <View
-                  style={{
-                    flex: 1,
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                  }}>
-                  <TouchableOpacity
-                    style={[styles.fundView, {backgroundColor: '#054B99'}]}
-                    onPress={() => toggleFundWallet()}>
-                    <Text style={[styles.FundButton, {color: '#FFFFFF'}]}>
-                      {item.button}
-                    </Text>
-                  </TouchableOpacity>
-                  {item.accountName && (
-                    <View>
-                      <Text
-                        style={{
-                          color: '#6E7191',
-                          marginTop: 5,
-                          fontFamily: 'Montserat',
-                          fontWeight: '400',
-                          textAlign: 'right',
-                        }}>
-                        Providus Bank
-                      </Text>
-                      <View
-                        style={{
-                          flex: 1,
-                          flexDirection: 'row',
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                        }}>
-                        <TouchableWithoutFeedback>
-                          <Text
-                            style={{
-                              color: '#14142A',
-                              marginTop: 5,
-                              fontFamily: 'Montserat',
-                              fontWeight: '400',
-                              textAlign: 'right',
-                            }}>
-                            {item.accountName}
-                          </Text>
-                        </TouchableWithoutFeedback>
-                        <TouchableWithoutFeedback>
-                          <FontIcon
-                            size={17}
-                            color={COLORS.lendaBlue}
-                            name="copy"
-                            style={{marginLeft: 4}}
-                            onPress={() => handleLongPress(item.accountName)}
-                          />
-                        </TouchableWithoutFeedback>
-                      </View>
-                    </View>
-                  )}
-                </View>
-              )}
-
-              <TouchableOpacity
-                onPress={() => {
-                  navigation.navigate('Loan');
-                }}>
-                <Text
-                  style={[styles.extrat, {color: '#fff', fontWeight: 'bold'}]}>
-                  {item.extra}
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </ImageBackground>
-      </LinearGradient>
-    );
   };
 
   // Wallet Statement Functions
@@ -1060,27 +648,276 @@ const Homescreen = () => {
       });
   };
 
-  return !timeOut ? (
-    <Splashscreen text="Getting Profile Details..." />
-  ) : timeOut &&
-    userProfileData &&
-    userProfileData?.profileProgress === null ? (
-    <PersonalDetails />
-  ) : (
-    timeOut &&
-    userProfileData &&
-    userProfileData?.profileProgress !== null && (
-      <SafeAreaView
-        style={{
-          flex: 1,
-          height: hp('100%'),
-          width: wp('100%'),
-          backgroundColor: '#FCFCFC',
-          paddingTop: insets.top !== 0 ? insets.top : 18,
-          paddingBottom: insets.bottom !== 0 ? insets.bottom / 2 : 'auto',
-          paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
-          paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
-        }}>
+  const buttonItems = [
+    {
+      buttonText: 'Fund Wallet',
+      buttonImage: 'wallet-plus-outline',
+      buttonImageColor: COLORS.lendaBlue,
+      buttonAction: toggleFundWallet,
+      buttonTextColor: COLORS.lendaBlue,
+      buttonColor: COLORS.lendaBlue,
+      buttonBackground: COLORS.white,
+      buttonIcon: true,
+    },
+    {
+      buttonText: 'Make Transfer',
+      buttonImage: 'bank-transfer',
+      buttonImageColor: COLORS.lendaOrange,
+      buttonAction: toggleMakeTransfer,
+      buttonTextColor: COLORS.lendaBlue,
+      buttonColor: COLORS.lendaOrange,
+      buttonBackground: COLORS.white,
+      buttonIcon: true,
+    },
+    {
+      buttonText: 'Bill Payment',
+      buttonImage: 'cash-multiple',
+      buttonImageColor: COLORS.lendaGreen,
+      buttonAction: () => navigation.navigate('Paybills'),
+      buttonTextColor: COLORS.lendaBlue,
+      buttonColor: COLORS.lendaGreen,
+      buttonBackground: COLORS.white,
+      buttonIcon: true,
+    },
+    {
+      buttonText: 'Save With ARM',
+      buttonImage: require('../../../assets/images/arm.png'),
+      buttonImageColor: COLORS.highwayRed,
+      buttonAction: () => navigation.navigate('Invest'),
+      buttonTextColor: COLORS.lendaBlue,
+      buttonColor: COLORS.highwayRed,
+      buttonBackground: COLORS.white,
+      buttonIcon: false,
+    },
+    {
+      buttonText: 'Earn With Us',
+      buttonImage: require('../../../assets/images/lenda.png'),
+      buttonImageColor: COLORS.lendaGreen,
+      buttonAction: () => navigation.navigate('Invest'),
+      buttonTextColor: COLORS.lendaBlue,
+      buttonColor: COLORS.lendaGreen,
+      buttonBackground: COLORS.white,
+      buttonIcon: false,
+    },
+    {
+      buttonText: 'Get Loan',
+      buttonImage: require('../../../assets/images/approvedLoan.png'),
+      buttonImageColor: COLORS.lendaBlue,
+      buttonAction: () => {
+        if (guarantor && guarantor.length <= 0) {
+          Toast.show({
+            type: 'warning',
+            position: 'top',
+            topOffset: 50,
+            text1: 'Guarantor Data',
+            text2: 'Guarantor Data is not available',
+            visibilityTime: 2000,
+            autoHide: true,
+            onPress: () => Toast.hide(),
+          });
+        }
+        navigation.navigate(
+          `${
+            loanUserDetails === undefined ||
+            loanUserDetails?.loanDocumentDetails?.validIdentification ===
+              undefined
+              ? 'OnboardingHome'
+              : guarantor && guarantor.length > 0
+              ? 'GetLoan'
+              : 'AddGuarantors'
+          }`,
+        );
+      },
+      buttonTextColor: COLORS.lendaBlue,
+      buttonColor: COLORS.lendaBlue,
+      buttonBackground: COLORS.white,
+      buttonIcon: false,
+    },
+    {
+      buttonText: 'ARM eStatement',
+      buttonImage: 'file-document-outline',
+      buttonImageColor: COLORS.highwayRed,
+      buttonAction: () => {
+        setShowArmStatementModal(true);
+      },
+      buttonTextColor: COLORS.lendaBlue,
+      buttonColor: COLORS.highwayRed,
+      buttonBackground: COLORS.white,
+      buttonIcon: true,
+    },
+    {
+      buttonText: 'Earn With Us eStatement',
+      buttonImage: 'file-document-outline',
+      buttonImageColor: COLORS.lendaGreen,
+      buttonAction: () => {
+        setShowLendaStatementModal(true);
+      },
+      buttonTextColor: COLORS.lendaBlue,
+      buttonColor: COLORS.lendaGreen,
+      buttonBackground: COLORS.white,
+      buttonIcon: true,
+    },
+    {
+      buttonText: 'Wallet eStatement',
+      buttonImage: 'file-document-outline',
+      buttonImageColor: COLORS.lendaBlue,
+      buttonAction: () => {
+        setShowWalletStatementModal(true);
+      },
+      buttonTextColor: COLORS.lendaBlue,
+      buttonColor: COLORS.lendaBlue,
+      buttonBackground: COLORS.white,
+      buttonIcon: true,
+    },
+  ];
+
+  const renderOverLayComponents = () => {
+    return (
+      <>
+        {/* Fund Wallet Section */}
+        <FundWalletSection
+          isFundWalletVisible={isFundWalletVisible}
+          toggleFundWallet={toggleFundWallet}
+          userProfileData={userProfileData}
+          userWalletData={userWalletData}
+          handleLongPress={handleLongPress}
+        />
+
+        {/* Make Transfer Section */}
+        <MakeTransferSection
+          isMakeTransferVisible={isMakeTransferVisible}
+          toggleMakeTransfer={toggleMakeTransfer}
+          setIsMakeTransferVisible={setIsMakeTransferVisible}
+        />
+
+        {/* E-Statements Modal */}
+        {/* Wallet Statement Modal */}
+        <WalletStatementModal
+          showWalletStatementModal={showWalletStatementModal}
+          setShowWalletStatementModal={setShowWalletStatementModal}
+          showDatePickerStartWallet={showDatePickerStartWallet}
+          walletStatementDetails={walletStatementDetails}
+          setWalletStatementDetails={setWalletStatementDetails}
+          hideDatePickerStartWallet={hideDatePickerStartWallet}
+          showDatePickerEndWallet={showDatePickerEndWallet}
+          hideDatePickerEndWallet={hideDatePickerEndWallet}
+          handleWalletStatement={handleWalletStatement}
+          showStartWallet={showStartWallet}
+          showEndWallet={showEndWallet}
+          setShowStartWallet={setShowStartWallet}
+          setShowEndWallet={setShowEndWallet}
+        />
+
+        {/* ARM Statement Modal */}
+        <ArmStatementModal
+          allArmData={allArmData}
+          showArmStatementModal={showArmStatementModal}
+          setShowArmStatementModal={setShowArmStatementModal}
+          showDatePickerStartArm={showDatePickerStartArm}
+          armStatementDetails={armStatementDetails}
+          setArmStatementDetails={setArmStatementDetails}
+          hideDatePickerStartArm={hideDatePickerStartArm}
+          showDatePickerEndArm={showDatePickerEndArm}
+          hideDatePickerEndArm={hideDatePickerEndArm}
+          handleArmStatement={handleArmStatement}
+          showStartArm={showStartArm}
+          showEndArm={showEndArm}
+          setShowStartArm={setShowStartArm}
+          setShowEndArm={setShowEndArm}
+        />
+
+        {/* Lenda Statement Modal */}
+        <LendaStatementModal
+          showLendaStatementModal={showLendaStatementModal}
+          setShowLendaStatementModal={setShowLendaStatementModal}
+          showDatePickerStartLenda={showDatePickerStartLenda}
+          lendaStatementDetails={lendaStatementDetails}
+          setLendaStatementDetails={setLendaStatementDetails}
+          hideDatePickerStartLenda={hideDatePickerStartLenda}
+          showDatePickerEndLenda={showDatePickerEndLenda}
+          hideDatePickerEndLenda={hideDatePickerEndLenda}
+          handleLendaStatement={handleLendaStatement}
+          showStartLenda={showStartLenda}
+          showEndLenda={showEndLenda}
+          setShowStartLenda={setShowStartLenda}
+          setShowEndLenda={setShowEndLenda}
+        />
+      </>
+    );
+  };
+
+  const renderHeaderComponents = () => {
+    return (
+      <>
+        {/* First Section */}
+        <IntroSection
+          userProfileData={userProfileData}
+          loanUserDetails={loanUserDetails}
+        />
+
+        {/* Second Section */}
+        <SlideSection
+          portfolioDetail={portfolioDetail}
+          userWalletData={userWalletData}
+          totalLendaAmount={totalLendaAmount}
+          userLoanAmount={userLoanAmount}
+          guarantor={guarantor}
+          totalArmAmount={totalArmAmount}
+          hideBalance={hideBalance}
+          toggleHideBalance={toggleHideBalance}
+          handleLongPress={handleLongPress}
+          toggleFundWallet={toggleFundWallet}
+        />
+      </>
+    );
+  };
+
+  const renderOptionalComponents = () => {
+    return (
+      <>
+        {/* Optional Section */}
+        {!userPin && (
+          <UpdateProfileBtn
+            title="Attention Needed !!!"
+            body="Click here to create your transaction pin"
+            image={require('../../../assets/images/badge.png')}
+            action={() => navigation.navigate('SetPin')}
+          />
+        )}
+
+        {/* Optional Section */}
+        {loanUserDetails === undefined ||
+        loanUserDetails?.loanDocumentDetails === undefined ? (
+          <UpdateProfileBtn
+            title="Complete Account Setup !!!"
+            body="Click here to update your profile details"
+            image={require('../../../assets/images/badge.png')}
+            action={() => navigation.navigate('OnboardingHome')}
+          />
+        ) : null}
+      </>
+    );
+  };
+
+  const renderScrollableComponents = () => {
+    return (
+      <>
+        {/* Third Section Wallet and Bill*/}
+        <ItemsSection buttonParameters={buttonItems} userPin={userPin} />
+
+        {/* Sixth Section Single Transaction History*/}
+        <SingleTransactionSection
+          userTransactionsData={userTransactionsData}
+          userWalletData={userWalletData}
+          hideBalance={hideBalance}
+        />
+      </>
+    );
+  };
+
+  const renderMainComponents = () => {
+    return (
+      <>
         {isLoading ||
         isLoadingWallet ||
         isLoadingTransaction ||
@@ -1088,24 +925,42 @@ const Homescreen = () => {
         isLoadingLenda ||
         isLoadingArm ||
         isLoadingLoanAmount ? (
-          <Spinner
-            textContent={'Getting Profile Details...'}
-            textStyle={{color: 'white'}}
-            visible={true}
-            overlayColor="rgba(78, 75, 102, 0.7)"
-            animation="slide"
+          <ActivityIndicator
+            size="large"
+            color={COLORS.lendaGreen}
+            animating
+            style={{
+              zIndex: 99999,
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
           />
         ) : null}
-
         {isSending ? (
-          <Spinner
-            textContent={'Processing Transaction Statement...'}
-            textStyle={{color: 'white'}}
-            visible={true}
-            overlayColor="rgba(78, 75, 102, 0.7)"
-            animation="slide"
+          <ActivityIndicator
+            size="large"
+            color="rgba(78, 75, 102, 0.7)"
+            animating
+            style={{
+              zIndex: 99999,
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
           />
         ) : null}
+        {renderOverLayComponents()}
+        {renderHeaderComponents()}
+
         <ScrollView
           bounces={false}
           refreshControl={
@@ -1120,1946 +975,36 @@ const Homescreen = () => {
           style={[styles.scrollView, {marginBottom: 10, height: hp('100%')}]}
           contentContainerStyle={styles.contentContainer}
           alwaysBounceVertical={true}>
-          {/* Fund Wallet Section */}
-          <View style={styles.container}>
-            <Actionsheet
-              isOpen={isFundWalletVisible}
-              onClose={toggleFundWallet}
-              hideDragIndicator={true}>
-              <Actionsheet.Content justifyContent="center">
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    marginHorizontal: 15,
-                  }}>
-                  <TouchableOpacity>
-                    <View
-                      style={{
-                        borderWidth: 0.5,
-                        borderColor: '#D9DBE9',
-                        borderRadius: 5,
-                      }}>
-                      <TouchableOpacity onPress={toggleFundWallet}>
-                        <Icon name="chevron-left" size={36} color="black" />
-                      </TouchableOpacity>
-                    </View>
-                  </TouchableOpacity>
-
-                  <View
-                    style={[
-                      styles.HeadView,
-                      {
-                        flex: 1,
-                      },
-                    ]}>
-                    <View style={styles.TopView}>
-                      <Text style={styles.TextHead}>Fund Wallet</Text>
-                    </View>
-                  </View>
-                  <TouchableOpacity>
-                    <View
-                      style={{
-                        padding: 2,
-                      }}>
-                      <Text>{'      '}</Text>
-                    </View>
-                  </TouchableOpacity>
-                </View>
-                <Text
-                  style={{
-                    fontSize: 14,
-                    fontFamily: 'MontSBold',
-                    color: '#4E4B66',
-                    textAlign: 'center',
-                    margin: 4,
-                  }}>
-                  Transfer Money to the account details below to fund your
-                  account
-                </Text>
-                <View
-                  style={[styles.demark, {marginLeft: 16, marginRight: 16}]}
-                />
-                <View style={{marginTop: 16, marginHorizontal: 16}}>
-                  <View
-                    style={{
-                      marginBottom: 10,
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                    }}>
-                    <View
-                      style={{
-                        backgroundColor: '#CDDBEB',
-                        width: 40,
-                        height: 40,
-                        borderRadius: 5,
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                      }}>
-                      <FontIcon name="bank" size={24} color="#054B99" />
-                    </View>
-                    <View
-                      style={{
-                        flexDirection: 'row',
-                        alignContent: 'center',
-                        justifyContent: 'space-between',
-                        width: '90%',
-                      }}>
-                      <View>
-                        <Text
-                          style={[
-                            styles.TextHead,
-                            {fontSize: 14, color: '#4E4B66', marginLeft: 5},
-                          ]}>
-                          Bank Name:
-                        </Text>
-                      </View>
-                      <Text style={styles.TextHead}>Providus bank</Text>
-                    </View>
-                  </View>
-                </View>
-                <View style={[styles.demark, {marginLeft: 16}]} />
-                <View style={{marginTop: 16, marginHorizontal: 16}}>
-                  <View
-                    style={{
-                      marginBottom: 10,
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                    }}>
-                    <View
-                      style={{
-                        backgroundColor: '#CDDBEB',
-                        width: 40,
-                        height: 40,
-                        borderRadius: 5,
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                      }}>
-                      <Icon
-                        name="account-box-outline"
-                        size={24}
-                        color="#054B99"
-                      />
-                    </View>
-                    <View
-                      style={{
-                        flexDirection: 'row',
-                        alignContent: 'center',
-                        justifyContent: 'space-between',
-                        width: '90%',
-                      }}>
-                      <View>
-                        <Text
-                          style={[
-                            styles.TextHead,
-                            {fontSize: 14, color: '#4E4B66', marginLeft: 5},
-                          ]}>
-                          Account Name:
-                        </Text>
-                      </View>
-                      <Text
-                        style={
-                          (styles.TextHead,
-                          {
-                            fontSize: 14,
-                            textAlign: 'right',
-                            fontFamily: 'MontSBold',
-                            lineHeight: 20,
-                            letterSpacing: 0.5,
-                            flexShrink: 1,
-                          })
-                        }>
-                        {userProfileData?.firstName} {userProfileData?.lastName}
-                      </Text>
-                    </View>
-                  </View>
-                </View>
-
-                <View style={[styles.demark, {marginLeft: 16}]} />
-                <View style={{marginTop: 16, marginHorizontal: 16}}>
-                  <View
-                    style={{
-                      marginBottom: 10,
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                    }}>
-                    <View
-                      style={{
-                        backgroundColor: '#CDDBEB',
-                        width: 40,
-                        height: 40,
-                        borderRadius: 5,
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                      }}>
-                      <OctaIcon name="number" size={24} color="#054B99" />
-                    </View>
-                    <View
-                      style={{
-                        flexDirection: 'row',
-                        alignContent: 'center',
-                        justifyContent: 'space-between',
-                        width: '90%',
-                      }}>
-                      <View>
-                        <Text
-                          style={[
-                            styles.TextHead,
-                            {fontSize: 14, color: '#4E4B66', marginLeft: 5},
-                          ]}>
-                          Account Number:
-                        </Text>
-                      </View>
-                      <View
-                        style={{
-                          flex: 1,
-                          flexDirection: 'row',
-                          justifyContent: 'flex-end',
-                        }}>
-                        <TouchableWithoutFeedback>
-                          <FontIcon
-                            size={17}
-                            color={COLORS.lendaBlue}
-                            name="copy"
-                            style={{marginRight: 4}}
-                            onPress={() =>
-                              handleLongPress(
-                                userWalletData?.walletIdAccountNumber,
-                              )
-                            }
-                          />
-                        </TouchableWithoutFeedback>
-                        <TouchableWithoutFeedback
-                          onLongPress={() =>
-                            handleLongPress(
-                              userWalletData?.walletIdAccountNumber,
-                            )
-                          }>
-                          <Text
-                            selectable={true}
-                            selectionColor={'#CED4DA'}
-                            style={styles.TextHead}>
-                            {userWalletData &&
-                            userWalletData?.walletIdAccountNumber
-                              ? userWalletData?.walletIdAccountNumber
-                              : 'N/A'}
-                          </Text>
-                        </TouchableWithoutFeedback>
-                      </View>
-                    </View>
-                  </View>
-                </View>
-              </Actionsheet.Content>
-            </Actionsheet>
-          </View>
-
-          {/* Make Transfer Section */}
-          <View style={styles.container}>
-            <Actionsheet
-              isOpen={isMakeTransferVisible}
-              onClose={toggleMakeTransfer}
-              hideDragIndicator={true}>
-              <Actionsheet.Content justifyContent="center">
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    marginHorizontal: 15,
-                  }}>
-                  <TouchableOpacity>
-                    <View
-                      style={{
-                        borderWidth: 0.5,
-                        borderColor: '#D9DBE9',
-                        borderRadius: 5,
-                      }}>
-                      <TouchableOpacity onPress={toggleMakeTransfer}>
-                        <Icon name="chevron-left" size={36} color="black" />
-                      </TouchableOpacity>
-                    </View>
-                  </TouchableOpacity>
-
-                  <View
-                    style={[
-                      styles.HeadView,
-                      {
-                        flex: 1,
-                      },
-                    ]}>
-                    <View style={styles.TopView}>
-                      <Text style={styles.TextHead}>SELECT TRANSFER TYPE</Text>
-                    </View>
-                  </View>
-                  <TouchableOpacity>
-                    <View
-                      style={{
-                        padding: 2,
-                      }}>
-                      <Text>{'      '}</Text>
-                    </View>
-                  </TouchableOpacity>
-                </View>
-                <View style={styles.demark} />
-                <View
-                  style={{
-                    marginTop: 16,
-                    justifyContent: 'space-between',
-                  }}>
-                  <TouchableOpacity
-                    style={{
-                      marginBottom: 5,
-                      flexDirection: 'row',
-                    }}
-                    onPress={() => {
-                      setIsMakeTransferVisible(false);
-                      navigation.navigate('Transfer', {
-                        paramKey: 'InternalTransfer',
-                      });
-                    }}>
-                    <View
-                      style={{
-                        backgroundColor: '#CDDBEB',
-                        borderRadius: 5,
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        marginRight: 10,
-                      }}>
-                      <EntypoIcon name="wallet" size={24} color="#054B99" />
-                    </View>
-                    <View>
-                      <Text
-                        style={[
-                          styles.TextHead,
-                          {
-                            fontSize: 14,
-                            color: '#4E4B66',
-                            marginHorizontal: 12,
-                          },
-                        ]}>
-                        Transfer to Trade Lenda wallet
-                      </Text>
-                      <Text
-                        style={{
-                          fontSize: 12,
-                          fontFamily: 'Montserat',
-                          color: '#4E4B66',
-                          marginHorizontal: 12,
-                        }}>
-                        Make transfer to other trade Lenda wallets
-                      </Text>
-                    </View>
-                    <View
-                      style={{
-                        flexDirection: 'row',
-                        justifyContent: 'flex-end',
-                        flexGrow: 1,
-                      }}>
-                      <Icon name="chevron-right" size={24} color="black" />
-                    </View>
-                  </TouchableOpacity>
-                  <View style={[styles.demark, {width: width * 0.8}]} />
-                  <TouchableOpacity
-                    style={{
-                      marginTop: 20,
-                      flexDirection: 'row',
-                    }}
-                    onPress={() => {
-                      setIsMakeTransferVisible(false);
-                      navigation.navigate('Transfer', {
-                        paramKey: 'Nip',
-                      });
-                    }}>
-                    <View
-                      style={{
-                        backgroundColor: '#CDDBEB',
-                        borderRadius: 5,
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        marginRight: 20,
-                      }}>
-                      <EntypoIcon name="wallet" size={24} color="#054B99" />
-                    </View>
-                    <View>
-                      <Text
-                        style={[
-                          styles.TextHead,
-                          {fontSize: 14, color: '#4E4B66'},
-                        ]}>
-                        Transfer to Bank
-                      </Text>
-                      <Text
-                        style={{
-                          fontSize: 12,
-                          fontFamily: 'Montserat',
-                          color: '#4E4B66',
-                        }}>
-                        Make transfer to other bank accounts{'         '}
-                      </Text>
-                    </View>
-
-                    <View
-                      style={{
-                        flexDirection: 'row',
-                        justifyContent: 'flex-end',
-                        flexGrow: 1,
-                      }}>
-                      <Icon name="chevron-right" size={24} color="black" />
-                    </View>
-                  </TouchableOpacity>
-                  <View style={styles.demark} />
-                </View>
-              </Actionsheet.Content>
-            </Actionsheet>
-          </View>
-
-          {/* Show All Transaction */}
-          <View style={styles.container}>
-            <Actionsheet
-              isOpen={isAllTransactionVisible}
-              onClose={toggleAllTransaction}
-              hideDragIndicator={true}>
-              <Actionsheet.Content justifyContent="center">
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    marginHorizontal: 15,
-                    marginTop: 10,
-                  }}>
-                  <TouchableOpacity>
-                    <View
-                      style={{
-                        borderWidth: 0.5,
-                        borderColor: '#D9DBE9',
-                        borderRadius: 5,
-                      }}>
-                      <TouchableOpacity onPress={toggleAllTransaction}>
-                        <Icon name="chevron-left" size={36} color="black" />
-                      </TouchableOpacity>
-                    </View>
-                  </TouchableOpacity>
-
-                  <View
-                    style={[
-                      styles.HeadView,
-                      {
-                        flex: 1,
-                      },
-                    ]}>
-                    <View style={styles.TopView}>
-                      <Text style={styles.TextHead}> TRANSACTION HISTORY </Text>
-                    </View>
-                  </View>
-                  <TouchableOpacity>
-                    <View
-                      style={{
-                        padding: 2,
-                      }}>
-                      <Text>{'      '}</Text>
-                    </View>
-                  </TouchableOpacity>
-                </View>
-                <View style={styles.demark} />
-                <View style={{marginTop: 16, height: '90%'}}>
-                  {isFetching ? (
-                    <Spinner
-                      textContent={'Fetching All Transactions...'}
-                      textStyle={{color: 'white'}}
-                      visible={true}
-                      overlayColor="rgba(78, 75, 102, 0.7)"
-                      animation="slide"
-                    />
-                  ) : (
-                    <ScrollView
-                      bounces={false}
-                      showsHorizontalScrollIndicator={false}
-                      showsVerticalScrollIndicator={true}
-                      style={[styles.scrollView]}
-                      contentContainerStyle={styles.contentContainer}
-                      alwaysBounceVertical={false}>
-                      {(allUserTransactionsData &&
-                        allUserTransactionsData.length === 0) ||
-                      (allUserTransactionsData &&
-                        allUserTransactionsData == undefined) ? (
-                        <View style={styles.transHistory}>
-                          <View
-                            style={{
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              marginHorizontal: 20,
-                              marginVertical: hp('15%'),
-                            }}>
-                            <Image
-                              source={require('../../../assets/images/Group.png')}
-                            />
-                            <Text style={styles.noTrans}>
-                              No transaction data available!
-                            </Text>
-                          </View>
-                        </View>
-                      ) : (
-                        allUserTransactionsData &&
-                        allUserTransactionsData.map((item, i) => {
-                          const dateObj = new Date(item.createdAt);
-                          const hours = dateObj.getHours();
-                          const minutes = dateObj.getMinutes();
-                          const seconds = dateObj.getSeconds();
-                          const date = item.createdAt.substring(0, 10);
-
-                          const amOrPm = hours >= 12 ? 'PM' : 'AM';
-
-                          const twelveHourFormat =
-                            hours > 12 ? hours - 12 : hours;
-
-                          const time = `${twelveHourFormat}:${minutes}:${seconds} ${amOrPm}`;
-                          let stringArray = item?.narration
-                            .split(' ')[0]
-                            .trim();
-                          let imageResource = require('../../../assets/images/approvedLoan.png');
-                          if (stringArray == 'mtn') {
-                            imageResource = require('../../../assets/images/mtn.png');
-                          }
-                          if (stringArray == 'airtel') {
-                            imageResource = require('../../../assets/images/airtel.png');
-                          }
-                          if (stringArray == 'glo') {
-                            imageResource = require('../../../assets/images/glo.png');
-                          }
-                          if (stringArray == '9mobile') {
-                            imageResource = require('../../../assets/images/9mobile.png');
-                          }
-                          if (stringArray == 'spectranet') {
-                            imageResource = require('../../../assets/images/spectranet.png');
-                          }
-                          if (stringArray == 'smile') {
-                            imageResource = require('../../../assets/images/smile.png');
-                          }
-                          return (
-                            <TouchableOpacity
-                              key={i}
-                              style={{marginHorizontal: 15}}
-                              onPress={
-                                isScrolling
-                                  ? null
-                                  : () => {
-                                      navigation.navigate('Transaction', {
-                                        transaction: item,
-                                        time: time,
-                                        day: date,
-                                      });
-                                      setIsAllTransactionVisible(
-                                        !isAllTransactionVisible,
-                                      );
-                                    }
-                              }>
-                              <View style={styles.PanelItemContainer}>
-                                <View
-                                  style={{
-                                    flexDirection: 'row',
-                                    alignItems: 'center',
-                                  }}>
-                                  <View style={{marginRight: 10}}>
-                                    {item.transactionType === 'NIP' &&
-                                      (item?.narration?.includes(
-                                        'airtime purchase',
-                                      ) ||
-                                      item?.narration?.includes(
-                                        'data bundle purchase',
-                                      ) ? (
-                                        <>
-                                          <Image
-                                            style={styles.PanelImage}
-                                            source={imageResource}
-                                          />
-                                        </>
-                                      ) : (
-                                        <>
-                                          <Image
-                                            style={styles.PanelImage}
-                                            source={require('../../../assets/images/Transfer.png')}
-                                          />
-                                        </>
-                                      ))}
-                                    {item.transactionType ===
-                                      'Tradelenda Internal Wallet' &&
-                                      (item.credit != null ||
-                                      item.credit > 0 ||
-                                      item.credit != undefined ? (
-                                        <>
-                                          <Image
-                                            style={[
-                                              styles.PanelImage,
-                                              {
-                                                transform: [{rotate: '180deg'}],
-                                              },
-                                            ]}
-                                            source={require('../../../assets/images/Transfer.png')}
-                                          />
-                                        </>
-                                      ) : (
-                                        <>
-                                          <Image
-                                            style={styles.PanelImage}
-                                            source={require('../../../assets/images/Transfer.png')}
-                                          />
-                                        </>
-                                      ))}
-                                    {item.title === 'Loan Application' && (
-                                      <>
-                                        <Image
-                                          style={styles.PanelImage}
-                                          source={require('../../../assets/images/LoanBox.png')}
-                                        />
-                                      </>
-                                    )}
-                                    {item.title === 'PayBills' && (
-                                      <>
-                                        <Image
-                                          style={styles.PanelImage}
-                                          source={require('../../../assets/images/paybilBox.png')}
-                                        />
-                                      </>
-                                    )}
-                                  </View>
-                                  <View>
-                                    <Text
-                                      style={{
-                                        fontSize: hp(1.8),
-                                        color: COLORS.dark,
-                                      }}>
-                                      {item.transactionType ===
-                                      'Tradelenda Internal Wallet'
-                                        ? // ? 'Internal Wallet'
-                                          'WALLET TRANSFER'
-                                        : item.transactionType === 'NIP'
-                                        ? item?.narration?.includes(
-                                            'airtime purchase',
-                                          ) ||
-                                          item?.narration?.includes(
-                                            'data bundle purchase',
-                                          )
-                                          ? item?.narration
-                                              .split(' ')[0]
-                                              .toUpperCase() +
-                                            ' ' +
-                                            item?.narration
-                                              .split(' ')[1]
-                                              .toUpperCase()
-                                          : 'NIP TRANSFER'
-                                        : item.transactionType}
-                                    </Text>
-                                    <Text
-                                      style={[
-                                        styles.desc,
-                                        {
-                                          color: COLORS.dark,
-                                          opacity: 0.8,
-                                          marginTop: 1,
-                                        },
-                                      ]}>
-                                      {date} : {time}
-                                    </Text>
-                                  </View>
-                                </View>
-                                <View
-                                  style={{
-                                    flexDirection: 'row',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                  }}>
-                                  {item.credit != null ||
-                                  item.credit > 0 ||
-                                  item.credit != undefined ||
-                                  item?.fromWalletAccountNumber !=
-                                    userWalletData?.walletIdAccountNumber ? (
-                                    <Icon
-                                      name="plus"
-                                      size={16}
-                                      color={COLORS.googleGreen}
-                                    />
-                                  ) : (
-                                    <Icon
-                                      name="minus"
-                                      size={16}
-                                      color={COLORS.googleRed}
-                                    />
-                                  )}
-                                  <Text
-                                    style={{
-                                      fontSize: hp(2),
-                                      color:
-                                        item.credit != null ||
-                                        item.credit > 0 ||
-                                        item.credit != undefined ||
-                                        item?.fromWalletAccountNumber !=
-                                          userWalletData?.walletIdAccountNumber
-                                          ? COLORS.googleGreen
-                                          : COLORS.googleRed,
-                                      alignSelf: 'flex-end',
-                                    }}>
-                                    {item.credit === null ? (
-                                      <>
-                                        ₦
-                                        {new Intl.NumberFormat('en-US', {
-                                          style: 'decimal',
-                                          minimumFractionDigits: 2,
-                                          maximumFractionDigits: 2,
-                                        }).format(Number(item.debit))}
-                                      </>
-                                    ) : (
-                                      <>
-                                        ₦
-                                        {new Intl.NumberFormat('en-US', {
-                                          style: 'decimal',
-                                          minimumFractionDigits: 2,
-                                          maximumFractionDigits: 2,
-                                        }).format(Number(item.credit))}
-                                      </>
-                                    )}
-                                  </Text>
-                                </View>
-                              </View>
-                            </TouchableOpacity>
-                          );
-                        })
-                      )}
-                      <View
-                        style={{
-                          flex: 1,
-                          marginTop: 10,
-                          flexDirection: 'row',
-                          justifyContent: 'space-evenly',
-                        }}>
-                        <Text
-                          style={{
-                            backgroundColor: COLORS.light,
-                            borderColor: COLORS.lightGray,
-                            borderWidth: 1,
-                            justifyContent: 'center',
-                            alignSelf: 'center',
-                            textAlign: 'center',
-                            alignItems: 'center',
-                            width: '6%',
-                            height: '60%',
-                            color: COLORS.lendaBlue,
-                            paddingVertical: 2,
-                          }}>
-                          {currentPage ? currentPage : 0}
-                        </Text>
-                        <Button
-                          icon="arrow-left"
-                          mode="elevated"
-                          textColor={COLORS.lendaBlue}
-                          buttonColor={COLORS.lightGray}
-                          loading={isPrevious}
-                          disabled={currentPage === 0 ? true : false}
-                          style={{width: '35%'}}
-                          onPress={() =>
-                            handleGetPreviousPage(currentPage - 1)
-                          }>
-                          Previous
-                        </Button>
-                        <Button
-                          icon="arrow-right"
-                          mode="elevated"
-                          textColor={COLORS.lendaBlue}
-                          buttonColor={COLORS.lightGray}
-                          contentStyle={{flexDirection: 'row-reverse'}}
-                          style={{width: '35%'}}
-                          loading={isNext}
-                          disabled={
-                            currentPage === userTransactionsPages ? true : false
-                          }
-                          onPress={() => handleGetNextPage(currentPage + 1)}>
-                          Next
-                        </Button>
-                        <Text
-                          style={{
-                            backgroundColor: COLORS.light,
-                            borderColor: COLORS.lightGray,
-                            borderWidth: 1,
-                            justifyContent: 'center',
-                            alignSelf: 'center',
-                            textAlign: 'center',
-                            alignItems: 'center',
-                            width: '6%',
-                            height: '60%',
-                            color: COLORS.lendaBlue,
-                            paddingVertical: 2,
-                          }}>
-                          {userTransactionsPages ? userTransactionsPages : 1}
-                        </Text>
-                      </View>
-                    </ScrollView>
-                  )}
-                </View>
-              </Actionsheet.Content>
-            </Actionsheet>
-          </View>
-
-          {/* First Section */}
-          <View
-            style={[
-              styles.container,
-              {
-                width: wp('100%'),
-                height: hp(8),
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                backgroundColor: '#FCFCFC',
-                marginVertical: 1,
-              },
-            ]}>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                paddingHorizontal: 2,
-              }}>
-              <TouchableOpacity
-                onPress={async () => {
-                  navigation.navigate('More');
-                }}
-                style={styles.personIcon}>
-                <Icon name="account-circle" size={36} color="#6E7191" />
-              </TouchableOpacity>
-              <Text style={styles.hello}>
-                Hello {userProfileData?.firstName}!
-              </Text>
-
-              <View
-                style={{
-                  flex: 1,
-                  alignItems: 'flex-end',
-                  marginRight: 10,
-                }}>
-                <Image
-                  source={require('../../../assets/images/HeadLogo.png')}
-                  style={{width: 83, height: 32}}
-                />
-              </View>
-            </View>
-          </View>
-          {/* Second Section */}
-          <View>
-            <Carousel
-              layout={'stack'}
-              layoutCardOffset={10}
-              ref={carouselRef}
-              data={slides}
-              renderItem={({item}) => <Slide item={item} />}
-              sliderWidth={wp('100%')}
-              itemWidth={wp('100%') - 10}
-              inactiveSlideOpacity={0.4}
-              useScrollView={true}
-              containerCustomStyle={{flex: 1}}
-              slideStyle={{flex: 1}}
-              firstItem={2}
-              initialScrollIndex={2}
-              autoplay={true}
-              autoplayDelay={6000}
-              autoplayInterval={12000}
-            />
-          </View>
-
-          {/* Optional Section */}
-          {!userPin ? (
-            <TouchableOpacity
-              style={[
-                styles.container,
-                {
-                  height: hp(9),
-                  width: wp('90%'),
-                  alignSelf: 'center',
-                  backgroundColor: '#CDDBEB',
-                  marginHorizontal: 15,
-                  marginVertical: 5,
-                  borderRadius: 8,
-                  justifyContent: 'center',
-                },
-              ]}
-              onPress={() => navigation.navigate('SetPin')}>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                }}>
-                <View
-                  style={{
-                    width: 30,
-                    height: 30,
-                    borderRadius: 5,
-                    marginRight: 16,
-                    marginLeft: 16,
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                  }}>
-                  <Image source={require('../../../assets/images/badge.png')} />
-                </View>
-
-                <View style={{flex: 1, marginHorizontal: 10}}>
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      justifyContent: 'space-between',
-                    }}>
-                    <Text style={styles.title}>Attention Needed !!!</Text>
-                  </View>
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      justifyContent: 'space-between',
-                    }}>
-                    <Text style={styles.desc}>
-                      Click here to create your transaction pin
-                    </Text>
-                  </View>
-                </View>
-              </View>
-            </TouchableOpacity>
-          ) : null}
-
-          {/* Optional Section */}
-          {loanUserDetails === undefined ||
-          loanUserDetails?.loanDocumentDetails === undefined ? (
-            <TouchableOpacity
-              style={[
-                styles.container,
-                {
-                  height: hp(9),
-                  width: wp('90%'),
-                  alignSelf: 'center',
-                  backgroundColor: '#CDDBEB',
-                  marginHorizontal: 15,
-                  marginVertical: 5,
-                  borderRadius: 8,
-                  justifyContent: 'center',
-                },
-              ]}
-              onPress={() => navigation.navigate('OnboardingHome')}>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                }}>
-                <View
-                  style={{
-                    width: 30,
-                    height: 30,
-                    borderRadius: 5,
-                    marginRight: 16,
-                    marginLeft: 16,
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                  }}>
-                  <Image source={require('../../../assets/images/badge.png')} />
-                </View>
-
-                <View style={{flex: 1, marginHorizontal: 10}}>
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      justifyContent: 'space-between',
-                    }}>
-                    <Text style={styles.title}>Complete Account Setup</Text>
-                  </View>
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      justifyContent: 'space-between',
-                    }}>
-                    <Text style={styles.desc}>Update your profile details</Text>
-                  </View>
-                </View>
-              </View>
-            </TouchableOpacity>
-          ) : null}
-
-          {/* Third Section Wallet and Bill*/}
-          <View
-            style={[
-              styles.container,
-              styles.transView,
-              {marginTop: userPin ? hp(3) : hp(1)},
-            ]}>
-            <Pressable
-              onPress={toggleFundWallet}
-              style={({pressed}) => [
-                {
-                  // backgroundColor: pressed ? '#D9DBE9' : '#FFFFFF',
-                  backgroundColor: pressed ? '#D9DBE9' : COLORS.lendaBlue,
-                  transform: [
-                    {
-                      scale: pressed ? 0.96 : 1,
-                    },
-                  ],
-                },
-                styles.transButtons,
-              ]}>
-              <View
-                style={{
-                  alignSelf: 'center',
-                  justifyContent: 'center',
-                }}>
-                <Icon
-                  name="wallet-plus-outline"
-                  size={29}
-                  color={COLORS.white}
-                />
-              </View>
-              <View style={{alignSelf: 'center', marginTop: 5}}>
-                <Text
-                  style={[
-                    styles.transText,
-                    {
-                      color: COLORS.textLight,
-                    },
-                  ]}>
-                  Fund Wallet
-                </Text>
-              </View>
-            </Pressable>
-
-            <Pressable
-              onPress={toggleMakeTransfer}
-              style={({pressed}) => [
-                {
-                  backgroundColor: pressed ? '#D9DBE9' : COLORS.lendaOrange,
-                  transform: [
-                    {
-                      scale: pressed ? 0.96 : 1,
-                    },
-                  ],
-                },
-                styles.transButtons,
-              ]}>
-              <View
-                style={{
-                  alignSelf: 'center',
-                  justifyContent: 'center',
-                }}>
-                <Icon name="bank-transfer" size={29} color={COLORS.white} />
-              </View>
-              <View style={{alignSelf: 'center', marginTop: 5}}>
-                <Text
-                  style={[
-                    styles.transText,
-                    {
-                      color: COLORS.textLight,
-                    },
-                  ]}>
-                  Make Transfer
-                </Text>
-              </View>
-            </Pressable>
-
-            <Pressable
-              onPress={() => navigation.navigate('Paybills')}
-              style={({pressed}) => [
-                {
-                  backgroundColor: pressed ? '#D9DBE9' : COLORS.lendaGreen,
-                  transform: [
-                    {
-                      scale: pressed ? 0.96 : 1,
-                    },
-                  ],
-                },
-                styles.transButtons,
-              ]}>
-              <View
-                style={{
-                  alignSelf: 'center',
-                  justifyContent: 'center',
-                }}>
-                <Icon name="cash-multiple" size={29} color={COLORS.white} />
-              </View>
-              <View style={{alignSelf: 'center', marginTop: 5}}>
-                <Text
-                  style={[
-                    styles.transText,
-                    {
-                      color: COLORS.textLight,
-                    },
-                  ]}>
-                  Bill Payment
-                </Text>
-              </View>
-            </Pressable>
-          </View>
-
-          {/* Forth Section  Investment and Loans*/}
-          <View style={[styles.container, styles.transView]}>
-            <Pressable
-              onPress={() => navigation.navigate('Invest')}
-              style={({pressed}) => [
-                {
-                  // backgroundColor: pressed ? '#D9DBE9' : '#FFFFFF',
-                  backgroundColor: pressed ? '#D9DBE9' : COLORS.white,
-                  transform: [
-                    {
-                      scale: pressed ? 0.96 : 1,
-                    },
-                  ],
-                },
-                styles.transButtons,
-              ]}>
-              <View
-                style={{
-                  alignSelf: 'center',
-                  justifyContent: 'center',
-                }}>
-                <Image
-                  style={{
-                    height: 32,
-                    width: 32,
-                    resizeMode: 'contain',
-                    backgroundColor: COLORS.white,
-                    borderRadius: 100,
-                  }}
-                  source={require('../../../assets/images/arm.png')}
-                />
-              </View>
-              <View style={{alignSelf: 'center', marginTop: 5}}>
-                <Text
-                  style={[
-                    styles.transText,
-                    {
-                      color: COLORS.highwayRed,
-                    },
-                  ]}>
-                  Save with ARM
-                </Text>
-              </View>
-            </Pressable>
-
-            <Pressable
-              onPress={() => navigation.navigate('Invest')}
-              style={({pressed}) => [
-                {
-                  backgroundColor: pressed ? '#D9DBE9' : COLORS.white,
-                  transform: [
-                    {
-                      scale: pressed ? 0.96 : 1,
-                    },
-                  ],
-                },
-                styles.transButtons,
-              ]}>
-              <View
-                style={{
-                  alignSelf: 'center',
-                  justifyContent: 'center',
-                }}>
-                <Image
-                  style={{
-                    height: 32,
-                    width: 32,
-                    resizeMode: 'contain',
-                    backgroundColor: COLORS.white,
-                    borderRadius: 100,
-                  }}
-                  source={require('../../../assets/images/lenda.png')}
-                />
-              </View>
-              <View style={{alignSelf: 'center', marginTop: 5}}>
-                <Text
-                  style={[
-                    styles.transText,
-                    {
-                      color: COLORS.lendaGreen,
-                    },
-                  ]}>
-                  Earn With Us
-                </Text>
-              </View>
-            </Pressable>
-
-            <Pressable
-              onPress={() => {
-                if (guarantor && guarantor.length <= 0) {
-                  Toast.show({
-                    type: 'warning',
-                    position: 'top',
-                    topOffset: 50,
-                    text1: 'Guarantor Data',
-                    text2: 'Guarantor Data is not available',
-                    visibilityTime: 2000,
-                    autoHide: true,
-                    onPress: () => Toast.hide(),
-                  });
-                }
-                navigation.navigate(
-                  `${
-                    loanUserDetails === undefined ||
-                    loanUserDetails?.loanDocumentDetails
-                      ?.validIdentification === undefined
-                      ? 'OnboardingHome'
-                      : guarantor && guarantor.length > 0
-                      ? 'GetLoan'
-                      : 'AddGuarantors'
-                  }`,
-                );
-              }}
-              style={({pressed}) => [
-                {
-                  backgroundColor: pressed ? '#D9DBE9' : COLORS.white,
-                  transform: [
-                    {
-                      scale: pressed ? 0.96 : 1,
-                    },
-                  ],
-                },
-                styles.transButtons,
-              ]}>
-              <View
-                style={{
-                  alignSelf: 'center',
-                  justifyContent: 'center',
-                }}>
-                <Image
-                  style={{
-                    height: 32,
-                    width: 32,
-                    resizeMode: 'contain',
-                  }}
-                  source={require('../../../assets/images/approvedLoan.png')}
-                />
-              </View>
-              <View style={{alignSelf: 'center', marginTop: 5}}>
-                <Text
-                  style={[
-                    styles.transText,
-                    {
-                      color: COLORS.lendaBlue,
-                    },
-                  ]}>
-                  Get Loan
-                </Text>
-              </View>
-            </Pressable>
-          </View>
-
-          {/* Fifth Section  E-Statement*/}
-          <View style={[styles.container, styles.transView]}>
-            <Pressable
-              onPress={() => {
-                setShowArmStatementModal(true);
-              }}
-              style={({pressed}) => [
-                {
-                  // backgroundColor: pressed ? '#D9DBE9' : '#FFFFFF',
-                  backgroundColor: pressed ? '#D9DBE9' : COLORS.white,
-                  transform: [
-                    {
-                      scale: pressed ? 0.96 : 1,
-                    },
-                  ],
-                },
-                styles.transButtons,
-              ]}>
-              <View
-                style={{
-                  alignSelf: 'center',
-                  justifyContent: 'center',
-                }}>
-                <Icon
-                  name="file-document-outline"
-                  size={29}
-                  color={COLORS.highwayRed}
-                />
-              </View>
-              <View style={{alignSelf: 'center', marginTop: 5}}>
-                <Text
-                  style={[
-                    styles.transText,
-                    {
-                      color: COLORS.highwayRed,
-                    },
-                  ]}>
-                  ARM E-Statement
-                </Text>
-              </View>
-            </Pressable>
-
-            <Pressable
-              onPress={() => {
-                setShowLendaStatementModal(true);
-              }}
-              style={({pressed}) => [
-                {
-                  backgroundColor: pressed ? '#D9DBE9' : COLORS.white,
-                  transform: [
-                    {
-                      scale: pressed ? 0.96 : 1,
-                    },
-                  ],
-                },
-                styles.transButtons,
-              ]}>
-              <View
-                style={{
-                  alignSelf: 'center',
-                  justifyContent: 'center',
-                }}>
-                <Icon
-                  name="file-document-outline"
-                  size={29}
-                  color={COLORS.lendaGreen}
-                />
-              </View>
-              <View style={{alignSelf: 'center', marginTop: 5}}>
-                <Text
-                  style={[
-                    styles.transText,
-                    {
-                      color: COLORS.lendaGreen,
-                    },
-                  ]}>
-                  Lenda E-Statement
-                </Text>
-              </View>
-            </Pressable>
-
-            <Pressable
-              onPress={() => {
-                setShowWalletStatementModal(true);
-              }}
-              style={({pressed}) => [
-                {
-                  backgroundColor: pressed ? '#D9DBE9' : COLORS.white,
-                  transform: [
-                    {
-                      scale: pressed ? 0.96 : 1,
-                    },
-                  ],
-                },
-                styles.transButtons,
-              ]}>
-              <View
-                style={{
-                  alignSelf: 'center',
-                  justifyContent: 'center',
-                }}>
-                <Icon
-                  name="file-document-outline"
-                  size={29}
-                  color={COLORS.lendaBlue}
-                />
-              </View>
-              <View style={{alignSelf: 'center', marginTop: 5}}>
-                <Text
-                  style={[
-                    styles.transText,
-                    {
-                      color: COLORS.lendaBlue,
-                    },
-                  ]}>
-                  Wallet E-Statement
-                </Text>
-              </View>
-            </Pressable>
-          </View>
-
-          {/* E-Statements Modal */}
-          {/* Wallet Statement Modal */}
-          <Center>
-            <Modal
-              isOpen={showWalletStatementModal}
-              onClose={() => {
-                setShowWalletStatementModal(false);
-              }}
-              closeOnOverlayClick={false}>
-              <Modal.Content width={wp(90)} height={hp(50)}>
-                <Modal.CloseButton />
-                <Modal.Header>Generate Wallet E-Statement</Modal.Header>
-                <Modal.Body>
-                  <Pressable onPress={showDatePickerStartWallet}>
-                    <Input
-                      label="Start Date"
-                      iconName="calendar-month-outline"
-                      placeholder="2000 - 01 - 01"
-                      defaultValue={walletStatementDetails?.startDate}
-                      isDate={true}
-                      editable={false}
-                      showDatePicker={showDatePickerStartWallet}
-                      isNeeded={true}
-                    />
-                  </Pressable>
-
-                  <DateTimePickerModal
-                    isVisible={showStartWallet}
-                    testID="dateTimePicker"
-                    defaultValue={walletStatementDetails?.startDate}
-                    mode="date"
-                    is24Hour={true}
-                    onConfirm={text => {
-                      const formattedDate = new Date(text)
-                        .toISOString()
-                        .split('T')[0];
-                      setWalletStatementDetails({
-                        ...walletStatementDetails,
-                        startDate: formattedDate,
-                      });
-                      setShowStartWallet(false);
-                    }}
-                    onCancel={hideDatePickerStartWallet}
-                    textColor="#054B99"
-                  />
-
-                  <Pressable onPress={showDatePickerEndWallet}>
-                    <Input
-                      label="Stop Date"
-                      iconName="calendar-month-outline"
-                      placeholder="2000 - 01 - 01"
-                      defaultValue={walletStatementDetails?.endDate}
-                      isDate={true}
-                      editable={false}
-                      showDatePicker={showDatePickerEndWallet}
-                      isNeeded={true}
-                    />
-                  </Pressable>
-
-                  <DateTimePickerModal
-                    isVisible={showEndWallet}
-                    testID="dateTimePicker"
-                    defaultValue={walletStatementDetails?.endDate}
-                    mode="date"
-                    is24Hour={true}
-                    onConfirm={text => {
-                      const formattedDate = new Date(text)
-                        .toISOString()
-                        .split('T')[0];
-                      setWalletStatementDetails({
-                        ...walletStatementDetails,
-                        endDate: formattedDate,
-                      });
-                      setShowEndWallet(false);
-                    }}
-                    onCancel={hideDatePickerEndWallet}
-                    textColor="#054B99"
-                  />
-                </Modal.Body>
-                <Modal.Footer>
-                  <Btn.Group space={2}>
-                    <Btn
-                      variant="ghost"
-                      colorScheme="blueGray"
-                      onPress={() => {
-                        setShowWalletStatementModal(false);
-                      }}>
-                      Cancel
-                    </Btn>
-                    <Btn
-                      onPress={() => {
-                        handleWalletStatement();
-                        setShowWalletStatementModal(false);
-                      }}>
-                      Send Statement
-                    </Btn>
-                  </Btn.Group>
-                </Modal.Footer>
-              </Modal.Content>
-            </Modal>
-          </Center>
-
-          {/* ARM Statement Modal */}
-          <Center>
-            <Modal
-              isOpen={showArmStatementModal}
-              onClose={() => {
-                setShowArmStatementModal(false);
-              }}
-              closeOnOverlayClick={false}>
-              <Modal.Content width={wp(90)} height={hp(50)}>
-                <Modal.CloseButton />
-                <Modal.Header>Generate ARM E-Statement</Modal.Header>
-                <Modal.Body>
-                  <Pressable onPress={showDatePickerStartArm}>
-                    <Input
-                      label="Start Date"
-                      iconName="calendar-month-outline"
-                      placeholder="2000 - 01 - 01"
-                      defaultValue={armStatementDetails?.startDate}
-                      isDate={true}
-                      editable={false}
-                      showDatePicker={showDatePickerStartArm}
-                      isNeeded={true}
-                    />
-                  </Pressable>
-
-                  <DateTimePickerModal
-                    isVisible={showStartArm}
-                    testID="dateTimePicker"
-                    defaultValue={armStatementDetails?.startDate}
-                    mode="date"
-                    is24Hour={true}
-                    onConfirm={text => {
-                      const formattedDate = new Date(text)
-                        .toISOString()
-                        .split('T')[0];
-                      setArmStatementDetails({
-                        ...armStatementDetails,
-                        startDate: formattedDate,
-                      });
-                      setShowStartArm(false);
-                    }}
-                    onCancel={hideDatePickerStartArm}
-                    textColor="#054B99"
-                  />
-
-                  <Pressable onPress={showDatePickerEndArm}>
-                    <Input
-                      label="Stop Date"
-                      iconName="calendar-month-outline"
-                      placeholder="2000 - 01 - 01"
-                      defaultValue={armStatementDetails?.endDate}
-                      isDate={true}
-                      editable={false}
-                      showDatePicker={showDatePickerEndArm}
-                      isNeeded={true}
-                    />
-                  </Pressable>
-
-                  <DateTimePickerModal
-                    isVisible={showEndArm}
-                    testID="dateTimePicker"
-                    defaultValue={armStatementDetails?.endDate}
-                    mode="date"
-                    is24Hour={true}
-                    onConfirm={text => {
-                      const formattedDate = new Date(text)
-                        .toISOString()
-                        .split('T')[0];
-                      setArmStatementDetails({
-                        ...armStatementDetails,
-                        endDate: formattedDate,
-                      });
-                      setShowEndArm(false);
-                    }}
-                    onCancel={hideDatePickerEndArm}
-                    textColor="#054B99"
-                  />
-                </Modal.Body>
-                <Modal.Footer>
-                  <Btn.Group space={2}>
-                    <Btn
-                      variant="ghost"
-                      colorScheme="blueGray"
-                      onPress={() => {
-                        setShowArmStatementModal(false);
-                      }}>
-                      Cancel
-                    </Btn>
-                    <Btn
-                      disabled={!allArmData[0]?.membershipId}
-                      onPress={() => {
-                        handleArmStatement();
-                        setShowArmStatementModal(false);
-                      }}>
-                      Send Statement
-                    </Btn>
-                  </Btn.Group>
-                </Modal.Footer>
-              </Modal.Content>
-            </Modal>
-          </Center>
-
-          {/* Lenda Statement Modal */}
-          <Center>
-            <Modal
-              isOpen={showLendaStatementModal}
-              onClose={() => {
-                setShowLendaStatementModal(false);
-              }}
-              closeOnOverlayClick={false}>
-              <Modal.Content width={wp(90)} height={hp(50)}>
-                <Modal.CloseButton />
-                <Modal.Header>Generate Lenda E-Statement</Modal.Header>
-                <Modal.Body>
-                  <Pressable onPress={showDatePickerStartLenda}>
-                    <Input
-                      label="Start Date"
-                      iconName="calendar-month-outline"
-                      placeholder="2000 - 01 - 01"
-                      defaultValue={lendaStatementDetails?.startDate}
-                      isDate={true}
-                      editable={false}
-                      showDatePicker={showDatePickerStartLenda}
-                      isNeeded={true}
-                    />
-                  </Pressable>
-
-                  <DateTimePickerModal
-                    isVisible={showStartLenda}
-                    testID="dateTimePicker"
-                    defaultValue={lendaStatementDetails?.startDate}
-                    mode="date"
-                    is24Hour={true}
-                    onConfirm={text => {
-                      const formattedDate = new Date(text)
-                        .toISOString()
-                        .split('T')[0];
-                      setLendaStatementDetails({
-                        ...lendaStatementDetails,
-                        startDate: formattedDate,
-                      });
-                      setShowStartLenda(false);
-                    }}
-                    onCancel={hideDatePickerStartLenda}
-                    textColor="#054B99"
-                  />
-
-                  <Pressable onPress={showDatePickerEndLenda}>
-                    <Input
-                      label="Stop Date"
-                      iconName="calendar-month-outline"
-                      placeholder="2000 - 01 - 01"
-                      defaultValue={lendaStatementDetails?.endDate}
-                      isDate={true}
-                      editable={false}
-                      showDatePicker={showDatePickerEndLenda}
-                      isNeeded={true}
-                    />
-                  </Pressable>
-
-                  <DateTimePickerModal
-                    isVisible={showEndLenda}
-                    testID="dateTimePicker"
-                    defaultValue={lendaStatementDetails?.endDate}
-                    mode="date"
-                    is24Hour={true}
-                    onConfirm={text => {
-                      const formattedDate = new Date(text)
-                        .toISOString()
-                        .split('T')[0];
-                      setLendaStatementDetails({
-                        ...lendaStatementDetails,
-                        endDate: formattedDate,
-                      });
-                      setShowEndLenda(false);
-                    }}
-                    onCancel={hideDatePickerEndLenda}
-                    textColor="#054B99"
-                  />
-                </Modal.Body>
-                <Modal.Footer>
-                  <Btn.Group space={2}>
-                    <Btn
-                      variant="ghost"
-                      colorScheme="blueGray"
-                      onPress={() => {
-                        setShowLendaStatementModal(false);
-                      }}>
-                      Cancel
-                    </Btn>
-                    <Btn
-                      onPress={() => {
-                        handleLendaStatement();
-                        setShowLendaStatementModal(false);
-                      }}>
-                      Send Statement
-                    </Btn>
-                  </Btn.Group>
-                </Modal.Footer>
-              </Modal.Content>
-            </Modal>
-          </Center>
-
-          {/* Sixth Section Single Transaction History*/}
-          <View
-            style={{
-              flex: 1,
-              marginHorizontal: wp('5%'),
-              width: wp('90%'),
-              height: hp(
-                userTransactionsData && userTransactionsData.length > 0
-                  ? '15%'
-                  : '40%',
-              ),
-              borderRadius: 5,
-            }}>
-            <View
-              style={{
-                marginVertical: 5,
-              }}>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                  paddingHorizontal: 10,
-                  marginVertical: 10,
-                }}>
-                <Text
-                  style={
-                    ([styles.history],
-                    {
-                      fontWeight: 700,
-                      fontSize: hp(2),
-                      color: COLORS.grey,
-                    })
-                  }>
-                  Recent Transactions
-                </Text>
-                <TouchableOpacity
-                  style={{flexDirection: 'row', justifyContent: 'center'}}
-                  disabled={
-                    (userTransactionsData &&
-                      userTransactionsData.length === 0) ||
-                    userTransactionsData == undefined
-                      ? true
-                      : false
-                  }
-                  onPress={toggleAllTransaction}>
-                  <Text
-                    style={[
-                      styles.seeHistory,
-                      {
-                        color:
-                          (userTransactionsData &&
-                            userTransactionsData.length === 0) ||
-                          userTransactionsData == undefined
-                            ? COLORS.grey
-                            : COLORS.lendaBlue,
-                      },
-                    ]}>
-                    See all
-                  </Text>
-                  <Icon
-                    name="chevron-right"
-                    size={hp(2.5)}
-                    color={
-                      (userTransactionsData &&
-                        userTransactionsData.length === 0) ||
-                      userTransactionsData == undefined
-                        ? COLORS.grey
-                        : COLORS.lendaBlue
-                    }
-                  />
-                </TouchableOpacity>
-              </View>
-
-              {(userTransactionsData && userTransactionsData.length === 0) ||
-              userTransactionsData == undefined ? (
-                <View style={styles.transHistory}>
-                  <View
-                    style={{
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      marginHorizontal: 20,
-                      marginVertical: hp('1%'),
-                    }}>
-                    <Image
-                      source={require('../../../assets/images/Group.png')}
-                    />
-                    <Text style={styles.noTrans}>
-                      No transaction data available!
-                    </Text>
-                  </View>
-                </View>
-              ) : (
-                userTransactionsData &&
-                userTransactionsData.slice(0, 1).map((item, i) => {
-                  const dateObj = new Date(item.createdAt);
-                  const hours = dateObj.getHours();
-                  const minutes = dateObj.getMinutes();
-                  const seconds = dateObj.getSeconds();
-                  const date = item.createdAt.substring(0, 10);
-
-                  const amOrPm = hours >= 12 ? 'PM' : 'AM';
-
-                  const twelveHourFormat = hours > 12 ? hours - 12 : hours;
-
-                  const time = `${twelveHourFormat}:${minutes}:${seconds} ${amOrPm}`;
-                  let stringArray = item?.narration.split(' ')[0].trim();
-                  let imageResource = require('../../../assets/images/Transfer.png');
-                  if (stringArray == 'mtn') {
-                    imageResource = require('../../../assets/images/mtn.png');
-                  }
-                  if (stringArray == 'airtel') {
-                    imageResource = require('../../../assets/images/airtel.png');
-                  }
-                  if (stringArray == 'glo') {
-                    imageResource = require('../../../assets/images/glo.png');
-                  }
-                  if (stringArray == '9mobile') {
-                    imageResource = require('../../../assets/images/9mobile.png');
-                  }
-                  if (stringArray == 'spectranet') {
-                    imageResource = require('../../../assets/images/spectranet.png');
-                  }
-                  if (stringArray == 'smile') {
-                    imageResource = require('../../../assets/images/smile.png');
-                  }
-                  return (
-                    <TouchableOpacity
-                      key={i}
-                      // delayPressIn={500}
-                      onPress={() =>
-                        navigation.navigate('Transaction', {
-                          transaction: item,
-                          time: time,
-                          day: date,
-                        })
-                      }>
-                      <View style={styles.PanelItemContainer}>
-                        <View
-                          style={{
-                            flexDirection: 'row',
-                            alignItems: 'center',
-                          }}>
-                          <View style={{marginRight: 10}}>
-                            {item.transactionType === 'NIP' &&
-                              (item?.narration?.includes('airtime purchase') ||
-                              item?.narration?.includes(
-                                'data bundle purchase',
-                              ) ? (
-                                <>
-                                  <Image
-                                    style={styles.PanelImage}
-                                    source={imageResource}
-                                  />
-                                </>
-                              ) : (
-                                <>
-                                  <Image
-                                    style={styles.PanelImage}
-                                    source={require('../../../assets/images/Transfer.png')}
-                                  />
-                                </>
-                              ))}
-                            {item.transactionType ===
-                              'Tradelenda Internal Wallet' && (
-                              <>
-                                <Image
-                                  style={styles.PanelImage}
-                                  source={require('../../../assets/images/Transfer.png')}
-                                />
-                              </>
-                            )}
-                            {item.title === 'Loan Application' && (
-                              <>
-                                <Image
-                                  style={styles.PanelImage}
-                                  source={require('../../../assets/images/LoanBox.png')}
-                                />
-                              </>
-                            )}
-                            {item.title === 'PayBills' && (
-                              <>
-                                <Image
-                                  style={styles.PanelImage}
-                                  source={require('../../../assets/images/paybilBox.png')}
-                                />
-                              </>
-                            )}
-                          </View>
-                          <View>
-                            <Text
-                              style={{fontSize: hp(1.8), color: COLORS.dark}}>
-                              {item.transactionType ===
-                              'Tradelenda Internal Wallet'
-                                ? // ? 'Internal Wallet'
-                                  'WALLET TRANSFER'
-                                : item.transactionType === 'NIP'
-                                ? item?.narration?.includes(
-                                    'airtime purchase',
-                                  ) ||
-                                  item?.narration?.includes(
-                                    'data bundle purchase',
-                                  )
-                                  ? item?.narration
-                                      .split(' ')[0]
-                                      .toUpperCase() +
-                                    ' ' +
-                                    item?.narration.split(' ')[1].toUpperCase()
-                                  : 'NIP TRANSFER'
-                                : item.transactionType}
-                            </Text>
-                            <Text
-                              style={[
-                                styles.desc,
-                                {
-                                  color: COLORS.dark,
-                                  opacity: 0.8,
-                                  marginTop: 1,
-                                },
-                              ]}>
-                              {date} : {time}
-                            </Text>
-                          </View>
-                        </View>
-                        <View
-                          style={{
-                            flexDirection: 'row',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                          }}>
-                          {item.credit != null ||
-                          item.credit > 0 ||
-                          item.credit != undefined ||
-                          item?.fromWalletAccountNumber !=
-                            userWalletData?.walletIdAccountNumber ? (
-                            <Icon
-                              name="plus"
-                              size={16}
-                              color={COLORS.googleGreen}
-                            />
-                          ) : (
-                            <Icon
-                              name="minus"
-                              size={16}
-                              color={COLORS.googleRed}
-                            />
-                          )}
-                          <Text
-                            style={{
-                              fontSize: hp(2),
-                              color:
-                                item.credit != null ||
-                                item.credit > 0 ||
-                                item.credit != undefined ||
-                                item?.fromWalletAccountNumber !=
-                                  userWalletData?.walletIdAccountNumber
-                                  ? COLORS.googleGreen
-                                  : COLORS.googleRed,
-                              alignSelf: 'flex-end',
-                            }}>
-                            {item.credit === null ? (
-                              <>
-                                ₦
-                                {new Intl.NumberFormat('en-US', {
-                                  style: 'decimal',
-                                  minimumFractionDigits: 2,
-                                  maximumFractionDigits: 2,
-                                }).format(Number(item.debit))}
-                              </>
-                            ) : (
-                              <>
-                                ₦
-                                {new Intl.NumberFormat('en-US', {
-                                  style: 'decimal',
-                                  minimumFractionDigits: 2,
-                                  maximumFractionDigits: 2,
-                                }).format(Number(item.credit))}
-                              </>
-                            )}
-                          </Text>
-                        </View>
-                      </View>
-                    </TouchableOpacity>
-                  );
-                })
-              )}
-            </View>
-          </View>
+          {renderOptionalComponents()}
+          {renderScrollableComponents()}
         </ScrollView>
-      </SafeAreaView>
+      </>
+    );
+  };
+
+  return !timeOut ? (
+    <Splashscreen text="Getting Profile Details..." />
+  ) : timeOut &&
+    userProfileData &&
+    userProfileData?.profileProgress === null ? (
+    <PersonalDetails />
+  ) : (
+    timeOut &&
+    userProfileData &&
+    userProfileData?.profileProgress !== null && (
+        <SafeAreaView
+          style={{
+            flex: 1,
+            height: hp('100%'),
+            width: wp('100%'),
+            backgroundColor: COLORS.lendaLightGrey,
+            paddingTop: insets.top !== 0 ? Math.min(insets.top, 10) : 'auto',
+            paddingBottom: insets.bottom !== 0 ? Math.min(insets.bottom, 10) : 'auto',
+            paddingLeft: insets.left !== 0 ? Math.min(insets.left, 10) : 'auto',
+            paddingRight: insets.right !== 0 ? Math.min(insets.right, 10) : 'auto',
+          }}>
+          {renderMainComponents()}
+        </SafeAreaView>
     )
   );
 };
@@ -3078,9 +1023,7 @@ const styles = StyleSheet.create({
   contentContainer: {
     paddingBottom: 10,
   },
-  transHistory: {
-    padding: 14,
-  },
+
   HeadView: {
     alignItems: 'center',
   },
@@ -3105,22 +1048,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderTopRightRadius: 20,
   },
-  noTrans: {
-    fontFamily: 'MontSBold',
-    fontSize: 18,
-    textAlign: 'center',
-    lineHeight: 26,
-  },
-  history: {
-    fontFamily: 'MontSBold',
-    color: '#14142B',
-    fontSize: 16,
-  },
-  seeHistory: {
-    color: '#054B99',
-    fontFamily: 'MontSBold',
-    fontSize: hp(2),
-  },
+
   transView: {
     marginHorizontal: 2,
     flexDirection: 'row',
@@ -3144,28 +1072,21 @@ const styles = StyleSheet.create({
     paddingLeft: wp(1),
     fontSize: hp(1.4),
   },
-  personIcon: {
-    borderWidth: 1,
-    borderColor: '#D9DBE9',
-    borderRadius: 30,
-    paddingHorizontal: 3,
-    justifyContent: 'center',
-    marginRight: 16,
-  },
+
   bellIcon: {
     paddingHorizontal: 3,
     justifyContent: 'center',
     marginRight: 16,
   },
   hello: {
-    fontFamily: 'Montserat',
+    fontFamily: 'Montserrat',
     fontWeight: '800',
     fontSize: 16,
     lineHeight: 24,
     color: '#14142B',
   },
   netInfo: {
-    fontFamily: 'Montserat',
+    fontFamily: 'Montserrat',
     fontWeight: '800',
     fontSize: 14,
     lineHeight: 24,
@@ -3179,26 +1100,15 @@ const styles = StyleSheet.create({
     borderColor: '#D9DBE9',
   },
   tabtexts: {
-    fontFamily: 'Montserat',
+    fontFamily: 'Montserrat',
     fontSize: 12,
     fontWeight: '600',
     lineHeight: 18,
     textAlign: 'center',
   },
-  card: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  gradient: {
-    marginHorizontal: 16,
-    borderRadius: 15,
-    marginTop: 20,
-    width: width - 32,
-    height: 'auto',
-  },
   wallet: {
     color: '#054B99',
-    fontFamily: 'Montserat',
+    fontFamily: 'Montserrat',
     fontWeight: '400',
     fontSize: 14,
     lineHeight: 18,
@@ -3210,22 +1120,6 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: '#fff',
     marginTop: 20,
-  },
-  FundButton: {
-    color: '#054B99',
-    fontFamily: 'Montserat',
-    fontWeight: '500',
-    fontSize: 16,
-  },
-  fundView: {
-    backgroundColor: '#fff',
-    width: '50%',
-    borderRadius: 12,
-    paddingVertical: 6,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 20,
-    marginBottom: 12,
   },
   indicator: {
     height: 10,
@@ -3249,21 +1143,21 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   title: {
-    fontFamily: 'Montserat',
+    fontFamily: 'Montserrat',
     fontSize: 14,
     fontWeight: '800',
     lineHeight: 21,
     color: '#14142B',
   },
   price: {
-    fontFamily: 'Montserat',
+    fontFamily: 'Montserrat',
     fontSize: 16,
     fontWeight: '800',
     lineHeight: 24,
     color: '#14142B',
   },
   desc: {
-    fontFamily: 'Montserat',
+    fontFamily: 'Montserrat',
     fontSize: 12,
     fontWeight: '400',
     lineHeight: 18,
@@ -3288,23 +1182,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     marginTop: 6,
   },
-  PanelItemContainer: {
-    borderWidth: 0.4,
-    borderColor: COLORS.lightGray,
-    padding: 10,
-    borderRadius: 6,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 15,
-    marginHorizontal: 5,
-    backgroundColor: COLORS.lightGray,
-  },
-  PanelImage: {
-    width: 30,
-    height: 30,
-    borderRadius: 40,
-  },
+
   PanelButton: {
     padding: 14,
     // marginBottom: 50,

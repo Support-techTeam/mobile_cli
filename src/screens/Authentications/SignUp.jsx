@@ -10,11 +10,11 @@ import {
   Dimensions,
 } from 'react-native';
 import React, {useState, useEffect} from 'react';
-import { Formik } from 'formik';
+import {Formik} from 'formik';
 import {CheckBox} from '@rneui/themed';
 import {useNavigation} from '@react-navigation/native';
-import Spinner from 'react-native-loading-spinner-overlay';
 import Input from '../../component/inputField/input.component';
+import InputPhone from '../../component/inputField/phone-input.component';
 import KeyboardAvoidingWrapper from '../../component/KeyBoardAvoiding/keyBoardAvoiding';
 import Button from '../../component/buttons/Button';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
@@ -27,6 +27,9 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
+import {SIZES} from '../../constants';
+import {AuthHeader} from '../../component/header/AuthHeader';
+import Loader from '../../component/loader/loader';
 
 const SignUp = () => {
   const insets = useSafeAreaInsets();
@@ -49,6 +52,8 @@ const SignUp = () => {
     firstname: '',
     lastname: '',
     email: '',
+    countryCode: '+234',
+    phoneNumber: '',
     password: '',
     confirmpassword: '',
   });
@@ -57,6 +62,7 @@ const SignUp = () => {
     !inputs.firstname ||
     !inputs.lastname ||
     !inputs.password ||
+    !inputs.phoneNumber ||
     !inputs.email ||
     !inputs.confirmpassword ||
     checked === false ||
@@ -64,6 +70,19 @@ const SignUp = () => {
     error !== '';
 
   const handleSignUp = async () => {
+    if (isNaN(Number(inputs.phoneNumber))) {
+      Toast.show({
+        type: 'error',
+        position: 'top',
+        topOffset: 50,
+        text1: 'Input Verificaton',
+        text2: 'Please enter a valid phone number',
+        visibilityTime: 3000,
+        autoHide: true,
+        onPress: () => Toast.hide(),
+      });
+      return;
+    }
     try {
       setIsLoading(true);
       const res = await userSignUp(inputs);
@@ -105,6 +124,11 @@ const SignUp = () => {
       isValid = false;
     } else if (!inputs.email.match(/\S+@\S+\.\S+/)) {
       handleError('Please input a valid email', 'email');
+      isValid = false;
+    }
+
+    if (!inputs.phoneNumber) {
+      handleError('Please input phone number', 'phoneNumber');
       isValid = false;
     }
 
@@ -189,33 +213,38 @@ const SignUp = () => {
     }
   };
 
-  useEffect(() => {
-    if (
-      !(
-        lowerValid &&
-        upperValid &&
-        numberValid &&
-        specialValid &&
-        lengthValid
-      ) &&
-      inputs.password.length > 0
-    ) {
-      setShowPassLogs(true);
-    } else {
-      setShowPassLogs(false);
-    }
-  }, [
-    lowerValid,
-    upperValid,
-    numberValid,
-    specialValid,
-    lengthValid,
-    inputs.password.length,
-  ]);
+  useEffect(
+    () => {
+      if (
+        !(
+          lowerValid &&
+          upperValid &&
+          numberValid &&
+          specialValid &&
+          lengthValid
+        ) &&
+        inputs.password.length > 0
+      ) {
+        setShowPassLogs(true);
+      } else {
+        setShowPassLogs(false);
+      }
+    },
+    [
+      lowerValid,
+      upperValid,
+      numberValid,
+      specialValid,
+      lengthValid,
+      inputs.password.length,
+    ],
+    [],
+  );
 
   const handleOnchange = (text, input) => {
     setInputs(prevState => ({...prevState, [input]: text}));
   };
+
   const handleError = (error, input) => {
     setErrors(prevState => ({...prevState, [input]: error}));
   };
@@ -225,20 +254,15 @@ const SignUp = () => {
       style={[
         styles.container,
         {
-          paddingTop: insets.top !== 0 ? insets.top : 18,
-          paddingBottom: insets.bottom !== 0 ? insets.bottom : 'auto',
-          paddingLeft: insets.left !== 0 ? insets.left : 'auto',
-          paddingRight: insets.right !== 0 ? insets.right : 'auto',
+          paddingTop: insets.top !== 0 ? Math.min(insets.top, 10) : 'auto',
+          paddingBottom:
+            insets.bottom !== 0 ? Math.min(insets.bottom, 10) : 'auto',
+          paddingLeft: insets.left !== 0 ? Math.min(insets.left, 10) : 'auto',
+          paddingRight:
+            insets.right !== 0 ? Math.min(insets.right, 10) : 'auto',
         },
       ]}>
-      {isLoading && (
-        <Spinner
-          textContent={'Signing Up...'}
-          textStyle={{color: 'white'}}
-          visible={true}
-          overlayColor="rgba(78, 75, 102, 0.7)"
-        />
-      )}
+      <Loader visible={isLoading} loadingText={'Signing Up...'} />
       <KeyboardAvoidingWrapper>
         <ImageBackground
           source={require('../../../assets/signup.png')}
@@ -249,51 +273,21 @@ const SignUp = () => {
             showsHorizontalScrollIndicator={false}
             showsVerticalScrollIndicator={false}
             style={{
-              paddingHorizontal: 16,
+              paddingHorizontal: SIZES.base,
               marginBottom: hp('2%'),
             }}>
             <View>
-              <View>
-                <View style={{paddingHorizontal: 12}}>
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      justifyContent: 'center',
-                      marginTop: 15,
-                    }}>
-                    <View>
-                      <TouchableOpacity
-                        style={{
-                          alignSelf: 'flex-start',
-                          borderWidth: 0.5,
-                          borderColor: '#D9DBE9',
-                          borderRadius: 5,
-                        }}
-                        onPress={() => navigation.goBack()}>
-                        <View>
-                          <Icon name="chevron-left" size={30} color="black" />
-                        </View>
-                      </TouchableOpacity>
-                    </View>
-                    <View style={styles.signupView}>
-                      <Image
-                        source={require('../../../assets/images/HeadLogo.png')}
-                        style={{width: 83, height: 32, marginBottom: 24}}
-                      />
-                      <Image
-                        source={require('../../../assets/images/locked.png')}
-                      />
-                      <Text style={styles.signupText}>Sign Up</Text>
-                      <View style={styles.signupDetails}>
-                        <Text style={[styles.DetailsText, {marginBottom: 40}]}>
-                          Create an account to get started
-                        </Text>
-                      </View>
-                    </View>
-                  </View>
-                </View>
-              </View>
-
+              <AuthHeader
+                routeAction={() => navigation.goBack()}
+                heading={'SIGN UP'}
+                intro={'Create an account to get started'}
+                disabled={true}
+                renderImage={
+                  Image.resolveAssetSource(
+                    require('../../../assets/images/locked.png'),
+                  ).uri
+                }
+              />
               <View
                 style={{
                   paddingTop: 25,
@@ -310,6 +304,7 @@ const SignUp = () => {
                     firstname: '',
                     lastname: '',
                     email: '',
+                    phoneNumber: '',
                     password: '',
                     confirmpassword: '',
                   }}
@@ -372,6 +367,26 @@ const SignUp = () => {
                           autoCapitalize="none"
                           autoCorrect={false}
                           isNeeded={true}
+                        />
+
+                        <InputPhone
+                          label="Phone number"
+                          onFocus={() => handleError(null, 'phoneNumber')}
+                          layout="first"
+                          isNeeded={true}
+                          defaultCode="NG"
+                          error={errors.phoneNumber}
+                          codeTextStyle={{color: '#6E7191'}}
+                          defaultValue={inputs?.phoneNumber}
+                          onChangeCountry={text =>
+                            handleOnchange(
+                              `+${text?.callingCode[0]}`,
+                              'countryCode',
+                            )
+                          }
+                          onChangeText={text =>
+                            handleOnchange(text, 'phoneNumber')
+                          }
                         />
 
                         <Input
@@ -662,7 +677,7 @@ const styles = StyleSheet.create({
   },
   signupText: {
     fontWeight: '700',
-    fontSize: 36,
+    fontSize: SIZES.h3,
     letterSpacing: 1,
   },
   DetailsText: {

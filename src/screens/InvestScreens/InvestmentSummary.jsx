@@ -5,7 +5,6 @@ import {
   TouchableOpacity,
   ScrollView,
   Image,
-  FlatList,
 } from 'react-native';
 import React, {useState, useEffect} from 'react';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -17,7 +16,8 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import COLORS from '../../constants/colors';
-import Spinner from 'react-native-loading-spinner-overlay';
+import {Header} from '../../component/header/Header';
+import Loader from '../../component/loader/loader';
 
 const listData = [
   {id: '1', text: 'Long term income generation.'},
@@ -45,39 +45,19 @@ const InvestmentSummaryScreen = () => {
         flex: 1,
         height: hp(100),
         backgroundColor: '#fff',
-        paddingTop: insets.top !== 0 ? insets.top : 18,
-        paddingBottom: insets.bottom !== 0 ? insets.bottom / 2 : 'auto',
-        paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
-        paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
+        paddingTop: insets.top !== 0 ? Math.min(insets.top, 10) : 'auto',
+        paddingBottom:
+          insets.bottom !== 0 ? Math.min(insets.bottom, 10) : 'auto',
+        paddingLeft: insets.left !== 0 ? Math.min(insets.left, 10) : 'auto',
+        paddingRight: insets.right !== 0 ? Math.min(insets.right, 10) : 'auto',
       }}>
-      {isLoading && (
-        <Spinner
-          textContent={'Getting Investment Plans...'}
-          textStyle={{color: 'white'}}
-          visible={true}
-          overlayColor="rgba(78, 75, 102, 0.7)"
-          animation="slide"
-        />
-      )}
-      <View
-        style={{
-          width: wp(90),
-          marginHorizontal: 10,
-          flexDirection: 'row',
-          alignItems: 'center',
-        }}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <View
-            style={{
-              borderWidth: 0.5,
-              borderColor: '#D9DBE9',
-              borderRadius: 5,
-            }}>
-            <Icon name="chevron-left" size={36} color="black" />
-          </View>
-        </TouchableOpacity>
-      </View>
-      <View style={styles.demark} />
+      <Loader visible={isLoading} loadingText={'Getting Investment Plans...'} />
+
+      <Header
+        routeAction={() => navigation.goBack()}
+        heading={`INVESTMENT OVERVIEW`}
+        disable={false}
+      />
       <ScrollView
         style={[styles.scrollView]}
         bounces={false}

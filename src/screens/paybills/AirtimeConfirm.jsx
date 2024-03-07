@@ -11,6 +11,7 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 
 import Buttons from '../../component/buttons/Buttons';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
+import { Header } from '../../component/header/Header';
 
 const AirtimeConfirm = ({route}) => {
   const navigation = useNavigation();
@@ -22,39 +23,19 @@ const AirtimeConfirm = ({route}) => {
       style={{
         flex: 1,
         backgroundColor: '#fff',
-        paddingTop: insets.top !== 0 ? insets.top : 18,
-        paddingBottom: insets.bottom !== 0 ? insets.bottom / 2 : 'auto',
-        paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
-        paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
+        paddingTop: insets.top !== 0 ? Math.min(insets.top, 10) : 'auto',
+        paddingBottom:
+          insets.bottom !== 0 ? Math.min(insets.bottom, 10) : 'auto',
+        paddingLeft: insets.left !== 0 ? Math.min(insets.left, 10) : 'auto',
+        paddingRight: insets.right !== 0 ? Math.min(insets.right, 10) : 'auto',
       }}>
       <View>
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginHorizontal: 15,
-          }}>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-            <View
-              style={{
-                borderWidth: 0.5,
-                borderColor: '#D9DBE9',
-                borderRadius: 5,
-              }}>
-              <AntDesign name="left" size={24} color="black" />
-            </View>
-          </TouchableOpacity>
-          <View style={styles.HeadView}>
-            <View style={styles.TopView}>
-              <Text style={styles.TextHead}>CONFIRM</Text>
-            </View>
-          </View>
-          <View>
-            <Text> </Text>
-          </View>
-        </View>
-        <View style={styles.demark} />
+     
+      <Header
+        routeAction={() => navigation.goBack()}
+        heading="BILLING SUMMARY"
+        disable={false}
+      />
         <ScrollView
           bounces={false}
           showsHorizontalScrollIndicator={false}

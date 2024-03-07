@@ -21,7 +21,7 @@ const getState = async () => {
   ) {
     try {
       const response = await axiosInstance.get('/address/get-state');
-      DdLogs.info(`Profile | Get State | ${auth?.currentUser?.email}`, {
+      DdLogs.info(`Profile | Get State | ${auth()?.currentUser?.email}`, {
         context: JSON.stringify(response?.data),
       });
       return {
@@ -30,7 +30,7 @@ const getState = async () => {
         message: 'success',
       };
     } catch (error) {
-      DdLogs.error(`Profile | Get State | ${auth?.currentUser?.email}`, {
+      DdLogs.error(`Profile | Get State | ${auth()?.currentUser?.email}`, {
         errorMessage: JSON.stringify(error),
       });
       return {
@@ -58,7 +58,7 @@ const getCity = async cityByState => {
       const response = await axiosInstance.get(
         `/address/get-city/${cityByState}`,
       );
-      DdLogs.info(`Profile | Get City | ${auth?.currentUser?.email}`, {
+      DdLogs.info(`Profile | Get City | ${auth()?.currentUser?.email}`, {
         context: JSON.stringify(response?.data),
       });
       return {
@@ -67,7 +67,7 @@ const getCity = async cityByState => {
         message: 'success',
       };
     } catch (error) {
-      DdLogs.error(`Profile | Get City | ${auth?.currentUser?.email}`, {
+      DdLogs.error(`Profile | Get City | ${auth()?.currentUser?.email}`, {
         errorMessage: JSON.stringify(error),
       });
       return {
@@ -104,7 +104,7 @@ const getProfileDetails = async () => {
         });
         await AsyncStorage.setItem('hasProfile', 'true');
         DdLogs.info(
-          `Profile | Get Profile Detail | ${auth?.currentUser?.email}`,
+          `Profile | Get Profile Detail | ${auth()?.currentUser?.email}`,
           {
             context: JSON.stringify(response?.data),
           },
@@ -116,7 +116,7 @@ const getProfileDetails = async () => {
         };
       } catch (error) {
         DdLogs.error(
-          `Profile | Get Profile Detail | ${auth?.currentUser?.email}`,
+          `Profile | Get Profile Detail | ${auth()?.currentUser?.email}`,
           {
             errorMessage: JSON.stringify(error),
           },
@@ -152,13 +152,13 @@ const createUserProfile = async details => {
       };
       try {
         const response = await axiosInstance.post(
-          `/users/create-profile`,
+          `/users/create-profile-web`,
           details,
           {headers},
         );
         await AsyncStorage.setItem('hasProfile', 'true');
         DdLogs.info(
-          `Profile | Create user Profile | ${auth?.currentUser?.email}`,
+          `Profile | Create user Profile | ${auth()?.currentUser?.email}`,
           {
             context: JSON.stringify(response?.data),
           },
@@ -171,7 +171,7 @@ const createUserProfile = async details => {
         };
       } catch (error) {
         DdLogs.error(
-          `Profile | Create user Profile | ${auth?.currentUser?.email}`,
+          `Profile | Create user Profile | ${auth()?.currentUser?.email}`,
           {
             errorMessage: JSON.stringify(error),
           },
@@ -210,7 +210,7 @@ const checkPin = async () => {
         const response = await axiosInstance.get(`/transaction-pin/check-pin`, {
           headers,
         });
-        DdLogs.info(`Profile | Check Pin | ${auth?.currentUser?.email}`, {
+        DdLogs.info(`Profile | Check Pin | ${auth()?.currentUser?.email}`, {
           context: JSON.stringify(response?.data),
         });
         return {
@@ -220,7 +220,7 @@ const checkPin = async () => {
           message: 'success',
         };
       } catch (error) {
-        DdLogs.error(`Profile | Check Pin | ${auth?.currentUser?.email}`, {
+        DdLogs.error(`Profile | Check Pin | ${auth()?.currentUser?.email}`, {
           errorMessage: JSON.stringify(error),
         });
         return {
@@ -264,7 +264,7 @@ const createTransactionPin = async details => {
 
         if (response?.data?.error) {
           DdLogs.info(
-            `Profile | Create Transaction Pin | ${auth?.currentUser?.email}`,
+            `Profile | Create Transaction Pin | ${auth()?.currentUser?.email}`,
             {
               context: JSON.stringify(response?.data),
             },
@@ -277,7 +277,7 @@ const createTransactionPin = async details => {
           };
         }
         DdLogs.info(
-          `Profile | Create Transaction Pin | ${auth?.currentUser?.email}`,
+          `Profile | Create Transaction Pin | ${auth()?.currentUser?.email}`,
           {
             context: JSON.stringify(response?.data),
           },
@@ -286,11 +286,11 @@ const createTransactionPin = async details => {
           title: 'Create Transaction Pin',
           error: false,
           data: null,
-          message: 'success',
+          message: response?.data?.message,
         };
       } catch (error) {
         DdLogs.error(
-          `Profile | Create Transaction Pin | ${auth?.currentUser?.email}`,
+          `Profile | Create Transaction Pin | ${auth()?.currentUser?.email}`,
           {
             errorMessage: JSON.stringify(error),
           },
@@ -334,10 +334,10 @@ const changePin = async details => {
           },
         );
         if (response?.data?.error) {
-          DdLogs.error(
-            `Profile | Change Transaction Pin | ${auth?.currentUser?.email}`,
+          DdLogs.info(
+            `Profile | Change Transaction Pin | ${auth()?.currentUser?.email}`,
             {
-              errorMessage: JSON.stringify(response?.data),
+              context: JSON.stringify(response?.data),
             },
           );
           return {
@@ -348,7 +348,7 @@ const changePin = async details => {
           };
         }
         DdLogs.info(
-          `Profile | Change Transaction Pin | ${auth?.currentUser?.email}`,
+          `Profile | Change Transaction Pin | ${auth()?.currentUser?.email}`,
           {
             context: JSON.stringify(response?.data),
           },
@@ -356,12 +356,12 @@ const changePin = async details => {
         return {
           title: 'Change Transaction Pin',
           error: false,
-          data: response?.data,
-          message: 'success',
+          data: null,
+          message: response?.data?.message,
         };
       } catch (error) {
         DdLogs.error(
-          `Profile | Change Transaction Pin | ${auth?.currentUser?.email}`,
+          `Profile | Change Transaction Pin | ${auth()?.currentUser?.email}`,
           {
             errorMessage: JSON.stringify(error),
           },
@@ -371,6 +371,126 @@ const changePin = async details => {
           error: true,
           data: null,
           message: `Failed | ${error?.response?.data?.message}`,
+        };
+      }
+    }
+  } else {
+    return {
+      error: true,
+      data: null,
+      message: 'No Internet Connection',
+    };
+  }
+};
+
+const resetPin = async () => {
+  if (
+    store.getState().networkState &&
+    store.getState().networkState.network.isConnected &&
+    store.getState().networkState.network.isInternetReachable
+  ) {
+    await getFirebaseAuthToken();
+    if (token) {
+      headers = {
+        accept: 'application/json',
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      };
+      try {
+        const response = await axiosInstance.get(
+          `/transaction-pin/factory-reset-pin`,
+          {
+            headers,
+          },
+        );
+        if (response?.data?.error) {
+          DdLogs.info(`Profile | Reset Pin | ${auth()?.currentUser?.email}`, {
+            context: JSON.stringify(response?.data),
+          });
+          return {
+            title: 'Reset Pin',
+            error: true,
+            data: null,
+            message: `Failed | ${response?.data?.message}`,
+          };
+        }
+        DdLogs.info(`Profile | Reset Pin | ${auth()?.currentUser?.email}`, {
+          context: JSON.stringify(response?.data),
+        });
+        return {
+          title: 'Reset Pin',
+          error: false,
+          data: null,
+          message: response?.data?.message,
+        };
+      } catch (error) {
+        DdLogs.error(`Profile | Reset Pin | ${auth()?.currentUser?.email}`, {
+          errorMessage: JSON.stringify(error),
+        });
+        return {
+          title: 'Reset Pin',
+          error: true,
+          data: null,
+          message: `Failed | ${error?.response?.data?.message}`,
+        };
+      }
+    }
+  } else {
+    return {
+      error: true,
+      data: null,
+      message: 'No Internet Connection',
+    };
+  }
+};
+
+const bvnValidation = async data => {
+  if (
+    store.getState().networkState &&
+    store.getState().networkState.network.isConnected &&
+    store.getState().networkState.network.isInternetReachable
+  ) {
+    await getFirebaseAuthToken();
+    if (token) {
+      headers = {
+        accept: 'application/json',
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      };
+      try {
+        const response = await axiosInstance.post(`/users/validate-bvn`, data, {
+          headers,
+        });
+
+        DdLogs.info(`Profile | BVN Validation| ${auth()?.currentUser?.email}`, {
+          context: JSON.stringify(response?.data),
+        });
+        if (response?.data?.error) {
+          return {
+            title: 'BVN Validation',
+            error: true,
+            data: response?.data?.message,
+            message: response?.data?.message || 'Failed to validate BVN',
+          };
+        }
+        return {
+          title: 'BVN Validation',
+          error: false,
+          data: response?.data?.validateBvnResult,
+          message: response?.data?.message || 'BVN validated successfully',
+        };
+      } catch (error) {
+        DdLogs.error(
+          `Profile | BVN Validation | ${auth()?.currentUser?.email}`,
+          {
+            errorMessage: JSON.stringify(error),
+          },
+        );
+        return {
+          title: 'BVN Validation',
+          error: true,
+          data: null,
+          message: error || 'Failed to validate BVN',
         };
       }
     }
@@ -405,4 +525,6 @@ export {
   checkPin,
   createTransactionPin,
   changePin,
+  bvnValidation,
+  resetPin,
 };

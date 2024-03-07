@@ -11,7 +11,6 @@ import {
 import React, {useContext, useEffect, useState} from 'react';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import {useNavigation} from '@react-navigation/native';
-import Spinner from 'react-native-loading-spinner-overlay';
 import Pdf from 'react-native-pdf';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
@@ -24,6 +23,8 @@ import {useSelector} from 'react-redux';
 import {getGuarantors} from '../../stores/GuarantorStore';
 import COLORS from '../../constants/colors';
 import appsFlyer from 'react-native-appsflyer';
+import {Header} from '../../component/header/Header';
+import Loader from '../../component/loader/loader';
 
 const durationData = [
   {value: '', label: 'Select Duration'},
@@ -175,7 +176,7 @@ const GetLoan = () => {
     } catch (e) {
       setIsLoading(false);
     }
-  };
+  };  
 
   useEffect(() => {
     const Data =
@@ -213,52 +214,56 @@ const GetLoan = () => {
     !loanDetails.amount ||
     !loanDetails.loanTenor;
 
-
-    const logAppsFlyer = (event, duration, type, value) => {
-      const eventName = event;
-      const eventValues = {
-        loan_duration: duration,
-        loan_type: type,
-        currency: 'NGN',
-        revenue: value,
-      };
-  
-      appsFlyer.logEvent(
-        eventName,
-        eventValues,
-        res => {
-          // console.log(res);
-        },
-        err => {
-          // console.error(err);
-        },
-      );
+  const logAppsFlyer = (event, duration, type, value) => {
+    const eventName = event;
+    const eventValues = {
+      loan_duration: duration,
+      loan_type: type,
+      currency: 'NGN',
+      revenue: value,
     };
+
+    appsFlyer.logEvent(
+      eventName,
+      eventValues,
+      res => {
+        // console.log(res);
+      },
+      err => {
+        // console.error(err);
+      },
+    );
+  };
 
   const handleCreateLoan = async () => {
     if (guarantors.length !== 0) {
       try {
         setIsLoading(true);
         const res = await createLoan(loanDetails);
-        if (res?.error) {
+        if (res?.error || res?.data?.error) {
           Toast.show({
             type: 'error',
             position: 'top',
             topOffset: 50,
             text1: res?.title,
-            text2: res?.message,
+            text2: res?.message || res?.data?.message,
             visibilityTime: 5000,
             autoHide: true,
             onPress: () => Toast.hide(),
           });
         } else {
-          logAppsFlyer('loan', loanDetails?.loanTenor, loanDetails?.loanType, loanDetails?.amount);
+          logAppsFlyer(
+            'loan',
+            loanDetails?.loanTenor,
+            loanDetails?.loanType,
+            loanDetails?.amount,
+          );
           Toast.show({
             type: 'success',
             position: 'top',
             topOffset: 50,
             text1: res?.title,
-            text2: res?.message,
+            text2: res?.message || res?.data?.message,
             visibilityTime: 3000,
             autoHide: true,
             onPress: () => Toast.hide(),
@@ -304,40 +309,19 @@ const GetLoan = () => {
       style={{
         flex: 1,
         backgroundColor: '#fff',
-        paddingTop: insets.top !== 0 ? insets.top : 18,
-        paddingBottom: insets.bottom !== 0 ? insets.bottom / 2 : 'auto',
-        paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
-        paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
+        paddingTop: insets.top !== 0 ? Math.min(insets.top, 10) : 'auto',
+        paddingBottom:
+          insets.bottom !== 0 ? Math.min(insets.bottom, 10) : 'auto',
+        paddingLeft: insets.left !== 0 ? Math.min(insets.left, 10) : 'auto',
+        paddingRight: insets.right !== 0 ? Math.min(insets.right, 10) : 'auto',
       }}>
       {pdfmain ? (
         <>
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              marginHorizontal: 15,
-            }}>
-            <TouchableOpacity onPress={() => navigation.goBack()}>
-              <View
-                style={{
-                  borderWidth: 0.5,
-                  borderColor: '#D9DBE9',
-                  borderRadius: 5,
-                }}>
-                <AntDesign name="left" size={24} color="black" />
-              </View>
-            </TouchableOpacity>
-            <View style={styles.HeadView}>
-              <View style={styles.TopView}>
-                <Text style={styles.TextHead}>Terms and Policy Agreement</Text>
-              </View>
-            </View>
-            <View>
-              <Text> </Text>
-            </View>
-          </View>
-          <View style={styles.demark} />
+          <Header
+            routeAction={() => navigation.goBack()}
+            heading={'Terms and Policy Agreement'}
+            disable={false}
+          />
           <Pdf
             trustAllCerts={false}
             source={source2}
@@ -461,42 +445,12 @@ const GetLoan = () => {
                 </>
               ) : (
                 <>
-                  {isLoading && (
-                    <Spinner
-                      textContent={'Loading...'}
-                      textStyle={{color: 'white'}}
-                      visible={true}
-                      overlayColor="rgba(78, 75, 102, 0.7)"
-                    />
-                  )}
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      marginHorizontal: 10,
-                    }}>
-                    <TouchableOpacity
-                      onPress={() => navigation.navigate('Home')}>
-                      <View
-                        style={{
-                          borderWidth: 0.5,
-                          borderColor: '#D9DBE9',
-                          borderRadius: 5,
-                        }}>
-                        <AntDesign name="left" size={30} color="black" />
-                      </View>
-                    </TouchableOpacity>
-                    <View style={styles.HeadView}>
-                      <View style={styles.TopView}>
-                        <Text style={styles.TextHead}>LOAN APPLICATION</Text>
-                      </View>
-                    </View>
-                    <View>
-                      <Text> </Text>
-                    </View>
-                  </View>
-                  <View style={styles.demark} />
+                  <Loader visible={isLoading} loadingText={'Please wait...'} />
+                  <Header
+                    routeAction={() => navigation.navigate('Loan')}
+                    heading={'LOAN APPLICATION'}
+                    disable={false}
+                  />
                   <ImageBackground
                     source={require('../../../assets/signup.png')}
                     resizeMode="stretch"

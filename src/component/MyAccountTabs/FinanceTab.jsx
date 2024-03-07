@@ -35,11 +35,17 @@ const Finance = () => {
   return (
     <View style={styles.container}>
       <TouchableOpacity
+        disabled={bankDeets === undefined || bankDeets === null ? true : false}
         onPress={() =>
           navigation.navigate('BankDetails', {paramKey: 'myAccount'})
         }
         style={{marginBottom: 20}}>
-        <Buttons label={'Update Finance Details'} />
+        <Buttons
+          disabled={
+            bankDeets === undefined || bankDeets === null ? true : false
+          }
+          label={'Update Finance Details'}
+        />
       </TouchableOpacity>
       <ScrollView
         showsHorizontalScrollIndicator={false}

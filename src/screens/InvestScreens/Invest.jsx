@@ -5,18 +5,18 @@ import {
   Image,
   TouchableOpacity,
   ScrollView,
+  Dimensions,
   FlatList,
 } from 'react-native';
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {TabView, SceneMap} from 'react-native-tab-view';
-import {useNavigation} from '@react-navigation/native';
+import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import {Skeleton} from '@rneui/base';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import CustomTabBar from '../../component/CustomTabs/CustomTabBar3';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
-import Toast from 'react-native-toast-message';
 import {getLoanUserDetails} from '../../stores/LoanStore';
 import {useRoute} from '@react-navigation/native';
+import {useSelector} from 'react-redux';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -28,6 +28,12 @@ import {
   getSingleArmInvestment,
 } from '../../stores/InvestStore';
 import appsFlyer from 'react-native-appsflyer';
+import {IntroSection} from '../../component/homescreen/Intro-Section';
+import {FlashList} from '@shopify/flash-list';
+import CustomButton from '../../component/buttons/CustomButtons';
+
+const SLIDE_WIDTH = Dimensions.get('window').width * 0.88;
+const ITEM_WIDTH = SLIDE_WIDTH;
 
 const Investscreen = () => {
   const navigation = useNavigation();
@@ -40,6 +46,7 @@ const Investscreen = () => {
   const [isLoading, setIsLoading] = useState(false);
   const route = useRoute();
   const [portfolioDetail, setPortfolioDetail] = useState(0);
+  const userProfileData = useSelector(state => state.userProfile.profile);
 
   //total ARM Investment
   let totalArmAmount =
@@ -62,137 +69,139 @@ const Investscreen = () => {
         0,
       );
 
+  useFocusEffect(
+    useCallback(() => {
+      getLoanuserData();
+      getAllLendaInvestments();
+      getAllArmInvestments();
+    }, []),
+  );
+
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     const mergedData = [...allArmData, ...allILendaData];
+  //     setAllInvestmentData(mergedData);
+  //   }, [allArmData, allILendaData]),
+  // );
   useEffect(() => {
     if (route.name === 'Invest') {
-      const unsubscribe = navigation.addListener('focus', async () => {
-        getLoanuserData();
-        getAllLendaInvestments();
-        getAllArmInvestments();
-      });
-      return unsubscribe;
+      const mergedData = [...allArmData, ...allILendaData];
+      setAllInvestmentData(mergedData);
     }
-  }, [navigation]);
-
-  useEffect(() => {
-    getAllLendaInvestments();
-    getAllArmInvestments();
-  }, []);
-
-  useEffect(() => {
-    const mergedData = [...allArmData, ...allILendaData];
-    setAllInvestmentData(mergedData);
   }, [allArmData, allILendaData]);
 
-  const getLoanuserData = async () => {
+  const getLoanuserData = useCallback(async () => {
+    // console.log('getLoanuserData');
     try {
       setIsLoading(true);
       const res = await getLoanUserDetails();
-      if (res?.error) {
-      } else {
+      if (!res?.error) {
         setLoanUserDetails(res?.data);
       }
       setIsLoading(false);
     } catch (e) {
       setIsLoading(false);
     }
-  };
+  }, []);
 
-  const getAllLendaInvestments = async () => {
+  const getAllLendaInvestments = useCallback(async () => {
     try {
       setIsLoading(true);
       const res = await getAllLendaInvestment();
-      if (res?.error) {
-      } else {
-        if (res?.data?.length > 0) {
-          setAllLendaData(res?.data);
-        }
+      if (!res?.error && res?.data?.length > 0) {
+        setAllLendaData(res?.data);
       }
       setIsLoading(false);
     } catch (e) {
       setIsLoading(false);
     }
-  };
+  }, []);
 
-  const getAllArmInvestments = async () => {
+  const getAllArmInvestments = useCallback(async () => {
     try {
       setIsLoading(true);
       const res = await getAllArmInvestment();
-      if (res?.error) {
-      } else {
-        if (res?.data?.data?.length > 0) {
-          setAllArmData(res?.data?.data);
-          getSingleArmInvestment(
-            res?.data?.data[0]?.membershipId,
-            res?.data?.data[0]?.productCode,
-          ).then(res => {
-            if (!res?.error) {
-              if (res?.data?.length > 0) {
-                setPortfolioDetail(res?.data?.portfolio[0]?.accountBalance);
-              }
-            }
-          });
+      if (!res?.error && res?.data?.data?.length > 0) {
+        setAllArmData(res?.data?.data);
+        const singleArmInvestmentRes = await getSingleArmInvestment(
+          res?.data?.data[0]?.membershipId,
+          res?.data?.data[0]?.productCode,
+        );
+        if (
+          !singleArmInvestmentRes?.error &&
+          singleArmInvestmentRes?.data?.length > 0
+        ) {
+          setPortfolioDetail(
+            singleArmInvestmentRes?.data?.portfolio[0]?.accountBalance,
+          );
         }
       }
       setIsLoading(false);
     } catch (e) {
       setIsLoading(false);
     }
-  };
-  const isReadyToInvest =
-    loanUserDetails?.armUserBankDetails &&
-    loanUserDetails?.nextOfKinDetails &&
-    loanUserDetails?.loanDocumentDetails &&
-    loanUserDetails?.armUserBankDetails != null &&
-    loanUserDetails?.loanDocumentDetails != null &&
-    loanUserDetails?.nextOfKinDetails != null &&
-    loanUserDetails?.armUserBankDetails?.annualExpectedAnnualIncomeRange !=
-      undefined &&
-    loanUserDetails?.armUserBankDetails?.annualExpectedAnnualIncomeRange !=
-      '' &&
-    loanUserDetails?.armUserBankDetails?.bankAccountName != undefined &&
-    loanUserDetails?.armUserBankDetails?.bankAccountName != '' &&
-    loanUserDetails?.armUserBankDetails?.bankAccountNumber != undefined &&
-    loanUserDetails?.armUserBankDetails?.bankAccountNumber != '' &&
-    loanUserDetails?.armUserBankDetails?.bankCode != undefined &&
-    loanUserDetails?.armUserBankDetails?.bankCode != '' &&
-    loanUserDetails?.armUserBankDetails?.bankName != undefined &&
-    loanUserDetails?.armUserBankDetails?.bankName != '' &&
-    loanUserDetails?.armUserBankDetails?.branchCode != undefined &&
-    loanUserDetails?.armUserBankDetails?.branchCode != '' &&
-    loanUserDetails?.armUserBankDetails?.employmentStatus != undefined &&
-    loanUserDetails?.armUserBankDetails?.employmentStatus != '' &&
-    loanUserDetails?.armUserBankDetails?.expiryDateOfId != undefined &&
-    loanUserDetails?.armUserBankDetails?.expiryDateOfId != '' &&
-    loanUserDetails?.armUserBankDetails?.idType != undefined &&
-    loanUserDetails?.armUserBankDetails?.idType != '' &&
-    loanUserDetails?.armUserBankDetails?.kycLevel != undefined &&
-    loanUserDetails?.armUserBankDetails?.kycLevel != '' &&
-    loanUserDetails?.armUserBankDetails?.maximumSingleInvestmentAmount !=
-      undefined &&
-    loanUserDetails?.armUserBankDetails?.maximumSingleInvestmentAmount != '' &&
-    loanUserDetails?.armUserBankDetails?.maximumSingleRedemptionAmount !=
-      undefined &&
-    loanUserDetails?.armUserBankDetails?.maximumSingleRedemptionAmount != '' &&
-    loanUserDetails?.armUserBankDetails?.reInvestDividends != undefined &&
-    loanUserDetails?.armUserBankDetails?.reInvestDividends != '' &&
-    loanUserDetails?.armUserBankDetails?.utilityBillIdType != undefined &&
-    loanUserDetails?.armUserBankDetails?.utilityBillIdType != null &&
-    loanUserDetails?.armUserBankDetails?.utilityBillIdType != '' &&
-    loanUserDetails?.loanDocumentDetails?.identityCard != undefined &&
-    loanUserDetails?.loanDocumentDetails?.identityCard != null &&
-    loanUserDetails?.loanDocumentDetails?.identityCard != '' &&
-    loanUserDetails?.loanDocumentDetails?.utilityBill != undefined &&
-    loanUserDetails?.loanDocumentDetails?.utilityBill != null &&
-    loanUserDetails?.loanDocumentDetails?.utilityBill != '' &&
-    loanUserDetails?.loanDocumentDetails?.personalPhoto != undefined &&
-    loanUserDetails?.loanDocumentDetails?.personalPhoto != null &&
-    loanUserDetails?.loanDocumentDetails?.personalPhoto != '';
+  }, []);
+
+  const isReadyToInvest = useMemo(() => {
+    return (
+      loanUserDetails?.armUserBankDetails &&
+      loanUserDetails?.nextOfKinDetails &&
+      loanUserDetails?.loanDocumentDetails &&
+      loanUserDetails?.armUserBankDetails != null &&
+      loanUserDetails?.loanDocumentDetails != null &&
+      loanUserDetails?.nextOfKinDetails != null &&
+      loanUserDetails?.armUserBankDetails?.annualExpectedAnnualIncomeRange !=
+        undefined &&
+      loanUserDetails?.armUserBankDetails?.annualExpectedAnnualIncomeRange !=
+        '' &&
+      loanUserDetails?.armUserBankDetails?.bankAccountName != undefined &&
+      loanUserDetails?.armUserBankDetails?.bankAccountName != '' &&
+      loanUserDetails?.armUserBankDetails?.bankAccountNumber != undefined &&
+      loanUserDetails?.armUserBankDetails?.bankAccountNumber != '' &&
+      loanUserDetails?.armUserBankDetails?.bankCode != undefined &&
+      loanUserDetails?.armUserBankDetails?.bankCode != '' &&
+      loanUserDetails?.armUserBankDetails?.bankName != undefined &&
+      loanUserDetails?.armUserBankDetails?.bankName != '' &&
+      loanUserDetails?.armUserBankDetails?.branchCode != undefined &&
+      loanUserDetails?.armUserBankDetails?.branchCode != '' &&
+      loanUserDetails?.armUserBankDetails?.employmentStatus != undefined &&
+      loanUserDetails?.armUserBankDetails?.employmentStatus != '' &&
+      loanUserDetails?.armUserBankDetails?.expiryDateOfId != undefined &&
+      loanUserDetails?.armUserBankDetails?.expiryDateOfId != '' &&
+      loanUserDetails?.armUserBankDetails?.idType != undefined &&
+      loanUserDetails?.armUserBankDetails?.idType != '' &&
+      loanUserDetails?.armUserBankDetails?.kycLevel != undefined &&
+      loanUserDetails?.armUserBankDetails?.kycLevel != '' &&
+      loanUserDetails?.armUserBankDetails?.maximumSingleInvestmentAmount !=
+        undefined &&
+      loanUserDetails?.armUserBankDetails?.maximumSingleInvestmentAmount !=
+        '' &&
+      loanUserDetails?.armUserBankDetails?.maximumSingleRedemptionAmount !=
+        undefined &&
+      loanUserDetails?.armUserBankDetails?.maximumSingleRedemptionAmount !=
+        '' &&
+      loanUserDetails?.armUserBankDetails?.reInvestDividends != undefined &&
+      loanUserDetails?.armUserBankDetails?.reInvestDividends != '' &&
+      loanUserDetails?.armUserBankDetails?.utilityBillIdType != undefined &&
+      loanUserDetails?.armUserBankDetails?.utilityBillIdType != null &&
+      loanUserDetails?.armUserBankDetails?.utilityBillIdType != '' &&
+      loanUserDetails?.loanDocumentDetails?.identityCard != undefined &&
+      loanUserDetails?.loanDocumentDetails?.identityCard != null &&
+      loanUserDetails?.loanDocumentDetails?.identityCard != '' &&
+      loanUserDetails?.loanDocumentDetails?.utilityBill != undefined &&
+      loanUserDetails?.loanDocumentDetails?.utilityBill != null &&
+      loanUserDetails?.loanDocumentDetails?.utilityBill != '' &&
+      loanUserDetails?.loanDocumentDetails?.personalPhoto != undefined &&
+      loanUserDetails?.loanDocumentDetails?.personalPhoto != null &&
+      loanUserDetails?.loanDocumentDetails?.personalPhoto != ''
+    );
+  }, [loanUserDetails]);
 
   const loadingList = ['string', 'string', 'string'];
   const status = [
     {
       id: 1,
-      state: 'Lend with Trade Lenda',
+      state: 'Earn With Us',
       amount: `₦${
         totalLendaAmount === undefined
           ? '0.00'
@@ -242,8 +251,8 @@ const Investscreen = () => {
         {isLoading ? (
           <View
             style={{
-              width: wp('43.5%'),
-              height: hp('25%'),
+              width: wp(43.5),
+              height: hp(26),
               marginHorizontal: 2,
               borderRadius: 20,
               borderColor: '#F7F7FC',
@@ -288,7 +297,7 @@ const Investscreen = () => {
               </View>
               <View>
                 <Text style={styles.amount}>{item.amount}</Text>
-                <TouchableOpacity
+                <CustomButton
                   onPress={() => {
                     if (item.id == 1) {
                       logAppsFlyer(
@@ -317,11 +326,11 @@ const Investscreen = () => {
                         navigation.navigate('OnboardingHome');
                       }
                     }
-                  }}>
-                  <View style={styles.buttonAction}>
-                    <Text style={styles.getText}>{item.buttonText}</Text>
-                  </View>
-                </TouchableOpacity>
+                  }}
+                  title={item.buttonText}
+                  buttonStyle={{width: '70%'}}
+                  textStyle={{fontSize: 14}}
+                />
               </View>
               <View
                 style={{
@@ -432,8 +441,10 @@ const Investscreen = () => {
                   <View style={{marginTop: 0}}>
                     <TouchableOpacity
                       disabled={
-                        !investment?.investmentType 
-                          ? investment?.productCode && investment?.membershipId ? false : true
+                        !investment?.investmentType
+                          ? investment?.productCode && investment?.membershipId
+                            ? false
+                            : true
                           : false
                       }
                       onPress={() =>
@@ -551,7 +562,7 @@ const Investscreen = () => {
     myInvesments: FirstRoute,
   });
 
-  const logAppsFlyer = (event, investmentName, activity, value) => {
+  const logAppsFlyer = useCallback((event, investmentName, activity, value) => {
     const eventName = event;
     const eventValues = {
       investment_type: investmentName,
@@ -570,120 +581,68 @@ const Investscreen = () => {
         // console.error(err);
       },
     );
+  }, []);
+
+  const reanderIntroSection = () => {
+    return isLoading ? (
+      <View style={[styles.headerContainer, {justifyContent: 'center'}]}>
+        <Skeleton animation="wave" width={wp(90)} height={50} />
+      </View>
+    ) : (
+      <IntroSection
+        userProfileData={userProfileData}
+        loanUserDetails={loanUserDetails}
+      />
+    );
+  };
+
+  const renderRootComponents = () => {
+    return <>{reanderIntroSection()}</>;
   };
 
   return (
-    <>
-      {isLoading ? (
-        <SafeAreaView
-          style={{
-            flex: 1,
-            backgroundColor: '#fff',
-            paddingTop: insets.top !== 0 ? insets.top : 18,
-            paddingBottom: insets.bottom !== 0 ? insets.bottom / 2 : 'auto',
-            paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
-            paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
-          }}>
-          <View style={styles.innerContainer}>
-            <View style={{flexDirection: 'row', width: '45%'}}>
-              <View style={{flexDirection: 'row'}}>
-                <View style={{marginRight: 16}}>
-                  <Skeleton animation="wave" width={70} height={20} />
-                </View>
-
-                <Skeleton animation="wave" width={70} height={20} />
-              </View>
-            </View>
-
-            <View style={styles.getInvestmentLoader}>
-              <Skeleton animation="wave" width={80} height={25} />
-            </View>
-
-            <FlatList
-              data={status ? status : []}
-              numColumns={1}
-              showsHorizontalScrollIndicator={false}
-              showsVerticalScrollIndicator={false}
-              contentContainerStyle={{flex: 1, justifyContent: 'center'}}
-              horizontal
-              renderItem={({item}) => <Slide item={item} />}
-            />
-          </View>
-          <TabView
-            navigationState={{
-              index,
-              routes: data?.map(item => ({key: item.id, title: item.title})),
-            }}
-            renderScene={renderScene}
-            onIndexChange={setIndex}
-            swipeEnabled={false}
-            tabBarPosition="top"
-            renderTabBar={props => (
-              <CustomTabBar {...props} onIndexChange={setIndex} />
-            )}
-          />
-        </SafeAreaView>
-      ) : (
-        <SafeAreaView
-          style={{
-            flex: 1,
-            backgroundColor: '#fff',
-            paddingTop: insets.top !== 0 ? insets.top : 18,
-            paddingBottom: insets.bottom !== 0 ? insets.bottom / 2 : 'auto',
-            paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
-            paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
-          }}>
-          <View style={styles.innerContainer}>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                marginBottom: 20,
-                marginRight: 15,
-              }}>
-              <Image
-                source={require('../../../assets/images/HeadLogo.png')}
-                style={{width: 83, height: 32}}
-              />
-              <TouchableOpacity
-                onPress={() => navigation.navigate('More')}
-                style={{
-                  backgroundColor: '#D9DBE9',
-                  padding: 8,
-                  borderRadius: 50,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}>
-                <Icon name="account-circle-outline" size={24} color="black" />
-              </TouchableOpacity>
-            </View>
-
-            <FlatList
-              data={status ? status : []}
-              showsHorizontalScrollIndicator={false}
-              showsVerticalScrollIndicator={false}
-              contentContainerStyle={{flex: 1, justifyContent: 'center'}}
-              horizontal
-              renderItem={({item}) => <Slide item={item} />}
-            />
-          </View>
-          <TabView
-            navigationState={{
-              index,
-              routes: data?.map(item => ({key: item.id, title: item.title})),
-            }}
-            renderScene={renderScene}
-            onIndexChange={setIndex}
-            swipeEnabled={false}
-            tabBarPosition="top"
-            renderTabBar={props => (
-              <CustomTabBar {...props} onIndexChange={setIndex} />
-            )}
-          />
-        </SafeAreaView>
-      )}
-    </>
+    <SafeAreaView
+      style={{
+        flex: 1,
+        backgroundColor: '#fff',
+        paddingTop:
+          insets.top !== 0 ? (insets.top < 10 ? insets.top : 10) : 'auto',
+        paddingBottom:
+          insets.bottom !== 0
+            ? insets.bottom < 10
+              ? insets.bottom
+              : 10
+            : 'auto',
+        paddingLeft:
+          insets.left !== 0 ? (insets.left < 10 ? insets.left : 10) : 'auto',
+        paddingRight:
+          insets.right !== 0 ? (insets.right < 10 ? insets.right : 10) : 'auto',
+      }}>
+      {renderRootComponents()}
+      <View style={styles.innerContainer}>
+        <FlatList
+          data={status ? status : []}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{flex: 1, justifyContent: 'space-evenly'}}
+          horizontal
+          renderItem={({item}) => <Slide item={item} />}
+        />
+      </View>
+      <TabView
+        navigationState={{
+          index,
+          routes: data?.map(item => ({key: item.id, title: item.title})),
+        }}
+        renderScene={renderScene}
+        onIndexChange={setIndex}
+        swipeEnabled={false}
+        tabBarPosition="top"
+        renderTabBar={props => (
+          <CustomTabBar {...props} onIndexChange={setIndex} />
+        )}
+      />
+    </SafeAreaView>
   );
 };
 
@@ -694,15 +653,21 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
   },
+  headerContainer: {
+    paddingHorizontal: 20,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 10,
+  },
   innerContainer: {
     marginHorizontal: 16,
   },
   tobTab: {
-    borderWidth: 1,
-    borderColor: '#D9DBE9',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
     borderRadius: 5,
-    paddingVertical: 4,
-    paddingHorizontal: 8,
   },
   tabText: {
     fontSize: 12,
@@ -712,7 +677,7 @@ const styles = StyleSheet.create({
   buttonAction: {
     backgroundColor: COLORS.lendaBlue,
     borderRadius: 12,
-    width: wp(22),
+    width: wp(23),
     height: 35,
     justifyContent: 'center',
   },
@@ -725,8 +690,7 @@ const styles = StyleSheet.create({
   getText: {
     textAlign: 'center',
     color: 'white',
-
-    fontSize: 14,
+    fontSize: hp('1.8'),
     fontWeight: '500',
   },
   tabBar: {

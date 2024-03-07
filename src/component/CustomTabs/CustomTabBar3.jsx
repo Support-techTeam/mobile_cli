@@ -55,7 +55,7 @@ const styles = StyleSheet.create({
   },
   tabBar: {
     flexDirection: 'row',
-    height: hp(10),
+    marginVertical: 15,
     width: wp(100),
     marginTop: 20,
   },

@@ -1,83 +1,226 @@
-/* eslint-disable no-undef */
 import {
-  View,
-  Text,
+  ScrollView,
   StyleSheet,
+  Text,
   TouchableOpacity,
+  View,
   Dimensions,
-  FlatList,
+  Image,
 } from 'react-native';
-import React, {useContext, useEffect, useState} from 'react';
+import React, {Fragment, useContext, useEffect, useState} from 'react';
 import {getStatusBarHeight} from 'react-native-status-bar-height';
 import {useNavigation} from '@react-navigation/native';
-import AntDesign from 'react-native-vector-icons/AntDesign';
-import Spinner from 'react-native-loading-spinner-overlay/lib';
-import CustomView from '../../component/paybillsview/CustomView';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
-
+import Loader from '../../component/loader/loader';
+import {Header} from '../../component/header/Header';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import Accordion from 'react-native-collapsible/Accordion';
+import COLORS from '../../constants/colors';
+import {
+  getNetworkProvider,
+  getDataProvider,
+  getElectricityProviders,
+} from '../../stores/BillStore';
+import {AirtimeSection} from '../../component/bill/Airtime-Section';
+import {ActivityIndicator} from 'react-native';
+import {DataSection} from '../../component/bill/Data-Section';
+import {ElectricSection} from '../../component/bill/Electric-Section';
+import {CableSection} from '../../component/bill/Cable-Section';
 const statusBarHeight = getStatusBarHeight();
 const midth = Dimensions.get('window').width;
-
-const billData = [
-  {value: 'Airtime', label: 'Airtime', key: 'airtime'},
-  {value: 'Data Bundle', label: 'Data Bundle', key: 'data_bundle'},
-  {value: 'Electricity', label: 'Electricity', key: 'electricity'},
-  {value: 'Cable TV', label: 'Cable TV', key: 'cable_tv'},
-];
 
 const Paybills = () => {
   const navigation = useNavigation();
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingAirtime, setIsLoadingAirtime] = useState(false);
+  const [isLoadingData, setIsLoadingData] = useState(false);
+  const [isLoadingPower, setIsLoadingPower] = useState(false);
+  const [isLoadingCable, setIsLoadingCable] = useState(false);
   const insets = useSafeAreaInsets();
+  const [activeSections, setActiveSections] = useState([]);
+  const [networkProviders, setNetworkProviders] = useState([]);
+  const [dataNetworkProviders, setDataNetworkProviders] = useState([]);
+  const [electricityProviders, setElectricityProviders] = useState([]);
+  const [cableProviders, setCableProviders] = useState([
+    {value: 'gotv', name: 'GOTV'},
+    {value: 'dstv', name: 'DSTV'},
+  ]);
+
+  const sections = [
+    {
+      title: 'Airtime Purchase',
+      image: require('../../../assets/images/airtime.png'),
+      content: (
+        <Fragment>
+          {isLoadingAirtime ? (
+            <ActivityIndicator size={'large'} color={COLORS.lendaBlue} />
+          ) : (
+            <AirtimeSection networkProviders={networkProviders} />
+          )}
+        </Fragment>
+      ),
+    },
+    {
+      title: 'Data Bundle Purchase',
+      image: require('../../../assets/images/databuy.png'),
+      content: (
+        <Fragment>
+          {isLoadingData ? (
+            <ActivityIndicator size={'large'} color={COLORS.lendaBlue} />
+          ) : (
+            <DataSection networkProviders={dataNetworkProviders} />
+          )}
+        </Fragment>
+      ),
+    },
+    {
+      title: 'Pay Electric Bill',
+      image: require('../../../assets/images/Electricity.png'),
+      content: (
+        <Fragment>
+          {isLoadingPower ? (
+            <ActivityIndicator size={'large'} color={COLORS.lendaBlue} />
+          ) : (
+            <ElectricSection networkProviders={electricityProviders} />
+          )}
+        </Fragment>
+      ),
+    },
+    {
+      title: 'Cable TV Subscription',
+      image: require('../../../assets/images/cable.png'),
+      content: (
+        <Fragment>
+          {isLoadingCable ? (
+            <ActivityIndicator size={'large'} color={COLORS.lendaBlue} />
+          ) : (
+            <CableSection networkProviders={cableProviders} />
+          )}
+        </Fragment>
+      ),
+    },
+  ];
+
+  useEffect(() => {
+    fetchingAllNetworkProvider();
+  }, []);
+
+  const fetchingAllNetworkProvider = async () => {
+    try {
+      setIsLoadingAirtime(true);
+      const res = await getNetworkProvider();
+      if (res?.error) {
+      } else {
+        setNetworkProviders(res?.data?.data?.data?.providers);
+      }
+      setIsLoadingAirtime(false);
+    } catch (e) {
+      setIsLoadingAirtime(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchingAllDataNetworkProvider();
+  }, []);
+
+  const fetchingAllDataNetworkProvider = async () => {
+    try {
+      setIsLoadingData(true);
+      const res = await getDataProvider();
+      if (res?.error) {
+        // TODO: handle error
+      } else {
+        setDataNetworkProviders(res?.data?.data?.data);
+      }
+      setIsLoadingData(false);
+    } catch (e) {
+      setIsLoadingData(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchingAllElectricityProvider();
+  }, []);
+
+  const fetchingAllElectricityProvider = async () => {
+    try {
+      setIsLoadingPower(true);
+      const res = await getElectricityProviders();
+      if (res?.error) {
+        // TODO: handle error
+      } else {
+        setElectricityProviders(res?.data?.data?.data);
+      }
+      setIsLoadingPower(false);
+    } catch (e) {
+      setIsLoadingPower(false);
+    }
+  };
+
+  function renderHeader(section, _, isActive) {
+    return (
+      <View style={[styles.accordHeader, {paddingVertical: isActive ? 8 : 18}]}>
+        <View
+          style={{
+            flexDirection: 'row',
+            gap: 8,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+          <Image source={section.image} />
+          <Text style={styles.accordTitle}>{section.title}</Text>
+        </View>
+        <Icon
+          name={isActive ? 'chevron-up' : 'chevron-down'}
+          size={20}
+          color="#bbb"
+        />
+      </View>
+    );
+  }
+
+  function renderContent(section, _, isActive) {
+    return <View style={styles.accordBody}>{section.content}</View>;
+  }
 
   return (
     <SafeAreaView
       style={{
         flex: 1,
         backgroundColor: '#fff',
-        paddingTop: insets.top !== 0 ? insets.top : 18,
-        paddingBottom: insets.bottom !== 0 ? insets.bottom / 2 : 'auto',
-        paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
-        paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
+        paddingTop: insets.top !== 0 ? Math.min(insets.top, 10) : 'auto',
+        paddingBottom:
+          insets.bottom !== 0 ? Math.min(insets.bottom, 10) : 'auto',
+        paddingLeft: insets.left !== 0 ? Math.min(insets.left, 10) : 'auto',
+        paddingRight: insets.right !== 0 ? Math.min(insets.right, 10) : 'auto',
       }}>
-      {isLoading && (
-        <Spinner
-          textContent={'Loading...'}
-          textStyle={{color: 'white'}}
-          visible={true} //check
-          overlayColor="rgba(78, 75, 102, 0.7)"
-        />
-      )}
-      <View>
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginHorizontal: 15,
-          }}>
-          <TouchableOpacity onPress={() => navigation.navigate('Home')}>
-            <View
-              style={{
-                borderWidth: 0.5,
-                borderColor: '#D9DBE9',
-                borderRadius: 5,
-              }}>
-              <AntDesign name="left" size={24} color="black" />
-            </View>
-          </TouchableOpacity>
-          <View style={styles.HeadView}>
-            <View style={styles.TopView}>
-              <Text style={styles.TextHead}>PAYBILLS</Text>
-            </View>
-          </View>
-          <View>
-            <Text> </Text>
-          </View>
-        </View>
-        <View style={styles.demark} />
+      <Loader visible={isLoading} loadingText={'Please wait...'} />
 
-        <View style={[styles.innercontainer]}>
+      <Header
+        routeAction={() => navigation.goBack()}
+        heading="PAY BILLS"
+        disable={false}
+      />
+
+      <ScrollView
+        contentInsetAdjustmentBehavior="automatic"
+        style={styles.container}>
+        <Accordion
+          easing="easeIn"
+          duration={300}
+          expandMultiple={false}
+          align="top"
+          sections={sections}
+          activeSections={activeSections}
+          renderHeader={renderHeader}
+          renderContent={renderContent}
+          onChange={sections => setActiveSections(sections)}
+          sectionContainerStyle={styles.accordContainer}
+          touchableComponent={TouchableOpacity}
+        />
+      </ScrollView>
+
+      {/* <View style={[styles.innercontainer]}>
           <View style={styles.selectView}>
             <FlatList
               showsHorizontalScrollIndicator={false}
@@ -96,9 +239,8 @@ const Paybills = () => {
                 );
               }}
             />
-          </View>
-        </View>
-      </View>
+          </View> */}
+      {/* </View> */}
     </SafeAreaView>
   );
 };
@@ -107,7 +249,37 @@ export default Paybills;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+  },
+  accordContainer: {
+    marginTop: 20,
+    paddingHorizontal: 18,
+    paddingBottom: 4,
+  },
+  accordHeader: {
+    flexDirection: 'row',
+    backgroundColor: '#e7e7e7',
+    backgroundColor: COLORS.lendaLightBlue,
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    borderRadius: 8,
+    borderWidth: 0.8,
+    borderColor: COLORS.lendaComponentBorder,
+    flex: 1,
+  },
+  accordTitle: {
+    fontSize: 20,
+    color: 'white',
+  },
+  accordBody: {
+    padding: 12,
+  },
+  textSmall: {
+    fontSize: 16,
+  },
+  seperator: {
+    height: 12,
   },
   notihead: {
     fontSize: 14,
@@ -247,5 +419,10 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '400',
     lineHeight: 18,
+  },
+  PanelImage: {
+    width: 30,
+    height: 30,
+    borderRadius: 40,
   },
 });

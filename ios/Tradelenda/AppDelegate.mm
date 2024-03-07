@@ -1,33 +1,98 @@
 #import "AppDelegate.h"
 #import "RNSplashScreen.h"
 #import <Firebase.h>
-#import <UserNotifications/UserNotifications.h>
 #import <RNCPushNotificationIOS.h>
 #import <React/RCTBundleURLProvider.h>
+#import <AuthenticationServices/AuthenticationServices.h>
+#import <SafariServices/SafariServices.h>
+#import <FBSDKCoreKit/FBSDKCoreKit-Swift.h>
+#import <React/RCTLinkingManager.h>
+#import <FirebaseAuth/FirebaseAuth.h>
 
-// @import FirebaseCore;
+
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-  
+
   // Initialize Firebase
   [FIRApp configure];
-// Define UNUserNotificationCenter
-  UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
+
+  self.moduleName = @"Tradelenda";
+  self.initialProps = @{};
+
+  [[FBSDKApplicationDelegate sharedInstance] application:application
+                       didFinishLaunchingWithOptions:launchOptions];
+
+  // Define UNUserNotificationCenter
+  UNUserNotificationCenter *center =
+      [UNUserNotificationCenter currentNotificationCenter];
   center.delegate = self;
 
-  self.moduleName = @"Tradelenda";
-  // You can add your custom initial props in the dictionary below.
-  // They will be passed down to the ViewController used by React Native.
-  self.initialProps = @{};
-  self.moduleName = @"Tradelenda";
-
-
   return [super application:application didFinishLaunchingWithOptions:launchOptions];
+}
 
- 
+- (void)application:(UIApplication *)application performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler {
+    // Perform the logout operation for Firebase
+    if ([FIRAuth auth].currentUser) {
+        NSError *signOutError;
+        BOOL success = [[FIRAuth auth] signOut:&signOutError];
+        if (!success) {
+            NSLog(@"Error signing out: %@", signOutError);
+            completionHandler(UIBackgroundFetchResultFailed);
+        } else {
+            NSLog(@"User signed out successfully");
+            completionHandler(UIBackgroundFetchResultNewData);
+        }
+    } else {
+        NSLog(@"No user is currently signed in");
+        completionHandler(UIBackgroundFetchResultNoData);
+    }
+}
 
+////Called when a notification is delivered to a foreground app.
+-(void)userNotificationCenter:(UNUserNotificationCenter *)center willPresentNotification:(UNNotification *)notification withCompletionHandler:(void (^)(UNNotificationPresentationOptions options))completionHandler
+{
+  completionHandler(UNAuthorizationOptionSound | UNAuthorizationOptionAlert | UNAuthorizationOptionBadge);
+}
+
+// // Called when a notification is delivered to a foreground app.
+// - (void)userNotificationCenter:(UNUserNotificationCenter *)center
+//        willPresentNotification:(UNNotification *)notification
+//          withCompletionHandler:
+//              (void (^)(UNNotificationPresentationOptions options))
+//                  completionHandler {
+//   completionHandler(UNNotificationPresentationOptionSound | UNNotificationPresentationOptionBadge |
+//                     UNNotificationPresentationOptionAlert);
+// }
+
+// Required for the register event.
+- (void)application:(UIApplication *)application
+    didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
+  [RNCPushNotificationIOS
+      didRegisterForRemoteNotificationsWithDeviceToken:deviceToken];
+}
+// Required for the notification event. You must call the completion handler
+// after handling the remote notification.
+- (void)application:(UIApplication *)application
+    didReceiveRemoteNotification:(NSDictionary *)userInfo
+          fetchCompletionHandler:
+              (void (^)(UIBackgroundFetchResult))completionHandler {
+  [RNCPushNotificationIOS didReceiveRemoteNotification:userInfo
+                                fetchCompletionHandler:completionHandler];
+}
+// Required for the registrationError event.
+- (void)application:(UIApplication *)application
+    didFailToRegisterForRemoteNotificationsWithError:(NSError *)error {
+  [RNCPushNotificationIOS
+      didFailToRegisterForRemoteNotificationsWithError:error];
+}
+// Required for local notification tapped event
+- (void)userNotificationCenter:(UNUserNotificationCenter *)center
+    didReceiveNotificationResponse:(UNNotificationResponse *)response
+             withCompletionHandler:(void (^)(void))completionHandler {
+  [RNCPushNotificationIOS didReceiveNotificationResponse:response];
+  completionHandler();
 }
 
 - (NSURL *)sourceURLForBridge:(RCTBridge *)bridge
@@ -39,33 +104,20 @@
 #endif
 }
 
-// Required for the register event.
-- (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken
+//Facebook SDK integration
+- (BOOL)application:(UIApplication *)app
+            openURL:(NSURL *)url
+            options:(NSDictionary<UIApplicationOpenURLOptionsKey,id> *)options
 {
- [RNCPushNotificationIOS didRegisterForRemoteNotificationsWithDeviceToken:deviceToken];
-}
-// Required for the notification event. You must call the completion handler after handling the remote notification.
-- (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo
-fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler
-{
-  [RNCPushNotificationIOS didReceiveRemoteNotification:userInfo fetchCompletionHandler:completionHandler];
-}
-// Required for the registrationError event.
-- (void)application:(UIApplication *)application didFailToRegisterForRemoteNotificationsWithError:(NSError *)error
-{
- [RNCPushNotificationIOS didFailToRegisterForRemoteNotificationsWithError:error];
-}
-// Required for localNotification event
-- (void)userNotificationCenter:(UNUserNotificationCenter *)center
-didReceiveNotificationResponse:(UNNotificationResponse *)response
-         withCompletionHandler:(void (^)(void))completionHandler
-{
-  [RNCPushNotificationIOS didReceiveNotificationResponse:response];
-}
+  if ([[FBSDKApplicationDelegate sharedInstance] application:app openURL:url options:options]) {
+    return YES;
+  }
 
--(void)userNotificationCenter:(UNUserNotificationCenter *)center willPresentNotification:(UNNotification *)notification withCompletionHandler:(void (^)(UNNotificationPresentationOptions options))completionHandler
-{
-  completionHandler(UNNotificationPresentationOptionSound | UNNotificationPresentationOptionAlert | UNNotificationPresentationOptionBadge);
+  if ([RCTLinkingManager application:app openURL:url options:options]) {
+    return YES;
+  }
+
+  return NO;
 }
 
 @end

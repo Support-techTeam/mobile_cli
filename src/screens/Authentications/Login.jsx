@@ -7,11 +7,11 @@ import {
   Image,
   ImageBackground,
   Dimensions,
+  Platform,
 } from 'react-native';
 import {Formik} from 'formik';
-import React, {useState, useEffect} from 'react';
-import {useNavigation} from '@react-navigation/native';
-import Spinner from 'react-native-loading-spinner-overlay';
+import React, {useState, useEffect, useCallback} from 'react';
+import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 import KeyboardAvoidingWrapper from '../../component/KeyBoardAvoiding/keyBoardAvoiding';
@@ -29,6 +29,14 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
+import {AuthHeader} from '../../component/header/AuthHeader';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import FingerprintScanner from 'react-native-fingerprint-scanner';
+import {
+  decryptData,
+  retrieveSenditiveData,
+  hasSensitiveData,
+} from '../../stores/SecurityStore';
 
 const Login = () => {
   const insets = useSafeAreaInsets();
@@ -37,13 +45,50 @@ const Login = () => {
   const [error, setError] = useState('');
   const [errors, setErrors] = React.useState({});
   const [isLoading, setIsLoading] = useState(false);
-
   const [userDetails, setUserDetails] = useState({
     email: '',
     password: '',
   });
-
   const dispatch = useDispatch();
+  const [isFingerPrintAvailable, setIsFingerPrintAvailable] = useState(false);
+
+  //check availability
+  useFocusEffect(
+    useCallback(() => {
+      FingerprintScanner.isSensorAvailable()
+        .then(async () => {
+          const biometricState = await retrieveBiometricState();
+
+          //user enabled biometric
+          if (biometricState) {
+            //check if credentials is available
+            const hasService = await hasSensitiveData();
+            if (hasService) {
+              const credential = await retrieveSenditiveData();
+              //chack that username and password is available
+              if (
+                credential.username !== '' &&
+                credential.username !== undefined &&
+                credential.password !== '' &&
+                credential.password !== undefined
+              ) {
+                setIsFingerPrintAvailable(true);
+              }
+            } else {
+              setIsFingerPrintAvailable(false);
+            }
+          } else {
+            setIsFingerPrintAvailable(false);
+          }
+        })
+        .catch(() => {
+          setIsFingerPrintAvailable(false);
+        })
+        .finally(() => {
+          FingerprintScanner.release();
+        });
+    }, []),
+  );
 
   const getUSerStorage = async () => {
     const emaill = await AsyncStorage.getItem('userEmail');
@@ -54,7 +99,95 @@ const Login = () => {
 
   useEffect(() => {
     getUSerStorage();
+    // getData();
   }, []);
+
+  // const getData = async () => {
+  //   try {
+  //     const value = await AsyncStorage.getItem('deviceInfo');
+  //     if (value !== null) {
+  //       console.log(value, 'deviceInfo');
+  //     }
+  //   } catch (e) {
+  //     // error reading value
+  //   }
+  // };
+
+  const retrieveBiometricState = async () => {
+    try {
+      const value = await AsyncStorage.getItem('fingerprintState');
+      if (value !== null) {
+        // console.log(value);
+        return JSON.parse(value);
+      }
+      return null;
+    } catch (error) {
+      // console.log('Error retrieving toggle state:', error);
+      return null;
+    }
+  };
+
+  const handleFingerprintLogin = async () => {
+    FingerprintScanner.authenticate({
+      title: 'Log in with Fingerprint',
+      description: 'Place your finger on the sensor',
+    })
+      .then(async result => {
+        if (result) {
+          const cred = await getCredentials();
+          const decryptedPass = await decryptData(cred.password);
+          try {
+            setIsLoading(true);
+            const res = await userLogin(cred.username, decryptedPass);
+            if (res?.error) {
+              Toast.show({
+                type: 'error',
+                position: 'top',
+                topOffset: 50,
+                text1: res?.title,
+                text2: res?.message,
+                visibilityTime: 5000,
+                autoHide: true,
+                onPress: () => Toast.hide(),
+              });
+            } else {
+              Toast.show({
+                type: 'success',
+                position: 'top',
+                topOffset: 50,
+                text1: res?.title,
+                text2: res?.message,
+                visibilityTime: 3000,
+                autoHide: true,
+                onPress: () => Toast.hide(),
+              });
+              dispatch(signInUser(JSON.stringify(res?.user)));
+              fetchProfileData();
+            }
+            setIsLoading(false);
+          } catch (e) {
+            setIsLoading(false);
+          }
+        }
+      })
+      .catch(error => {})
+      .finally(() => {
+        FingerprintScanner.release();
+      });
+  };
+
+  const getCredentials = async () => {
+    try {
+      const hasService = await hasSensitiveData();
+      if (hasService) {
+        const credentials = await retrieveSenditiveData();
+        if (credentials) {
+          return credentials;
+        } else {
+        }
+      }
+    } catch (error) {}
+  };
 
   useEffect(() => {
     setUserDetails({
@@ -69,6 +202,7 @@ const Login = () => {
     try {
       setIsLoading(true);
       const {email, password} = userDetails;
+      // await storeSensitiveData(email, password);
       const res = await userLogin(email, password);
       if (res?.error) {
         Toast.show({
@@ -148,22 +282,15 @@ const Login = () => {
       style={[
         styles.container,
         {
-          paddingTop: insets.top !== 0 ? insets.top : 18,
-          paddingBottom: insets.bottom !== 0 ? insets.bottom : 'auto',
-          paddingLeft: insets.left !== 0 ? insets.left : 'auto',
-          paddingRight: insets.right !== 0 ? insets.right : 'auto',
+          paddingTop: insets.top !== 0 ? Math.min(insets.top, 10) : 'auto',
+          paddingBottom:
+            insets.bottom !== 0 ? Math.min(insets.bottom, 10) : 'auto',
+          paddingLeft: insets.left !== 0 ? Math.min(insets.left, 10) : 'auto',
+          paddingRight:
+            insets.right !== 0 ? Math.min(insets.right, 10) : 'auto',
         },
       ]}>
-      <Loader visible={false} />
-      {isLoading && (
-        <Spinner
-          textContent={'Logging in...'}
-          textStyle={{color: 'white'}}
-          visible={true}
-          overlayColor="rgba(78, 75, 102, 0.7)"
-          animation="slide"
-        />
-      )}
+      <Loader visible={isLoading} loadingText={'Logging in...'} />
       <KeyboardAvoidingWrapper>
         <ImageBackground
           source={require('../../../assets/login.png')}
@@ -175,119 +302,147 @@ const Login = () => {
             showsVerticalScrollIndicator={false}
             style={{paddingHorizontal: 16}}>
             <View style={{marginBottom: 40}}>
-              <View style={{alignItems: 'center'}}>
-                <View>
-                  <View style={{alignItems: 'center'}}>
-                    <Image
-                      source={require('../../../assets/images/HeadLogo.png')}
-                      style={{width: 83, height: 32}}
-                    />
-                  </View>
-                  <Text style={[styles.signupText, {marginBottom: 40}]}>
-                    Log In
-                  </Text>
-                </View>
+              <View>
+                <AuthHeader
+                  routeAction={() => navigation.goBack()}
+                  heading={'Log In'}
+                  intro={false}
+                  disabled={false}
+                  returnRoute={true}
+                  back
+                  renderImage={
+                    Image.resolveAssetSource(
+                      require('../../../assets/images/locked.png'),
+                    ).uri
+                  }
+                />
               </View>
               <View
                 style={{
-                  paddingTop: 25,
-                  backgroundColor: '#FFFFFF',
-                  borderRadius: 15,
-                  paddingHorizontal: 15,
-                  paddingVertical: 15,
-                  opacity: 0.86,
-                  borderColor: '#D9DBE9',
-                  borderWidth: 2,
+                  height: hp('70%'),
+                  justifyContent: 'center',
                 }}>
-                <Formik
-                  initialValues={{
-                    email: '',
-                    password: '',
-                  }}
-                  onSubmit={values => {
-                    values = {...values};
-                    if (values.email === '' || values.password === '') {
-                      // setError('Fill all fields');
-                    } else {
-                    }
+                <View
+                  style={{
+                    paddingTop: 25,
+                    backgroundColor: '#FFFFFF',
+                    borderRadius: 15,
+                    paddingHorizontal: 15,
+                    paddingVertical: 15,
+                    opacity: 0.86,
+                    borderColor: '#D9DBE9',
+                    borderWidth: 2,
                   }}>
-                  {({handleChange, handleBlur}) => (
-                    <View>
-                      <Input
-                        onChangeText={text =>
-                          handleOnchange(text.trim(), 'email')
-                        }
-                        onFocus={() => handleError(null, 'email')}
-                        iconName="email-outline"
-                        label="Email"
-                        placeholder="Enter your email address"
-                        error={errors.email}
-                        autoCorrect={false}
-                        autoCapitalize="none"
-                        defaultValue={userMail}
-                        isNeeded={true}
-                      />
-                      <Input
-                        onChangeText={text => handleOnchange(text, 'password')}
-                        onFocus={() => handleError(null, 'password')}
-                        iconName="lock-outline"
-                        label="Password"
-                        placeholder="Enter your password"
-                        error={errors.password}
-                        password
-                        autoCorrect={false}
-                        autoCapitalize="none"
-                        isNeeded={true}
-                      />
-                    </View>
-                  )}
-                </Formik>
-                {error === '' ? <></> : <Text>{error}</Text>}
-
-                <View style={styles.termsRow}>
-                  <View style={{marginLeft: 15}}>
-                    <View style={{flexDirection: 'row'}}>
-                      <TouchableOpacity
-                        onPress={() => navigation.navigate('ForgotPassword')}>
-                        <Text
-                          style={{
-                            color: COLORS.lendaBlue,
-                            fontFamily: 'serif',
-                            fontSize: 16,
-                          }}>
-                          Forgot password?
-                        </Text>
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-                </View>
-                <Button
-                  title="Log In"
-                  onPress={validate}
-                  disabled={disableit}
-                />
-
-                <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      marginTop: 19,
+                  <Formik
+                    initialValues={{
+                      email: '',
+                      password: '',
+                    }}
+                    onSubmit={values => {
+                      values = {...values};
+                      if (values.email === '' || values.password === '') {
+                        // setError('Fill all fields');
+                      } else {
+                      }
                     }}>
-                    <Text style={styles.checkText}>
-                      Don't have an account?{' '}
-                    </Text>
-                    <Text
-                      style={{
-                        color: COLORS.lendaBlue,
-                        fontFamily: 'serif',
-                        fontSize: 16,
-                      }}>
-                      Sign up
-                    </Text>
+                    {({handleChange, handleBlur}) => (
+                      <View>
+                        <Input
+                          onChangeText={text =>
+                            handleOnchange(text.trim(), 'email')
+                          }
+                          onFocus={() => handleError(null, 'email')}
+                          iconName="email-outline"
+                          label="Email"
+                          placeholder="Enter your email address"
+                          error={errors.email}
+                          autoCorrect={false}
+                          autoCapitalize="none"
+                          defaultValue={userMail}
+                          isNeeded={true}
+                        />
+                        <Input
+                          onChangeText={text =>
+                            handleOnchange(text, 'password')
+                          }
+                          onFocus={() => handleError(null, 'password')}
+                          iconName="lock-outline"
+                          label="Password"
+                          placeholder="Enter your password"
+                          error={errors.password}
+                          password
+                          autoCorrect={false}
+                          autoCapitalize="none"
+                          isNeeded={true}
+                        />
+                      </View>
+                    )}
+                  </Formik>
+                  {error === '' ? <></> : <Text>{error}</Text>}
+
+                  <View style={styles.termsRow}>
+                    <View style={{marginLeft: 15}}>
+                      <View style={{flexDirection: 'row'}}>
+                        <TouchableOpacity
+                          onPress={() => navigation.navigate('ForgotPassword')}>
+                          <Text
+                            style={{
+                              color: COLORS.lendaBlue,
+                              fontFamily: 'serif',
+                              fontSize: 16,
+                            }}>
+                            Forgot password?
+                          </Text>
+                        </TouchableOpacity>
+                      </View>
+                    </View>
                   </View>
-                </TouchableOpacity>
+                  <Button
+                    title="Log In"
+                    onPress={validate}
+                    disabled={disableit}
+                  />
+
+                  <TouchableOpacity
+                    onPress={() => navigation.navigate('SignUp')}>
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        marginTop: 19,
+                      }}>
+                      <Text style={styles.checkText}>
+                        Don't have an account?{' '}
+                      </Text>
+                      <Text
+                        style={{
+                          color: COLORS.lendaBlue,
+                          fontFamily: 'serif',
+                          fontSize: 16,
+                        }}>
+                        Sign up
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
+
+                  {isFingerPrintAvailable && (
+                    <TouchableOpacity
+                      onPress={handleFingerprintLogin}
+                      style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        marginTop: 19,
+                      }}>
+                      <Icon
+                        name="fingerprint"
+                        size={60}
+                        color={COLORS.lendaBlue}
+                      />
+                    </TouchableOpacity>
+                  )}
+                </View>
               </View>
             </View>
           </ScrollView>

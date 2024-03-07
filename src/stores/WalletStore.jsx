@@ -28,8 +28,9 @@ const getAccountWallet = async () => {
         const response = await axiosInstance.get(`/loan-wallet/get-wallet`, {
           headers,
         });
+
         DdLogs.info(
-          `Wallet | Get Account Wallet | ${auth?.currentUser?.email}`,
+          `Wallet | Get Account Wallet | ${auth()?.currentUser?.email}`,
           {
             context: JSON.stringify(response?.data),
           },
@@ -42,7 +43,7 @@ const getAccountWallet = async () => {
         };
       } catch (error) {
         DdLogs.error(
-          `Wallet | Get Account Wallet | ${auth?.currentUser?.email}`,
+          `Wallet | Get Account Wallet | ${auth()?.currentUser?.email}`,
           {
             errorMessage: JSON.stringify(error),
           },
@@ -63,7 +64,63 @@ const getAccountWallet = async () => {
     };
   }
 };
+// get-all-beneficiaries
 
+const getBeneficiaries = async () => {
+  if (
+    store.getState().networkState &&
+    store.getState().networkState.network.isConnected &&
+    store.getState().networkState.network.isInternetReachable
+  ) {
+    await getFirebaseAuthToken();
+    if (token) {
+      headers = {
+        accept: 'application/json',
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      };
+      try {
+        const response = await axiosInstance.get(
+          `/beneficiary/get-all-beneficiaries`,
+          {
+            headers,
+          },
+        );
+        DdLogs.info(
+          `Beneficiary | Get Beneficiary | ${auth()?.currentUser?.email}`,
+          {
+            context: JSON.stringify(response?.data),
+          },
+        );
+        return {
+          title: 'Get Beneficiary',
+          error: false,
+          data: response?.data,
+          message: 'success',
+        };
+      } catch (error) {
+        DdLogs.error(
+          `Beneficiary | Get Beneficiary | ${auth()?.currentUser?.email}`,
+          {
+            errorMessage: JSON.stringify(error),
+          },
+        );
+        return {
+          title: 'Get Beneficiary',
+          error: true,
+          data: null,
+          message: error,
+        };
+      }
+    }
+  } else {
+    return {
+      error: true,
+      data: null,
+      message: 'No Internet Connection',
+    };
+  }
+};
 const getAccountTransactions = async (page, limit) => {
   if (
     store.getState().networkState &&
@@ -85,7 +142,7 @@ const getAccountTransactions = async (page, limit) => {
         );
 
         DdLogs.info(
-          `Wallet | Get Wallet Transactions | ${auth?.currentUser?.email}`,
+          `Wallet | Get Wallet Transactions | ${auth()?.currentUser?.email}`,
           {
             context: JSON.stringify(response?.data),
           },
@@ -98,7 +155,7 @@ const getAccountTransactions = async (page, limit) => {
         };
       } catch (error) {
         DdLogs.error(
-          `Wallet | Get Wallet Transactions | ${auth?.currentUser?.email}`,
+          `Wallet | Get Wallet Transactions | ${auth()?.currentUser?.email}`,
           {
             errorMessage: JSON.stringify(error),
           },
@@ -139,7 +196,7 @@ const verifyNIPAccountInfo = async (accountNumber, bankName) => {
           {headers},
         );
         DdLogs.info(
-          `Wallet | Verify NIP Account Info | ${auth?.currentUser?.email}`,
+          `Wallet | Verify NIP Account Info | ${auth()?.currentUser?.email}`,
           {
             context: JSON.stringify(response?.data),
           },
@@ -161,7 +218,7 @@ const verifyNIPAccountInfo = async (accountNumber, bankName) => {
         };
       } catch (error) {
         DdLogs.error(
-          `Wallet | Verify NIP Account Info | ${auth?.currentUser?.email}`,
+          `Wallet | Verify NIP Account Info | ${auth()?.currentUser?.email}`,
           {
             errorMessage: JSON.stringify(error),
           },
@@ -204,7 +261,7 @@ const verifyBeneficiaryInfo = async accountNumber => {
           {headers},
         );
         DdLogs.info(
-          `Wallet | Verify Beneficiary Info | ${auth?.currentUser?.email}`,
+          `Wallet | Verify Beneficiary Info | ${auth()?.currentUser?.email}`,
           {
             context: JSON.stringify(response?.data),
           },
@@ -217,7 +274,7 @@ const verifyBeneficiaryInfo = async accountNumber => {
         };
       } catch (error) {
         DdLogs.error(
-          `Wallet | Verify Beneficiary Info | ${auth?.currentUser?.email}`,
+          `Wallet | Verify Beneficiary Info | ${auth()?.currentUser?.email}`,
           {
             errorMessage: JSON.stringify(error),
           },
@@ -260,7 +317,7 @@ const createInternalTransfer = async details => {
         );
         if (response?.data?.error) {
           DdLogs.warn(
-            `Wallet | Internal Transfer | ${auth?.currentUser?.email}`,
+            `Wallet | Internal Transfer | ${auth()?.currentUser?.email}`,
             {
               errorMessage: JSON.stringify(response?.data),
             },
@@ -273,7 +330,7 @@ const createInternalTransfer = async details => {
           };
         } else {
           DdLogs.info(
-            `Wallet | Internal Transfer | ${auth?.currentUser?.email}`,
+            `Wallet | Internal Transfer | ${auth()?.currentUser?.email}`,
             {
               context: 'No internet Connection',
             },
@@ -287,7 +344,7 @@ const createInternalTransfer = async details => {
         }
       } catch (error) {
         DdLogs.error(
-          `Wallet | Internal Transfer | ${auth?.currentUser?.email}`,
+          `Wallet | Internal Transfer | ${auth()?.currentUser?.email}`,
           {
             errorMessage: JSON.stringify(error),
           },
@@ -329,9 +386,12 @@ const createNIPTransfer = async details => {
           {headers},
         );
         if (response?.data?.error) {
-          DdLogs.error(`Wallet | NIP Transfer | ${auth?.currentUser?.email}`, {
-            errorMessage: JSON.stringify(response?.data),
-          });
+          DdLogs.error(
+            `Wallet | NIP Transfer | ${auth()?.currentUser?.email}`,
+            {
+              errorMessage: JSON.stringify(response?.data),
+            },
+          );
           return {
             title: 'NIP Transfer',
             error: true,
@@ -339,7 +399,7 @@ const createNIPTransfer = async details => {
             message: response?.data?.message,
           };
         } else {
-          DdLogs.info(`Wallet | NIP Transfer | ${auth?.currentUser?.email}`, {
+          DdLogs.info(`Wallet | NIP Transfer | ${auth()?.currentUser?.email}`, {
             context: JSON.stringify(response?.data),
           });
           return {
@@ -350,7 +410,7 @@ const createNIPTransfer = async details => {
           };
         }
       } catch (error) {
-        DdLogs.error(`Wallet | NIP Transfer | ${auth?.currentUser?.email}`, {
+        DdLogs.error(`Wallet | NIP Transfer | ${auth()?.currentUser?.email}`, {
           errorMessage: JSON.stringify(error),
         });
         return {
@@ -388,7 +448,7 @@ const getAllBankDetails = async () => {
           `/loan-wallet/get-all-NIP-banks`,
           {headers},
         );
-        DdLogs.info(`Wallet | Get All Banks | ${auth?.currentUser?.email}`, {
+        DdLogs.info(`Wallet | Get All Banks | ${auth()?.currentUser?.email}`, {
           context: JSON.stringify(response?.data),
         });
         return {
@@ -398,7 +458,7 @@ const getAllBankDetails = async () => {
           message: 'success',
         };
       } catch (error) {
-        DdLogs.error(`Wallet | Get All Banks | ${auth?.currentUser?.email}`, {
+        DdLogs.error(`Wallet | Get All Banks | ${auth()?.currentUser?.email}`, {
           errorMessage: JSON.stringify(error),
         });
         return {
@@ -438,7 +498,7 @@ const getTransactionsStatement = async (startDate, endDate) => {
         );
 
         DdLogs.info(
-          `Wallet | Get Transactions Statement | ${auth?.currentUser?.email}`,
+          `Wallet | Get Transactions Statement | ${auth()?.currentUser?.email}`,
           {
             context: JSON.stringify(response?.data),
           },
@@ -451,7 +511,7 @@ const getTransactionsStatement = async (startDate, endDate) => {
         };
       } catch (error) {
         DdLogs.error(
-          `Wallet | Get Transactions Statement | ${auth?.currentUser?.email}`,
+          `Wallet | Get Transactions Statement | ${auth()?.currentUser?.email}`,
           {
             errorMessage: JSON.stringify(error),
           },
@@ -461,6 +521,146 @@ const getTransactionsStatement = async (startDate, endDate) => {
           error: true,
           data: null,
           message: `Failed | ${error}`,
+        };
+      }
+    }
+  } else {
+    return {
+      error: true,
+      data: null,
+      message: 'No Internet Connection',
+    };
+  }
+};
+
+const requestLimitIncrease = async details => {
+  if (
+    store.getState().networkState &&
+    store.getState().networkState.network.isConnected &&
+    store.getState().networkState.network.isInternetReachable
+  ) {
+    await getFirebaseAuthToken();
+    if (token) {
+      headers = {
+        accept: 'application/json',
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      };
+      try {
+        const response = await axiosInstance.post(
+          `/users/user-limit-increase-request`,
+          details,
+          {headers},
+        );
+        if (response?.data?.error) {
+          DdLogs.warn(
+            `Wallet | Limit Increase | ${auth()?.currentUser?.email}`,
+            {
+              errorMessage: JSON.stringify(response?.data),
+            },
+          );
+          return {
+            title: 'Limit Increase',
+            error: true,
+            data: null,
+            message: response?.data?.message,
+          };
+        } else {
+          DdLogs.info(
+            `Wallet | Limit Increase | ${auth()?.currentUser?.email}`,
+            {
+              context: 'No internet Connection',
+            },
+          );
+          return {
+            title: 'Limit Increase',
+            error: false,
+            data: response?.data,
+            message: response?.data?.message,
+          };
+        }
+      } catch (error) {
+        DdLogs.error(
+          `Wallet | Limit Increase | ${auth()?.currentUser?.email}`,
+          {
+            errorMessage: JSON.stringify(error),
+          },
+        );
+        return {
+          title: 'Limit Increase',
+          error: true,
+          data: null,
+          message: error,
+        };
+      }
+    }
+  } else {
+    return {
+      error: true,
+      data: null,
+      message: 'No Internet Connection',
+    };
+  }
+};
+
+const upgradeWallet = async data => {
+  if (
+    store.getState().networkState &&
+    store.getState().networkState.network.isConnected &&
+    store.getState().networkState.network.isInternetReachable
+  ) {
+    await getFirebaseAuthToken();
+    if (token) {
+      headers = {
+        accept: 'application/json',
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      };
+      try {
+        const response = await axiosInstance.post(
+          `/loan-wallet/upgrade-wallet`,
+          data,
+          {headers},
+        );
+        if (response?.data?.error) {
+          DdLogs.warn(
+            `Wallet | Wallet name|type update  | ${auth()?.currentUser?.email}`,
+            {
+              errorMessage: JSON.stringify(response?.data),
+            },
+          );
+          return {
+            title: 'Wallet Upgrade|Downgrade',
+            error: true,
+            data: null,
+            message: response?.data?.message,
+          };
+        } else {
+          DdLogs.info(
+            `Wallet | Wallet name|type update  | ${auth()?.currentUser?.email}`,
+            {
+              context: 'No internet Connection',
+            },
+          );
+          return {
+            title: 'Wallet Upgrade|Downgrade',
+            error: false,
+            data: response?.data,
+            message: response?.data?.message,
+          };
+        }
+      } catch (error) {
+        DdLogs.error(
+          `Wallet | Wallet name|type update  | ${auth()?.currentUser?.email}`,
+          {
+            errorMessage: JSON.stringify(error),
+          },
+        );
+        return {
+          title: 'Wallet Upgrade|Downgrade',
+          error: true,
+          data: null,
+          message: error,
         };
       }
     }
@@ -496,4 +696,7 @@ export {
   createNIPTransfer,
   getAllBankDetails,
   getTransactionsStatement,
+  getBeneficiaries,
+  requestLimitIncrease,
+  upgradeWallet,
 };

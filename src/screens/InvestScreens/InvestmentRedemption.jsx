@@ -9,7 +9,6 @@ import {
 import React, {useState, useRef} from 'react';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import Spinner from 'react-native-loading-spinner-overlay/lib';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 import Input from '../../component/inputField/input.component';
 import CustomDropdown from '../../component/dropDown/dropdown.component';
@@ -29,6 +28,8 @@ import {
   redeemLendaInvestment,
 } from '../../stores/InvestStore';
 import appsFlyer from 'react-native-appsflyer';
+import { Header } from '../../component/header/Header';
+import Loader from '../../component/loader/loader';
 
 const durationData = [
   {value: '', label: 'Select Option'},
@@ -260,55 +261,20 @@ const InvestmentRedemption = () => {
     <SafeAreaView
       style={{
         flex: 1,
-        paddingHorizontal: 16,
         backgroundColor: '#fff',
-        paddingTop: insets.top !== 0 ? insets.top : 18,
-        paddingBottom: insets.bottom !== 0 ? insets.bottom : 'auto',
-        paddingLeft: insets.left !== 0 ? insets.left : 'auto',
-        paddingRight: insets.right !== 0 ? insets.right : 'auto',
+        paddingTop: insets.top !== 0 ? Math.min(insets.top, 10) : 'auto',
+        paddingBottom: insets.bottom !== 0 ? Math.min(insets.bottom, 10) : 'auto',
+        paddingLeft: insets.left !== 0 ? Math.min(insets.left, 10) : 'auto',
+        paddingRight: insets.right !== 0 ? Math.min(insets.right, 10) : 'auto',
       }}>
-      {isLoading && (
-        <Spinner
-          textContent={'Processing...'}
-          textStyle={{color: 'white'}}
-          visible={true}
-          overlayColor="rgba(78, 75, 102, 0.7)"
-        />
-      )}
-      <View
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-        }}>
-        <TouchableOpacity
-          onPress={() => {
-            navigation.goBack();
-          }}>
-          <View
-            style={{
-              borderWidth: 0.5,
-              borderColor: '#D9DBE9',
-              borderRadius: 5,
-            }}>
-            <Icon name="chevron-left" size={36} color="black" />
-          </View>
-        </TouchableOpacity>
-        <View style={styles.HeadView}>
-          <View style={styles.TopView}>
-            <Text style={styles.TextHead}>
-              {name === 'Arm'
-                ? 'REDEEM ARM INVESTMENT'
-                : 'REDEEM LENDA INVESTMENT'}
-            </Text>
-          </View>
-        </View>
-
-        <View style={{}}>
-          <Text>{'       '}</Text>
-        </View>
-      </View>
-      <View style={styles.demark} />
+       <Loader visible={isLoading} loadingText={'Please wait...'} />
+      <Header
+        routeAction={() => navigation.goBack()}
+        heading={
+          name === 'Arm' ? 'REDEEM ARM INVESTMENT' : 'REDEEM LENDA INVESTMENT'
+        }
+        disable={false}
+      />
       <ScrollView
         bounces={false}
         showsHorizontalScrollIndicator={false}

@@ -39,11 +39,22 @@ const ARM = () => {
   return (
     <View style={styles.container}>
       <TouchableOpacity
+        disabled={
+          bankDeets === undefined ||
+          bankDeets === null
+            ? true
+            : false
+        }
         onPress={() =>
           navigation.navigate('ArmDetails', {paramKey: 'myAccount'})
         }
         style={{marginBottom: 20}}>
-        <Buttons label={'Update ARM Details'} />
+        <Buttons   disabled={
+        bankDeets === undefined ||
+        bankDeets === null
+          ? true
+          : false
+      } label={'Update ARM Details'} />
       </TouchableOpacity>
       <ScrollView
         showsHorizontalScrollIndicator={false}
