@@ -74,6 +74,7 @@ def projectRoot = rootDir.getAbsoluteFile().getParentFile().getAbsolutePath()
 
 def reactNativeRoot = new File(["node", "--print", "require.resolve('react-native/package.json')"].execute(null, rootDir).text.trim()).getParentFile().getAbsolutePath()
 
+
 project.ext.react = [
         entryfile: 'packages/mobile/index.js',
         root: '../../../../',
@@ -100,11 +101,10 @@ android {
         applicationId 'com.tradelenda.app'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionName "3.0.8"
-        versionCode 42
+        versionName "3.0.9"
+        versionCode 43
         multiDexEnabled true
     }
-
      if (isNewArchitectureEnabled()) {
             // We configure the CMake build only if you decide to opt-in for the New Architecture.
             externalNativeBuild {
@@ -248,6 +248,11 @@ dependencies {
     implementation project(':react-native-push-notification')
     implementation('com.google.android.play:integrity:1.3.0')
     implementation('com.facebook.android:facebook-android-sdk:latest.release')
+     if (findProject(':notifee_core')) {
+        implementation findProject(':notifee_core')
+    } else {
+        implementation(group: 'app.notifee', name:'core', version: '+')
+    }
 
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}")
     debugImplementation("com.facebook.flipper:flipper-network-plugin:${FLIPPER_VERSION}") {

@@ -24,6 +24,9 @@ buildscript {
 
 def REACT_NATIVE_VERSION = new File(['node', '--print', "JSON.parse(require('fs').readFileSync(require.resolve('react-native/package.json'), 'utf-8')).version"].execute(null, rootDir).text.trim())
 
+def notifeeDir = "$rootDir/../node_modules/@notifee/react-native"
+println ":${project.name} @notifee/react-native found at $notifeeDir"
+
 allprojects {
     configurations.all {
         resolutionStrategy {
@@ -41,6 +44,9 @@ allprojects {
         maven {
             // Android JSC is installed from npm
             url(new File(['node', '--print', "require.resolve('jsc-android/package.json')"].execute(null, rootDir).text.trim(), '../dist'))
+        }
+        maven {
+            url "$notifeeDir/android/libs"
         }
 
         google()

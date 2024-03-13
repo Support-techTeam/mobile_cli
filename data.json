@@ -1,0 +1,17 @@
+{
+  "collapseKey": "com.tradelenda.app",
+  "data": {"country": "Nigeria", "redirectUrl": "https://www.tradelenda.com"},
+  "from": "24130547176",
+  "messageId": "0:1710258721528123%25c68aae25c68aae",
+  "notification": {
+    "android": {
+      "channelId": "https://www.tradelenda.com",
+      "imageUrl": "https://tradelenda.com/images/logos/TradeLendaLOGO.png",
+      "sound": "default"
+    },
+    "body": "Embrace the opportunity with Trade Lenda, offering a chance to invest with as low as 5k and enjoy a monthly return of 1.5%.",
+    "title": "Earn With Trade Lenda"
+  },
+  "sentTime": 1710258721502,
+  "ttl": 2419200
+}

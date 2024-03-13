@@ -1,6 +1,6 @@
 {
   "name": "Tradelenda",
-  "version": "3.0.7",
+  "version": "3.0.9",
   "private": true,
   "scripts": {
     "android": "react-native run-android",
@@ -21,7 +21,7 @@
     "@fortawesome/free-regular-svg-icons": "^6.4.2",
     "@fortawesome/free-solid-svg-icons": "^6.4.2",
     "@fortawesome/react-native-fontawesome": "^0.3.0",
-    "@notifee/react-native": "^7.8.2",
+    "@notifee/react-native": "^7.8.0",
     "@react-native-async-storage/async-storage": "^1.19.3",
     "@react-native-clipboard/clipboard": "^1.11.2",
     "@react-native-community/datetimepicker": "^7.5.0",
@@ -56,7 +56,6 @@
     "react-native-animated-multistep": "^1.1.1",
     "react-native-app-intro-slider": "^4.0.4",
     "react-native-appsflyer": "^6.12.2",
-    "react-native-background-fetch": "^4.2.2",
     "react-native-blob-util": "^0.19.1",
     "react-native-btr": "^2.2.1",
     "react-native-collapsible": "^1.6.1",
@@ -126,5 +125,8 @@
   },
   "engines": {
     "node": ">=16"
-  }
+  },
+  "transformIgnorePatterns": [
+    "node_modules/(?!(jest-)?@react-native|@notifee/react-native|react-native)"
+  ]
 }

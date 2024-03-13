@@ -1,10 +1,18 @@
 // CustomNotification.js
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {View, Text, Image, TouchableOpacity, StyleSheet} from 'react-native';
 import Modal from 'react-native-modal';
 import COLORS from '../../constants/colors';
 
-const CustomNotification = ({isVisible, title, body, imageUrl, onPress, redirectUrl}) => {
+const CustomNotification = ({
+  isVisible,
+  title,
+  body,
+  imageUrl,
+  onPress,
+  redirectUrl,
+  navigationRef,
+}) => {
   return (
     <Modal
       isVisible={isVisible}
@@ -18,13 +26,24 @@ const CustomNotification = ({isVisible, title, body, imageUrl, onPress, redirect
         </View>
         <Text style={styles.body}>{body}</Text>
         <View style={styles.buttonContainer}>
-            {redirectUrl  && <TouchableOpacity onPress={redirectUrl} style={styles.primaryButton}>
-              <Text style={styles.buttonText}>Open</Text>
-            </TouchableOpacity>}
-            <TouchableOpacity onPress={onPress} style={styles.secondaryButton}>
-              <Text style={styles.buttonText}>CLose</Text>
+          {redirectUrl && (
+            <TouchableOpacity
+              onPress={() => {
+                onPress();
+                if (navigationRef.isReady()) {
+                  try {
+                    navigationRef.navigate(redirectUrl);
+                  } catch (e) {}
+                }
+              }}
+              style={styles.primaryButton}>
+              <Text style={styles.buttonText}>Explore</Text>
             </TouchableOpacity>
-          </View>
+          )}
+          <TouchableOpacity onPress={onPress} style={styles.secondaryButton}>
+            <Text style={styles.buttonText}>Dismiss</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </Modal>
   );
@@ -74,13 +93,12 @@ const styles = StyleSheet.create({
     flex: 1,
     marginRight: 5,
     padding: 10,
-    backgroundColor: 'blue',
     borderRadius: 5,
   },
   secondaryButton: {
     padding: 10,
     width: '95%',
-    backgroundColor: COLORS.microsoftRed,
+    backgroundColor: COLORS.highwayRed,
     borderRadius: 5,
     alignSelf: 'center',
     flex: 1,
@@ -96,4 +114,3 @@ const styles = StyleSheet.create({
 });
 
 export default CustomNotification;
-

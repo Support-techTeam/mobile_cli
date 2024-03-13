@@ -17,6 +17,9 @@ import {useSelector} from 'react-redux';
 // import {networkState} from '../util/redux/networkState/network.slice';
 import {TabContextProvider} from '../context/TabContext';
 import {useData} from '../context/DataProvider';
+import CustomNotification from '../component/push-notifications/CustomNotification';
+import notifee from '@notifee/react-native';
+import messaging from '@react-native-firebase/messaging';
 
 const AppNavigationContainer = () => {
   const navigationRef = useNavigationContainerRef();
@@ -27,6 +30,7 @@ const AppNavigationContainer = () => {
   const networkState = useSelector(state => state.networkState.network);
   const [networkStatus, setNetworkStatus] = useState(true);
   const {dataStore, setDataStore} = useData();
+  const [notification, setNotification] = useState(null);
   useLayoutEffect(() => {
     if (
       auth().currentUser === undefined ||
@@ -85,9 +89,41 @@ const AppNavigationContainer = () => {
   useLayoutEffect(() => {
     setTimeout(() => {
       setIsLoading(false);
-    },2000);
-}, [])
+    }, 2000);
+  }, []);
 
+  const handleNotificationPress = () => {
+    setNotification(null);
+  };
+
+  async function onBackgroundMessageReceived(message) {
+    await notifee.requestPermission();
+    // console.log('onBackgroundMessageReceived', message);
+    const {from, collapseKey, data, messageId, notification, sentTime, ttl} =
+      message;
+    const {title, body, android} = notification;
+    await notifee.displayNotification({
+      title: title,
+      body: body,
+      android: android,
+    });
+  }
+
+  async function onForegroundMessageReceived(message) {
+    await notifee.requestPermission();
+    // console.log('onForegroundMessageReceived', message);
+    const {from, collapseKey, data, messageId, notification, sentTime, ttl} =
+      message;
+    const {title, body, android} = notification;
+    const {redirectUrl} = data;
+    setNotification({title, body, android, redirectUrl});
+  }
+
+  messaging().onMessage(onForegroundMessageReceived);
+  messaging().setBackgroundMessageHandler(onBackgroundMessageReceived);
+  messaging().onNotificationOpenedApp(remoteMessage => {
+    onForegroundMessageReceived(remoteMessage);
+  });
 
   return (
     <TabContextProvider>
@@ -101,6 +137,15 @@ const AppNavigationContainer = () => {
           const previousRouteName = routeNameRef.current;
           const currentRouteName = navigationRef.getCurrentRoute();
         }}>
+        <CustomNotification
+          isVisible={notification === null ? false : true}
+          title={notification?.title}
+          body={notification?.body}
+          imageUrl={notification?.android?.imageUrl}
+          redirectUrl={notification?.redirectUrl}
+          onPress={handleNotificationPress}
+          navigationRef={navigationRef}
+        />
         {isLoading && <Splashscreen text="Checking Authentication..." />}
         {user ? (
           networkStatus ? (

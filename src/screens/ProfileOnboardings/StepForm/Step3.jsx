@@ -406,6 +406,14 @@ const Step3 = props => {
     !userDetails.nin;
 
   const handleCreateUser = async () => {
+    const platform = Platform.OS;
+    if (platform === 'ios') {
+      setUserDetails({...userDetails, signedOnDevice: 'ios'});
+      ('Running on iOS');
+    } else if (platform === 'android') {
+      setUserDetails({...userDetails, signedOnDevice: 'android'});
+      ('Running on Android');
+    }
     if (userDetails?.accountType === 'Personal') {
       try {
         setIsLoading(true);
