@@ -38,6 +38,8 @@ import CustomButton from '../../../component/buttons/CustomButtons';
 import {SelectList} from 'react-native-dropdown-select-list';
 import COLORS from '../../../constants/colors';
 import Loader from '../../../component/loader/loader';
+import {getAsyncData} from '../../../context/AsyncContext';
+import CustomInputPhone from '../../../component/inputField/input-phone.component';
 const countryList = require('country-list');
 
 const titleData = [
@@ -118,7 +120,9 @@ let currentState = [
   {value: '', label: '...Select State'},
   {value: 'Outside Nigeria', label: 'Outside Nigeria', key: 0},
 ];
+let defaultNumber = '';
 const Step3 = props => {
+  const phoneInputRef = useRef(null);
   const insets = useSafeAreaInsets();
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
@@ -126,11 +130,13 @@ const Step3 = props => {
   const user = useSelector(state => state.userAuth.user);
   const dispatch = useDispatch();
   const [userDetails, setUserDetails] = useState({
-    title: '',
     email: user != undefined || user != null ? JSON.parse(user)?.email : '',
+    signedOnDevice: Platform.OS,
+    title: '',
     firstName: '',
     lastName: '',
     phoneNumber: '',
+    gender: '',
     bvn: '',
     nin: '',
     dob: '',
@@ -139,15 +145,12 @@ const Step3 = props => {
     state: '',
     city: '',
     maritalStatus: '',
-    eduLevel: '',
-    gender: '',
-    residentialStatus: '',
-    yearYouMovedToCurrentAddress: '',
     NoOfDependents: 0,
-    referredByCode: undefined,
+    wdymtta: '',
+    eduLevel: '',
+    referredByCode: '',
     referredByOption: '',
-    referredByAnswer: undefined,
-    signedOnDevice: '',
+    referredByAnswer: '',
     bvnData: '',
     accountType: 'Personal',
   });
@@ -165,6 +168,19 @@ const Step3 = props => {
     label: country.name,
   }));
 
+  const [selectedCountry, setSelectedCountry] = useState();
+
+  function handleInputValue(phoneNumber) {
+    setUserDetails(prevData => ({
+      ...prevData,
+      phoneNumber: phoneNumber.replace(/^0+|\s+/g, ''),
+    }));
+  }
+
+  function handleSelectedCountry(country) {
+    setSelectedCountry(country);
+  }
+
   useLayoutEffect(() => {
     setTotalSteps(props.getTotalSteps());
     setCurrentStep(props.getCurrentStep());
@@ -181,7 +197,6 @@ const Step3 = props => {
       firstName: retrieveState()?.firstName?.split(' ')[0],
       gender: retrieveState()?.gender,
       lastName: retrieveState()?.lastname,
-      phoneNumber: Number(retrieveState()?.phoneNumber).toString(),
     });
   }, [retrieveState()]);
 
@@ -208,11 +223,17 @@ const Step3 = props => {
     saveState(null);
     finish();
   };
+
   useLayoutEffect(() => {
     if (preDetails && preDetails?.firstName && preDetails?.lastName) {
       setUserDetails({...preDetails});
     }
   }, [preDetails, retrieveState()]);
+
+  const retrieveMobileNumber = async () => {
+    const retrieve = await getAsyncData({storage_name: 'signup'});
+    defaultNumber = retrieve?.data?.countryCode + retrieve?.data?.phoneNumber;
+  };
 
   useLayoutEffect(() => {
     setUserDetails(prevData => ({
@@ -276,6 +297,8 @@ const Step3 = props => {
 
       bvnData: bvnData != undefined || bvnData != null ? bvnData : '',
     }));
+
+    retrieveMobileNumber();
   }, [user, verifiedUser, bvnData]);
 
   useLayoutEffect(() => {
@@ -396,35 +419,24 @@ const Step3 = props => {
     setErrors(prevState => ({...prevState, [input]: error}));
   };
 
-  const disableit =
-    !userDetails.phoneNumber ||
-    !userDetails.address ||
-    !userDetails.title ||
-    !userDetails.bvn ||
-    !userDetails.city ||
-    !userDetails.state ||
-    !userDetails.nin;
+  const disableit = false;
 
   const handleCreateUser = async () => {
-    const platform = Platform.OS;
-    if (platform === 'ios') {
-      setUserDetails({...userDetails, signedOnDevice: 'ios'});
-      ('Running on iOS');
-    } else if (platform === 'android') {
-      setUserDetails({...userDetails, signedOnDevice: 'android'});
-      ('Running on Android');
-    }
+    const customNumber =
+      selectedCountry.callingCode +
+      userDetails.phoneNumber.replace(/^0+|\s+/g, '');
+
     if (userDetails?.accountType === 'Personal') {
       try {
         setIsLoading(true);
-        const res = await createUserProfile(userDetails);
-        if (res?.data?.error) {
+        const res = await createUserProfile(userDetails, customNumber);
+        if (res?.error) {
           Toast.show({
             type: 'error',
             position: 'top',
             topOffset: 50,
-            text1: res?.data?.title,
-            text2: res?.data?.message,
+            text1: res?.title,
+            text2: res?.message,
             visibilityTime: 5000,
             autoHide: true,
             onPress: () => Toast.hide(),
@@ -434,8 +446,8 @@ const Step3 = props => {
             type: 'success',
             position: 'top',
             topOffset: 50,
-            text1: res?.data?.title,
-            text2: res?.data?.message,
+            text1: res?.title,
+            text2: res?.message,
             visibilityTime: 3000,
             autoHide: true,
             onPress: () => Toast.hide(),
@@ -451,6 +463,7 @@ const Step3 = props => {
     } else {
       saveState({
         profileData: userDetails,
+        customNumber: customNumber,
         routeType: 'onboarding',
       });
       nextStep();
@@ -625,17 +638,17 @@ const Step3 = props => {
                     defaultValue={user && JSON.parse(user)?.email}
                   />
 
-                  <InputPhone
-                    label="Phone number"
-                    onFocus={() => handleError(null, 'phoneNumber')}
-                    layout="first"
+                  <CustomInputPhone
+                    label={'Phone number'}
                     isNeeded={true}
-                    defaultCode="NG"
-                    error={errors.phoneNumber}
-                    codeTextStyle={{color: '#6E7191'}}
-                    onChangeFormattedText={text => {
-                      setUserDetails({...userDetails, phoneNumber: text});
-                    }}
+                    defaultValue={defaultNumber}
+                    value={userDetails.phoneNumber}
+                    onChangePhoneNumber={handleInputValue}
+                    selectedCountry={selectedCountry}
+                    onChangeSelectedCountry={handleSelectedCountry}
+                    defaultCountry="NG"
+                    placeholder="Phone number"
+                    language="en"
                   />
 
                   <View style={{marginVertical: 10}}>
@@ -805,6 +818,16 @@ const Step3 = props => {
                             //Get cities by state
                             getCity(option.value)
                               .then(res => {
+                                fetchedCity = [
+                                  {value: '', label: '...Select LGA'},
+                                  {
+                                    value: 'Outside Nigeria',
+                                    label: 'Outside Nigeria',
+                                    key: 0,
+                                  },
+                                ];
+
+                                fetchedCity;
                                 res?.data &&
                                   res?.data?.length > 0 &&
                                   res?.data.map((item, index) => {
@@ -971,7 +994,10 @@ const Step3 = props => {
                     onChangeText={text =>
                       setUserDetails({
                         ...userDetails,
-                        NoOfDependents: parseInt(text, 10),
+                        NoOfDependents:
+                          text != undefined || text != null
+                            ? Number(text)
+                            : text,
                       })
                     }
                     defaultValue={userDetails?.NoOfDependents?.toString()}
@@ -1246,6 +1272,43 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderColor: COLORS.lendaComponentBorder,
     padding: 12,
+    borderBottomWidth: 0.8,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 1.41,
+  },
+  labelPhone: {
+    marginVertical: 5,
+    fontSize: 14,
+    color: COLORS.labelColor,
+  },
+  inputContainerPhone: {
+    height: 53,
+    backgroundColor: COLORS.light,
+    paddingVertical: 15,
+    width: '100%',
+    borderTopWidth: 0,
+    borderBottomWidth: 0,
+    borderLeftWidth: 0,
+    borderRightWidth: 0,
+    borderRadius: 8,
+    borderTopLeftRadius: 0,
+    borderBottomLeftRadius: 0,
+    borderColor: COLORS.lendaBlue,
+  },
+  mainContainerPhone: {
+    height: 55,
+    alignItems: 'center',
+    backgroundColor: COLORS.light,
+    paddingHorizontal: 5,
+    width: '100%',
+    borderWidth: 0.5,
+    borderRadius: 8,
+    borderColor: COLORS.lendaComponentBorder,
     borderBottomWidth: 0.8,
     shadowColor: '#000',
     shadowOffset: {

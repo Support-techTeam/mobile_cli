@@ -109,7 +109,7 @@ const userSignUp = async details => {
       const newUser = userCredential.user;
 
       const formatPhoneNumber =
-        details.countryCode + Number(details.phoneNumber).toString();
+        details.countryCode + details.phoneNumber;
 
       if (newUser) {
         await updatePhoneNumber(formatPhoneNumber, newUser?.uid);
