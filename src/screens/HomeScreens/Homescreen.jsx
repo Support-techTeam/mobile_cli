@@ -156,6 +156,7 @@ const Homescreen = () => {
       unsubGetAllTransactions();
       unsubGetTransactions();
       unsubCheckPin();
+      getLoanUserData();
     }, []),
   );
 
@@ -989,19 +990,21 @@ const Homescreen = () => {
     timeOut &&
     userProfileData &&
     userProfileData?.profileProgress !== null && (
-        <SafeAreaView
-          style={{
-            flex: 1,
-            height: hp('100%'),
-            width: wp('100%'),
-            backgroundColor: COLORS.lendaLightGrey,
-            paddingTop: insets.top !== 0 ? Math.min(insets.top, 10) : 'auto',
-            paddingBottom: insets.bottom !== 0 ? Math.min(insets.bottom, 10) : 'auto',
-            paddingLeft: insets.left !== 0 ? Math.min(insets.left, 10) : 'auto',
-            paddingRight: insets.right !== 0 ? Math.min(insets.right, 10) : 'auto',
-          }}>
-          {renderMainComponents()}
-        </SafeAreaView>
+      <SafeAreaView
+        style={{
+          flex: 1,
+          height: hp('100%'),
+          width: wp('100%'),
+          backgroundColor: COLORS.lendaLightGrey,
+          paddingTop: insets.top !== 0 ? Math.min(insets.top, 10) : 'auto',
+          paddingBottom:
+            insets.bottom !== 0 ? Math.min(insets.bottom, 10) : 'auto',
+          paddingLeft: insets.left !== 0 ? Math.min(insets.left, 10) : 'auto',
+          paddingRight:
+            insets.right !== 0 ? Math.min(insets.right, 10) : 'auto',
+        }}>
+        {renderMainComponents()}
+      </SafeAreaView>
     )
   );
 };
