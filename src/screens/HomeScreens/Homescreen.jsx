@@ -155,12 +155,9 @@ const Homescreen = () => {
       getAllArmInvestments();
       unsubGetAllTransactions();
       unsubGetTransactions();
+      unsubCheckPin();
     }, []),
   );
-
-  useEffect(() => {
-    unsubCheckPin();
-  }, [userPin]);
 
   // // Timed useEffect
   useEffect(() => {
