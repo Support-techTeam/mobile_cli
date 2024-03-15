@@ -15,7 +15,7 @@ import Pin from '../screens/TransferScreens/Pin';
 import Success from '../screens/TransferScreens/Success';
 import LoanTransactions from '../screens/LoanScreens/LoanTransaction';
 import GuarantorDetails from '../screens/LoanScreens/GuarantorDetails';
-import {AddGuarantors, GetLoan, Loanscreen} from '../screens/LoanScreens';
+import {AddGuarantors, GetLoan} from '../screens/LoanScreens';
 import {
   BankDetails,
   BusinessDetails,
@@ -40,7 +40,7 @@ import {
 import FinalSubmit from '../screens/ProfileOnboardings/AddDocuments/FinalSubmit';
 import Securindex from '../screens/SecurityScreens/Securindex';
 import TransPin from '../screens/SecurityScreens/TransPin';
-import {Homescreen, Paybills} from '../screens/HomeScreens';
+import {Paybills} from '../screens/HomeScreens';
 import BillPin from '../screens/paybills/billPin';
 import AirtimeConfirm from '../screens/paybills/AirtimeConfirm';
 import StatusFailed from '../screens/paybills/StatusFailed';
@@ -270,8 +270,6 @@ const AppStack = () => {
             name="NotificationsScreen"
             component={NotificationsScreen}
           />
-          <Stack.Screen name="Home" component={Homescreen} />
-          <Stack.Screen name="Loan" component={Loanscreen} />
         </>
       )}
     </Stack.Navigator>

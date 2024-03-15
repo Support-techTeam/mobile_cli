@@ -98,7 +98,6 @@ const AppNavigationContainer = () => {
 
   async function onBackgroundMessageReceived(message) {
     await notifee.requestPermission();
-    // console.log('onBackgroundMessageReceived', message);
     const {from, collapseKey, data, messageId, notification, sentTime, ttl} =
       message;
     const {title, body, android} = notification;
@@ -111,7 +110,6 @@ const AppNavigationContainer = () => {
 
   async function onForegroundMessageReceived(message) {
     await notifee.requestPermission();
-    // console.log('onForegroundMessageReceived', message);
     const {from, collapseKey, data, messageId, notification, sentTime, ttl} =
       message;
     const {title, body, android} = notification;
