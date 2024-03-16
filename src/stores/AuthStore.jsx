@@ -9,7 +9,6 @@ import {storeSensitiveData} from './SecurityStore';
 const axiosInstance = axios.create({baseURL: BASE_API_URL});
 let token = null;
 let headers;
-let confirm = null;
 
 const userLogin = async (email, password) => {
   if (

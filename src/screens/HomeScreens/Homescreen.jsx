@@ -49,6 +49,7 @@ import {WalletStatementModal} from '../../component/modals/WalletStatementModal'
 import {UpdateProfileBtn} from '../../component/homescreen/Update-Profile-Btn';
 import {FundWalletSection} from '../../component/homescreen/FundWallet-Section';
 import {MakeTransferSection} from '../../component/homescreen/MakeTransferSection';
+import {getAsyncData} from '../../context/AsyncContext';
 
 const Homescreen = () => {
   const insets = useSafeAreaInsets();

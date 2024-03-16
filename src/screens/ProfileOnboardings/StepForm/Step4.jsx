@@ -124,10 +124,11 @@ const industryData = [
 
 const monthlySalesData = [
   {value: '', label: 'Select Option'},
-  {value: 'Less than 10 sales', label: 'Less than 10 sales'},
-  {value: '51 to 100 sales', label: '51 to 100 sales'},
-  {value: '100 to 500 sales', label: '100 to 500 sales'},
-  {value: 'Above 500 sales', label: 'Above 500 sales'},
+  {value: 'Less than ₦10,000', label: 'Less than ₦10,000'},
+  {value: '₦10,000 to ₦100,000', label: '₦10,000 to ₦100,000'},
+  {value: '₦100,000 to ₦500,000', label: '₦100,000 to ₦500,000'},
+  {value: '₦500,000 to ₦1,000,000', label: '₦500,000 to ₦1,000,000'},
+  {value: 'Above ₦1,000,000', label: 'Above ₦1,000,000'},
 ];
 
 const businessDurationData = [
@@ -146,7 +147,6 @@ const monthlyExpData = [
   {value: '₦100,000 to ₦500,000', label: '₦100,000 to ₦500,000'},
   {value: '₦500,000 to ₦1,000,000', label: '₦500,000 to ₦1,000,000'},
   {value: 'Above ₦1,000,000', label: 'Above ₦1,000,000'},
-  {value: 'Dr', label: 'Dr'},
 ];
 
 const screenHeight = Dimensions.get('window').height;

@@ -47,7 +47,8 @@ const TobTabs = [
 const Others = () => {
   const route = useRoute();
   const {params} = route;
-  const {paramKey} = params;
+  const {paramKey, origin} = params;
+
 
   const [userDocs, setUserDocs] = useState({
     validIdentificationType: '',
@@ -280,6 +281,7 @@ const Others = () => {
               ...paramKey,
               [document]: newUrl,
             },
+            origin: origin,
           });
         }, 500);
       }
@@ -320,6 +322,7 @@ const Others = () => {
             paramKey: {
               ...formDetails,
             },
+            origin: origin,
           });
         }, 500);
       }
