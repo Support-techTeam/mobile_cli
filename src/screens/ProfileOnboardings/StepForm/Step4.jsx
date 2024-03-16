@@ -264,15 +264,18 @@ const BusinessDetails = props => {
 
   const handleCreateUser = async () => {
     setIsLoading(true);
-    createUserProfile(retrieveState()?.profileData)
+    createUserProfile(
+      retrieveState()?.profileData,
+      retrieveState()?.customNumber,
+    )
       .then(async res => {
-        if (res?.data?.error) {
+        if (res?.error) {
           Toast.show({
             type: 'error',
             position: 'top',
             topOffset: 50,
-            text1: res?.data?.title,
-            text2: res?.data?.message,
+            text1: res?.title,
+            text2: res?.message,
             visibilityTime: 5000,
             autoHide: true,
             onPress: () => Toast.hide(),
