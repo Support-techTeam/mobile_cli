@@ -8,7 +8,6 @@ import {
   Platform,
 } from 'react-native';
 import React, {useState, useEffect} from 'react';
-import AntDesign from 'react-native-vector-icons/AntDesign';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import {useNavigation} from '@react-navigation/native';
 import {TabView, SceneMap, TabBar} from 'react-native-tab-view';

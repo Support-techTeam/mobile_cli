@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   Platform,
   StatusBar,
@@ -8,6 +8,7 @@ import {
   AppState,
   LogBox,
   PermissionsAndroid,
+  Text,
 } from 'react-native';
 import SpInAppUpdates, {IAUUpdateKind} from 'sp-react-native-in-app-updates';
 import {version} from './app.json';
@@ -44,6 +45,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {DataProvider} from './src/context/DataProvider';
 import {Settings} from 'react-native-fbsdk-next';
 import notifee from '@notifee/react-native';
+import {CopilotProvider} from 'react-native-copilot';
 
 const inAppUpdates = new SpInAppUpdates(false);
 LogBox.ignoreAllLogs();
@@ -114,7 +116,6 @@ const requestNotificationPermission = async () => {
 };
 
 function App() {
-
   //Facebook SDK integration
   useEffect(() => {
     Settings.setAppID('225305113437958');
@@ -320,9 +321,25 @@ function App() {
                 <DataProvider>
                   <PersistGate persistor={persistor} loading={null}>
                     <TextColorProvider>
-                      <InitializeSDKHandler />
-                      <NetworkStatus />
-                      <AppNavigationContainer />
+                      <CopilotProvider
+                        stopOnOutsideClick={false}
+                        androidStatusBarVisible={false}
+                        animated={false}
+                        overlay="svg"
+                        verticalOffset={36}
+                        margin={10}
+                        backdropColor="rgba(50, 50, 100, 0.6)"
+                        tooltipStyle={{
+                          backgroundColor: COLORS.lendaComponentBg,
+                          borderColor: COLORS.lendaComponentBorder,
+                          borderWidth: 0.8,
+                          borderRadius: 10,
+                          margin: 15,
+                        }}>
+                        <InitializeSDKHandler />
+                        <NetworkStatus />
+                        <AppNavigationContainer />
+                      </CopilotProvider>
                     </TextColorProvider>
                   </PersistGate>
                 </DataProvider>

@@ -86,7 +86,7 @@ const AppStack = () => {
   const dispatch = useDispatch();
   const isVerified = auth().currentUser?.emailVerified;
   const userProfileData = useSelector(state => state.userProfile.profile);
-  const [timeOut, setTimeOut] = useState(false);
+  const [timeOut, setTimeOut] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
 
   // fetch profile

@@ -99,7 +99,7 @@ const FinalSubmit = ({route}) => {
             style={styles.signUpactivity}
             onPress={() => {
               toggleConfirm();
-              navigation.replace('BottomTabs', {screen: 'Loan'});
+              navigation.navigate('BottomTabs', {screen: 'Loan'});
             }}>
             <Text style={styles.confirmText}>Yes</Text>
           </TouchableOpacity>

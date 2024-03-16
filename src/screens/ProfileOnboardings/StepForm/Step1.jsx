@@ -59,7 +59,7 @@ const Step1 = props => {
     }
    }, [])
  
-console.log(insets.bottom)
+// console.log(insets.bottom)
   return (
     <SafeAreaView
       style={{

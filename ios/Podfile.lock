@@ -626,8 +626,6 @@ PODS:
     - React-logger (= 0.72.4)
     - React-perflogger (= 0.72.4)
   - RecaptchaInterop (100.0.0)
-  - RNBackgroundFetch (4.2.2):
-    - React-Core
   - RNCAsyncStorage (1.19.3):
     - React-Core
   - RNCClipboard (1.11.2):
@@ -660,10 +658,10 @@ PODS:
     - React-Core
   - RNKeychain (8.1.2):
     - React-Core
-  - RNNotifee (7.8.2):
+  - RNNotifee (7.8.0):
     - React-Core
-    - RNNotifee/NotifeeCore (= 7.8.2)
-  - RNNotifee/NotifeeCore (7.8.2):
+    - RNNotifee/NotifeeCore (= 7.8.0)
+  - RNNotifee/NotifeeCore (7.8.0):
     - React-Core
   - RNPermissions (3.10.1):
     - React-Core
@@ -672,7 +670,7 @@ PODS:
     - React-Core
   - RNShare (9.4.0):
     - React-Core
-  - RNSVG (13.13.0):
+  - RNSVG (13.14.0):
     - React-Core
   - RNVectorIcons (10.0.3):
     - RCT-Folly (= 2021.07.22.00)
@@ -752,7 +750,6 @@ DEPENDENCIES:
   - React-runtimescheduler (from `../node_modules/react-native/ReactCommon/react/renderer/runtimescheduler`)
   - React-utils (from `../node_modules/react-native/ReactCommon/react/utils`)
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
-  - RNBackgroundFetch (from `../node_modules/react-native-background-fetch`)
   - "RNCAsyncStorage (from `../node_modules/@react-native-async-storage/async-storage`)"
   - "RNCClipboard (from `../node_modules/@react-native-clipboard/clipboard`)"
   - "RNCPushNotificationIOS (from `../node_modules/@react-native-community/push-notification-ios`)"
@@ -924,8 +921,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/react/utils"
   ReactCommon:
     :path: "../node_modules/react-native/ReactCommon"
-  RNBackgroundFetch:
-    :path: "../node_modules/react-native-background-fetch"
   RNCAsyncStorage:
     :path: "../node_modules/@react-native-async-storage/async-storage"
   RNCClipboard:
@@ -1053,7 +1048,6 @@ SPEC CHECKSUMS:
   React-utils: b79f2411931f9d3ea5781404dcbb2fa8a837e13a
   ReactCommon: 2635a013764a291989765d6ec136513911f478c6
   RecaptchaInterop: 7d1a4a01a6b2cb1610a47ef3f85f0c411434cb21
-  RNBackgroundFetch: 35c7183f6eeff69396d42c4b206e1ae2a21e9327
   RNCAsyncStorage: c913ede1fa163a71cea118ed4670bbaaa4b511bb
   RNCClipboard: 3f0451a8100393908bea5c5c5b16f96d45f30bfc
   RNCPushNotificationIOS: 64218f3c776c03d7408284a819b2abfda1834bc8
@@ -1066,11 +1060,11 @@ SPEC CHECKSUMS:
   RNFlashList: 4b4b6b093afc0df60ae08f9cbf6ccd4c836c667a
   RNFS: 4ac0f0ea233904cb798630b3c077808c06931688
   RNKeychain: a65256b6ca6ba6976132cc4124b238a5b13b3d9c
-  RNNotifee: 8e2d3df3f0e9ce8f5d1fe4c967431138190b6175
+  RNNotifee: f3c01b391dd8e98e67f539f9a35a9cbcd3bae744
   RNPermissions: 6dbf8b319b841caea7a1feb46019cfcc2b404fab
   RNScreens: 3c5b9f4a9dcde752466854b6109b79c0e205dad3
   RNShare: df09e4d08ce0b50e32e2b6b9ec0249d7fdc06960
-  RNSVG: ed492aaf3af9ca01bc945f7a149d76d62e73ec82
+  RNSVG: d00c8f91c3cbf6d476451313a18f04d220d4f396
   RNVectorIcons: 64e6a523ac30a3241efa9baf1ffbcc5e76ff747a
   SDWebImage: a7f831e1a65eb5e285e3fb046a23fcfbf08e696d
   SDWebImageWebPCoder: 908b83b6adda48effe7667cd2b7f78c897e5111d
