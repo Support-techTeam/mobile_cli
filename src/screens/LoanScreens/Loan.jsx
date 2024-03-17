@@ -1057,11 +1057,7 @@ const Loanscreen = () => {
               }
               navigation.navigate(
                 `${
-                  loanUserDetails === undefined ||
-                  loanUserDetails?.loanDocumentDetails?.validIdentification ===
-                    undefined
-                    ? 'OnboardingHome'
-                    : guarantor && guarantor?.length > 0
+                  guarantor && guarantor?.length > 0
                     ? 'GetLoan'
                     : 'AddGuarantors'
                 }`,
@@ -1088,7 +1084,6 @@ const Loanscreen = () => {
       </View>
     );
   };
-
 
   const renderSlideComponent = () => {
     return (

@@ -247,11 +247,7 @@ const Guarantor = () => {
                   }
                   navigation.navigate(
                     `${
-                      loanUserdetails === undefined ||
-                      loanUserdetails?.loanDocumentDetails
-                        ?.validIdentification === undefined
-                        ? 'OnboardingHome'
-                        : guarantors && guarantors?.length > 0
+                      guarantors && guarantors?.length > 0
                         ? 'GetLoan'
                         : 'AddGuarantors'
                     }`,

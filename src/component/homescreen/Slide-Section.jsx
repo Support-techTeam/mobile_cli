@@ -174,17 +174,17 @@ export const SlideSection = props => {
                 onPress={toggleHideBalance}
               />
             </View>
-         
-                <Text
-                  style={[
-                    styles.prices,
-                    {
-                      color:
-                        item.title === 'Wallet balance' ? '#054B99' : '#FFFFFF',
-                    },
-                  ]}>
-                  {hideBalance ? '₦******' : `₦${item.balance}`}
-                </Text>
+
+            <Text
+              style={[
+                styles.prices,
+                {
+                  color:
+                    item.title === 'Wallet balance' ? '#054B99' : '#FFFFFF',
+                },
+              ]}>
+              {hideBalance ? '₦******' : `₦${item.balance}`}
+            </Text>
 
             <View
               style={{
@@ -209,11 +209,7 @@ export const SlideSection = props => {
                     }
                     navigation.navigate(
                       `${
-                        loanUserDetails === undefined ||
-                        loanUserDetails?.loanDocumentDetails
-                          ?.validIdentification === undefined
-                          ? 'OnboardingHome'
-                          : guarantor && guarantor.length > 0
+                        guarantor && guarantor.length > 0
                           ? 'GetLoan'
                           : 'AddGuarantors'
                       }`,

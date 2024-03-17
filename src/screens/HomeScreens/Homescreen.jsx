@@ -721,17 +721,21 @@ const Homescreen = () => {
             onPress: () => Toast.hide(),
           });
         }
+        // changed on the 17th march 2024, on CEO's request.
         navigation.navigate(
-          `${
-            loanUserDetails === undefined ||
-            loanUserDetails?.loanDocumentDetails?.validIdentification ===
-              undefined
-              ? 'OnboardingHome'
-              : guarantor && guarantor.length > 0
-              ? 'GetLoan'
-              : 'AddGuarantors'
-          }`,
+          `${guarantor && guarantor.length > 0 ? 'GetLoan' : 'AddGuarantors'}`,
         );
+        // navigation.navigate(
+        //   `${
+        //     loanUserDetails === undefined ||
+        //     loanUserDetails?.loanDocumentDetails?.validIdentification ===
+        //       undefined
+        //       ? 'OnboardingHome'
+        //       : guarantor && guarantor.length > 0
+        //       ? 'GetLoan'
+        //       : 'AddGuarantors'
+        //   }`,
+        // );
       },
       buttonTextColor: COLORS.lendaBlue,
       buttonColor: COLORS.lendaBlue,
