@@ -152,7 +152,7 @@ const NextOfKin = () => {
         });
         setTimeout(() => {
           if (previousRoute !== 'MyAccount') {
-            navigation.navigate('BankDetails');
+            navigation.navigate('ValidIdentity');
           } else {
             navigation.navigate('MyAccount');
           }
@@ -192,7 +192,7 @@ const NextOfKin = () => {
         });
         setTimeout(() => {
           if (previousRoute !== 'MyAccount') {
-            navigation.navigate('BankDetails');
+            navigation.navigate('ValidIdentity');
           } else {
             navigation.navigate('MyAccount');
           }
@@ -215,7 +215,7 @@ const NextOfKin = () => {
         paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
       }}>
        <Loader visible={isLoading} loadingText={'Please wait...'} />
-       <Loader visible={isUpdating} loadingText={'Please wait...'} />
+       <Loader visible={isUpdating} loadingText={'Storing data...'} />
       <View
         style={{
           flexDirection: 'row',

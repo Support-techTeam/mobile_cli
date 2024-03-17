@@ -13,6 +13,7 @@ import {
 } from '../../../stores/LoanStore';
 import Toast from 'react-native-toast-message';
 import Loader from '../../../component/loader/loader';
+import { storeAsyncData } from '../../../context/AsyncContext';
 const idTypeData = [
   {value: '', label: 'Select ID Type'},
   {value: 'National ID', label: 'National ID'},
@@ -53,9 +54,21 @@ const ValidIdentity = () => {
     personalPhoto: '',
   });
 
+  const activeTab = 'ValidIndentity';
+  const navigation = useNavigation();
+  const insets = useSafeAreaInsets();
   const [orgDetails, setOrgDetails] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const route = useRoute();
+  const previousRoute = navigation.getState()?.routes.slice(-2)[0]?.name;
+
+  useEffect(() => {
+    saveData();
+  }, [previousRoute])
+
+  const saveData = async () => {
+    await storeAsyncData({storage_name: 'originRoute', storage_value: previousRoute});
+  }
 
   useEffect(() => {
     if (route.name === 'ValidIdentity') {
@@ -139,10 +152,6 @@ const ValidIdentity = () => {
   const disableit =
     !formDetails.validIdentification || !formDetails.validIdentificationType;
 
-  const activeTab = 'ValidIndentity';
-  const navigation = useNavigation();
-  const insets = useSafeAreaInsets();
-
   const renderItem = ({item}) => {
     const isActive = item.key === activeTab;
 
@@ -185,7 +194,10 @@ const ValidIdentity = () => {
           onPress: () => Toast.hide(),
         });
         setTimeout(() => {
-          navigation.navigate('ProofOfAddress', {paramKey: formDetails});
+          navigation.navigate('ProofOfAddress', {
+            paramKey: formDetails,
+            origin: previousRoute,
+          });
         }, 1000);
       }
       setIsLoading(false);
@@ -221,7 +233,10 @@ const ValidIdentity = () => {
           onPress: () => Toast.hide(),
         });
         setTimeout(() => {
-          navigation.navigate('ProofOfAddress', {paramKey: formDetails});
+          navigation.navigate('ProofOfAddress', {
+            paramKey: formDetails,
+            origin: previousRoute,
+          });
         }, 1000);
       }
       setIsLoading(false);

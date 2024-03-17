@@ -243,6 +243,24 @@ const TransactionScreen = ({route}) => {
             </View>
           )}
 
+          {wallet?.walletIdAccountNumber ==
+            transaction.fromWalletAccountNumber &&
+            (transaction?.toAccount || transaction?.toWalletAccountNumber ? (
+              <View style={styles.body}>
+                <View style={styles.leftView}>
+                  <Text style={styles.infotext}>Beneficiary Account</Text>
+                </View>
+                <View style={styles.rightView}>
+                  <Text style={styles.values}>
+                    {transaction?.toAccount
+                      ? '******' + transaction?.toAccount?.slice(-4)
+                      : '******' +
+                        transaction?.toWalletAccountNumber?.slice(-4)}
+                  </Text>
+                </View>
+              </View>
+            ) : null)}
+
           <View style={styles.body}>
             <View style={styles.leftView}>
               <Text style={styles.infotext}>Remark</Text>
@@ -302,9 +320,9 @@ const TransactionScreen = ({route}) => {
               style={[
                 styles.body,
                 {
-                  justifyContent: 'space-evenly',
+                  paddingHorizontal: 0,
+                  justifyContent: 'space-between',
                   alignItems: 'center',
-                  gap: 10,
                   paddingTop: 10,
                 },
               ]}>
@@ -316,7 +334,6 @@ const TransactionScreen = ({route}) => {
                       borderColor: COLORS.lendaBlue,
                       backgroundColor: COLORS.lendaBlue,
                       borderRadius: 5,
-                      marginRight: 8,
                       padding: 2,
                       flexDirection: 'row',
                       width: wp('40%'),
@@ -348,7 +365,6 @@ const TransactionScreen = ({route}) => {
                       borderColor: COLORS.lendaBlue,
                       backgroundColor: COLORS.white,
                       borderRadius: 5,
-                      marginRight: 8,
                       padding: 2,
                       flexDirection: 'row',
                       width: wp('40%'),
@@ -386,11 +402,16 @@ const TransactionScreen = ({route}) => {
         flex: 1,
         backgroundColor: '#fff',
         paddingTop: insets.top !== 0 ? Math.min(insets.top, 10) : 'auto',
-        paddingBottom: insets.bottom !== 0 ? Math.min(insets.bottom, 10) : 'auto',
+        paddingBottom:
+          insets.bottom !== 0 ? Math.min(insets.bottom, 10) : 'auto',
         paddingLeft: insets.left !== 0 ? Math.min(insets.left, 10) : 'auto',
         paddingRight: insets.right !== 0 ? Math.min(insets.right, 10) : 'auto',
       }}>
-      <Header routeAction={() => navigation.goBack()} heading="TRANSACTION" disable={false}/>
+      <Header
+        routeAction={() => navigation.goBack()}
+        heading="TRANSACTION"
+        disable={false}
+      />
 
       <ScrollView
         bounces={false}

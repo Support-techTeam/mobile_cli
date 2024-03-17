@@ -9,7 +9,6 @@ import {storeSensitiveData} from './SecurityStore';
 const axiosInstance = axios.create({baseURL: BASE_API_URL});
 let token = null;
 let headers;
-let confirm = null;
 
 const userLogin = async (email, password) => {
   if (
@@ -109,7 +108,7 @@ const userSignUp = async details => {
       const newUser = userCredential.user;
 
       const formatPhoneNumber =
-        details.countryCode + Number(details.phoneNumber).toString();
+        details.countryCode + details.phoneNumber;
 
       if (newUser) {
         await updatePhoneNumber(formatPhoneNumber, newUser?.uid);

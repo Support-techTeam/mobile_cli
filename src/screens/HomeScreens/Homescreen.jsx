@@ -1,7 +1,6 @@
 import {
   StyleSheet,
   ScrollView,
-  NativeModules,
   RefreshControl,
   ActivityIndicator,
 } from 'react-native';
@@ -49,6 +48,7 @@ import {WalletStatementModal} from '../../component/modals/WalletStatementModal'
 import {UpdateProfileBtn} from '../../component/homescreen/Update-Profile-Btn';
 import {FundWalletSection} from '../../component/homescreen/FundWallet-Section';
 import {MakeTransferSection} from '../../component/homescreen/MakeTransferSection';
+import {getAsyncData} from '../../context/AsyncContext';
 
 const Homescreen = () => {
   const insets = useSafeAreaInsets();
@@ -68,11 +68,11 @@ const Homescreen = () => {
   const userProfileData = useSelector(state => state.userProfile.profile);
   const userWalletData = useSelector(state => state.userProfile.wallet);
   const [userTransactionsData, setUserTransactionsData] = useState([]);
-  const [allUserTransactionsData, setAllUserTransactionsData] = useState([]);
-  const [userTransactionsPages, setUserTransactionsPages] = useState([]);
-  const [userTransactionsTotal, setUserTransactionsTotal] = useState([]);
+  // const [allUserTransactionsData, setAllUserTransactionsData] = useState([]);
+  // const [userTransactionsPages, setUserTransactionsPages] = useState([]);
+  // const [userTransactionsTotal, setUserTransactionsTotal] = useState([]);
+  // const [currentPage, setCurrentPage] = useState(1);
   const [userLoanAmount, setUserLoanAmount] = useState(undefined);
-  const [currentPage, setCurrentPage] = useState(1);
   const [data, setString] = useClipboard();
   const [timeOut, setTimeOut] = useState(false);
   const route = useRoute();
@@ -144,8 +144,16 @@ const Homescreen = () => {
   useEffect(() => {
     setTimeout(() => {
       setTimeOut(true);
-    }, 3000);
+    }, 5000);
   });
+
+  useFocusEffect(
+    useCallback(() => {
+      setTimeout(() => {
+        setTimeOut(true);
+      }, 5000);
+    }, []),
+  );
 
   useFocusEffect(
     useCallback(() => {
@@ -155,12 +163,11 @@ const Homescreen = () => {
       getAllArmInvestments();
       unsubGetAllTransactions();
       unsubGetTransactions();
+      unsubCheckPin();
+      getLoanUserData();
+      unsubGetLoanAmount();
     }, []),
   );
-
-  useEffect(() => {
-    unsubCheckPin();
-  }, [userPin]);
 
   // // Timed useEffect
   useEffect(() => {
@@ -196,7 +203,7 @@ const Homescreen = () => {
           res?.data?.transactions?.transaction !== null
         ) {
           setUserTransactionsData(res?.data?.transactions.transaction);
-          setAllUserTransactionsData(res?.data?.transactions.transaction);
+          // setAllUserTransactionsData(res?.data?.transactions.transaction);
         }
       }
     }, 60000);
@@ -233,15 +240,15 @@ const Homescreen = () => {
       .then(res => {
         if (res) {
           if (!res?.error) {
-            setCurrentPage(0);
+            // setCurrentPage(0);
             if (
               res?.data?.transactions?.transaction !== undefined &&
               res?.data?.transactions?.transaction !== null
             ) {
               setUserTransactionsData(res?.data?.transactions?.transaction);
-              setAllUserTransactionsData(res?.data?.transactions?.transaction);
-              setUserTransactionsPages(res?.data?.transactions?.maxPages);
-              setUserTransactionsTotal(res?.data?.transactions?.count);
+              // setAllUserTransactionsData(res?.data?.transactions?.transaction);
+              // setUserTransactionsPages(res?.data?.transactions?.maxPages);
+              // setUserTransactionsTotal(res?.data?.transactions?.count);
             }
           }
         }
@@ -259,10 +266,10 @@ const Homescreen = () => {
       .then(res => {
         if (res) {
           if (!res?.error) {
-            setCurrentPage(0);
+            // setCurrentPage(0);
             setUserTransactionsData(res?.data?.transactions?.transaction);
-            setUserTransactionsPages(res?.data?.transactions?.maxPages);
-            setUserTransactionsTotal(res?.data?.transactions?.count);
+            // setUserTransactionsPages(res?.data?.transactions?.maxPages);
+            // setUserTransactionsTotal(res?.data?.transactions?.count);
           }
         }
       })
@@ -278,10 +285,10 @@ const Homescreen = () => {
       .then(res => {
         if (res) {
           if (!res?.error) {
-            setCurrentPage(0);
+            // setCurrentPage(0);
             setUserTransactionsData(res?.data?.transactions?.transaction);
-            setUserTransactionsPages(res?.data?.transactions?.maxPages);
-            setUserTransactionsTotal(res?.data?.transactions?.count);
+            // setUserTransactionsPages(res?.data?.transactions?.maxPages);
+            // setUserTransactionsTotal(res?.data?.transactions?.count);
           }
         }
       })
@@ -399,9 +406,7 @@ const Homescreen = () => {
         autoHide: true,
         onPress: () => Toast.hide(),
       });
-    } catch (error) {
-      // console.error('Error copying to clipboard:', error);
-    }
+    } catch (error) {}
   };
 
   const getLoanUserData = async () => {
@@ -920,10 +925,10 @@ const Homescreen = () => {
       <>
         {isLoading ||
         isLoadingWallet ||
-        isLoadingTransaction ||
-        isLoadingLoanData ||
-        isLoadingLenda ||
-        isLoadingArm ||
+        // isLoadingTransaction ||
+        // isLoadingLoanData ||
+        // isLoadingLenda ||
+        // isLoadingArm ||
         isLoadingLoanAmount ? (
           <ActivityIndicator
             size="large"
@@ -989,23 +994,24 @@ const Homescreen = () => {
     userProfileData?.profileProgress === null ? (
     <PersonalDetails />
   ) : (
-    timeOut &&
-    userProfileData &&
-    userProfileData?.profileProgress !== null && (
-        <SafeAreaView
-          style={{
-            flex: 1,
-            height: hp('100%'),
-            width: wp('100%'),
-            backgroundColor: COLORS.lendaLightGrey,
-            paddingTop: insets.top !== 0 ? Math.min(insets.top, 10) : 'auto',
-            paddingBottom: insets.bottom !== 0 ? Math.min(insets.bottom, 10) : 'auto',
-            paddingLeft: insets.left !== 0 ? Math.min(insets.left, 10) : 'auto',
-            paddingRight: insets.right !== 0 ? Math.min(insets.right, 10) : 'auto',
-          }}>
-          {renderMainComponents()}
-        </SafeAreaView>
-    )
+    // timeOut &&
+    // userProfileData &&
+    // userProfileData?.profileProgress !== null && (
+    <SafeAreaView
+      style={{
+        flex: 1,
+        height: hp('100%'),
+        width: wp('100%'),
+        backgroundColor: COLORS.lendaLightGrey,
+        paddingTop: insets.top !== 0 ? Math.min(insets.top, 10) : 'auto',
+        paddingBottom:
+          insets.bottom !== 0 ? Math.min(insets.bottom, 10) : 'auto',
+        paddingLeft: insets.left !== 0 ? Math.min(insets.left, 10) : 'auto',
+        paddingRight: insets.right !== 0 ? Math.min(insets.right, 10) : 'auto',
+      }}>
+      {renderMainComponents()}
+    </SafeAreaView>
+    // )
   );
 };
 

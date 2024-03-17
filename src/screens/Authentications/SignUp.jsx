@@ -7,7 +7,6 @@ import {
   Linking,
   Image,
   ImageBackground,
-  Dimensions,
 } from 'react-native';
 import React, {useState, useEffect} from 'react';
 import {Formik} from 'formik';
@@ -30,6 +29,12 @@ import {
 import {SIZES} from '../../constants';
 import {AuthHeader} from '../../component/header/AuthHeader';
 import Loader from '../../component/loader/loader';
+import {
+  storeAsyncData,
+  getAsyncData,
+  deleteAsyncData,
+} from '../../context/AsyncContext';
+import CustomInputPhone from '../../component/inputField/input-phone.component';
 
 const SignUp = () => {
   const insets = useSafeAreaInsets();
@@ -47,7 +52,7 @@ const SignUp = () => {
   const toggleCheckbox = () => setChecked(!checked);
   const navigation = useNavigation();
   const dispatch = useDispatch();
-
+  const [selectedCountry, setSelectedCountry] = useState();
   const [inputs, setInputs] = useState({
     firstname: '',
     lastname: '',
@@ -69,7 +74,29 @@ const SignUp = () => {
     showPassLogs === true ||
     error !== '';
 
+  function handleInputValue(phoneNumber) {
+    setInputs(prevData => ({
+      ...prevData,
+      phoneNumber: phoneNumber.replace(/^0+|\s+/g, ''),
+    }));
+  }
+
+  function handleSelectedCountry(country) {
+    setInputs(prevData => ({
+      ...prevData,
+      countryCode: country.callingCode,
+    }));
+    setSelectedCountry(country);
+  }
+
   const handleSignUp = async () => {
+    await deleteAsyncData({storage_name: 'signup'});
+
+    await storeAsyncData({
+      storage_name: 'signup',
+      storage_value: inputs,
+    });
+
     if (isNaN(Number(inputs.phoneNumber))) {
       Toast.show({
         type: 'error',
@@ -369,24 +396,15 @@ const SignUp = () => {
                           isNeeded={true}
                         />
 
-                        <InputPhone
-                          label="Phone number"
-                          onFocus={() => handleError(null, 'phoneNumber')}
-                          layout="first"
+                        <CustomInputPhone
+                          label={'Phone number'}
                           isNeeded={true}
-                          defaultCode="NG"
-                          error={errors.phoneNumber}
-                          codeTextStyle={{color: '#6E7191'}}
-                          defaultValue={inputs?.phoneNumber}
-                          onChangeCountry={text =>
-                            handleOnchange(
-                              `+${text?.callingCode[0]}`,
-                              'countryCode',
-                            )
-                          }
-                          onChangeText={text =>
-                            handleOnchange(text, 'phoneNumber')
-                          }
+                          value={inputs?.phoneNumber}
+                          onChangePhoneNumber={handleInputValue}
+                          selectedCountry={selectedCountry}
+                          onChangeSelectedCountry={handleSelectedCountry}
+                          defaultCountry="NG"
+                          language="en"
                         />
 
                         <Input

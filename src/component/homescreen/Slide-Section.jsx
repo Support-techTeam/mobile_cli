@@ -174,17 +174,17 @@ export const SlideSection = props => {
                 onPress={toggleHideBalance}
               />
             </View>
-
-            <Text
-              style={[
-                styles.prices,
-                {
-                  color:
-                    item.title === 'Wallet balance' ? '#054B99' : '#FFFFFF',
-                },
-              ]}>
-              {hideBalance ? '₦******' : `₦${item.balance}`}
-            </Text>
+         
+                <Text
+                  style={[
+                    styles.prices,
+                    {
+                      color:
+                        item.title === 'Wallet balance' ? '#054B99' : '#FFFFFF',
+                    },
+                  ]}>
+                  {hideBalance ? '₦******' : `₦${item.balance}`}
+                </Text>
 
             <View
               style={{
@@ -330,12 +330,23 @@ export const SlideSection = props => {
         dotsLength={slides?.length}
         activeDotIndex={index}
         carouselRef={carouselRef}
-        containerStyle={{alignSelf: 'flex-end', paddingVertical: 0, paddingTop: 10, paddingBottom: 5, marginVertical: 0}}
+        containerStyle={{
+          alignSelf: 'flex-end',
+          paddingVertical: 0,
+          paddingTop: 10,
+          paddingBottom: 5,
+          marginVertical: 0,
+        }}
         dotStyle={{
           width: 10,
           height: 10,
           borderRadius: 5,
-          backgroundColor: index == 0 ? COLORS.lendaOrange : index == 1 ? COLORS.lendaBlue : COLORS.lendaGreen,
+          backgroundColor:
+            index == 0
+              ? COLORS.lendaOrange
+              : index == 1
+              ? COLORS.lendaBlue
+              : COLORS.lendaGreen,
         }}
         tappableDots={true}
         inactiveDotStyle={{

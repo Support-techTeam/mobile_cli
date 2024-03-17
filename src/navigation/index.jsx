@@ -5,7 +5,13 @@ import {
   DarkTheme,
   useNavigationContainerRef,
 } from '@react-navigation/native';
-import {Animated, useColorScheme} from 'react-native';
+import {
+  StyleSheet,
+  useColorScheme,
+  View,
+  TouchableOpacity,
+  Text,
+} from 'react-native';
 import AppStack from './AppStack';
 import AuthStack from './AuthStack';
 // import {auth} from '../util/firebase/firebaseConfig';
@@ -20,6 +26,18 @@ import {useData} from '../context/DataProvider';
 import CustomNotification from '../component/push-notifications/CustomNotification';
 import notifee from '@notifee/react-native';
 import messaging from '@react-native-firebase/messaging';
+import {version} from '../../app.json';
+// For Step by Step Walkthrough
+import {CopilotStep, walkthroughable, useCopilot} from 'react-native-copilot';
+import FastImage from 'react-native-fast-image';
+import COLORS from '../constants/colors';
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from 'react-native-responsive-screen';
+
+const WalkthroughableText = walkthroughable(Text);
+const WalkthroughableImage = walkthroughable(FastImage);
 
 const AppNavigationContainer = () => {
   const navigationRef = useNavigationContainerRef();
@@ -31,6 +49,57 @@ const AppNavigationContainer = () => {
   const [networkStatus, setNetworkStatus] = useState(true);
   const {dataStore, setDataStore} = useData();
   const [notification, setNotification] = useState(null);
+
+  //walktrrough
+  const [mainOpacity, setMainOpacity] = useState(0.6);
+  const [componentOpacity, setComponentOpacity] = useState(1);
+
+  // const [secondStepActive, setSecondStepActive] = useState(true);
+  const {start, copilotEvents, stop, visible} = useCopilot();
+  const [lastEvent, setLastEvent] = useState(null);
+  const [isTourFinished, setIsTourFinished] = useState(false);
+
+  useEffect(() => {
+    copilotEvents.on('stepChange', step => {
+      setLastEvent(`stepChange: ${step.name}`);
+      // if (step.name === 'moreSection') {
+      //   // navigationRef.navigate('BottomTabs', {screen: 'More'});
+      // } else if (step.name === 'walletIndesSection') {
+      //   navigationRef.navigate('BottomTabs', {screen: 'More'});
+      //   // navigationRef.navigate('WalletIndex');
+      // } else if (step.name === 'securitySection') {
+      //   // navigationRef.navigate('Security');
+      // } else {
+      //   navigationRef.navigate('BottomTabs', {screen: 'Home'});
+      // }
+    });
+    copilotEvents.on('start', () => {
+      setLastEvent(`start`);
+      setMainOpacity(0);
+      setComponentOpacity(0);
+    });
+    copilotEvents.on('stop', () => {
+      setLastEvent(`stop`);
+      setMainOpacity(0.6);
+      setComponentOpacity(1);
+    });
+  }, [copilotEvents]);
+
+  useEffect(() => {
+    const listener = () => {
+      // console.log('Copilot tutorial finished!');
+      stop();
+      // setIsTourFinished(true);
+      // Copilot tutorial finished!
+    };
+
+    copilotEvents.on('stop', listener);
+
+    return () => {
+      copilotEvents.off('stop', listener);
+    };
+  }, []);
+
   useLayoutEffect(() => {
     if (
       auth().currentUser === undefined ||
@@ -98,7 +167,6 @@ const AppNavigationContainer = () => {
 
   async function onBackgroundMessageReceived(message) {
     await notifee.requestPermission();
-    // console.log('onBackgroundMessageReceived', message);
     const {from, collapseKey, data, messageId, notification, sentTime, ttl} =
       message;
     const {title, body, android} = notification;
@@ -111,7 +179,6 @@ const AppNavigationContainer = () => {
 
   async function onForegroundMessageReceived(message) {
     await notifee.requestPermission();
-    // console.log('onForegroundMessageReceived', message);
     const {from, collapseKey, data, messageId, notification, sentTime, ttl} =
       message;
     const {title, body, android} = notification;
@@ -125,6 +192,66 @@ const AppNavigationContainer = () => {
     onForegroundMessageReceived(remoteMessage);
   });
 
+  const featureIntro = () => {
+    return (
+      <View
+        style={{
+          position: 'absolute',
+          zIndex: 99999999,
+          backgroundColor: `rgba(0,0,0,${mainOpacity})`,
+          justifyContent: 'center',
+          alignItems: 'center',
+          width: wp('100%'),
+          height: hp('100%'),
+        }}>
+        <WalkthroughableText
+          style={[
+            styles.title,
+            {
+              color: COLORS.white,
+              paddingVertical: 60,
+              opacity: componentOpacity,
+            },
+          ]}>
+          {`Welcome to Trade Lenda App \nv${version}\nnew features intro.`}
+        </WalkthroughableText>
+
+        <View style={[styles.middleView, {opacity: componentOpacity}]}>
+          <View
+            style={{
+              backgroundColor: COLORS.white,
+              width: 160,
+              height: 160,
+              borderRadius: 80,
+              marginVertical: 20,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+            <WalkthroughableImage
+              source={{
+                uri: 'https://tradelenda.com/images/logos/TradeLendaLOGO.png',
+                priority: FastImage.priority.normal,
+              }}
+              resizeMode={FastImage.resizeMode.contain}
+              style={[styles.profilePhoto]}
+            />
+          </View>
+          <View
+            style={[
+              styles.activeSwitchContainer,
+              {opacity: componentOpacity},
+            ]}></View>
+
+          <TouchableOpacity
+            style={[styles.button, {opacity: componentOpacity}]}
+            onPress={() => start()}>
+            <Text style={styles.buttonText}>START FEATURES INTRO!</Text>
+          </TouchableOpacity>
+          <View style={styles.eventContainer}></View>
+        </View>
+      </View>
+    );
+  };
   return (
     <TabContextProvider>
       <NavigationContainer
@@ -149,7 +276,10 @@ const AppNavigationContainer = () => {
         {isLoading && <Splashscreen text="Checking Authentication..." />}
         {user ? (
           networkStatus ? (
-            <AppStack />
+            <>
+              {/* {!isTourFinished && featureIntro()} */}
+              <AppStack />
+            </>
           ) : (
             <NetworkScreen />
           )
@@ -162,3 +292,47 @@ const AppNavigationContainer = () => {
 };
 
 export default AppNavigationContainer;
+
+const styles = StyleSheet.create({
+  container: {
+    paddingHorizontal: 10,
+  },
+  title: {
+    fontSize: 24,
+    textAlign: 'center',
+  },
+  profilePhoto: {
+    width: 130,
+    height: 130,
+  },
+  middleView: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  button: {
+    backgroundColor: COLORS.lendaBlue,
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+  },
+  buttonText: {
+    color: 'white',
+    fontSize: 16,
+  },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  tabItem: {
+    textAlign: 'center',
+  },
+  activeSwitchContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 20,
+    alignItems: 'center',
+    paddingHorizontal: 25,
+  },
+  eventContainer: {
+    marginTop: 20,
+  },
+});

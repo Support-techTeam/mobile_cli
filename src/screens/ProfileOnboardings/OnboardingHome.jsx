@@ -6,10 +6,13 @@ import {
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
-import React, {useState, useEffect} from 'react';
-import {useNavigation} from '@react-navigation/native';
+import React, {useState, useEffect, useCallback} from 'react';
+import {
+  useFocusEffect,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 import CustomView from '../../component/profileOnboardSelects/CustomView';
 import CustomView2 from '../../component/profileOnboardSelects/CustomView2';
@@ -20,27 +23,57 @@ import {
 } from 'react-native-responsive-screen';
 import {getProfileDetails} from '../../stores/ProfileStore.jsx';
 import {getLoanUserDetails} from '../../stores/LoanStore.jsx';
+import {getAsyncData, storeAsyncData} from '../../context/AsyncContext';
+import Loader from '../../component/loader/loader';
 
 const OnboardingHome = () => {
   const [hasStarted, setHasStarted] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [hasDocumentCount, setHasDocumentCount] = useState(0);
   const insets = useSafeAreaInsets();
-  useEffect(() => {
-    getProfileDetailsStatus();
-    const getStartedStatus = async () => {
-      try {
-        const started = await AsyncStorage.getItem('hasStarted');
-        setHasStarted(started);
-      } catch (e) {
-        // console.log(e);
-      }
-    };
-    getStartedStatus();
-  }, []);
+
+  useFocusEffect(
+    // timer to get status every 2 seconds
+    useCallback(() => {
+      const interval = setInterval(async () => {
+        getStartedStatus();
+      }, 2000);
+
+      return () => {
+        clearInterval(interval);
+      };
+    }, []),
+  );
+
+  useFocusEffect(
+    //loading timeout
+    useCallback(() => {
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 2500);
+    }, []),
+  );
+
+  useFocusEffect(
+    useCallback(() => {
+      getProfileDetailsStatus();
+      getStartedStatus();
+      getLoanUserDetailsStatus();
+    }, []),
+  );
 
   useEffect(() => {
     getProfileDetailsStatus();
+    getStartedStatus();
+    getLoanUserDetailsStatus();
   }, []);
+
+  const getStartedStatus = async () => {
+    try {
+      const started = await getAsyncData({storage_name: 'hasStarted'});
+      setHasStarted(started.data);
+    } catch (e) {}
+  };
 
   const getProfileDetailsStatus = async () => {
     try {
@@ -50,7 +83,7 @@ const OnboardingHome = () => {
         getProfileResponse?.data !== undefined ||
         getProfileResponse?.data !== ''
       ) {
-        await AsyncStorage.setItem('hasStarted', '1');
+        await storeAsyncData({storage_name: 'hasStarted', storage_value: '1'});
         getLoanUserDetailsStatus();
       }
     } catch (err) {
@@ -71,28 +104,40 @@ const OnboardingHome = () => {
           getLoanUserDetailsResponse?.data?.organizationDetails !== null &&
           getLoanUserDetailsResponse?.data?.organizationDetails !== undefined
         ) {
-          await AsyncStorage.setItem('hasStarted', '2');
+          await storeAsyncData({
+            storage_name: 'hasStarted',
+            storage_value: '2',
+          });
         }
         if (
           getLoanUserDetailsResponse?.data?.nextOfKinDetails !== '' &&
           getLoanUserDetailsResponse?.data?.nextOfKinDetails !== null &&
           getLoanUserDetailsResponse?.data?.nextOfKinDetails !== undefined
         ) {
-          await AsyncStorage.setItem('hasStarted', '3');
+          await storeAsyncData({
+            storage_name: 'hasStarted',
+            storage_value: '3',
+          });
         }
         if (
           getLoanUserDetailsResponse?.data?.bankDetails !== '' &&
           getLoanUserDetailsResponse?.data?.bankDetails !== null &&
           getLoanUserDetailsResponse?.data?.bankDetails !== undefined
         ) {
-          await AsyncStorage.setItem('hasStarted', '4');
+          await storeAsyncData({
+            storage_name: 'hasStarted',
+            storage_value: '4',
+          });
         }
         if (
           getLoanUserDetailsResponse?.data?.armUserBankDetails !== '' &&
           getLoanUserDetailsResponse?.data?.armUserBankDetails !== null &&
           getLoanUserDetailsResponse?.data?.armUserBankDetails !== undefined
         ) {
-          await AsyncStorage.setItem('hasStarted', '5');
+          await storeAsyncData({
+            storage_name: 'hasStarted',
+            storage_value: '5',
+          });
         }
         if (
           getLoanUserDetailsResponse?.data?.loanDocumentDetails !== '' &&
@@ -120,12 +165,15 @@ const OnboardingHome = () => {
             }
             setHasDocumentCount(counter);
             if (counter === 9) {
-              await AsyncStorage.setItem('hasStarted', '6');
+              await storeAsyncData({
+                storage_name: 'hasStarted',
+                storage_value: '6',
+              });
             }
           }
         }
       } else {
-        await AsyncStorage.setItem('hasStarted', '1');
+        await storeAsyncData({storage_name: 'hasStarted', storage_value: '1'});
       }
     } catch (err) {
       // console.log(err);
@@ -146,6 +194,7 @@ const OnboardingHome = () => {
         paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
         paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
       }}>
+      <Loader visible={isLoading} loadingText={'Getting profile status...'} />
       <ScrollView
         bounces={false}
         showsHorizontalScrollIndicator={false}
@@ -200,12 +249,6 @@ const OnboardingHome = () => {
 
             <TouchableOpacity
               disabled={true}
-              onPress={() => navigation.navigate('BankDetails')}>
-              <CustomView label="Bank Details" status="Pending" />
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              disabled={true}
               onPress={() => navigation.navigate('ArmDetails')}>
               <CustomView label="ARM Details" status="Pending" />
             </TouchableOpacity>
@@ -236,10 +279,6 @@ const OnboardingHome = () => {
 
             <TouchableOpacity disabled={true}>
               <CustomView label="Next Of Kin Details" status="Pending" />
-            </TouchableOpacity>
-
-            <TouchableOpacity disabled={true}>
-              <CustomView label="Bank Details" status="Pending" />
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -274,10 +313,6 @@ const OnboardingHome = () => {
               <CustomView label="Next Of Kin Details" status="Pending" />
             </TouchableOpacity>
 
-            <TouchableOpacity disabled={true}>
-              <CustomView label="Bank Details" status="Pending" />
-            </TouchableOpacity>
-
             <TouchableOpacity
               disabled={true}
               onPress={() => navigation.navigate('ArmDetails')}>
@@ -310,54 +345,12 @@ const OnboardingHome = () => {
             </TouchableOpacity>
 
             <TouchableOpacity
-              onPress={() => navigation.navigate('BankDetails')}>
-              <CustomView label="Bank Details" status="Pending" />
-            </TouchableOpacity>
-
-            <TouchableOpacity
               disabled={true}
               onPress={() => navigation.navigate('ArmDetails')}>
               <CustomView label="ARM Details" status="Pending" />
             </TouchableOpacity>
 
             <TouchableOpacity disabled={true}>
-              <CustomView label="Add Documents" status="[0 / 9] Pending" />
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              onPress={() => navigation.navigate('BankDetails')}>
-              <Buttons label={'Complete Profile'} />
-            </TouchableOpacity>
-          </View>
-        )}
-        {hasStarted === '4' && (
-          <View style={styles.selectView}>
-            <TouchableOpacity
-              onPress={() => navigation.navigate('UpdatePersonalDetails')}>
-              <CustomView2 label="Personal Details" status="Filled" />
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              onPress={() => navigation.navigate('BusinessDetails')}>
-              <CustomView2 label="Business Details" status="Filled" />
-            </TouchableOpacity>
-
-            <TouchableOpacity onPress={() => navigation.navigate('NextOfKin')}>
-              <CustomView2 label="Next Of Kin Details" status="Filled" />
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              onPress={() => navigation.navigate('BankDetails')}>
-              <CustomView2 label="Bank Details" status="Filled" />
-            </TouchableOpacity>
-
-            <TouchableOpacity onPress={() => navigation.navigate('ArmDetails')}>
-              <CustomView label="ARM Details" status="Pending" />
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              // disabled={true}
-              onPress={() => navigation.navigate('ValidIdentity')}>
               <CustomView label="Add Documents" status="[0 / 9] Pending" />
             </TouchableOpacity>
 
@@ -380,11 +373,6 @@ const OnboardingHome = () => {
 
             <TouchableOpacity onPress={() => navigation.navigate('NextOfKin')}>
               <CustomView2 label="Next Of Kin Details" status="Filled" />
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              onPress={() => navigation.navigate('BankDetails')}>
-              <CustomView2 label="Bank Details" status="Filled" />
             </TouchableOpacity>
 
             <TouchableOpacity onPress={() => navigation.navigate('ArmDetails')}>
@@ -419,11 +407,6 @@ const OnboardingHome = () => {
 
             <TouchableOpacity onPress={() => navigation.navigate('NextOfKin')}>
               <CustomView2 label="Next Of Kin Details" status="Filled" />
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              onPress={() => navigation.navigate('BankDetails')}>
-              <CustomView2 label="Bank Details" status="Filled" />
             </TouchableOpacity>
 
             <TouchableOpacity onPress={() => navigation.navigate('ArmDetails')}>

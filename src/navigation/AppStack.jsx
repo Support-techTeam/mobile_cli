@@ -86,7 +86,7 @@ const AppStack = () => {
   const dispatch = useDispatch();
   const isVerified = auth().currentUser?.emailVerified;
   const userProfileData = useSelector(state => state.userProfile.profile);
-  const [timeOut, setTimeOut] = useState(false);
+  const [timeOut, setTimeOut] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
 
   // fetch profile
@@ -149,17 +149,30 @@ const AppStack = () => {
       {auth().currentUser &&
       isVerified === false &&
       userProfileData?.profileProgress == null ? (
-        <Stack.Screen
-          name="Verification"
-          component={Verification}
-          options={{
-            title: 'Verification',
-            transitionSpec: {
-              open: config,
-              close: config,
-            },
-          }}
-        />
+        <>
+          <Stack.Screen
+            name="Verification"
+            component={Verification}
+            options={{
+              title: 'Verification',
+              transitionSpec: {
+                open: config,
+                close: config,
+              },
+            }}
+          />
+          <Stack.Screen
+            name="BottomTabs"
+            component={BottomTabs}
+            options={{
+              title: 'BottomTabs',
+              transitionSpec: {
+                open: config,
+                close: config,
+              },
+            }}
+          />
+        </>
       ) : (
         <>
           <Stack.Screen
