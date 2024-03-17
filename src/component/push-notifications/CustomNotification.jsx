@@ -12,6 +12,7 @@ const CustomNotification = ({
   onPress,
   redirectUrl,
   navigationRef,
+  insideRoute,
 }) => {
   return (
     <Modal
@@ -30,7 +31,13 @@ const CustomNotification = ({
             <TouchableOpacity
               onPress={() => {
                 onPress();
-                if (navigationRef.isReady()) {
+                if (!insideRoute) {
+                  if (navigationRef.isReady()) {
+                    try {
+                      navigationRef.navigate(redirectUrl);
+                    } catch (e) {}
+                  }
+                } else if (insideRoute) {
                   try {
                     navigationRef.navigate(redirectUrl);
                   } catch (e) {}

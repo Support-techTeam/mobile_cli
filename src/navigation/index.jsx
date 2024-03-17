@@ -1,4 +1,10 @@
-import React, {useLayoutEffect, useRef, useState, useEffect} from 'react';
+import React, {
+  useLayoutEffect,
+  useRef,
+  useState,
+  useEffect,
+  useContext,
+} from 'react';
 import {
   NavigationContainer,
   DefaultTheme,
@@ -35,6 +41,8 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
+import {NotificationContext} from '../context/NotificationContext';
+import {deleteAsyncData} from '../context/AsyncContext';
 
 const WalkthroughableText = walkthroughable(Text);
 const WalkthroughableImage = walkthroughable(FastImage);
@@ -49,6 +57,7 @@ const AppNavigationContainer = () => {
   const [networkStatus, setNetworkStatus] = useState(true);
   const {dataStore, setDataStore} = useData();
   const [notification, setNotification] = useState(null);
+  const {addNotification} = useContext(NotificationContext);
 
   //walktrrough
   const [mainOpacity, setMainOpacity] = useState(0.6);
@@ -161,6 +170,32 @@ const AppNavigationContainer = () => {
     }, 2000);
   }, []);
 
+  // Add a new notification
+  const handleAddNotification = async (
+    title,
+    body,
+    android,
+    redirectUrl,
+    state,
+  ) => {
+    await deleteAsyncData({storage_name: 'tradelenda_notifications'});
+    const dateObj = new Date(Date.now());
+    const hours = dateObj.getHours();
+    const minutes = dateObj.getMinutes();
+    const time = `${hours}:${minutes}`;
+
+    addNotification({
+      id: Date.now(), // Unique ID for the notification
+      time: time,
+      title: title,
+      description: body,
+      lineColor: COLORS.lendaBlue,
+      viewed: state,
+      android: android,
+      redirectUrl: redirectUrl,
+    });
+  };
+
   const handleNotificationPress = () => {
     setNotification(null);
   };
@@ -170,11 +205,14 @@ const AppNavigationContainer = () => {
     const {from, collapseKey, data, messageId, notification, sentTime, ttl} =
       message;
     const {title, body, android} = notification;
+    const {redirectUrl} = data;
     await notifee.displayNotification({
       title: title,
       body: body,
       android: android,
     });
+    const state = false;
+    handleAddNotification(title, body, android, redirectUrl, state);
   }
 
   async function onForegroundMessageReceived(message) {
@@ -184,13 +222,15 @@ const AppNavigationContainer = () => {
     const {title, body, android} = notification;
     const {redirectUrl} = data;
     setNotification({title, body, android, redirectUrl});
+    const state = true;
+    handleAddNotification(title, body, android, redirectUrl, state);
   }
 
   messaging().onMessage(onForegroundMessageReceived);
   messaging().setBackgroundMessageHandler(onBackgroundMessageReceived);
-  messaging().onNotificationOpenedApp(remoteMessage => {
-    onForegroundMessageReceived(remoteMessage);
-  });
+  // messaging().onNotificationOpenedApp(remoteMessage => {
+  //   onForegroundMessageReceived(remoteMessage);
+  // });
 
   const featureIntro = () => {
     return (
@@ -272,6 +312,7 @@ const AppNavigationContainer = () => {
           redirectUrl={notification?.redirectUrl}
           onPress={handleNotificationPress}
           navigationRef={navigationRef}
+          insideRoute={false}
         />
         {isLoading && <Splashscreen text="Checking Authentication..." />}
         {user ? (

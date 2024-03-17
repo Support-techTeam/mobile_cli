@@ -1,5 +1,5 @@
-import {useNavigation} from '@react-navigation/native';
-import React from 'react';
+import {useFocusEffect, useNavigation} from '@react-navigation/native';
+import React, {useContext, useState, useEffect, useCallback} from 'react';
 import {
   StyleSheet,
   Image,
@@ -15,6 +15,7 @@ import {
 } from 'react-native-responsive-screen';
 import FastImage from 'react-native-fast-image';
 import COLORS from '../../constants/colors';
+import {NotificationContext} from '../../context/NotificationContext';
 
 const SLIDE_WIDTH = Dimensions.get('window').width;
 const ITEM_WIDTH = SLIDE_WIDTH - 30;
@@ -22,6 +23,39 @@ const ITEM_WIDTH = SLIDE_WIDTH - 30;
 export const IntroSection = props => {
   const {userProfileData, loanUserDetails} = props;
   const navigation = useNavigation();
+  const {notifications, loadNotifications} = useContext(NotificationContext);
+  const [notificationCount, setNotoficationCount] = useState(0);
+
+  useFocusEffect(
+    useCallback(() => {
+      const interval = setInterval(() => {
+        loadNotifications();
+        const count = notifications.reduce((accum, notif) => {
+          if (!notif.viewed) {
+            return accum + 1;
+          }
+          return accum;
+        }, 0);
+        setNotoficationCount(count);
+      }, 10000);
+
+      return () => {
+        clearInterval(interval);
+      };
+    }, []),
+  );
+
+  useEffect(() => {
+    loadNotifications();
+    const count = notifications.reduce((accum, notif) => {
+      if (!notif.viewed) {
+        return accum + 1;
+      }
+      return accum;
+    }, 0);
+    setNotoficationCount(count);
+    // }
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -62,21 +96,29 @@ export const IntroSection = props => {
           }}>
           <Icon name="headset" size={26} color={COLORS.lendaBlue} />
         </TouchableOpacity>
-        <TouchableOpacity
-         onPress={() => navigation.navigate('NotificationsScreen')}
-         disabled={true}
-          style={{
-            paddingLeft: 10,
-            paddingVertical: 5,
-          }}>
-          <Icon name="bell-outline" size={26} color={COLORS.lendaBlue} />
-        </TouchableOpacity>
-        {/* <TouchableOpacity style={{
-                paddingLeft: 10,
-                paddingVertical: 5,
-          }}>
-          <Icon name="bell-badge-outline" size={28} color={COLORS.highwayRed} />
-        </TouchableOpacity> */}
+        {notifications && notificationCount <= 0 ? (
+          <TouchableOpacity
+            onPress={() => navigation.navigate('NotificationsScreen')}
+            style={{
+              paddingLeft: 10,
+              paddingVertical: 5,
+            }}>
+            <Icon name="bell-outline" size={26} color={COLORS.lendaBlue} />
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity
+            onPress={() => navigation.navigate('NotificationsScreen')}
+            style={{
+              paddingLeft: 10,
+              paddingVertical: 5,
+            }}>
+            <Icon
+              name="bell-badge-outline"
+              size={28}
+              color={COLORS.highwayRed}
+            />
+          </TouchableOpacity>
+        )}
       </View>
     </View>
   );

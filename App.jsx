@@ -46,6 +46,7 @@ import {DataProvider} from './src/context/DataProvider';
 import {Settings} from 'react-native-fbsdk-next';
 import notifee from '@notifee/react-native';
 import {CopilotProvider} from 'react-native-copilot';
+import {NotificationProvider} from './src/context/NotificationContext';
 
 const inAppUpdates = new SpInAppUpdates(false);
 LogBox.ignoreAllLogs();
@@ -252,7 +253,7 @@ function App() {
       .getToken()
       .then(fid => {
         // console.log('FCM message:', Platform.OS);
-        // console.log('Firebase Installation ID:', fid);
+        console.log('Firebase Installation ID:', fid);
       })
       .catch(error => {
         // console.error('Error getting Firebase Installation ID:', error);
@@ -321,25 +322,27 @@ function App() {
                 <DataProvider>
                   <PersistGate persistor={persistor} loading={null}>
                     <TextColorProvider>
-                      <CopilotProvider
-                        stopOnOutsideClick={false}
-                        androidStatusBarVisible={false}
-                        animated={false}
-                        overlay="svg"
-                        verticalOffset={36}
-                        margin={10}
-                        backdropColor="rgba(50, 50, 100, 0.6)"
-                        tooltipStyle={{
-                          backgroundColor: COLORS.lendaComponentBg,
-                          borderColor: COLORS.lendaComponentBorder,
-                          borderWidth: 0.8,
-                          borderRadius: 10,
-                          margin: 15,
-                        }}>
-                        <InitializeSDKHandler />
-                        <NetworkStatus />
-                        <AppNavigationContainer />
-                      </CopilotProvider>
+                      <NotificationProvider>
+                        <CopilotProvider
+                          stopOnOutsideClick={false}
+                          androidStatusBarVisible={false}
+                          animated={false}
+                          overlay="svg"
+                          verticalOffset={36}
+                          margin={10}
+                          backdropColor="rgba(50, 50, 100, 0.6)"
+                          tooltipStyle={{
+                            backgroundColor: COLORS.lendaComponentBg,
+                            borderColor: COLORS.lendaComponentBorder,
+                            borderWidth: 0.8,
+                            borderRadius: 10,
+                            margin: 15,
+                          }}>
+                          <InitializeSDKHandler />
+                          <NetworkStatus />
+                          <AppNavigationContainer />
+                        </CopilotProvider>
+                      </NotificationProvider>
                     </TextColorProvider>
                   </PersistGate>
                 </DataProvider>
