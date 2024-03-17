@@ -149,10 +149,11 @@ const GetLoan = () => {
   };
 
   useEffect(() => {
-    if (loanDetails.amount !== 0 && loanDetails.loanTenor !== '') {
+    if (loanDetails.amount > 0 && loanDetails.loanTenor !== '') {
       getLoanDetail(loanDetails.amount, loanDetails.loanTenor);
     }
-  }, [loanDetails.amount, loanDetails.loanTenor]);
+  }, [loanDetails.loanTenor]);
+
 
   const getLoanDetail = async (amount, loanTenor) => {
     try {
@@ -238,6 +239,23 @@ const GetLoan = () => {
   };
 
   const handleCreateLoan = async () => {
+    if (
+      profile?.email == undefined ||
+      profile?.email == '' ||
+      profile?.email == null
+    ) {
+      Toast.show({
+        type: 'error',
+        position: 'top',
+        topOffset: 50,
+        text1: 'Unable to process loan request, please try again later.',
+        text2: '',
+        visibilityTime: 5000,
+        autoHide: true,
+        onPress: () => Toast.hide(),
+      });
+      return;
+    }
     if (guarantors.length !== 0) {
       try {
         setIsLoading(true);
@@ -546,6 +564,17 @@ const GetLoan = () => {
                           placeholder="Enter amount"
                           keyboardType="numeric"
                           // value={details?.Amount}
+                          onBlur={() => {
+                            if (
+                              loanDetails.amount > 0 &&
+                              loanDetails.loanTenor !== ''
+                            ) {
+                              getLoanDetail(
+                                loanDetails.amount,
+                                loanDetails.loanTenor,
+                              );
+                            }
+                          }}
                           onChangeText={text =>
                             setLoanDetails({
                               ...loanDetails,
