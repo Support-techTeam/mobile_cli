@@ -178,9 +178,12 @@ const getPendingLoans = async () => {
         const response = await axiosInstance.get(`/loans/pending-loans/list`, {
           headers,
         });
-        DdLogs.info(`Loans | Get Pending Loans | ${auth()?.currentUser?.email}`, {
-          context: JSON.stringify(response?.data),
-        });
+        DdLogs.info(
+          `Loans | Get Pending Loans | ${auth()?.currentUser?.email}`,
+          {
+            context: JSON.stringify(response?.data),
+          },
+        );
         return {
           title: 'Get Pending Loans',
           error: false,
@@ -231,9 +234,12 @@ const getLoansAmount = async () => {
             headers,
           },
         );
-        DdLogs.info(`Loans | Get Loans Amount | ${auth()?.currentUser?.email}`, {
-          context: JSON.stringify(response?.data),
-        });
+        DdLogs.info(
+          `Loans | Get Loans Amount | ${auth()?.currentUser?.email}`,
+          {
+            context: JSON.stringify(response?.data),
+          },
+        );
         return {
           title: 'Get Loans Amount',
           error: false,
@@ -241,9 +247,12 @@ const getLoansAmount = async () => {
           message: 'success',
         };
       } catch (error) {
-        DdLogs.error(`Loans | Get Loans Amount | ${auth()?.currentUser?.email}`, {
-          errorMessage: JSON.stringify(error),
-        });
+        DdLogs.error(
+          `Loans | Get Loans Amount | ${auth()?.currentUser?.email}`,
+          {
+            errorMessage: JSON.stringify(error),
+          },
+        );
         return {
           title: 'Get Loans Amount',
           error: true,
@@ -394,9 +403,12 @@ const getLoanById = async id => {
           message: 'success',
         };
       } catch (error) {
-        DdLogs.error(`Loans | Get Single Loan | ${auth()?.currentUser?.email}`, {
-          errorMessage: JSON.stringify(error),
-        });
+        DdLogs.error(
+          `Loans | Get Single Loan | ${auth()?.currentUser?.email}`,
+          {
+            errorMessage: JSON.stringify(error),
+          },
+        );
         return {
           title: 'Get Single Loan ',
           error: true,
@@ -434,9 +446,12 @@ const getLoanDetails = async (amount, tenor) => {
             headers,
           },
         );
-        DdLogs.info(`Loans | Get Loan Details | ${auth()?.currentUser?.email}`, {
-          context: JSON.stringify(response?.data),
-        });
+        DdLogs.info(
+          `Loans | Get Loan Details | ${auth()?.currentUser?.email}`,
+          {
+            context: JSON.stringify(response?.data),
+          },
+        );
         return {
           title: 'Get Loan Details ',
           error: false,
@@ -444,9 +459,12 @@ const getLoanDetails = async (amount, tenor) => {
           message: 'success',
         };
       } catch (error) {
-        DdLogs.error(`Loans | Get Loan Details | ${auth()?.currentUser?.email}`, {
-          errorMessage: JSON.stringify(error),
-        });
+        DdLogs.error(
+          `Loans | Get Loan Details | ${auth()?.currentUser?.email}`,
+          {
+            errorMessage: JSON.stringify(error),
+          },
+        );
         return {
           title: 'Get Loan Details ',
           error: true,
@@ -485,14 +503,26 @@ const createLoan = async details => {
             headers,
           },
         );
+        if (response?.data?.error) {
+          DdLogs.error(`Loans | Create Loan | ${auth()?.currentUser?.email}`, {
+            errorMessage: JSON.stringify(response?.data),
+          });
+          return {
+            title: 'Create Loan',
+            error: true,
+            data: null,
+            message: response?.data?.message,
+          };
+        }
+
         DdLogs.info(`Loans | Create Loan | ${auth()?.currentUser?.email}`, {
           context: JSON.stringify(response?.data),
         });
         return {
           title: 'Create Loan ',
           error: false,
-          data: response?.data,
-          message: "Loan request successful. You'll be redirected shortly!,",
+          data: response?.data?.data,
+          message: response?.data?.message,
         };
       } catch (error) {
         DdLogs.error(`Loans | Create Loan | ${auth()?.currentUser?.email}`, {
