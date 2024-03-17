@@ -3,7 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const NotificationContext = createContext();
 
-const MAX_NOTIFICATIONS = 11; // Maximum number of notifications allowed
+const MAX_NOTIFICATIONS = 20; // Maximum number of notifications allowed
 export const NotificationProvider = ({children}) => {
   const [notifications, setNotifications] = useState([]);
 
