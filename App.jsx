@@ -253,7 +253,7 @@ function App() {
       .getToken()
       .then(fid => {
         // console.log('FCM message:', Platform.OS);
-        console.log('Firebase Installation ID:', fid);
+        // console.log('Firebase Installation ID:', fid);
       })
       .catch(error => {
         // console.error('Error getting Firebase Installation ID:', error);

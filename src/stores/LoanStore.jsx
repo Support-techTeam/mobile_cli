@@ -426,6 +426,62 @@ const getLoanById = async id => {
   }
 };
 
+const getLoanScheduleById = async id => {
+  if (
+    store.getState().networkState &&
+    store.getState().networkState.network.isConnected &&
+    store.getState().networkState.network.isInternetReachable
+  ) {
+    await getFirebaseAuthToken();
+    if (token) {
+      headers = {
+        accept: 'application/json',
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      };
+      try {
+        const response = await axiosInstance.get(
+          `/loans/get-loan-repayments/${id}`,
+          {
+            headers,
+          },
+        );
+        DdLogs.info(
+          `Loans | Get Single Loan Schedule | ${auth()?.currentUser?.email}`,
+          {
+            context: JSON.stringify(response?.data),
+          },
+        );
+        return {
+          title: 'Get Single Loan Schedule',
+          error: false,
+          data: response?.data,
+          message: 'success',
+        };
+      } catch (error) {
+        DdLogs.error(
+          `Loans | Get Single Loan Schedule | ${auth()?.currentUser?.email}`,
+          {
+            errorMessage: JSON.stringify(error),
+          },
+        );
+        return {
+          title: 'Get Single Loan Schedule',
+          error: true,
+          data: null,
+          message: 'Failed to retrieve loan data!',
+        };
+      }
+    }
+  } else {
+    return {
+      error: true,
+      data: null,
+      message: 'No Internet Connection',
+    };
+  }
+};
+
 const getLoanDetails = async (amount, tenor) => {
   if (
     store.getState().networkState &&
@@ -1255,6 +1311,75 @@ const createArmDetails = async details => {
   }
 };
 
+const repayLoan = async loanrepaymentId => {
+  if (
+    store.getState().networkState &&
+    store.getState().networkState.network.isConnected &&
+    store.getState().networkState.network.isInternetReachable
+  ) {
+    await getFirebaseAuthToken();
+    if (token) {
+      headers = {
+        accept: 'application/json',
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      };
+      try {
+        const payload = {
+          loanRepaymentId: loanrepaymentId,
+        };
+        const response = await axiosInstance.post(
+          `/loans/self-loan-repayment`,
+          payload,
+          {
+            headers,
+          },
+        );
+        if (response?.data?.error) {
+          DdLogs.error(
+            `Loans | Pay Back Loan | ${auth()?.currentUser?.email}`,
+            {
+              errorMessage: JSON.stringify(response?.data),
+            },
+          );
+          return {
+            title: 'Pay Back Loan',
+            error: true,
+            data: null,
+            message: response?.data?.message,
+          };
+        }
+
+        DdLogs.info(`Loans | Pay Back Loan | ${auth()?.currentUser?.email}`, {
+          context: JSON.stringify(response?.data),
+        });
+        return {
+          title: 'Pay Back Loan',
+          error: false,
+          data: response?.data,
+          message: response?.data?.message,
+        };
+      } catch (error) {
+        DdLogs.error(`Loans | Pay Back Loan| ${auth()?.currentUser?.email}`, {
+          errorMessage: JSON.stringify(error),
+        });
+        return {
+          title: 'Pay Back Loan',
+          error: true,
+          data: null,
+          message: 'Loan Pay Back failed',
+        };
+      }
+    }
+  } else {
+    return {
+      error: true,
+      data: null,
+      message: 'No Internet Connection',
+    };
+  }
+};
+
 const getFirebaseAuthToken = async () => {
   try {
     const user = auth().currentUser;
@@ -1293,4 +1418,6 @@ export {
   updateBankDetails,
   updateDocumentsDetails,
   createArmDetails,
+  getLoanScheduleById,
+  repayLoan,
 };
