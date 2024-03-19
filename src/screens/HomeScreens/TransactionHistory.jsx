@@ -3,17 +3,15 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  TouchableHighlight,
   Image,
-  Dimensions,
   ActivityIndicator,
-  Pressable
+  Pressable,
 } from 'react-native';
 import React, {useEffect, useState, useRef} from 'react';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useNavigation, useFocusEffect} from '@react-navigation/native';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
-import {getAccountTransactions} from '../../stores/WalletStore';
+import {getAccountFilteredTransactions} from '../../stores/WalletStore';
 import {useRoute} from '@react-navigation/native';
 import Toast from 'react-native-toast-message';
 import {
@@ -27,14 +25,12 @@ import {Header} from '../../component/header/Header';
 import {FlashList} from '@shopify/flash-list';
 
 let filter = '';
-const {width} = Dimensions.get('window');
 const TransactionHistory = () => {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
   const userWalletData = useSelector(state => state.userProfile.wallet);
   const [isLoadingTransaction, setIsLoadingTransaction] = useState(false);
   const [allUserTransactionsData, setAllUserTransactionsData] = useState([]);
-  const [filteredList, setFilteredList] = useState([]);
   const [userTransactionsPages, setUserTransactionsPages] = useState([]);
   const [userTransactionsTotal, setUserTransactionsTotal] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
@@ -44,12 +40,10 @@ const TransactionHistory = () => {
   const [isFirstPageReceived, setIsFirstPageReceived] = useState(false);
   const route = useRoute();
   const [userInput, setUserInput] = useState('');
-  const [filter, setFilter] = useState('');
-
 
   const unsubGetAllTransactions = async () => {
     setIsLoadingTransaction(true);
-    getAccountTransactions(0, 10)
+    getAccountFilteredTransactions(0, 10, filter)
       .then(res => {
         if (res) {
           if (!res?.error) {
@@ -78,16 +72,50 @@ const TransactionHistory = () => {
   useFocusEffect(
     React.useCallback(() => {
       if (route?.name === 'TransactionHistory') {
+        filter = '';
+        setUserInput('')
         unsubGetAllTransactions();
       }
     }, []),
   );
 
+  const handleSearch = evt => {
+    setUserInput(evt);
+    filter = evt;
+    if (userInput != '') {
+      setIsLoadingTransaction(true);
+      getAccountFilteredTransactions(0, 10, filter)
+        .then(res => {
+          if (res) {
+            if (!res?.error) {
+              setCurrentPage(0);
+              if (
+                res?.data?.transactions?.transaction !== undefined &&
+                res?.data?.transactions?.transaction !== null
+              ) {
+                setAllUserTransactionsData(
+                  res?.data?.transactions?.transaction,
+                );
+                setUserTransactionsPages(res?.data?.transactions?.maxPages);
+                setUserTransactionsTotal(res?.data?.transactions?.count);
+                setNextPage(1);
+              }
+            }
+          }
+          setIsLoadingTransaction(false);
+        })
+        .catch(e => {
+          setIsLoadingTransaction(false);
+        })
+        .finally(() => {});
+    }
+  };
+
   // useEffect(() => {
   //   const interval = setInterval(async () => {
   //     if (route?.name === 'TransactionHistory') {
   //       setIsLoadingTransaction(true);
-  //       const res = await getAccountTransactions();
+  //       const res = await getAccountFilteredTransactions();
   //       if (res?.error == false) {
   //         if (
   //           res?.data?.transactions?.transaction !== undefined &&
@@ -111,10 +139,9 @@ const TransactionHistory = () => {
       return;
     }
     if (currentPage !== Number(userTransactionsPages)) {
-      // console.log('Loading more', currentPage, ' | ', userTransactionsPages);
       setIsLoading(true);
       const nextPage = currentPage + 1;
-      getAccountTransactions(nextPage, 10)
+      getAccountFilteredTransactions(nextPage, 10, filter)
         .then(res => {
           if (res) {
             if (!res?.error) {
@@ -181,11 +208,13 @@ const TransactionHistory = () => {
     }
     return (
       <Pressable
-        style={({ pressed }) => [
+        style={({pressed}) => [
           styles.button,
           {
             marginHorizontal: 15,
-            backgroundColor: pressed ? COLORS.lendaLightGrey : COLORS.lendaComponentBg,
+            backgroundColor: pressed
+              ? COLORS.lendaLightGrey
+              : COLORS.lendaComponentBg,
           },
         ]}
         onPress={
@@ -402,7 +431,13 @@ const TransactionHistory = () => {
   };
 
   const ListEndLoader = () => {
-    return isLoading && <View><ActivityIndicator size={'large'} /></View>
+    return (
+      isLoading && (
+        <View>
+          <ActivityIndicator size={'large'} />
+        </View>
+      )
+    );
   };
 
   return (
@@ -411,7 +446,8 @@ const TransactionHistory = () => {
         flex: 1,
         backgroundColor: '#fff',
         paddingTop: insets.top !== 0 ? Math.min(insets.top, 10) : 'auto',
-        paddingBottom: insets.bottom !== 0 ? Math.min(insets.bottom, 10) : 'auto',
+        paddingBottom:
+          insets.bottom !== 0 ? Math.min(insets.bottom, 10) : 'auto',
         paddingLeft: insets.left !== 0 ? Math.min(insets.left, 10) : 'auto',
         paddingRight: insets.right !== 0 ? Math.min(insets.right, 10) : 'auto',
       }}>
@@ -431,10 +467,12 @@ const TransactionHistory = () => {
           width: wp(95),
         }}>
         <Input
-          // onChangeText={handleSearch}
+          onChangeText={text => handleSearch(text)}
+          name="searchTerm"
+          value={userInput}
           style={{width: wp('60%')}}
           iconName="magnify"
-          placeholder="Search by transaction type"
+          placeholder="Search by transaction type or amount"
         />
         <TouchableOpacity>
           <Icon name="tune-vertical" size={30} color={COLORS.lendaBlue} />
@@ -444,13 +482,7 @@ const TransactionHistory = () => {
         <ActivityIndicator size={'large'} />
       ) : (
         <FlashList
-          data={
-            userInput !== ''
-              ? filteredList
-              : filter !== ''
-              ? filteredList
-              : allUserTransactionsData
-          }
+          data={allUserTransactionsData}
           renderItem={({item}) => RenderItem(item)}
           contentContainerStyle={{paddingVertical: 10}}
           refreshing={isLoadingTransaction}
@@ -514,7 +546,7 @@ const styles = StyleSheet.create({
     fontWeight: '400',
     lineHeight: 18,
   },
-  button:{
+  button: {
     borderWidth: 0.2,
     borderColor: COLORS.lendaComponentBorder,
     borderRadius: 6,

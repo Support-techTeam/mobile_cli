@@ -520,6 +520,73 @@ const bvnValidation = async data => {
   }
 };
 
+const getAllAdverts = async () => {
+  if (
+    store.getState().networkState &&
+    store.getState().networkState.network.isConnected &&
+    store.getState().networkState.network.isInternetReachable
+  ) {
+    await getFirebaseAuthToken();
+    if (token) {
+      headers = {
+        accept: 'application/json',
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      };
+      try {
+        const response = await axiosInstance.get(`/advert/get-open-advert`, {
+          headers,
+        });
+        if (response?.data?.error) {
+          DdLogs.error(
+            `Adverts | Get Open Adverts | ${auth()?.currentUser?.email}`,
+            {
+              errorMessage: JSON.stringify(response?.data),
+            },
+          );
+          return {
+            title: 'Get Open Adverts',
+            error: true,
+            data: null,
+            message: `Failed | ${response?.data?.error}`,
+          };
+        }
+        DdLogs.info(
+          `Adverts | Get Open Adverts | ${auth()?.currentUser?.email}`,
+          {
+            context: JSON.stringify(response?.data),
+          },
+        );
+        return {
+          title: 'Get Open Adverts',
+          error: false,
+          data: response?.data?.data,
+          message: 'success',
+        };
+      } catch (error) {
+        DdLogs.error(
+          `Adverts | Get Open Adverts | ${auth()?.currentUser?.email}`,
+          {
+            errorMessage: JSON.stringify(error),
+          },
+        );
+        return {
+          title: 'Get Open Adverts',
+          error: true,
+          data: null,
+          message: `Failed | ${error?.message}`,
+        };
+      }
+    }
+  } else {
+    return {
+      error: true,
+      data: null,
+      message: 'No Internet Connection',
+    };
+  }
+};
+
 const getFirebaseAuthToken = async () => {
   try {
     const user = auth().currentUser;
@@ -544,4 +611,5 @@ export {
   changePin,
   bvnValidation,
   resetPin,
+  getAllAdverts,
 };

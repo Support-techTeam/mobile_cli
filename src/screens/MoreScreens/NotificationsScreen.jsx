@@ -3,21 +3,14 @@ import {
   Image,
   Text,
   StyleSheet,
-  ScrollView,
+  Pressable,
   ActivityIndicator,
   Button,
+  SectionList,
+  TouchableOpacity,
 } from 'react-native';
-import React, {
-  useEffect,
-  useState,
-  Component,
-  useContext,
-  useCallback,
-} from 'react';
-import {
-  useNavigation,
-  useNavigationContainerRef,
-} from '@react-navigation/native';
+import React, {useEffect, useState, useContext} from 'react';
+import {useNavigation} from '@react-navigation/native';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 import {Header} from '../../component/header/Header';
 import {
@@ -25,7 +18,7 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import COLORS from '../../constants/colors';
-import Timeline from 'react-native-timeline-flatlist';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {NotificationContext} from '../../context/NotificationContext';
 import CustomNotification from '../../component/push-notifications/CustomNotification';
 
@@ -245,7 +238,11 @@ const NotificationsScreen = () => {
   };
 
   function renderDetail(rowData, sectionID, rowID) {
-    let title = <Text style={[styles.title]}>{sectionID + 1}. {rowData.title}</Text>;
+    let title = (
+      <Text style={[styles.title]}>
+        {sectionID + 1}. {rowData.title}
+      </Text>
+    );
     var desc = null;
     const date = new Date(rowData.id);
     const formattedDate = date.toLocaleDateString('en-US', {
@@ -278,6 +275,22 @@ const NotificationsScreen = () => {
     );
   }
 
+  const formatDate = date => {
+    return date.toLocaleDateString(undefined, {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      weekday: 'long',
+    });
+  };
+
+  const formatDateTime = date => {
+    return `${date.toLocaleDateString()} ${date.toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit',
+    })}`;
+  };
+
   const RenderEmptyItem = () => {
     return (
       <View style={{flex: 1}}>
@@ -291,6 +304,115 @@ const NotificationsScreen = () => {
           <Image source={require('../../../assets/images/Group.png')} />
           <Text style={styles.noTrans}>No notification data available!</Text>
         </View>
+      </View>
+    );
+  };
+
+  // Organize notifications into sections by date
+  const sections = notifications.reduce((acc, notification) => {
+    const dateKey = formatDate(new Date(notification.id));
+    const existingSection = acc.find(section => section.title === dateKey);
+    if (existingSection) {
+      existingSection.data.push(notification);
+    } else {
+      acc.push({title: dateKey, data: [notification]});
+    }
+    return acc;
+  }, []);
+
+  // Render each section
+  const renderSection = ({section: {title}}) => (
+    <View style={styles.sectionHeader}>
+      <Text style={styles.sectionHeaderText}>{title}</Text>
+    </View>
+  );
+
+  // Render each notification item
+  const renderItem = ({item}) => {
+    const date = new Date(item.id);
+    const formattedDate = formatDate(date);
+    return (
+      <View
+        style={[
+          styles.PanelItemContainer,
+          {
+            justifyContent: 'center',
+          },
+        ]}>
+        <TouchableOpacity
+          style={[
+            styles.button,
+            {
+              height: 'auto',
+              paddingHorizontal: 10,
+              backgroundColor: '#F7F7FC',
+            },
+          ]}
+          onPress={() => {
+            const title = item?.title;
+            const body = item?.description;
+            const android = item?.android;
+            const redirectUrl = item?.redirectUrl;
+            setNotification({title, body, android, redirectUrl});
+            if (item.viewed === false) {
+              updateNotification(item.id, {viewed: true});
+              getNotificationList();
+            }
+          }}>
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-evenly',
+              gap: 5,
+            }}>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                flex: 0.8,
+              }}>
+              <View>
+                <Text
+                  style={[
+                    styles.title,
+                    {
+                      fontSize: hp(1.8),
+                      color: COLORS.dark,
+                    },
+                  ]}>
+                  {item.title}
+                </Text>
+                <Text
+                  numberOfLines={4}
+                  style={[
+                    styles.desc,
+                    {
+                      color: COLORS.dark,
+                      opacity: 0.8,
+                      marginTop: 1,
+                    },
+                  ]}>
+                  {item.description}
+                </Text>
+              </View>
+            </View>
+            <View
+              style={{
+                flex: 0.2,
+                flexDirection: 'row',
+                alignSelf: 'center',
+                justifyContent: 'center',
+              }}>
+              <Text style={styles.desc}>
+                {formatDateTime(new Date(item.id))}
+              </Text>
+
+              <View style={{alignSelf: 'center', justifyContent: 'center'}}>
+                <Icon name="chevron-right" size={16} color={COLORS.lendaBlue} />
+              </View>
+            </View>
+          </View>
+        </TouchableOpacity>
       </View>
     );
   };
@@ -339,41 +461,12 @@ const NotificationsScreen = () => {
         insideRoute={true}
       />
       <View style={styles.container}>
-        <Timeline
-          style={styles.list}
-          data={notifications}
-          circleSize={20}
-          circleColor="rgb(45,156,219)"
-          lineColor="rgb(45,156,219)"
-          timeContainerStyle={{minWidth: 52, marginTop: 0}}
-          timeStyle={{
-            textAlign: 'center',
-            backgroundColor: '#ff9797',
-            color: 'white',
-            padding: 5,
-            borderRadius: 13,
-          }}
-          descriptionStyle={{color: 'gray'}}
-          options={{
-            style: {paddingTop: 5},
-            ListEmptyComponent: <RenderEmptyItem />,
-          }}
-          isUsingFlatlist={true}
-          innerCircle={'dot'}
-          renderDetail={renderDetail}
-          columnFormat="single-column-left"
-          onEventPress={e => {
-            const title = e?.title;
-            const body = e?.description;
-            const android = e?.android;
-            const redirectUrl = e?.redirectUrl;
-            setNotification({title, body, android, redirectUrl});
-            if (e.viewed === false) {
-              updateNotification(e.id, {viewed: true});
-              getNotificationList();
-            }
-          }}
-          renderFullLine={true}
+        <SectionList
+          sections={sections}
+          keyExtractor={(item, index) => item.id.toString()}
+          renderSectionHeader={renderSection}
+          renderItem={renderItem}
+          ListEmptyComponent={<RenderEmptyItem />}
         />
       </View>
     </SafeAreaView>
@@ -385,12 +478,8 @@ export default NotificationsScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 20,
     backgroundColor: 'white',
-  },
-  list: {
-    flex: 1,
-    marginTop: 20,
+    marginTop: 10,
   },
   title: {
     fontSize: 16,
@@ -421,5 +510,44 @@ const styles = StyleSheet.create({
     fontFamily: 'MontSBold',
     fontSize: 14,
     fontWeight: '600',
+  },
+  PanelItemContainer: {
+    paddingHorizontal: 15,
+    paddingVertical: 5,
+  },
+  title: {
+    fontFamily: 'Montserrat',
+    fontSize: 14,
+    fontWeight: '800',
+    lineHeight: 21,
+    color: '#14142B',
+  },
+  desc: {
+    fontFamily: 'Montserrat',
+    fontSize: 12,
+    fontWeight: '400',
+    lineHeight: 18,
+  },
+  button: {
+    borderWidth: 0,
+    borderColor: COLORS.lendaComponentBorder,
+    borderRadius: 6,
+    paddingVertical: 5,
+    paddingHorizontal: 5,
+    marginBottom: 10,
+  },
+  sectionHeader: {
+    backgroundColor: '#fff',
+    paddingHorizontal: 15,
+    paddingVertical: 5,
+  },
+  sectionHeaderText: {
+    fontWeight: 'bold',
+    color: '#6E7191',
+  },
+  notificationItem: {
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
   },
 });

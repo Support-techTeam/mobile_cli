@@ -121,6 +121,7 @@ const getBeneficiaries = async () => {
     };
   }
 };
+
 const getAccountTransactions = async (page, limit) => {
   if (
     store.getState().networkState &&
@@ -138,6 +139,63 @@ const getAccountTransactions = async (page, limit) => {
         const response = await axiosInstance.get(
           // `/loan-wallet/paginated-transactions?page=${page}&limit=${limit}`,
           `/loan-wallet/paginated-all-transactions?page=${page}&limit=${limit}`,
+          {headers},
+        );
+
+        DdLogs.info(
+          `Wallet | Get Wallet Transactions | ${auth()?.currentUser?.email}`,
+          {
+            context: JSON.stringify(response?.data),
+          },
+        );
+        return {
+          title: 'Get Wallet Transactions',
+          error: false,
+          data: response?.data,
+          message: 'success',
+        };
+      } catch (error) {
+        DdLogs.error(
+          `Wallet | Get Wallet Transactions | ${auth()?.currentUser?.email}`,
+          {
+            errorMessage: JSON.stringify(error),
+          },
+        );
+        return {
+          title: 'Get Wallet Transactions',
+          error: true,
+          data: null,
+          message: error,
+        };
+      }
+    }
+  } else {
+    return {
+      error: true,
+      data: null,
+      message: 'No Internet Connection',
+    };
+  }
+};
+
+const getAccountFilteredTransactions = async (page, limit, params) => {
+  if (
+    store.getState().networkState &&
+    store.getState().networkState.network.isConnected &&
+    store.getState().networkState.network.isInternetReachable
+  ) {
+    await getFirebaseAuthToken();
+    if (token) {
+      headers = {
+        accept: 'application/json',
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      };
+      try {
+        const response = await axiosInstance.get(
+          // `/loan-wallet/paginated-transactions?page=${page}&limit=${limit}`,
+          // `/loan-wallet/paginated-all-transactions?page=${page}&limit=${limit}`,
+          `/loan-wallet/paginated-transactions?page=${page}&limit=${limit}&params=${params}`,
           {headers},
         );
 
@@ -699,4 +757,5 @@ export {
   getBeneficiaries,
   requestLimitIncrease,
   upgradeWallet,
+  getAccountFilteredTransactions,
 };

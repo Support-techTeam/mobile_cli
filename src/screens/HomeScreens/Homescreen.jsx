@@ -19,7 +19,7 @@ import PersonalDetails from '../ProfileOnboardings/PersonalDetails';
 import Splashscreen from '../../navigation/Splashscreen';
 import {useRoute, useIsFocused} from '@react-navigation/native';
 import {getLoanUserDetails, getLoansAmount} from '../../stores/LoanStore';
-import {checkPin} from '../../stores/ProfileStore';
+import {checkPin, getAllAdverts} from '../../stores/ProfileStore';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -48,7 +48,8 @@ import {WalletStatementModal} from '../../component/modals/WalletStatementModal'
 import {UpdateProfileBtn} from '../../component/homescreen/Update-Profile-Btn';
 import {FundWalletSection} from '../../component/homescreen/FundWallet-Section';
 import {MakeTransferSection} from '../../component/homescreen/MakeTransferSection';
-import {getAsyncData} from '../../context/AsyncContext';
+import {Announcement} from '../../component/homescreen/Announcement';
+// import {AdvertBtn} from '../../component/homescreen/advert-Btn';
 
 const Homescreen = () => {
   const insets = useSafeAreaInsets();
@@ -110,6 +111,7 @@ const Homescreen = () => {
     endDate: new Date().toISOString().split('T')[0],
   });
   const [hideBalance, setHideBalance] = useState(true);
+  const [adverts, setAdverts] = useState([]);
   const toggleHideBalance = () => {
     setHideBalance(!hideBalance);
   };
@@ -166,6 +168,7 @@ const Homescreen = () => {
       unsubCheckPin();
       getLoanUserData();
       unsubGetLoanAmount();
+      unsubGetAllAdverts();
     }, []),
   );
 
@@ -270,6 +273,21 @@ const Homescreen = () => {
             setUserTransactionsData(res?.data?.transactions?.transaction);
             // setUserTransactionsPages(res?.data?.transactions?.maxPages);
             // setUserTransactionsTotal(res?.data?.transactions?.count);
+          }
+        }
+      })
+      .catch(e => {})
+      .finally(() => {
+        setIsLoadingTransaction(false);
+      });
+  };
+
+  const unsubGetAllAdverts = async () => {
+    getAllAdverts()
+      .then(res => {
+        if (res) {
+          if (!res?.error) {
+            setAdverts(res?.data);
           }
         }
       })
@@ -914,6 +932,20 @@ const Homescreen = () => {
         {/* Third Section Wallet and Bill*/}
         <ItemsSection buttonParameters={buttonItems} userPin={userPin} />
 
+        {/* Adverts */}
+
+        {adverts &&
+          adverts?.length > 0 &&
+          adverts.map((item, idx) => (
+            <Announcement
+              key={idx}
+              title={item?.title}
+              body={item?.description}
+              image={require('../../../assets/images/announcement.png')}
+              action={() => navigation.navigate('SetPin')}
+            />
+          ))}
+
         {/* Sixth Section Single Transaction History*/}
         <SingleTransactionSection
           userTransactionsData={userTransactionsData}
@@ -990,6 +1022,7 @@ const Homescreen = () => {
       </>
     );
   };
+
 
   return !timeOut ? (
     <Splashscreen text="Getting Profile Details..." />
