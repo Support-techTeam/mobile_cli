@@ -12,7 +12,11 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useNavigation} from '@react-navigation/native';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
-import {getLoanById, getLoanScheduleById, repayLoan} from '../../stores/LoanStore';
+import {
+  getLoanById,
+  getLoanScheduleById,
+  repayLoan,
+} from '../../stores/LoanStore';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -37,6 +41,7 @@ const LoanTransactions = ({route}) => {
   const [loanRepayments, setLoanRepayments] = useState([]);
   const [showConfirm, setShowConfirm] = useState(false);
   const [loanPaymentId, setLoanPaymentId] = useState('');
+  const [paymentAmount, setPaymentAmount] = useState(0);
 
   useEffect(() => {
     // getLoan();
@@ -369,16 +374,20 @@ const LoanTransactions = ({route}) => {
                   <Text style={styles.infotext}>₦</Text>
                   <Text style={styles.infotext}>
                     {item?.status === 'new'
+                      ? item?.amount
+                        ? new Intl.NumberFormat('en-US', {
+                            style: 'decimal',
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          }).format(Number(item?.amount))
+                        : '0.00'
+                      : item?.totalPaidBack
                       ? new Intl.NumberFormat('en-US', {
                           style: 'decimal',
                           minimumFractionDigits: 2,
                           maximumFractionDigits: 2,
-                        }).format(Number(item?.amount))
-                      : new Intl.NumberFormat('en-US', {
-                          style: 'decimal',
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
-                        }).format(Number(item?.totalPaidBack))}
+                        }).format(Number(item?.totalPaidBack))
+                      : '0.00'}
                   </Text>
                 </View>
                 <View style={[styles.rightView]}>
@@ -386,6 +395,7 @@ const LoanTransactions = ({route}) => {
                     disabled={item?.status === 'paid' ? true : false}
                     onPress={() => {
                       setLoanPaymentId(item?._id);
+                      setPaymentAmount(item?.amount);
                       toggleConfirm(true);
                     }}>
                     <View
@@ -565,7 +575,7 @@ const LoanTransactions = ({route}) => {
         heading="LOAN DETAILS"
         disable={false}
       />
-      <Loader visible={isLoading} loadingText={"Processing payment..."}/>
+      <Loader visible={isLoading} loadingText={'Processing payment...'} />
 
       <VerifyModal visible={showConfirm}>
         <View style={{alignItems: 'center'}}>
@@ -580,7 +590,7 @@ const LoanTransactions = ({route}) => {
             Loan Repayment!
           </Text>
           <Text style={styles.question}>
-            Are you sure you want to process loan repayment?
+            Are you sure you want to process loan repayment ₦{paymentAmount}?
           </Text>
 
           <TouchableOpacity
