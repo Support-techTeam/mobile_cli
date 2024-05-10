@@ -17,7 +17,7 @@ import {
 } from '../../util/redux/userProfile/user.profile.slice';
 import PersonalDetails from '../ProfileOnboardings/PersonalDetails';
 import Splashscreen from '../../navigation/Splashscreen';
-import {useRoute, useIsFocused} from '@react-navigation/native';
+import {useRoute} from '@react-navigation/native';
 import {getLoanUserDetails, getLoansAmount} from '../../stores/LoanStore';
 import {checkPin, getAllAdverts} from '../../stores/ProfileStore';
 import {
@@ -69,10 +69,6 @@ const Homescreen = () => {
   const userProfileData = useSelector(state => state.userProfile.profile);
   const userWalletData = useSelector(state => state.userProfile.wallet);
   const [userTransactionsData, setUserTransactionsData] = useState([]);
-  // const [allUserTransactionsData, setAllUserTransactionsData] = useState([]);
-  // const [userTransactionsPages, setUserTransactionsPages] = useState([]);
-  // const [userTransactionsTotal, setUserTransactionsTotal] = useState([]);
-  // const [currentPage, setCurrentPage] = useState(1);
   const [userLoanAmount, setUserLoanAmount] = useState(undefined);
   const [data, setString] = useClipboard();
   const [timeOut, setTimeOut] = useState(false);
@@ -925,7 +921,6 @@ const Homescreen = () => {
       </>
     );
   };
-
   const renderScrollableComponents = () => {
     return (
       <>
@@ -939,6 +934,7 @@ const Homescreen = () => {
           adverts.map((item, idx) => (
             <Announcement
               key={idx}
+              index={item._id}
               title={item?.title}
               body={item?.description}
               image={require('../../../assets/images/announcement.png')}
@@ -959,13 +955,7 @@ const Homescreen = () => {
   const renderMainComponents = () => {
     return (
       <>
-        {isLoading ||
-        isLoadingWallet ||
-        // isLoadingTransaction ||
-        // isLoadingLoanData ||
-        // isLoadingLenda ||
-        // isLoadingArm ||
-        isLoadingLoanAmount ? (
+        {isLoading || isLoadingWallet || isLoadingLoanAmount ? (
           <ActivityIndicator
             size="large"
             color={COLORS.lendaGreen}
@@ -1023,7 +1013,6 @@ const Homescreen = () => {
     );
   };
 
-
   return !timeOut ? (
     <Splashscreen text="Getting Profile Details..." />
   ) : timeOut &&
@@ -1031,9 +1020,6 @@ const Homescreen = () => {
     userProfileData?.profileProgress === null ? (
     <PersonalDetails />
   ) : (
-    // timeOut &&
-    // userProfileData &&
-    // userProfileData?.profileProgress !== null && (
     <SafeAreaView
       style={{
         flex: 1,
@@ -1095,7 +1081,6 @@ const styles = StyleSheet.create({
   transView: {
     marginHorizontal: 2,
     flexDirection: 'row',
-    // justifyContent: 'space-between',
     justifyContent: 'space-evenly',
     marginVertical: 10,
   },
