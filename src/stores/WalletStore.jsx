@@ -731,6 +731,333 @@ const upgradeWallet = async data => {
   }
 };
 
+// Seerbit Implementation
+
+const getAllWallet = async () => {
+  if (
+    store.getState().networkState &&
+    store.getState().networkState.network.isConnected &&
+    store.getState().networkState.network.isInternetReachable
+  ) {
+    await getFirebaseAuthToken();
+    if (token) {
+      headers = {
+        accept: 'application/json',
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      };
+      try {
+        const response = await axiosInstance.get(
+          `/loan-wallet/get-user-wallets`,
+          {
+            headers,
+          },
+        );
+
+        DdLogs.info(
+          `Wallet | Get All Account Wallet | ${auth()?.currentUser?.email}`,
+          {
+            context: JSON.stringify(response?.data),
+          },
+        );
+        return {
+          title: 'Get Account Wallet',
+          error: false,
+          data: response?.data,
+          message: 'success',
+        };
+      } catch (error) {
+        DdLogs.error(
+          `Wallet | Get Account Wallet | ${auth()?.currentUser?.email}`,
+          {
+            errorMessage: JSON.stringify(error),
+          },
+        );
+        return {
+          title: 'Get Account Wallet',
+          error: true,
+          data: null,
+          message: error,
+        };
+      }
+    }
+  } else {
+    return {
+      error: true,
+      data: null,
+      message: 'No Internet Connection',
+    };
+  }
+};
+
+const getSeerbitWalletBalance = async data => {
+  if (
+    store.getState().networkState &&
+    store.getState().networkState.network.isConnected &&
+    store.getState().networkState.network.isInternetReachable
+  ) {
+    await getFirebaseAuthToken();
+    if (token) {
+      headers = {
+        accept: 'application/json',
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      };
+      try {
+        const response = await axiosInstance.get(
+          `/loan-wallet/seerbit-wallet-balance/{pocketId}?pocketId=${data}`,
+          {
+            headers,
+          },
+        );
+
+        DdLogs.info(
+          `Wallet | Get Seerbit Wallet balance | ${auth()?.currentUser?.email}`,
+          {
+            context: JSON.stringify(response?.data),
+          },
+        );
+        if (response?.data?.error) {
+          return {
+            title: 'Get Seerbit Wallet balance',
+            error: true,
+            data: null,
+            message: response?.data?.message,
+          };
+        }
+        return {
+          title: 'Get Seerbit Wallet balance',
+          error: false,
+          data: response?.data?.data?.availableBalanceAmount,
+          message: 'success',
+        };
+      } catch (error) {
+        DdLogs.error(
+          `Wallet | Get Seerbit Wallet balance | ${auth()?.currentUser?.email}`,
+          {
+            errorMessage: JSON.stringify(error),
+          },
+        );
+        return {
+          title: 'Get Seerbit Wallet balance',
+          error: true,
+          data: null,
+          message: error,
+        };
+      }
+    }
+  } else {
+    return {
+      error: true,
+      data: null,
+      message: 'No Internet Connection',
+    };
+  }
+};
+
+const getSeerbitNipBanks = async () => {
+  if (
+    store.getState().networkState &&
+    store.getState().networkState.network.isConnected &&
+    store.getState().networkState.network.isInternetReachable
+  ) {
+    await getFirebaseAuthToken();
+    if (token) {
+      headers = {
+        accept: 'application/json',
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      };
+      try {
+        const response = await axiosInstance.get(
+          `/loan-wallet/get-seerbit-banks-list`,
+          {
+            headers,
+          },
+        );
+
+        DdLogs.info(
+          `Wallet | Get All Seerbit bank list| ${auth()?.currentUser?.email}`,
+          {
+            context: JSON.stringify(response?.data),
+          },
+        );
+        if (response?.data?.name === 'Error') {
+          return {
+            title: 'Get All Seerbit bank list',
+            error: true,
+            data: null,
+            message: error,
+          };
+        } else {
+          const bankList = [];
+          response.data.forEach(bank => {
+            bankList.push({
+              NIPCode: bank.bankcode,
+              bankName: bank.bankname,
+            });
+          });
+          return {
+            title: 'Get All Seerbit bank list',
+            error: false,
+            data: bankList,
+            message: 'success',
+          };
+        }
+      } catch (error) {
+        DdLogs.error(
+          `Wallet | Get All Seerbit bank list | ${auth()?.currentUser?.email}`,
+          {
+            errorMessage: JSON.stringify(error),
+          },
+        );
+        return {
+          title: 'Get All Seerbit bank list',
+          error: true,
+          data: null,
+          message: error,
+        };
+      }
+    }
+  } else {
+    return {
+      error: true,
+      data: null,
+      message: 'No Internet Connection',
+    };
+  }
+};
+
+const verifySeerbitNipAccount = async (accountNumber, bankName) => {
+  if (
+    store.getState().networkState &&
+    store.getState().networkState.network.isConnected &&
+    store.getState().networkState.network.isInternetReachable
+  ) {
+    await getFirebaseAuthToken();
+    if (token) {
+      headers = {
+        accept: 'application/json',
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      };
+      try {
+        const response = await axiosInstance.get(
+          `/loan-wallet/NIP-account-verification-seerbit/${accountNumber}/?accountNumber=${accountNumber}&bankName=${bankName}`,
+          {
+            headers,
+          },
+        );
+
+        DdLogs.info(
+          `Wallet | Verify Seerbit Wallet | ${auth()?.currentUser?.email}`,
+          {
+            context: JSON.stringify(response?.data),
+          },
+        );
+        if (response?.data?.error) {
+          return {
+            error: true,
+            data: null,
+            message: res.data?.message || 'Unable to verify account',
+          };
+        }
+        return {
+          title: 'Verify Seerbit Wallet',
+          error: false,
+          data: response?.data,
+          message: 'success',
+        };
+      } catch (error) {
+        DdLogs.error(
+          `Wallet | Verify Seerbit Wallet | ${auth()?.currentUser?.email}`,
+          {
+            errorMessage: JSON.stringify(error),
+          },
+        );
+        return {
+          title: 'Verify Seerbit Wallet',
+          error: true,
+          data: null,
+          message: error,
+        };
+      }
+    }
+  } else {
+    return {
+      error: true,
+      data: null,
+      message: 'No Internet Connection',
+    };
+  }
+};
+
+const getSecondWallet = async () => {
+  if (
+    store.getState().networkState &&
+    store.getState().networkState.network.isConnected &&
+    store.getState().networkState.network.isInternetReachable
+  ) {
+    await getFirebaseAuthToken();
+    if (token) {
+      headers = {
+        accept: 'application/json',
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      };
+      try {
+        const response = await axiosInstance.get(
+          `/loan-wallet/get-second-wallet`,
+          {
+            headers,
+          },
+        );
+
+        DdLogs.info(
+          `Wallet | Get Second Wallet | ${auth()?.currentUser?.email}`,
+          {
+            context: JSON.stringify(response?.data),
+          },
+        );
+        if (response?.data?.error) {
+          return {
+            title: 'Get Second Wallet',
+            error: true,
+            data: null,
+            message: response.data.message,
+          };
+        } else {
+          return {
+            title: 'Get Second Wallet',
+            error: false,
+            data: response?.data,
+            message: response.data.message,
+          };
+        }
+      } catch (error) {
+        DdLogs.error(
+          `Wallet | Get Second Wallet| ${auth()?.currentUser?.email}`,
+          {
+            errorMessage: JSON.stringify(error),
+          },
+        );
+        return {
+          title: 'Get Second Wallet',
+          error: true,
+          data: null,
+          message: error,
+        };
+      }
+    }
+  } else {
+    return {
+      error: true,
+      data: null,
+      message: 'No Internet Connection',
+    };
+  }
+};
+
 const getFirebaseAuthToken = async () => {
   try {
     const user = auth().currentUser;
