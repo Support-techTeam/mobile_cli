@@ -13,6 +13,7 @@ import {useSelector, useDispatch} from 'react-redux';
 import Toast from 'react-native-toast-message';
 import {
   setAccount,
+  setMultipleWallets,
   setWallet,
 } from '../../util/redux/userProfile/user.profile.slice';
 import PersonalDetails from '../ProfileOnboardings/PersonalDetails';
@@ -37,6 +38,9 @@ import {
   getTransactionsStatement,
   getAccountWallet,
   getAccountTransactions,
+  getAllWallet,
+  getSeerbitWalletBalance,
+  getSecondWallet,
 } from '../../stores/WalletStore';
 import {IntroSection} from '../../component/homescreen/Intro-Section';
 import {SlideSection} from '../../component/homescreen/Slide-Section';
@@ -68,6 +72,9 @@ const Homescreen = () => {
   //Redux Calls
   const userProfileData = useSelector(state => state.userProfile.profile);
   const userWalletData = useSelector(state => state.userProfile.wallet);
+  const userMultiWalletData = useSelector(
+    state => state.userProfile.multiWallet,
+  );
   const [userTransactionsData, setUserTransactionsData] = useState([]);
   const [userLoanAmount, setUserLoanAmount] = useState(undefined);
   const [data, setString] = useClipboard();
@@ -108,6 +115,9 @@ const Homescreen = () => {
   });
   const [hideBalance, setHideBalance] = useState(true);
   const [adverts, setAdverts] = useState([]);
+  const [isLoadingMultipleWallets, setIsLoadingMultipleWallets] =
+    useState(true);
+  const [seerbitBalance, setSeerbitBalance] = useState(0);
   const toggleHideBalance = () => {
     setHideBalance(!hideBalance);
   };
@@ -156,6 +166,7 @@ const Homescreen = () => {
   useFocusEffect(
     useCallback(() => {
       unsubGetWallet();
+      unsubGetMultipleWallets();
       getGuarantorData();
       getAllLendaInvestments();
       getAllArmInvestments();
@@ -186,6 +197,16 @@ const Homescreen = () => {
         .catch(error => {
           // Handle any unexpected errors
         });
+    }, 60000);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      unsubGetSeerbitWalletBalance();
     }, 60000);
 
     return () => {
@@ -231,6 +252,51 @@ const Homescreen = () => {
       .finally(() => {
         setIsLoadingWallet(false);
       });
+  };
+
+  // Get multiple Wallets
+  const unsubGetMultipleWallets = async () => {
+    setIsLoadingMultipleWallets(true);
+    getAllWallet()
+      .then(res => {
+        if (res) {
+          if (!res?.error) {
+            dispatch(setMultipleWallets(res?.data?.wallet));
+          }
+        }
+      })
+      .catch(e => {})
+      .finally(() => {
+        setIsLoadingMultipleWallets(false);
+        unsubGetSeerbitWalletBalance();
+      });
+  };
+
+  const unsubGetSeerbitWalletBalance = async () => {
+    if (userMultiWalletData && userMultiWalletData?.length > 1) {
+      let pocketIdData = null;
+      if (
+        userMultiWalletData[0]?.pocketId !== null &&
+        userMultiWalletData[0]?.banker !== 'Providus'
+      ) {
+        pocketIdData = userMultiWalletData[0]?.pocketId;
+      } else if (
+        userMultiWalletData[1]?.pocketId !== null &&
+        userMultiWalletData[1]?.banker !== 'Providus'
+      ) {
+        pocketIdData = userMultiWalletData[1]?.pocketId;
+      }
+      getSeerbitWalletBalance(pocketIdData)
+        .then(res => {
+          if (res) {
+            if (!res?.error) {
+              setSeerbitBalance(res?.data);
+            }
+          }
+        })
+        .catch(e => {})
+        .finally(() => {});
+    }
   };
 
   const unsubGetAllTransactions = async () => {
@@ -508,6 +574,55 @@ const Homescreen = () => {
           topOffset: 50,
           text1: 'Get Transactions Statement',
           text2: 'Error fetching statement',
+          visibilityTime: 5000,
+          autoHide: true,
+          onPress: () => Toast.hide(),
+        });
+      })
+      .finally(() => {
+        setTimeout(() => {
+          setIsSending(false);
+        }, 1000);
+      });
+  };
+
+  handleWalletCreation = async () => {
+    setIsSending(true);
+    getSecondWallet()
+      .then(res => {
+        if (res) {
+          if (!res?.error) {
+            Toast.show({
+              type: 'success',
+              position: 'top',
+              topOffset: 50,
+              text1: res?.title,
+              text2: res?.message,
+              visibilityTime: 3000,
+              autoHide: true,
+              onPress: () => Toast.hide(),
+            });
+          } else {
+            Toast.show({
+              type: 'error',
+              position: 'top',
+              topOffset: 50,
+              text1: res?.title,
+              text2: res?.message,
+              visibilityTime: 5000,
+              autoHide: true,
+              onPress: () => Toast.hide(),
+            });
+          }
+        }
+      })
+      .catch(e => {
+        Toast.show({
+          type: 'error',
+          position: 'top',
+          topOffset: 50,
+          text1: 'Create Wallet',
+          text2: 'Error creating wallet',
           visibilityTime: 5000,
           autoHide: true,
           onPress: () => Toast.hide(),
@@ -882,6 +997,7 @@ const Homescreen = () => {
         <SlideSection
           portfolioDetail={portfolioDetail}
           userWalletData={userWalletData}
+          userMultiWalletData={userMultiWalletData}
           totalLendaAmount={totalLendaAmount}
           userLoanAmount={userLoanAmount}
           guarantor={guarantor}
@@ -890,6 +1006,8 @@ const Homescreen = () => {
           toggleHideBalance={toggleHideBalance}
           handleLongPress={handleLongPress}
           toggleFundWallet={toggleFundWallet}
+          seerbitWalletBalance={seerbitBalance}
+          handleCreateSecondWallet={handleWalletCreation}
         />
       </>
     );
@@ -955,7 +1073,10 @@ const Homescreen = () => {
   const renderMainComponents = () => {
     return (
       <>
-        {isLoading || isLoadingWallet || isLoadingLoanAmount ? (
+        {isLoading ||
+        isLoadingWallet ||
+        isLoadingLoanAmount ||
+        isLoadingMultipleWallets ? (
           <ActivityIndicator
             size="large"
             color={COLORS.lendaGreen}
@@ -1012,7 +1133,6 @@ const Homescreen = () => {
       </>
     );
   };
-
   return !timeOut ? (
     <Splashscreen text="Getting Profile Details..." />
   ) : timeOut &&

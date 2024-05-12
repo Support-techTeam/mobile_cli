@@ -10,6 +10,7 @@ const userProfileSlice = createSlice({
     loanDetails: null,
     loans: null,
     transactions: null,
+    multiWallet: null,
   },
   reducers: {
     setProfile: (state, action) => {
@@ -30,6 +31,9 @@ const userProfileSlice = createSlice({
     setTransactions: (state, action) => {
       return {...state, transactions: action.payload};
     },
+    setMultipleWallets: (state, action) => {
+      return {...state, multiWallet: action.payload};
+    },
     clearProfileReduxState: state => {
       // console.log('clearing profile');
       return {
@@ -39,6 +43,7 @@ const userProfileSlice = createSlice({
         loanDetails: null,
         loans: null,
         transactions: null,
+        multiWallet: null,
       };
     },
   },
@@ -52,5 +57,6 @@ export const {
   setLoans,
   setTransactions,
   clearProfileReduxState,
+  setMultipleWallets,
 } = userProfileSlice.actions;
 export const userProfileReducer = userProfileSlice.reducer;

@@ -13,8 +13,8 @@ let headers;
 const userLogin = async (email, password) => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     try {
       const userCredential = await auth().signInWithEmailAndPassword(
@@ -63,8 +63,8 @@ const userLogin = async (email, password) => {
 const userLogOut = async () => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     await auth()
       .signOut()
@@ -96,8 +96,8 @@ const userLogOut = async () => {
 const userSignUp = async details => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     try {
       const userCredential = await auth().createUserWithEmailAndPassword(
@@ -163,8 +163,8 @@ const userSignUp = async details => {
 const resendVerificationEmail = async () => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     try {
       auth().currentUser.sendEmailVerification();
@@ -383,8 +383,8 @@ const resendOTP = async data => {
 const forgotPassword = async email => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     try {
       const actionCodeSettings = {

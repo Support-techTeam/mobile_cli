@@ -14,8 +14,8 @@ const axiosInstance = axios.create({baseURL: BASE_API_URL});
 const getAccountWallet = async () => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     await getFirebaseAuthToken();
     if (token) {
@@ -69,8 +69,8 @@ const getAccountWallet = async () => {
 const getBeneficiaries = async () => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     await getFirebaseAuthToken();
     if (token) {
@@ -125,8 +125,8 @@ const getBeneficiaries = async () => {
 const getAccountTransactions = async (page, limit) => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     await getFirebaseAuthToken();
     if (token) {
@@ -181,8 +181,8 @@ const getAccountTransactions = async (page, limit) => {
 const getAccountFilteredTransactions = async (page, limit, params) => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     await getFirebaseAuthToken();
     if (token) {
@@ -238,8 +238,8 @@ const getAccountFilteredTransactions = async (page, limit, params) => {
 const verifyNIPAccountInfo = async (accountNumber, bankName) => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     await getFirebaseAuthToken();
     if (token) {
@@ -301,8 +301,8 @@ const verifyNIPAccountInfo = async (accountNumber, bankName) => {
 const verifyBeneficiaryInfo = async accountNumber => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     await getFirebaseAuthToken();
     if (token) {
@@ -357,8 +357,8 @@ const verifyBeneficiaryInfo = async accountNumber => {
 const createInternalTransfer = async details => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     await getFirebaseAuthToken();
     if (token) {
@@ -427,8 +427,8 @@ const createInternalTransfer = async details => {
 const createNIPTransfer = async details => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     await getFirebaseAuthToken();
     if (token) {
@@ -491,8 +491,8 @@ const createNIPTransfer = async details => {
 const getAllBankDetails = async () => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     await getFirebaseAuthToken();
     if (token) {
@@ -539,8 +539,8 @@ const getAllBankDetails = async () => {
 const getTransactionsStatement = async (startDate, endDate) => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     await getFirebaseAuthToken();
     if (token) {
@@ -594,8 +594,8 @@ const getTransactionsStatement = async (startDate, endDate) => {
 const requestLimitIncrease = async details => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     await getFirebaseAuthToken();
     if (token) {
@@ -664,8 +664,8 @@ const requestLimitIncrease = async details => {
 const upgradeWallet = async data => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     await getFirebaseAuthToken();
     if (token) {
@@ -736,8 +736,8 @@ const upgradeWallet = async data => {
 const getAllWallet = async () => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     await getFirebaseAuthToken();
     if (token) {
@@ -763,7 +763,7 @@ const getAllWallet = async () => {
         return {
           title: 'Get Account Wallet',
           error: false,
-          data: response?.data,
+          data: response?.data?.data,
           message: 'success',
         };
       } catch (error) {
@@ -793,8 +793,8 @@ const getAllWallet = async () => {
 const getSeerbitWalletBalance = async data => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     await getFirebaseAuthToken();
     if (token) {
@@ -858,8 +858,8 @@ const getSeerbitWalletBalance = async data => {
 const getSeerbitNipBanks = async () => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     await getFirebaseAuthToken();
     if (token) {
@@ -931,8 +931,8 @@ const getSeerbitNipBanks = async () => {
 const verifySeerbitNipAccount = async (accountNumber, bankName) => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     await getFirebaseAuthToken();
     if (token) {
@@ -995,8 +995,8 @@ const verifySeerbitNipAccount = async (accountNumber, bankName) => {
 const getSecondWallet = async () => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     await getFirebaseAuthToken();
     if (token) {
@@ -1019,6 +1019,7 @@ const getSecondWallet = async () => {
             context: JSON.stringify(response?.data),
           },
         );
+
         if (response?.data?.error) {
           return {
             title: 'Get Second Wallet',
@@ -1085,4 +1086,9 @@ export {
   requestLimitIncrease,
   upgradeWallet,
   getAccountFilteredTransactions,
+  getAllWallet,
+  getSeerbitWalletBalance,
+  getSeerbitNipBanks,
+  verifySeerbitNipAccount,
+  getSecondWallet,
 };
