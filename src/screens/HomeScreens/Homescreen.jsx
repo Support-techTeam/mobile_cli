@@ -62,13 +62,9 @@ const Homescreen = () => {
   const [isFundWalletVisible, setIsFundWalletVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isSending, setIsSending] = useState(false);
-  const [isLoadingWallet, setIsLoadingWallet] = useState(false);
-  const [isLoadingTransaction, setIsLoadingTransaction] = useState(false);
-  const [isLoadingLoanData, setIsLoadingLoanData] = useState(false);
-  const [isLoadingLenda, setIsLoadingLenda] = useState(false);
-  const [isLoadingArm, setIsLoadingArm] = useState(false);
   const [isLoadingLoanAmount, setIsLoadingLoanAmount] = useState(false);
   const [isLoadingPullDown, setIsLoadingPullDown] = useState(false);
+  const [isLoadingWallet, setIsLoadingWallet] = useState(false);
   //Redux Calls
   const userProfileData = useSelector(state => state.userProfile.profile);
   const userWalletData = useSelector(state => state.userProfile.wallet);
@@ -176,6 +172,7 @@ const Homescreen = () => {
       getLoanUserData();
       unsubGetLoanAmount();
       unsubGetAllAdverts();
+      unsubGetSeerbitWalletBalance();
     }, []),
   );
 
@@ -223,7 +220,6 @@ const Homescreen = () => {
           res?.data?.transactions?.transaction !== null
         ) {
           setUserTransactionsData(res?.data?.transactions.transaction);
-          // setAllUserTransactionsData(res?.data?.transactions.transaction);
         }
       }
     }, 60000);
@@ -305,15 +301,11 @@ const Homescreen = () => {
       .then(res => {
         if (res) {
           if (!res?.error) {
-            // setCurrentPage(0);
             if (
               res?.data?.transactions?.transaction !== undefined &&
               res?.data?.transactions?.transaction !== null
             ) {
               setUserTransactionsData(res?.data?.transactions?.transaction);
-              // setAllUserTransactionsData(res?.data?.transactions?.transaction);
-              // setUserTransactionsPages(res?.data?.transactions?.maxPages);
-              // setUserTransactionsTotal(res?.data?.transactions?.count);
             }
           }
         }
@@ -325,23 +317,16 @@ const Homescreen = () => {
   };
 
   const unsubGetTransactions = async () => {
-    setIsLoadingTransaction(true);
-
     getAccountTransactions(0, 10)
       .then(res => {
         if (res) {
           if (!res?.error) {
-            // setCurrentPage(0);
             setUserTransactionsData(res?.data?.transactions?.transaction);
-            // setUserTransactionsPages(res?.data?.transactions?.maxPages);
-            // setUserTransactionsTotal(res?.data?.transactions?.count);
           }
         }
       })
       .catch(e => {})
-      .finally(() => {
-        setIsLoadingTransaction(false);
-      });
+      .finally(() => {});
   };
 
   const unsubGetAllAdverts = async () => {
@@ -354,9 +339,7 @@ const Homescreen = () => {
         }
       })
       .catch(e => {})
-      .finally(() => {
-        setIsLoadingTransaction(false);
-      });
+      .finally(() => {});
   };
 
   const unsubGetTransactionsonPullDown = async () => {
@@ -365,10 +348,7 @@ const Homescreen = () => {
       .then(res => {
         if (res) {
           if (!res?.error) {
-            // setCurrentPage(0);
             setUserTransactionsData(res?.data?.transactions?.transaction);
-            // setUserTransactionsPages(res?.data?.transactions?.maxPages);
-            // setUserTransactionsTotal(res?.data?.transactions?.count);
           }
         }
       })
@@ -420,7 +400,6 @@ const Homescreen = () => {
   };
 
   const getAllLendaInvestments = async () => {
-    setIsLoadingLenda(true);
     getAllLendaInvestment()
       .then(res => {
         if (res) {
@@ -430,13 +409,10 @@ const Homescreen = () => {
         }
       })
       .catch(e => {})
-      .finally(() => {
-        setIsLoadingLenda(false);
-      });
+      .finally(() => {});
   };
   // get all ARM investments
   const getAllArmInvestments = async () => {
-    setIsLoadingArm(true);
     getAllArmInvestment()
       .then(async res => {
         if (res) {
@@ -456,9 +432,7 @@ const Homescreen = () => {
         }
       })
       .catch(e => {})
-      .finally(() => {
-        setIsLoadingArm(false);
-      });
+      .finally(() => {});
   };
 
   const getGuarantorData = async () => {
@@ -490,7 +464,6 @@ const Homescreen = () => {
   };
 
   const getLoanUserData = async () => {
-    setIsLoadingLoanData(true);
     getLoanUserDetails()
       .then(res => {
         if (res) {
@@ -508,9 +481,7 @@ const Homescreen = () => {
         }
       })
       .catch(e => {})
-      .finally(() => {
-        setIsLoadingLoanData(false);
-      });
+      .finally(() => {});
   };
 
   // Wallet Statement Functions
@@ -602,6 +573,7 @@ const Homescreen = () => {
               autoHide: true,
               onPress: () => Toast.hide(),
             });
+            unsubGetMultipleWallets();
           } else {
             Toast.show({
               type: 'error',
@@ -918,6 +890,7 @@ const Homescreen = () => {
           toggleFundWallet={toggleFundWallet}
           userProfileData={userProfileData}
           userWalletData={userWalletData}
+          multipleWalletsData={userMultiWalletData}
           handleLongPress={handleLongPress}
         />
 
