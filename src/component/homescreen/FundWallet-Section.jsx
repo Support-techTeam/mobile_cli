@@ -90,8 +90,8 @@ export const FundWalletSection = props => {
             Transfer Money to the account details below to fund your account
           </Text>
           <View style={[styles.demark]} />
-          {multipleWalletsData.length > 0
-            ? multipleWalletsData.map((walletData, index) => (
+          {multipleWalletsData && multipleWalletsData?.length > 0
+            ? multipleWalletsData?.map((walletData, index) => (
                 <View key={index}>
                   <View style={{marginTop: 16, marginHorizontal: 16}}>
                     <View

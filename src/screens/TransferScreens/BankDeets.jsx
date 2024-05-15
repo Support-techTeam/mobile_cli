@@ -18,8 +18,11 @@ import {useSelector} from 'react-redux';
 import {
   getAllBankDetails,
   getBeneficiaries,
+  getSeerbitNipBanks,
+  getSeerbitWalletBalance,
   verifyBeneficiaryInfo,
   verifyNIPAccountInfo,
+  verifySeerbitNipAccount,
 } from '../../stores/WalletStore';
 import Toast from 'react-native-toast-message';
 import COLORS from '../../constants/colors';
@@ -29,24 +32,38 @@ import CustomSearchableDropdown from '../../component/inputField/CustomSearchabl
 import Loader from '../../component/loader/loader';
 
 const defaultData = [
-  {value: '', label: 'Select Option'},
-  {value: '', label: 'N/A'},
+  {value: 'Select Option', label: 'Select Option'},
+  {value: 'N/A', label: 'N/A'},
 ];
 
 const beneficiariesData = [
   {name: '...Select Option', label: '...Select Option', id: 0},
 ];
 
+let bankerListData = [
+  {value: '', label: 'Select Option'},
+  {value: '', label: 'N/A'},
+];
+
+let selectedData = '';
+
 const BankDeets = ({route}) => {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
   const userWalletData = useSelector(state => state.userProfile.wallet);
+  const userMultiWalletData = useSelector(
+    state => state.userProfile.multiWallet,
+  );
   const prevRoute = route?.params?.paramKey;
   const [isLoading, setIsLoading] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
+  const [isFetchingSeerbitBanks, setIsFetchingSeerbitBanks] = useState(false);
   const [currentBanks, setCurrentBanks] = useState(undefined);
+  const [seerbitBanks, setSeerbitBanks] = useState(undefined);
   const [numComplete, setNumComplete] = useState(false);
+  const [seerbitBalance, setSeerbitBalance] = useState(0);
   const [bankDetails, setBankDetails] = useState({
+    fromWalletIdAccountNumber: '',
     receiverAccountFirstName: '',
     receiverAccountLastName: '',
     receiverAccountNumber: '',
@@ -56,7 +73,7 @@ const BankDeets = ({route}) => {
     saveBeneficiary: false,
     toWalletIdAccountNumber: '',
     beneficiaryAccountName: '',
-    beneficiaryBankName: 'Providus',
+    beneficiaryBankName: '', // to make dynamic
   });
 
   const disableit =
@@ -77,6 +94,7 @@ const BankDeets = ({route}) => {
       handleGetAllBeneficiaries();
       if (prevRoute === 'Nip') {
         handleGetAllBanks();
+        handleGetAllSeerbitBanks();
       }
     }
   }, [route]);
@@ -111,6 +129,47 @@ const BankDeets = ({route}) => {
       .catch(error => {})
       .finally(() => {
         setIsFetching(false);
+      });
+  };
+
+  const handleGetAllSeerbitBanks = async () => {
+    setIsFetchingSeerbitBanks(true);
+    getSeerbitNipBanks()
+      .then(res => {
+        if (res) {
+          if (res?.error) {
+            Toast.show({
+              type: 'error',
+              position: 'top',
+              topOffset: 50,
+              text1: res?.title,
+              text2: res?.data?.message ?? 'Unable to retrieve banks',
+              visibilityTime: 5000,
+              autoHide: true,
+              onPress: () => Toast.hide(),
+            });
+          } else {
+            const bankData =
+              res?.data &&
+              res?.data?.length > 0 &&
+              res?.data?.map((bank, i) => {
+                return {
+                  value: bank?.bankname,
+                  label: bank?.bankname,
+                  key: i,
+                  NIPCode: bank?.bankcode,
+                };
+              });
+
+            if (seerbitBanks == undefined || seerbitBanks == '') {
+              setSeerbitBanks(bankData);
+            }
+          }
+        }
+      })
+      .catch(error => {})
+      .finally(() => {
+        setIsFetchingSeerbitBanks(false);
       });
   };
 
@@ -208,8 +267,12 @@ const BankDeets = ({route}) => {
 
   const handleGetAccountDetails = () => {
     if (
-      bankDetails?.receiverAccountNumber?.length === 10 &&
-      bankDetails?.receiverBankName !== ''
+      (bankDetails?.receiverAccountNumber?.length === 10 &&
+        bankDetails?.receiverBankName !== '' &&
+        bankDetails?.receiverBankName !== 'Select Option') ||
+      (bankDetails?.receiverAccountNumber?.length === 10 &&
+        bankDetails?.receiverBankName !== '' &&
+        bankDetails?.receiverBankName !== 'N/A')
     ) {
       setBankDetails({
         ...bankDetails,
@@ -218,39 +281,69 @@ const BankDeets = ({route}) => {
       });
       setIsLoading(true);
       const unsubVerifyBeneficiaryInfo = async () => {
-        try {
-          const res = await verifyNIPAccountInfo(
-            bankDetails?.receiverAccountNumber,
-            bankDetails?.receiverBankName,
-          );
-          if (res?.error) {
-            Toast.show({
-              type: 'error',
-              position: 'top',
-              topOffset: 50,
-              text1: res?.title,
-              text2: res?.message,
-              visibilityTime: 5000,
-              autoHide: true,
-              onPress: () => Toast.hide(),
-            });
-          } else {
-            setNumComplete(true);
-            const [firstPart, ...restParts] = res?.data?.split(/\s(.+)/);
-            setBankDetails({
-              ...bankDetails,
-              receiverAccountFirstName:
-                res?.data?.length === undefined ? '' : [...restParts][0],
-              receiverAccountLastName:
-                res?.data?.length === undefined ? '' : firstPart,
-            });
-          }
-        } catch (e) {}
+        if (bankDetails?.fromWalletIdAccountNumber[0] == '4') {
+          try {
+            const res = await verifySeerbitNipAccount(
+              bankDetails?.receiverAccountNumber,
+              bankDetails?.receiverBankName,
+            );
+            if (res?.error) {
+              Toast.show({
+                type: 'error',
+                position: 'top',
+                topOffset: 50,
+                text1: res?.title,
+                text2: res?.message,
+                visibilityTime: 5000,
+                autoHide: true,
+                onPress: () => Toast.hide(),
+              });
+            } else {
+              setNumComplete(true);
+              const [firstPart, ...restParts] = res?.data?.split(/\s(.+)/);
+              setBankDetails({
+                ...bankDetails,
+                receiverAccountFirstName:
+                  res?.data?.length === undefined ? '' : [...restParts][0],
+                receiverAccountLastName:
+                  res?.data?.length === undefined ? '' : firstPart,
+              });
+            }
+          } catch (e) {}
+        } else if (bankDetails?.fromWalletIdAccountNumber[0] == '9') {
+          try {
+            const res = await verifyNIPAccountInfo(
+              bankDetails?.receiverAccountNumber,
+              bankDetails?.receiverBankName,
+            );
+            if (res?.error) {
+              Toast.show({
+                type: 'error',
+                position: 'top',
+                topOffset: 50,
+                text1: res?.title,
+                text2: res?.message,
+                visibilityTime: 5000,
+                autoHide: true,
+                onPress: () => Toast.hide(),
+              });
+            } else {
+              setNumComplete(true);
+              const [firstPart, ...restParts] = res?.data?.split(/\s(.+)/);
+              setBankDetails({
+                ...bankDetails,
+                receiverAccountFirstName:
+                  res?.data?.length === undefined ? '' : [...restParts][0],
+                receiverAccountLastName:
+                  res?.data?.length === undefined ? '' : firstPart,
+              });
+            }
+          } catch (e) {}
+        }
+        setTimeout(() => {
+          setIsLoading(false); // Check if mounted
+        }, 1000);
       };
-
-      setTimeout(() => {
-        setIsLoading(false); // Check if mounted
-      }, 3000);
       unsubVerifyBeneficiaryInfo();
 
       return () => {
@@ -311,6 +404,46 @@ const BankDeets = ({route}) => {
     },
   ];
 
+  // set bank list
+  useEffect(() => {
+    try {
+      if (userMultiWalletData && userMultiWalletData?.length > 0) {
+        bankerListData = [{value: 'Select Option', label: 'Select Option'}];
+        userMultiWalletData?.map((walletData, index) => {
+          bankerListData.push({
+            label: walletData?.walletIdAccountNumber,
+            value: `${walletData?.walletIdAccountNumber} - ${
+              walletData?.banker === 'Providus'
+                ? 'Providus Bank'
+                : walletData?.banker
+            }`,
+            key: index,
+          });
+        });
+      }
+    } catch (e) {}
+  }, [userMultiWalletData]);
+  // Get seerbit balance
+  const unsubGetSeerbitWalletBalance = async () => {
+    if (userMultiWalletData && userMultiWalletData?.length > 0) {
+      if (
+        selectedData?.pocketId !== null &&
+        selectedData?.pocketId !== undefined
+      ) {
+        getSeerbitWalletBalance(selectedData?.pocketId)
+          .then(res => {
+            if (res) {
+              if (!res?.error) {
+                setSeerbitBalance(res?.data);
+              }
+            }
+          })
+          .catch(e => {})
+          .finally(() => {});
+      }
+    }
+  };
+
   const renderData = () => {
     return (
       <View>
@@ -328,25 +461,115 @@ const BankDeets = ({route}) => {
           {prevRoute === 'InternalTransfer' ? (
             <>
               <View style={{marginTop: 10}}>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                  }}>
-                  <View style={{flexDirection: 'row'}}>
-                    <Text style={styles.label}>Wallet Number</Text>
-                    <Text style={{color: 'red', marginRight: 10}}>*</Text>
-                  </View>
+                <View style={{flexDirection: 'row'}}>
+                  <Text style={styles.droplabel}>Select Account</Text>
+                  <Text style={{color: 'red', marginRight: 10}}>*</Text>
                 </View>
-                <CustomSearchableDropdown
-                  beneficiariesData={beneficiariesData}
-                  setBankDetails={setBankDetails}
-                  bankDetails={bankDetails}
-                  handleAccountDetails={handleGetWalletDetails}
-                  transferType={prevRoute}
+                <SelectList
+                  setSelected={val => {
+                    try {
+                      const splitData =
+                        val && val?.length > 0 && val.split('-');
+                      const selectedAccount = splitData[0].trim();
+                      if (selectedAccount === 'Select Option') {
+                        Toast.show({
+                          type: 'warning',
+                          position: 'top',
+                          topOffset: 50,
+                          text1: 'Select Account',
+                          text2: 'You need to select an account!',
+                          visibilityTime: 3000,
+                          autoHide: true,
+                          onPress: () => Toast.hide(),
+                        });
+                        setBankDetails({
+                          fromWalletIdAccountNumber: '',
+                          receiverAccountFirstName: '',
+                          receiverAccountLastName: '',
+                          receiverBankName: '',
+                          receiverAccountNumber: '',
+                          amount: 0,
+                          narration: '',
+                          saveBeneficiary: false,
+                          toWalletIdAccountNumber: '',
+                          beneficiaryAccountName: '',
+                          beneficiaryBankName: '',
+                        });
+                      } else {
+                        selectedData = userMultiWalletData?.find(
+                          walletData =>
+                            walletData?.walletIdAccountNumber ===
+                            selectedAccount.toString(),
+                        );
+                        setBankDetails({
+                          fromWalletIdAccountNumber: selectedAccount.toString(),
+                          receiverAccountFirstName: '',
+                          receiverAccountLastName: '',
+                          receiverBankName: '',
+                          receiverAccountNumber: '',
+                          amount: 0,
+                          narration: '',
+                          saveBeneficiary: false,
+                          toWalletIdAccountNumber: '',
+                          beneficiaryAccountName: '',
+                          beneficiaryBankName: '',
+                        });
+                        if (selectedAccount[0] == '4') {
+                          unsubGetSeerbitWalletBalance();
+                        }
+                      }
+                    } catch (e) {}
+                  }}
+                  data={bankerListData}
+                  save="value"
+                  searchPlaceholder="Search for account"
+                  search={false}
+                  boxStyles={styles.inputContainer}
+                  closeicon={
+                    <Icon name="times-circle" size={26} color="#000" />
+                  }
+                  dropdownStyles={{
+                    paddingHorizontal: 10,
+                    marginTop: 2,
+                    backgroundColor: COLORS.lendaComponentBg,
+                    borderColor: COLORS.lendaComponentBorder,
+                    borderWidth: 1,
+                    borderRadius: 5,
+                  }}
+                  dropdownItemStyles={{
+                    paddingHorizontal: 8,
+                    paddingVertical: 10,
+                    backgroundColor: COLORS.lendaComponentBg,
+                    borderColor: COLORS.lendaComponentBorder,
+                    borderWidth: 1,
+                    borderRadius: 5,
+                    marginVertical: 3,
+                  }}
                 />
               </View>
+
+              {bankDetails?.fromWalletIdAccountNumber !== '' && (
+                <View style={{marginTop: 10}}>
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                    }}>
+                    <View style={{flexDirection: 'row'}}>
+                      <Text style={styles.label}>Wallet Number</Text>
+                      <Text style={{color: 'red', marginRight: 10}}>*</Text>
+                    </View>
+                  </View>
+                  <CustomSearchableDropdown
+                    beneficiariesData={beneficiariesData}
+                    setBankDetails={setBankDetails}
+                    bankDetails={bankDetails}
+                    handleAccountDetails={handleGetWalletDetails}
+                    transferType={prevRoute}
+                  />
+                </View>
+              )}
               <View style={{marginTop: 10}}>
                 {(bankDetails?.toWalletIdAccountNumber).toString().length ===
                   10 && (
@@ -496,25 +719,115 @@ const BankDeets = ({route}) => {
           ) : (
             <>
               <View style={{marginTop: 10}}>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                  }}>
-                  <View style={{flexDirection: 'row'}}>
-                    <Text style={styles.label}>Account Number</Text>
-                    <Text style={{color: 'red', marginRight: 10}}>*</Text>
-                  </View>
+                <View style={{flexDirection: 'row'}}>
+                  <Text style={styles.droplabel}>Select Account</Text>
+                  <Text style={{color: 'red', marginRight: 10}}>*</Text>
                 </View>
-                <CustomSearchableDropdown
-                  beneficiariesData={beneficiariesData}
-                  setBankDetails={setBankDetails}
-                  bankDetails={bankDetails}
-                  handleAccountDetails={handleGetAccountDetails}
-                  transferType={prevRoute}
+                <SelectList
+                  setSelected={val => {
+                    try {
+                      const splitData =
+                        val && val?.length > 0 && val.split('-');
+                      const selectedAccount = splitData[0].trim();
+                      if (selectedAccount === 'Select Option') {
+                        Toast.show({
+                          type: 'warning',
+                          position: 'top',
+                          topOffset: 50,
+                          text1: 'Select Account',
+                          text2: 'You need to select an account!',
+                          visibilityTime: 3000,
+                          autoHide: true,
+                          onPress: () => Toast.hide(),
+                        });
+                        setBankDetails({
+                          fromWalletIdAccountNumber: '',
+                          receiverAccountFirstName: '',
+                          receiverAccountLastName: '',
+                          receiverBankName: '',
+                          receiverAccountNumber: '',
+                          amount: 0,
+                          narration: '',
+                          saveBeneficiary: false,
+                          toWalletIdAccountNumber: '',
+                          beneficiaryAccountName: '',
+                          beneficiaryBankName: '',
+                        });
+                      } else {
+                        selectedData = userMultiWalletData?.find(
+                          walletData =>
+                            walletData?.walletIdAccountNumber ===
+                            selectedAccount.toString(),
+                        );
+                        setBankDetails({
+                          fromWalletIdAccountNumber: selectedAccount.toString(),
+                          receiverAccountFirstName: '',
+                          receiverAccountLastName: '',
+                          receiverBankName: '',
+                          receiverAccountNumber: '',
+                          amount: 0,
+                          narration: '',
+                          saveBeneficiary: false,
+                          toWalletIdAccountNumber: '',
+                          beneficiaryAccountName: '',
+                          beneficiaryBankName: '',
+                        });
+                        if (selectedAccount[0] == '4') {
+                          unsubGetSeerbitWalletBalance();
+                        }
+                      }
+                    } catch (e) {}
+                  }}
+                  data={bankerListData}
+                  save="value"
+                  searchPlaceholder="Search for account"
+                  search={false}
+                  boxStyles={styles.inputContainer}
+                  closeicon={
+                    <Icon name="times-circle" size={26} color="#000" />
+                  }
+                  dropdownStyles={{
+                    paddingHorizontal: 10,
+                    marginTop: 2,
+                    backgroundColor: COLORS.lendaComponentBg,
+                    borderColor: COLORS.lendaComponentBorder,
+                    borderWidth: 1,
+                    borderRadius: 5,
+                  }}
+                  dropdownItemStyles={{
+                    paddingHorizontal: 8,
+                    paddingVertical: 10,
+                    backgroundColor: COLORS.lendaComponentBg,
+                    borderColor: COLORS.lendaComponentBorder,
+                    borderWidth: 1,
+                    borderRadius: 5,
+                    marginVertical: 3,
+                  }}
                 />
               </View>
+
+              {bankDetails?.fromWalletIdAccountNumber !== '' && (
+                <View style={{marginTop: 10}}>
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                    }}>
+                    <View style={{flexDirection: 'row'}}>
+                      <Text style={styles.label}>Account Number</Text>
+                      <Text style={{color: 'red', marginRight: 10}}>*</Text>
+                    </View>
+                  </View>
+                  <CustomSearchableDropdown
+                    beneficiariesData={beneficiariesData}
+                    setBankDetails={setBankDetails}
+                    bankDetails={bankDetails}
+                    handleAccountDetails={handleGetAccountDetails}
+                    transferType={prevRoute}
+                  />
+                </View>
+              )}
 
               {bankDetails?.receiverAccountNumber?.length === 10 && (
                 <View style={{marginTop: 10}}>
@@ -527,13 +840,37 @@ const BankDeets = ({route}) => {
                       bankDetails.receiverBankName &&
                       bankDetails?.receiverBankName
                     }
-                    setSelected={val =>
-                      setBankDetails({
-                        ...bankDetails,
-                        receiverBankName: val,
-                      })
+                    setSelected={val => {
+                      if (val === 'Select Option' || val === 'N/A') {
+                        Toast.show({
+                          type: 'warning',
+                          position: 'top',
+                          topOffset: 50,
+                          text1: 'Select Bank',
+                          text2: 'You need to select a bank!',
+                          visibilityTime: 3000,
+                          autoHide: true,
+                          onPress: () => Toast.hide(),
+                        });
+                        if (seerbitBanks && seerbitBanks.length <= 0) {
+                          handleGetAllSeerbitBanks();
+                        }
+                      } else {
+                        setBankDetails({
+                          ...bankDetails,
+                          receiverBankName: val,
+                        });
+                      }
+                    }}
+                    data={
+                      bankDetails?.fromWalletIdAccountNumber[0] == '4' &&
+                      seerbitBanks
+                        ? seerbitBanks
+                        : bankDetails?.fromWalletIdAccountNumber[0] == '9' &&
+                          currentBanks
+                        ? currentBanks
+                        : defaultData
                     }
-                    data={currentBanks ? currentBanks : defaultData}
                     save="value"
                     searchPlaceholder="Search for bank"
                     placeholder={
@@ -617,10 +954,26 @@ const BankDeets = ({route}) => {
                             isNeeded={true}
                             isAirtime={true}
                             isBalance={
-                              userWalletData &&
-                              userWalletData?.availableBalance
-                                ?.toString()
-                                ?.replace(/\B(?=(\d{3})+\b)/g, ',')
+                              userMultiWalletData &&
+                              selectedData?.banker === 'Providus'
+                                ? new Intl.NumberFormat('en-US', {
+                                    style: 'decimal',
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2,
+                                  }).format(
+                                    Number(selectedData?.availableBalance),
+                                  )
+                                : selectedData?.banker ===
+                                  '9 Payment Service Bank'
+                                ? new Intl.NumberFormat('en-US', {
+                                    style: 'decimal',
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2,
+                                  })
+                                    .format(Number(seerbitBalance))
+                                    ?.toString()
+                                    ?.replace(/\B(?=(\d{3})+\b)/g, ',')
+                                : '0.00'
                             }
                           />
 
@@ -657,35 +1010,85 @@ const BankDeets = ({route}) => {
                                       });
                                       return;
                                     } else if (
-                                      userWalletData?.availableBalance ==
-                                        undefined ||
-                                      userWalletData?.availableBalance == null
+                                      userMultiWalletData &&
+                                      selectedData?.banker === 'Providus'
                                     ) {
-                                      Toast.show({
-                                        type: 'error',
-                                        position: 'top',
-                                        topOffset: 50,
-                                        text1: 'Wallet Internal Transfer',
-                                        text2: 'Balance not available!',
-                                        visibilityTime: 5000,
-                                        autoHide: true,
-                                        onPress: () => Toast.hide(),
-                                      });
+                                      if (
+                                        selectedData?.availableBalance ==
+                                          undefined ||
+                                        selectedData?.availableBalance == null
+                                      ) {
+                                        Toast.show({
+                                          type: 'error',
+                                          position: 'top',
+                                          topOffset: 50,
+                                          text1: 'Wallet Internal Transfer',
+                                          text2: 'Balance not available!',
+                                          visibilityTime: 5000,
+                                          autoHide: true,
+                                          onPress: () => Toast.hide(),
+                                        });
+                                        return;
+                                      } else if (
+                                        Number(bankDetails?.amount) >
+                                        Number(selectedData?.availableBalance)
+                                      ) {
+                                        Toast.show({
+                                          type: 'error',
+                                          position: 'top',
+                                          topOffset: 50,
+                                          text1: 'NIP Transfer',
+                                          text2: 'Available balance exceeded!',
+                                          visibilityTime: 5000,
+                                          autoHide: true,
+                                          onPress: () => Toast.hide(),
+                                        });
+                                        return;
+                                      } else {
+                                        navigation.navigate('Summary', {
+                                          bankDetails: bankDetails,
+                                        });
+                                      }
                                     } else if (
-                                      Number(bankDetails?.amount) >
-                                      Number(userWalletData?.availableBalance)
+                                      userMultiWalletData &&
+                                      selectedData?.banker ===
+                                        '9 Payment Service Bank'
                                     ) {
-                                      Toast.show({
-                                        type: 'error',
-                                        position: 'top',
-                                        topOffset: 50,
-                                        text1: 'NIP Transfer',
-                                        text2: 'Available balance exceeded!',
-                                        visibilityTime: 5000,
-                                        autoHide: true,
-                                        onPress: () => Toast.hide(),
-                                      });
-                                      return;
+                                      if (
+                                        seerbitBalance == undefined ||
+                                        seerbitBalance == null
+                                      ) {
+                                        Toast.show({
+                                          type: 'error',
+                                          position: 'top',
+                                          topOffset: 50,
+                                          text1: 'Wallet Internal Transfer',
+                                          text2: 'Balance not available!',
+                                          visibilityTime: 5000,
+                                          autoHide: true,
+                                          onPress: () => Toast.hide(),
+                                        });
+                                        return;
+                                      } else if (
+                                        Number(bankDetails?.amount) >
+                                        Number(seerbitBalance)
+                                      ) {
+                                        Toast.show({
+                                          type: 'error',
+                                          position: 'top',
+                                          topOffset: 50,
+                                          text1: 'NIP Transfer',
+                                          text2: 'Available balance exceeded!',
+                                          visibilityTime: 5000,
+                                          autoHide: true,
+                                          onPress: () => Toast.hide(),
+                                        });
+                                        return;
+                                      } else {
+                                        navigation.navigate('Summary', {
+                                          bankDetails: bankDetails,
+                                        });
+                                      }
                                     } else {
                                       navigation.navigate('Summary', {
                                         bankDetails: bankDetails,

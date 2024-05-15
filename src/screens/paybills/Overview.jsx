@@ -25,24 +25,36 @@ import CustomDropdown from '../../component/dropDown/dropdown.component';
 import InputPhone from '../../component/inputField/phone-input.component';
 import Toast from 'react-native-toast-message';
 import {useSelector} from 'react-redux';
+import {SelectList} from 'react-native-dropdown-select-list';
 import {
   getDataPlanByProvider,
   verifyMeter,
   getCableTvProvider,
   verifyIUC,
 } from '../../stores/BillStore';
+import {getSeerbitWalletBalance} from '../../stores/WalletStore';
+
+let bankerListData = [
+  {value: '', label: 'Select Option'},
+  {value: '', label: 'N/A'},
+];
+
+let selectedData = '';
 
 const Overview = ({route}) => {
   const navigation = useNavigation();
   const [isLoading, setIsLoading] = useState(false);
   const routes = useRoute();
+  const [seerbitBalance, setSeerbitBalance] = useState(0);
   const [airtimeDetails, setAirtimeDetails] = useState({
+    fromWalletIdAccountNumber: '',
     number: '',
     network: '',
     amount: '',
   });
 
   const [dataDetails, setDataDetails] = useState({
+    fromWalletIdAccountNumber: '',
     number: '',
     network: '',
     amount: '',
@@ -50,6 +62,9 @@ const Overview = ({route}) => {
   });
   const insets = useSafeAreaInsets();
   const userWalletData = useSelector(state => state.userProfile.wallet);
+  const userMultiWalletData = useSelector(
+    state => state.userProfile.multiWallet,
+  );
   const {details, billType} = routes.params;
   const [providerPlan, setProviderPlan] = useState([]);
   const [verificationDetails, setVerificationDetails] = useState({
@@ -57,6 +72,7 @@ const Overview = ({route}) => {
     address: '',
   });
   const [powerDetails, setPowerDetails] = useState({
+    fromWalletIdAccountNumber: '',
     number: '',
     network: '',
     amount: '',
@@ -69,6 +85,7 @@ const Overview = ({route}) => {
   });
 
   const [cableDetails, setCableDetails] = useState({
+    fromWalletIdAccountNumber: '',
     number: '',
     network: '',
     amount: '',
@@ -205,6 +222,52 @@ const Overview = ({route}) => {
     }
   };
 
+  // set bank list
+  useEffect(() => {
+    try {
+      if (userMultiWalletData && userMultiWalletData?.length > 0) {
+        bankerListData = [{value: 'Select Option', label: 'Select Option'}];
+        userMultiWalletData?.map((walletData, index) => {
+          bankerListData.push({
+            label: walletData?.walletIdAccountNumber,
+            value: `${walletData?.walletIdAccountNumber} - ${
+              walletData?.banker === 'Providus'
+                ? 'Providus Bank'
+                : walletData?.banker
+            }`,
+            key: index,
+          });
+        });
+      }
+    } catch (e) {}
+  }, [userMultiWalletData]);
+
+  // Get seerbit balance
+  const unsubGetSeerbitWalletBalance = async () => {
+    try {
+      if (userMultiWalletData && userMultiWalletData?.length > 0) {
+        if (
+          selectedData?.pocketId !== null &&
+          selectedData?.pocketId !== undefined
+        ) {
+          setIsLoading(true);
+          getSeerbitWalletBalance(selectedData?.pocketId)
+            .then(res => {
+              if (res) {
+                if (!res?.error) {
+                  setSeerbitBalance(res?.data);
+                }
+              }
+            })
+            .catch(e => {})
+            .finally(() => {
+              setIsLoading(false);
+            });
+        }
+      }
+    } catch (e) {}
+  };
+
   const defaultAmount = [
     {value: 100, label: '100'},
     {value: 200, label: '200'},
@@ -224,18 +287,23 @@ const Overview = ({route}) => {
   ];
 
   const disableit =
-    !airtimeDetails.number || !airtimeDetails.network || !airtimeDetails.amount;
+    !airtimeDetails.number ||
+    !airtimeDetails.network ||
+    !airtimeDetails.amount ||
+    !airtimeDetails?.fromWalletIdAccountNumber;
 
   const disableitdata =
     !dataDetails.number ||
     !dataDetails.network ||
     !dataDetails.amount ||
+    !dataDetails?.fromWalletIdAccountNumber ||
     !dataDetails.packages;
 
   const disableitpower =
     !powerDetails.number ||
     !powerDetails.network ||
     !powerDetails.meterNumber ||
+    !powerDetails?.fromWalletIdAccountNumber ||
     !powerDetails.amount;
 
   const disableitcable =
@@ -243,8 +311,8 @@ const Overview = ({route}) => {
     !cableDetails.network ||
     !cableDetails.cardNumber ||
     !cableDetails.variationCode ||
+    !cableDetails?.fromWalletIdAccountNumber ||
     !cableDetails.amount;
-
   const airtimeDashboard = () => {
     return (
       <View style={[styles.container, styles.transView]}>
@@ -349,6 +417,69 @@ const Overview = ({route}) => {
         <KeyboardAvoidingWrapper>
           <View style={{marginTop: 19}}>
             <View style={{marginTop: 10}}>
+              <View style={{flexDirection: 'row', marginVertical: 5}}>
+                <Text style={styles.droplabel}>Select Account</Text>
+                <Text style={{color: 'red', marginRight: 10}}>*</Text>
+              </View>
+              <SelectList
+                setSelected={val => {
+                  try {
+                    const splitData = val && val?.length > 0 && val.split('-');
+                    const selectedAccount = splitData[0].trim();
+                    if (selectedAccount === 'Select Option') {
+                      Toast.show({
+                        type: 'warning',
+                        position: 'top',
+                        topOffset: 50,
+                        text1: 'Select Account',
+                        text2: 'You need to select an account!',
+                        visibilityTime: 3000,
+                        autoHide: true,
+                        onPress: () => Toast.hide(),
+                      });
+                    } else {
+                      selectedData = userMultiWalletData?.find(
+                        walletData =>
+                          walletData?.walletIdAccountNumber ===
+                          selectedAccount.toString(),
+                      );
+                      setAirtimeDetails({
+                        ...airtimeDetails,
+                        fromWalletIdAccountNumber: selectedAccount.toString(),
+                      });
+                      if (selectedAccount[0] == '4') {
+                        unsubGetSeerbitWalletBalance();
+                      }
+                    }
+                  } catch (e) {}
+                }}
+                data={bankerListData}
+                save="value"
+                searchPlaceholder="Search for account"
+                search={false}
+                boxStyles={styles.inputContainer}
+                closeicon={<Icon name="times-circle" size={26} color="#000" />}
+                dropdownStyles={{
+                  paddingHorizontal: 10,
+                  marginTop: 2,
+                  backgroundColor: COLORS.lendaComponentBg,
+                  borderColor: COLORS.lendaComponentBorder,
+                  borderWidth: 1,
+                  borderRadius: 5,
+                }}
+                dropdownItemStyles={{
+                  paddingHorizontal: 8,
+                  paddingVertical: 10,
+                  backgroundColor: COLORS.lendaComponentBg,
+                  borderColor: COLORS.lendaComponentBorder,
+                  borderWidth: 1,
+                  borderRadius: 5,
+                  marginVertical: 3,
+                }}
+              />
+            </View>
+
+            <View style={{marginTop: 10}}>
               <InputPhone
                 label="Mobile number"
                 layout="first"
@@ -367,12 +498,22 @@ const Overview = ({route}) => {
               defaultValue={airtimeDetails?.amount}
               isAirtime={true}
               isBalance={
-                userWalletData &&
-                new Intl.NumberFormat('en-US', {
-                  style: 'decimal',
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                }).format(Number(userWalletData?.availableBalance))
+                userMultiWalletData && selectedData?.banker === 'Providus'
+                  ? new Intl.NumberFormat('en-US', {
+                      style: 'decimal',
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    }).format(Number(selectedData?.availableBalance))
+                  : selectedData?.banker === '9 Payment Service Bank'
+                  ? new Intl.NumberFormat('en-US', {
+                      style: 'decimal',
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })
+                      .format(Number(seerbitBalance))
+                      ?.toString()
+                      ?.replace(/\B(?=(\d{3})+\b)/g, ',')
+                  : '0.00'
               }
               keyboardType="numeric"
               onChangeText={text =>
@@ -397,23 +538,98 @@ const Overview = ({route}) => {
                   });
                   return;
                 } else if (
-                  Number(airtimeDetails?.amount) >
-                  Number(userWalletData?.availableBalance)
+                  userMultiWalletData &&
+                  selectedData?.banker === 'Providus'
                 ) {
-                  Toast.show({
-                    type: 'error',
-                    position: 'top',
-                    topOffset: 50,
-                    text1: 'Bill Bayment',
-                    text2: 'Available balance exceeded!',
-                    visibilityTime: 5000,
-                    autoHide: true,
-                    onPress: () => Toast.hide(),
-                  });
-                  return;
+                  if (
+                    selectedData?.availableBalance == undefined ||
+                    selectedData?.availableBalance == null
+                  ) {
+                    Toast.show({
+                      type: 'error',
+                      position: 'top',
+                      topOffset: 50,
+                      text1: 'Bill Bayment',
+                      text2: 'Balance not available!',
+                      visibilityTime: 5000,
+                      autoHide: true,
+                      onPress: () => Toast.hide(),
+                    });
+                    return;
+                  } else if (
+                    Number(airtimeDetails?.amount) >
+                    Number(selectedData?.availableBalance)
+                  ) {
+                    Toast.show({
+                      type: 'error',
+                      position: 'top',
+                      topOffset: 50,
+                      text1: 'Bill Bayment',
+                      text2: 'Available balance exceeded!',
+                      visibilityTime: 5000,
+                      autoHide: true,
+                      onPress: () => Toast.hide(),
+                    });
+                    return;
+                  } else {
+                    navigation.navigate('AirtimeConfirm', {
+                      airtimeDetails: {
+                        fromWalletIdAccountNumber:
+                          airtimeDetails?.fromWalletIdAccountNumber,
+                        number: airtimeDetails?.number,
+                        network: airtimeDetails?.network,
+                        amount: airtimeDetails?.amount,
+                        service: 'airtime purchase',
+                      },
+                    });
+                  }
+                } else if (
+                  userMultiWalletData &&
+                  selectedData?.banker === '9 Payment Service Bank'
+                ) {
+                  if (seerbitBalance == undefined || seerbitBalance == null) {
+                    Toast.show({
+                      type: 'error',
+                      position: 'top',
+                      topOffset: 50,
+                      text1: 'Bill Bayment',
+                      text2: 'Balance not available!',
+                      visibilityTime: 5000,
+                      autoHide: true,
+                      onPress: () => Toast.hide(),
+                    });
+                    return;
+                  } else if (
+                    Number(airtimeDetails?.amount) > Number(seerbitBalance)
+                  ) {
+                    Toast.show({
+                      type: 'error',
+                      position: 'top',
+                      topOffset: 50,
+                      text1: 'Bill Bayment',
+                      text2: 'Available balance exceeded!',
+                      visibilityTime: 5000,
+                      autoHide: true,
+                      onPress: () => Toast.hide(),
+                    });
+                    return;
+                  } else {
+                    navigation.navigate('AirtimeConfirm', {
+                      airtimeDetails: {
+                        fromWalletIdAccountNumber:
+                          airtimeDetails?.fromWalletIdAccountNumber,
+                        number: airtimeDetails?.number,
+                        network: airtimeDetails?.network,
+                        amount: airtimeDetails?.amount,
+                        service: 'airtime purchase',
+                      },
+                    });
+                  }
                 } else {
                   navigation.navigate('AirtimeConfirm', {
                     airtimeDetails: {
+                      fromWalletIdAccountNumber:
+                        airtimeDetails?.fromWalletIdAccountNumber,
                       number: airtimeDetails?.number,
                       network: airtimeDetails?.network,
                       amount: airtimeDetails?.amount,
@@ -521,6 +737,68 @@ const Overview = ({route}) => {
         <KeyboardAvoidingWrapper>
           <View style={{marginTop: 19}}>
             <View style={{marginTop: 10}}>
+              <View style={{flexDirection: 'row', marginVertical: 5}}>
+                <Text style={styles.droplabel}>Select Account</Text>
+                <Text style={{color: 'red', marginRight: 10}}>*</Text>
+              </View>
+              <SelectList
+                setSelected={val => {
+                  try {
+                    const splitData = val && val?.length > 0 && val.split('-');
+                    const selectedAccount = splitData[0].trim();
+                    if (selectedAccount === 'Select Option') {
+                      Toast.show({
+                        type: 'warning',
+                        position: 'top',
+                        topOffset: 50,
+                        text1: 'Select Account',
+                        text2: 'You need to select an account!',
+                        visibilityTime: 3000,
+                        autoHide: true,
+                        onPress: () => Toast.hide(),
+                      });
+                    } else {
+                      selectedData = userMultiWalletData?.find(
+                        walletData =>
+                          walletData?.walletIdAccountNumber ===
+                          selectedAccount.toString(),
+                      );
+                      setDataDetails({
+                        ...dataDetails,
+                        fromWalletIdAccountNumber: selectedAccount.toString(),
+                      });
+                      if (selectedAccount[0] == '4') {
+                        unsubGetSeerbitWalletBalance();
+                      }
+                    }
+                  } catch (e) {}
+                }}
+                data={bankerListData}
+                save="value"
+                searchPlaceholder="Search for account"
+                search={false}
+                boxStyles={styles.inputContainer}
+                closeicon={<Icon name="times-circle" size={26} color="#000" />}
+                dropdownStyles={{
+                  paddingHorizontal: 10,
+                  marginTop: 2,
+                  backgroundColor: COLORS.lendaComponentBg,
+                  borderColor: COLORS.lendaComponentBorder,
+                  borderWidth: 1,
+                  borderRadius: 5,
+                }}
+                dropdownItemStyles={{
+                  paddingHorizontal: 8,
+                  paddingVertical: 10,
+                  backgroundColor: COLORS.lendaComponentBg,
+                  borderColor: COLORS.lendaComponentBorder,
+                  borderWidth: 1,
+                  borderRadius: 5,
+                  marginVertical: 3,
+                }}
+              />
+            </View>
+            <View style={{marginTop: 10}}>
               <InputPhone
                 label="Mobile number"
                 layout="first"
@@ -539,12 +817,22 @@ const Overview = ({route}) => {
               defaultValue={dataDetails.amount.toString()}
               isAirtime={true}
               isBalance={
-                userWalletData &&
-                new Intl.NumberFormat('en-US', {
-                  style: 'decimal',
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                }).format(Number(userWalletData?.availableBalance))
+                userMultiWalletData && selectedData?.banker === 'Providus'
+                  ? new Intl.NumberFormat('en-US', {
+                      style: 'decimal',
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    }).format(Number(selectedData?.availableBalance))
+                  : selectedData?.banker === '9 Payment Service Bank'
+                  ? new Intl.NumberFormat('en-US', {
+                      style: 'decimal',
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })
+                      .format(Number(seerbitBalance))
+                      ?.toString()
+                      ?.replace(/\B(?=(\d{3})+\b)/g, ',')
+                  : '0.00'
               }
               keyboardType="numeric"
               onChangeText={text =>
@@ -570,23 +858,100 @@ const Overview = ({route}) => {
                   });
                   return;
                 } else if (
-                  Number(dataDetails?.amount) >
-                  Number(userWalletData?.availableBalance)
+                  userMultiWalletData &&
+                  selectedData?.banker === 'Providus'
                 ) {
-                  Toast.show({
-                    type: 'error',
-                    position: 'top',
-                    topOffset: 50,
-                    text1: 'Bill Bayment',
-                    text2: 'Available balance exceeded!',
-                    visibilityTime: 5000,
-                    autoHide: true,
-                    onPress: () => Toast.hide(),
-                  });
-                  return;
+                  if (
+                    selectedData?.availableBalance == undefined ||
+                    selectedData?.availableBalance == null
+                  ) {
+                    Toast.show({
+                      type: 'error',
+                      position: 'top',
+                      topOffset: 50,
+                      text1: 'Bill Bayment',
+                      text2: 'Balance not available!',
+                      visibilityTime: 5000,
+                      autoHide: true,
+                      onPress: () => Toast.hide(),
+                    });
+                    return;
+                  } else if (
+                    Number(dataDetails?.amount) >
+                    Number(selectedData?.availableBalance)
+                  ) {
+                    Toast.show({
+                      type: 'error',
+                      position: 'top',
+                      topOffset: 50,
+                      text1: 'Bill Bayment',
+                      text2: 'Available balance exceeded!',
+                      visibilityTime: 5000,
+                      autoHide: true,
+                      onPress: () => Toast.hide(),
+                    });
+                    return;
+                  } else {
+                    navigation.navigate('AirtimeConfirm', {
+                      airtimeDetails: {
+                        fromWalletIdAccountNumber:
+                          dataDetails?.fromWalletIdAccountNumber,
+                        number: dataDetails?.number,
+                        network: dataDetails?.network,
+                        amount: dataDetails?.amount,
+                        package: dataDetails?.packages,
+                        service: 'data purchase',
+                      },
+                    });
+                  }
+                } else if (
+                  userMultiWalletData &&
+                  selectedData?.banker === '9 Payment Service Bank'
+                ) {
+                  if (seerbitBalance == undefined || seerbitBalance == null) {
+                    Toast.show({
+                      type: 'error',
+                      position: 'top',
+                      topOffset: 50,
+                      text1: 'Bill Bayment',
+                      text2: 'Balance not available!',
+                      visibilityTime: 5000,
+                      autoHide: true,
+                      onPress: () => Toast.hide(),
+                    });
+                    return;
+                  } else if (
+                    Number(dataDetails?.amount) > Number(seerbitBalance)
+                  ) {
+                    Toast.show({
+                      type: 'error',
+                      position: 'top',
+                      topOffset: 50,
+                      text1: 'Bill Bayment',
+                      text2: 'Available balance exceeded!',
+                      visibilityTime: 5000,
+                      autoHide: true,
+                      onPress: () => Toast.hide(),
+                    });
+                    return;
+                  } else {
+                    navigation.navigate('AirtimeConfirm', {
+                      airtimeDetails: {
+                        fromWalletIdAccountNumber:
+                          dataDetails?.fromWalletIdAccountNumber,
+                        number: dataDetails?.number,
+                        network: dataDetails?.network,
+                        amount: dataDetails?.amount,
+                        package: dataDetails?.packages,
+                        service: 'data purchase',
+                      },
+                    });
+                  }
                 } else {
                   navigation.navigate('AirtimeConfirm', {
                     airtimeDetails: {
+                      fromWalletIdAccountNumber:
+                        dataDetails?.fromWalletIdAccountNumber,
                       number: dataDetails?.number,
                       network: dataDetails?.network,
                       amount: dataDetails?.amount,
@@ -677,6 +1042,68 @@ const Overview = ({route}) => {
           showsVerticalScrollIndicator={false}
           style={{marginBottom: 20, paddingHorizontal: 10}}>
           <View style={{marginTop: 14}}>
+            <View style={{marginTop: 10}}>
+              <View style={{flexDirection: 'row', marginVertical: 5}}>
+                <Text style={styles.droplabel}>Select Account</Text>
+                <Text style={{color: 'red', marginRight: 10}}>*</Text>
+              </View>
+              <SelectList
+                setSelected={val => {
+                  try {
+                    const splitData = val && val?.length > 0 && val.split('-');
+                    const selectedAccount = splitData[0].trim();
+                    if (selectedAccount === 'Select Option') {
+                      Toast.show({
+                        type: 'warning',
+                        position: 'top',
+                        topOffset: 50,
+                        text1: 'Select Account',
+                        text2: 'You need to select an account!',
+                        visibilityTime: 3000,
+                        autoHide: true,
+                        onPress: () => Toast.hide(),
+                      });
+                    } else {
+                      selectedData = userMultiWalletData?.find(
+                        walletData =>
+                          walletData?.walletIdAccountNumber ===
+                          selectedAccount.toString(),
+                      );
+                      setPowerDetails({
+                        ...powerDetails,
+                        fromWalletIdAccountNumber: selectedAccount.toString(),
+                      });
+                      if (selectedAccount[0] == '4') {
+                        unsubGetSeerbitWalletBalance();
+                      }
+                    }
+                  } catch (e) {}
+                }}
+                data={bankerListData}
+                save="value"
+                searchPlaceholder="Search for account"
+                search={false}
+                boxStyles={styles.inputContainer}
+                closeicon={<Icon name="times-circle" size={26} color="#000" />}
+                dropdownStyles={{
+                  paddingHorizontal: 10,
+                  marginTop: 2,
+                  backgroundColor: COLORS.lendaComponentBg,
+                  borderColor: COLORS.lendaComponentBorder,
+                  borderWidth: 1,
+                  borderRadius: 5,
+                }}
+                dropdownItemStyles={{
+                  paddingHorizontal: 8,
+                  paddingVertical: 10,
+                  backgroundColor: COLORS.lendaComponentBg,
+                  borderColor: COLORS.lendaComponentBorder,
+                  borderWidth: 1,
+                  borderRadius: 5,
+                  marginVertical: 3,
+                }}
+              />
+            </View>
             <Input
               label="Meter Number"
               placeholder="Enter meter number"
@@ -733,10 +1160,22 @@ const Overview = ({route}) => {
                     defaultValue={powerDetails?.amount}
                     isAirtime={true}
                     isBalance={
-                      userWalletData &&
-                      userWalletData?.availableBalance
-                        ?.toString()
-                        ?.replace(/\B(?=(\d{3})+\b)/g, ',')
+                      userMultiWalletData && selectedData?.banker === 'Providus'
+                        ? new Intl.NumberFormat('en-US', {
+                            style: 'decimal',
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          }).format(Number(selectedData?.availableBalance))
+                        : selectedData?.banker === '9 Payment Service Bank'
+                        ? new Intl.NumberFormat('en-US', {
+                            style: 'decimal',
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })
+                            .format(Number(seerbitBalance))
+                            ?.toString()
+                            ?.replace(/\B(?=(\d{3})+\b)/g, ',')
+                        : '0.00'
                     }
                     keyboardType="numeric"
                     onChangeText={text =>
@@ -787,23 +1226,103 @@ const Overview = ({route}) => {
                         });
                         return;
                       } else if (
-                        Number(powerDetails?.amount) >
-                        Number(userWalletData?.availableBalance)
+                        userMultiWalletData &&
+                        selectedData?.banker === 'Providus'
                       ) {
-                        Toast.show({
-                          type: 'error',
-                          position: 'top',
-                          topOffset: 50,
-                          text1: 'Bill Bayment',
-                          text2: 'Available balance exceeded!',
-                          visibilityTime: 5000,
-                          autoHide: true,
-                          onPress: () => Toast.hide(),
-                        });
-                        return;
+                        if (
+                          selectedData?.availableBalance == undefined ||
+                          selectedData?.availableBalance == null
+                        ) {
+                          Toast.show({
+                            type: 'error',
+                            position: 'top',
+                            topOffset: 50,
+                            text1: 'Bill Bayment',
+                            text2: 'Balance not available!',
+                            visibilityTime: 5000,
+                            autoHide: true,
+                            onPress: () => Toast.hide(),
+                          });
+                          return;
+                        } else if (
+                          Number(powerDetails?.amount) >
+                          Number(selectedData?.availableBalance)
+                        ) {
+                          Toast.show({
+                            type: 'error',
+                            position: 'top',
+                            topOffset: 50,
+                            text1: 'Bill Bayment',
+                            text2: 'Available balance exceeded!',
+                            visibilityTime: 5000,
+                            autoHide: true,
+                            onPress: () => Toast.hide(),
+                          });
+                          return;
+                        } else {
+                          navigation.navigate('AirtimeConfirm', {
+                            airtimeDetails: {
+                              fromWalletIdAccountNumber:
+                                powerDetails.fromWalletIdAccountNumber,
+                              number: powerDetails?.number,
+                              network: powerDetails?.network,
+                              meter: powerDetails?.meterNumber,
+                              amount: powerDetails?.amount,
+                              service: 'electricity purchase',
+                            },
+                          });
+                        }
+                      } else if (
+                        userMultiWalletData &&
+                        selectedData?.banker === '9 Payment Service Bank'
+                      ) {
+                        if (
+                          seerbitBalance == undefined ||
+                          seerbitBalance == null
+                        ) {
+                          Toast.show({
+                            type: 'error',
+                            position: 'top',
+                            topOffset: 50,
+                            text1: 'Bill Bayment',
+                            text2: 'Balance not available!',
+                            visibilityTime: 5000,
+                            autoHide: true,
+                            onPress: () => Toast.hide(),
+                          });
+                          return;
+                        } else if (
+                          Number(powerDetails?.amount) > Number(seerbitBalance)
+                        ) {
+                          Toast.show({
+                            type: 'error',
+                            position: 'top',
+                            topOffset: 50,
+                            text1: 'Bill Bayment',
+                            text2: 'Available balance exceeded!',
+                            visibilityTime: 5000,
+                            autoHide: true,
+                            onPress: () => Toast.hide(),
+                          });
+                          return;
+                        } else {
+                          navigation.navigate('AirtimeConfirm', {
+                            airtimeDetails: {
+                              fromWalletIdAccountNumber:
+                                powerDetails.fromWalletIdAccountNumber,
+                              number: powerDetails?.number,
+                              network: powerDetails?.network,
+                              meter: powerDetails?.meterNumber,
+                              amount: powerDetails?.amount,
+                              service: 'electricity purchase',
+                            },
+                          });
+                        }
                       } else {
                         navigation.navigate('AirtimeConfirm', {
                           airtimeDetails: {
+                            fromWalletIdAccountNumber:
+                              powerDetails.fromWalletIdAccountNumber,
                             number: powerDetails?.number,
                             network: powerDetails?.network,
                             meter: powerDetails?.meterNumber,
@@ -901,6 +1420,68 @@ const Overview = ({route}) => {
       <Fragment>
         <KeyboardAvoidingWrapper>
           <View style={{marginTop: 19}}>
+            <View style={{marginTop: 10}}>
+              <View style={{flexDirection: 'row', marginVertical: 5}}>
+                <Text style={styles.droplabel}>Select Account</Text>
+                <Text style={{color: 'red', marginRight: 10}}>*</Text>
+              </View>
+              <SelectList
+                setSelected={val => {
+                  try {
+                    const splitData = val && val?.length > 0 && val.split('-');
+                    const selectedAccount = splitData[0].trim();
+                    if (selectedAccount === 'Select Option') {
+                      Toast.show({
+                        type: 'warning',
+                        position: 'top',
+                        topOffset: 50,
+                        text1: 'Select Account',
+                        text2: 'You need to select an account!',
+                        visibilityTime: 3000,
+                        autoHide: true,
+                        onPress: () => Toast.hide(),
+                      });
+                    } else {
+                      selectedData = userMultiWalletData?.find(
+                        walletData =>
+                          walletData?.walletIdAccountNumber ===
+                          selectedAccount.toString(),
+                      );
+                      setCableDetails({
+                        ...cableDetails,
+                        fromWalletIdAccountNumber: selectedAccount.toString(),
+                      });
+                      if (selectedAccount[0] == '4') {
+                        unsubGetSeerbitWalletBalance();
+                      }
+                    }
+                  } catch (e) {}
+                }}
+                data={bankerListData}
+                save="value"
+                searchPlaceholder="Search for account"
+                search={false}
+                boxStyles={styles.inputContainer}
+                closeicon={<Icon name="times-circle" size={26} color="#000" />}
+                dropdownStyles={{
+                  paddingHorizontal: 10,
+                  marginTop: 2,
+                  backgroundColor: COLORS.lendaComponentBg,
+                  borderColor: COLORS.lendaComponentBorder,
+                  borderWidth: 1,
+                  borderRadius: 5,
+                }}
+                dropdownItemStyles={{
+                  paddingHorizontal: 8,
+                  paddingVertical: 10,
+                  backgroundColor: COLORS.lendaComponentBg,
+                  borderColor: COLORS.lendaComponentBorder,
+                  borderWidth: 1,
+                  borderRadius: 5,
+                  marginVertical: 3,
+                }}
+              />
+            </View>
             <Input
               label="Card Number"
               placeholder="Enter meter number"
@@ -957,10 +1538,22 @@ const Overview = ({route}) => {
                     defaultValue={cableDetails.amount.toString()}
                     isAirtime={true}
                     isBalance={
-                      userWalletData &&
-                      userWalletData?.availableBalance
-                        ?.toString()
-                        ?.replace(/\B(?=(\d{3})+\b)/g, ',')
+                      userMultiWalletData && selectedData?.banker === 'Providus'
+                        ? new Intl.NumberFormat('en-US', {
+                            style: 'decimal',
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          }).format(Number(selectedData?.availableBalance))
+                        : selectedData?.banker === '9 Payment Service Bank'
+                        ? new Intl.NumberFormat('en-US', {
+                            style: 'decimal',
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })
+                            .format(Number(seerbitBalance))
+                            ?.toString()
+                            ?.replace(/\B(?=(\d{3})+\b)/g, ',')
+                        : '0.00'
                     }
                     editable={false}
                     isNeeded={true}
@@ -997,23 +1590,115 @@ const Overview = ({route}) => {
                       });
                       return;
                     } else if (
-                      Number(cableDetails?.amount) >
-                      Number(userWalletData?.availableBalance)
+                      userMultiWalletData &&
+                      selectedData?.banker === 'Providus'
                     ) {
-                      Toast.show({
-                        type: 'error',
-                        position: 'top',
-                        topOffset: 50,
-                        text1: 'Bill Bayment',
-                        text2: 'Available balance exceeded!',
-                        visibilityTime: 5000,
-                        autoHide: true,
-                        onPress: () => Toast.hide(),
-                      });
-                      return;
+                      if (
+                        selectedData?.availableBalance == undefined ||
+                        selectedData?.availableBalance == null
+                      ) {
+                        Toast.show({
+                          type: 'error',
+                          position: 'top',
+                          topOffset: 50,
+                          text1: 'Bill Bayment',
+                          text2: 'Balance not available!',
+                          visibilityTime: 5000,
+                          autoHide: true,
+                          onPress: () => Toast.hide(),
+                        });
+                        return;
+                      } else if (
+                        Number(cableDetails?.amount) >
+                        Number(selectedData?.availableBalance)
+                      ) {
+                        Toast.show({
+                          type: 'error',
+                          position: 'top',
+                          topOffset: 50,
+                          text1: 'Bill Bayment',
+                          text2: 'Available balance exceeded!',
+                          visibilityTime: 5000,
+                          autoHide: true,
+                          onPress: () => Toast.hide(),
+                        });
+                        return;
+                      } else {
+                        navigation.navigate('AirtimeConfirm', {
+                          airtimeDetails: {
+                            fromWalletIdAccountNumber:
+                              cableDashboard.fromWalletIdAccountNumber,
+                            number: cableDetails?.number,
+                            network: cableDetails?.network,
+                            cardNumber: cableDetails?.cardNumber,
+                            amount: cableDetails?.amount,
+                            variationCode: cableDetails?.variationCode,
+                            status:
+                              Number(cableDetails?.amount) ==
+                              Number(detailsIUC?.subscription)
+                                ? 'renewal'
+                                : 'update',
+                            service: 'cable_tv purchase',
+                          },
+                        });
+                      }
+                    } else if (
+                      userMultiWalletData &&
+                      selectedData?.banker === '9 Payment Service Bank'
+                    ) {
+                      if (
+                        seerbitBalance == undefined ||
+                        seerbitBalance == null
+                      ) {
+                        Toast.show({
+                          type: 'error',
+                          position: 'top',
+                          topOffset: 50,
+                          text1: 'Bill Bayment',
+                          text2: 'Balance not available!',
+                          visibilityTime: 5000,
+                          autoHide: true,
+                          onPress: () => Toast.hide(),
+                        });
+                        return;
+                      } else if (
+                        Number(cableDetails?.amount) > Number(seerbitBalance)
+                      ) {
+                        Toast.show({
+                          type: 'error',
+                          position: 'top',
+                          topOffset: 50,
+                          text1: 'Bill Bayment',
+                          text2: 'Available balance exceeded!',
+                          visibilityTime: 5000,
+                          autoHide: true,
+                          onPress: () => Toast.hide(),
+                        });
+                        return;
+                      } else {
+                        navigation.navigate('AirtimeConfirm', {
+                          airtimeDetails: {
+                            fromWalletIdAccountNumber:
+                              cableDashboard.fromWalletIdAccountNumber,
+                            number: cableDetails?.number,
+                            network: cableDetails?.network,
+                            cardNumber: cableDetails?.cardNumber,
+                            amount: cableDetails?.amount,
+                            variationCode: cableDetails?.variationCode,
+                            status:
+                              Number(cableDetails?.amount) ==
+                              Number(detailsIUC?.subscription)
+                                ? 'renewal'
+                                : 'update',
+                            service: 'cable_tv purchase',
+                          },
+                        });
+                      }
                     } else {
                       navigation.navigate('AirtimeConfirm', {
                         airtimeDetails: {
+                          fromWalletIdAccountNumber:
+                            cableDashboard.fromWalletIdAccountNumber,
                           number: cableDetails?.number,
                           network: cableDetails?.network,
                           cardNumber: cableDetails?.cardNumber,
@@ -1154,5 +1839,24 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     marginBottom: 20,
     flex: 1,
+  },
+  inputContainer: {
+    height: 55,
+    alignItems: 'center',
+    backgroundColor: COLORS.light,
+    paddingHorizontal: 15,
+    width: '100%',
+    borderWidth: 0.5,
+    borderRadius: 8,
+    borderColor: COLORS.lendaComponentBorder,
+    padding: 12,
+    borderBottomWidth: 0.8,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 1.41,
   },
 });

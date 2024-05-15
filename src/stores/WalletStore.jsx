@@ -875,14 +875,14 @@ const getSeerbitNipBanks = async () => {
             headers,
           },
         );
-
+        console.log(response?.data, 'verifySeerbitNipAccount');
         DdLogs.info(
           `Wallet | Get All Seerbit bank list| ${auth()?.currentUser?.email}`,
           {
             context: JSON.stringify(response?.data),
           },
         );
-        if (response?.data?.name === 'Error') {
+        if (response?.data?.error) {
           return {
             title: 'Get All Seerbit bank list',
             error: true,
@@ -890,17 +890,10 @@ const getSeerbitNipBanks = async () => {
             message: error,
           };
         } else {
-          const bankList = [];
-          response.data.forEach(bank => {
-            bankList.push({
-              NIPCode: bank.bankcode,
-              bankName: bank.bankname,
-            });
-          });
           return {
             title: 'Get All Seerbit bank list',
             error: false,
-            data: bankList,
+            data: response.data?.data,
             message: 'success',
           };
         }
@@ -948,7 +941,7 @@ const verifySeerbitNipAccount = async (accountNumber, bankName) => {
             headers,
           },
         );
-
+        console.log(response?.data, 'verifySeerbitNipAccount');
         DdLogs.info(
           `Wallet | Verify Seerbit Wallet | ${auth()?.currentUser?.email}`,
           {
