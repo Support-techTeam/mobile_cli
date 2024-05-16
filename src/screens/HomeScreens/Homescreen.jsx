@@ -60,6 +60,7 @@ import {MakeTransferSection} from '../../component/homescreen/MakeTransferSectio
 import {Announcement} from '../../component/homescreen/Announcement';
 // import {AdvertBtn} from '../../component/homescreen/advert-Btn';
 
+let selectedData = '';
 const Homescreen = () => {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
@@ -267,6 +268,9 @@ const Homescreen = () => {
         if (res) {
           if (!res?.error) {
             dispatch(setMultipleWallets(res?.data?.wallet));
+            selectedData = res?.data?.wallet?.find(
+              walletData => walletData?.walletIdAccountNumber[0] === '4',
+            );
           }
         }
       })
@@ -277,33 +281,32 @@ const Homescreen = () => {
       });
   };
 
+  // Get seerbit balance
   const unsubGetSeerbitWalletBalance = async () => {
-    if (userMultiWalletData && userMultiWalletData?.length > 1) {
-      let pocketIdData = null;
-      if (
-        userMultiWalletData[0]?.pocketId !== null &&
-        userMultiWalletData[0]?.banker !== 'Providus'
-      ) {
-        pocketIdData = userMultiWalletData[0]?.pocketId;
-      } else if (
-        userMultiWalletData[1]?.pocketId !== null &&
-        userMultiWalletData[1]?.banker !== 'Providus'
-      ) {
-        pocketIdData = userMultiWalletData[1]?.pocketId;
+    try {
+      if (userMultiWalletData && userMultiWalletData?.length > 0) {
+        if (
+          selectedData?.pocketId !== null &&
+          selectedData?.pocketId !== undefined
+        ) {
+          setIsLoading(true);
+          getSeerbitWalletBalance(selectedData?.pocketId)
+            .then(res => {
+              if (res) {
+                if (!res?.error) {
+                  dispatch(setBalanceSB(res?.data));
+                }
+              }
+            })
+            .catch(e => {})
+            .finally(() => {
+              setIsLoading(false);
+            });
+        }
       }
-      getSeerbitWalletBalance(pocketIdData)
-        .then(res => {
-          if (res) {
-            if (!res?.error) {
-              // setSeerbitBalance(res?.data);
-              dispatch(setBalanceSB(res?.data));
-            }
-          }
-        })
-        .catch(e => {})
-        .finally(() => {});
-    }
+    } catch (e) {}
   };
+
 
   const unsubGetAllTransactions = async () => {
     setIsLoading(true);

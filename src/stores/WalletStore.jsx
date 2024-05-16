@@ -940,6 +940,7 @@ const verifySeerbitNipAccount = async (accountNumber, bankName) => {
             headers,
           },
         );
+        console.log('response', response?.data);
         DdLogs.info(
           `Wallet | Verify Seerbit Wallet | ${auth()?.currentUser?.email}`,
           {
@@ -948,9 +949,10 @@ const verifySeerbitNipAccount = async (accountNumber, bankName) => {
         );
         if (response?.data?.error) {
           return {
+            title: 'Verify Seerbit Wallet',
             error: true,
             data: null,
-            message: res.data?.message || 'Unable to verify account',
+            message: response?.data?.message || 'Unable to verify account',
           };
         }
         return {
