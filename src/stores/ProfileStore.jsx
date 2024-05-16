@@ -16,8 +16,8 @@ const axiosInstance = axios.create({baseURL: BASE_API_URL});
 const getState = async () => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     try {
       const response = await axiosInstance.get('/address/get-state');
@@ -36,7 +36,7 @@ const getState = async () => {
       return {
         error: true,
         data: null,
-        message: error,
+        message: error?.message,
       };
     }
   } else {
@@ -51,8 +51,8 @@ const getState = async () => {
 const getCity = async cityByState => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     try {
       const response = await axiosInstance.get(
@@ -73,7 +73,7 @@ const getCity = async cityByState => {
       return {
         error: true,
         data: null,
-        message: error,
+        message: error?.message,
       };
     }
   } else {
@@ -88,8 +88,8 @@ const getCity = async cityByState => {
 const getProfileDetails = async () => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     await getFirebaseAuthToken();
     if (token) {
@@ -124,7 +124,7 @@ const getProfileDetails = async () => {
         return {
           error: true,
           data: null,
-          message: error,
+          message: error?.message,
         };
       }
     }
@@ -137,11 +137,11 @@ const getProfileDetails = async () => {
   }
 };
 
-const createUserProfile = async details => {
+const createUserProfile = async (details, customNumber) => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     await getFirebaseAuthToken();
     if (token) {
@@ -150,12 +150,27 @@ const createUserProfile = async details => {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       };
+      details.phoneNumber = customNumber;
       try {
         const response = await axiosInstance.post(
           `/users/create-profile-web`,
           details,
           {headers},
         );
+
+        if (response?.data?.error) {
+          DdLogs.error(
+            `Profile | Create Profile | ${auth()?.currentUser?.email}`,
+            {
+              errorMessage: JSON.stringify(response?.data),
+            },
+          );
+          return {
+            error: true,
+            data: null,
+            message: response?.data?.message || 'Profile creation failed!',
+          };
+        }
         await AsyncStorage.setItem('hasProfile', 'true');
         DdLogs.info(
           `Profile | Create user Profile | ${auth()?.currentUser?.email}`,
@@ -180,7 +195,7 @@ const createUserProfile = async details => {
           title: 'Create Profile',
           error: true,
           data: null,
-          message: error,
+          message: error?.message,
         };
       }
     }
@@ -196,8 +211,8 @@ const createUserProfile = async details => {
 const checkPin = async () => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     await getFirebaseAuthToken();
     if (token) {
@@ -227,7 +242,7 @@ const checkPin = async () => {
           title: 'Check Pin ',
           error: true,
           data: null,
-          message: `Failed | ${error?.response?.data?.message}`,
+          message: `Failed | ${error?.message}`,
         };
       }
     }
@@ -243,8 +258,8 @@ const checkPin = async () => {
 const createTransactionPin = async details => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     await getFirebaseAuthToken();
     if (token) {
@@ -299,7 +314,7 @@ const createTransactionPin = async details => {
           title: 'Create Transaction Pin',
           error: true,
           data: null,
-          message: `Failed | ${error?.response?.data?.message}`,
+          message: `Failed | ${error?.message}`,
         };
       }
     }
@@ -315,8 +330,8 @@ const createTransactionPin = async details => {
 const changePin = async details => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     await getFirebaseAuthToken();
     if (token) {
@@ -370,7 +385,7 @@ const changePin = async details => {
           title: 'Change Transaction Pin',
           error: true,
           data: null,
-          message: `Failed | ${error?.response?.data?.message}`,
+          message: `Failed | ${error?.message}`,
         };
       }
     }
@@ -386,8 +401,8 @@ const changePin = async details => {
 const resetPin = async () => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     await getFirebaseAuthToken();
     if (token) {
@@ -431,7 +446,7 @@ const resetPin = async () => {
           title: 'Reset Pin',
           error: true,
           data: null,
-          message: `Failed | ${error?.response?.data?.message}`,
+          message: `Failed | ${error?.message}`,
         };
       }
     }
@@ -447,8 +462,8 @@ const resetPin = async () => {
 const bvnValidation = async data => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     await getFirebaseAuthToken();
     if (token) {
@@ -469,8 +484,10 @@ const bvnValidation = async data => {
           return {
             title: 'BVN Validation',
             error: true,
-            data: response?.data?.message,
-            message: response?.data?.message || 'Failed to validate BVN',
+            data: response?.data ? response?.data : null,
+            message: response?.data?.message
+              ? response?.data?.message
+              : 'Failed to validate BVN',
           };
         }
         return {
@@ -490,7 +507,74 @@ const bvnValidation = async data => {
           title: 'BVN Validation',
           error: true,
           data: null,
-          message: error || 'Failed to validate BVN',
+          message: error?.message ? error?.message : 'Failed to validate BVN',
+        };
+      }
+    }
+  } else {
+    return {
+      error: true,
+      data: null,
+      message: 'No Internet Connection',
+    };
+  }
+};
+
+const getAllAdverts = async () => {
+  if (
+    store.getState().networkState &&
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
+  ) {
+    await getFirebaseAuthToken();
+    if (token) {
+      headers = {
+        accept: 'application/json',
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      };
+      try {
+        const response = await axiosInstance.get(`/advert/get-open-advert`, {
+          headers,
+        });
+        if (response?.data?.error) {
+          DdLogs.error(
+            `Adverts | Get Open Adverts | ${auth()?.currentUser?.email}`,
+            {
+              errorMessage: JSON.stringify(response?.data),
+            },
+          );
+          return {
+            title: 'Get Open Adverts',
+            error: true,
+            data: null,
+            message: `Failed | ${response?.data?.error}`,
+          };
+        }
+        DdLogs.info(
+          `Adverts | Get Open Adverts | ${auth()?.currentUser?.email}`,
+          {
+            context: JSON.stringify(response?.data),
+          },
+        );
+        return {
+          title: 'Get Open Adverts',
+          error: false,
+          data: response?.data?.data,
+          message: 'success',
+        };
+      } catch (error) {
+        DdLogs.error(
+          `Adverts | Get Open Adverts | ${auth()?.currentUser?.email}`,
+          {
+            errorMessage: JSON.stringify(error),
+          },
+        );
+        return {
+          title: 'Get Open Adverts',
+          error: true,
+          data: null,
+          message: `Failed | ${error?.message}`,
         };
       }
     }
@@ -527,4 +611,5 @@ export {
   changePin,
   bvnValidation,
   resetPin,
+  getAllAdverts,
 };

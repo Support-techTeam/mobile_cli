@@ -6,8 +6,6 @@ import {
   ScrollView,
 } from 'react-native';
 import React from 'react';
-import {AntDesign} from '@expo/vector-icons';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useNavigation} from '@react-navigation/native';
 
 import Buttons from '../../component/buttons/Buttons';
@@ -40,16 +38,25 @@ const Summary = ({route}) => {
         showsVerticalScrollIndicator={false}
         style={{paddingHorizontal: 16}}>
         <View style={{padding: 16}}>
+          {bankDetails?.fromWalletIdAccountNumber !== '' && (
+            <View style={styles.detailsView}>
+              <Text style={styles.desc}>From Wallet Number</Text>
+              <Text style={styles.amount}>
+                {bankDetails?.fromWalletIdAccountNumber}
+              </Text>
+            </View>
+          )}
+
           {bankDetails?.receiverAccountNumber === '' ? (
             <View style={styles.detailsView}>
-              <Text style={styles.desc}>Wallet Number</Text>
+              <Text style={styles.desc}>To Wallet Number</Text>
               <Text style={styles.amount}>
                 {bankDetails?.toWalletIdAccountNumber}
               </Text>
             </View>
           ) : (
             <View style={styles.detailsView}>
-              <Text style={styles.desc}>Account Number</Text>
+              <Text style={styles.desc}>To Account Number</Text>
               <Text style={styles.amount}>
                 {bankDetails?.receiverAccountNumber}
               </Text>
@@ -76,18 +83,24 @@ const Summary = ({route}) => {
           <View style={styles.detailsView}>
             <Text style={styles.desc}>Amount</Text>
             <Text style={styles.amount}>
-              {bankDetails?.amount && new Intl.NumberFormat('en-NG', {
-                style: 'currency',
-                currency: 'NGN',
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              }).format(bankDetails?.amount)}
+              {bankDetails?.amount &&
+                new Intl.NumberFormat('en-NG', {
+                  style: 'currency',
+                  currency: 'NGN',
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                }).format(bankDetails?.amount)}
             </Text>
           </View>
 
           <View style={styles.detailsView}>
             <Text style={styles.desc}>Transaction Fee</Text>
-            <Text style={styles.amount}>₦0.00</Text>
+            <Text style={styles.amount}>
+              {bankDetails?.fromWalletIdAccountNumber &&
+              bankDetails?.fromWalletIdAccountNumber[0] == '4'
+                ? '₦25.00'
+                : '₦0.00'}
+            </Text>
           </View>
 
           <View style={styles.detailsView}>
@@ -101,13 +114,22 @@ const Summary = ({route}) => {
           <View style={[styles.detailsView, {marginTop: 40}]}>
             <Text style={styles.desc}>Total</Text>
             <Text style={[styles.amount, {color: '#054B99'}]}>
-              
-              {bankDetails?.amount && new Intl.NumberFormat('en-NG', {
-                style: 'currency',
-                currency: 'NGN',
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              }).format(bankDetails?.amount)}
+              {bankDetails?.fromWalletIdAccountNumber &&
+              bankDetails?.fromWalletIdAccountNumber[0] == '4'
+                ? bankDetails?.amount &&
+                  new Intl.NumberFormat('en-NG', {
+                    style: 'currency',
+                    currency: 'NGN',
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  }).format(Number(bankDetails?.amount) + 25)
+                : bankDetails?.amount &&
+                  new Intl.NumberFormat('en-NG', {
+                    style: 'currency',
+                    currency: 'NGN',
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  }).format(Number(bankDetails?.amount))}
             </Text>
           </View>
           <View style={styles.demark} />

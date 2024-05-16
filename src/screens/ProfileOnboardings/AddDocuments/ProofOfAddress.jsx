@@ -5,7 +5,7 @@ import {useNavigation, useRoute} from '@react-navigation/native';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 import {TabView, SceneMap, TabBar} from 'react-native-tab-view';
 import ProofofAdd from '../../../component/Idtypes/ProofOfAddress';
-import { Header } from '../../../component/header/Header';
+import {Header} from '../../../component/header/Header';
 import COLORS from '../../../constants/colors';
 
 const ITEM_HEIGHT = 100;
@@ -28,7 +28,7 @@ const ProofOfAddress = () => {
   // const docsDetails = route?.params?.paramKey;
   const route = useRoute();
   const {params} = route;
-  const {paramKey} = params;
+  const {paramKey, origin} = params;
 
   const activeTab = 'ProofOfAddress';
   const [index, setIndex] = useState(0);
@@ -98,8 +98,7 @@ const ProofOfAddress = () => {
         paddingLeft: insets.left !== 0 ? Math.min(insets.left, 10) : 'auto',
         paddingRight: insets.right !== 0 ? Math.min(insets.right, 10) : 'auto',
       }}>
-
-       <Header
+      <Header
         routeAction={() => navigation.goBack()}
         heading={'DOCUMENT UPLOAD'}
         disable={false}
@@ -169,6 +168,7 @@ const ProofOfAddress = () => {
           onPress={() =>
             navigation.navigate('PersonalPhoto', {
               paramKey: {...paramKey},
+              origin: origin,
             })
           }>
           <View style={[styles.tobTab, {backgroundColor: '#054B99'}]}>
@@ -216,7 +216,6 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     letterSpacing: 0.4,
     textAlign: 'center',
-    
   },
   container: {
     flex: 1,
@@ -248,5 +247,5 @@ const styles = StyleSheet.create({
   camHead: {
     fontSize: 14,
     fontWeight: '400',
-  }
+  },
 });

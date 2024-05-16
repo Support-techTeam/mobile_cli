@@ -41,7 +41,8 @@ const CustomSearchableDropdown = ({
   }, [searchQuery, beneficiariesData]);
 
   const handleItemSelect = item => {
-    setBankDetails({
+    setBankDetails(prevData => ({
+      ...prevData,
       receiverAccountFirstName: '',
       receiverAccountLastName: '',
       receiverBankName: transferType == 'Nip' ? item?.bankName : '',
@@ -52,8 +53,8 @@ const CustomSearchableDropdown = ({
       toWalletIdAccountNumber:
         transferType === 'InternalTransfer' ? item?.accountNumber : '',
       beneficiaryAccountName: '',
-      beneficiaryBankName: 'Providus',
-    });
+      beneficiaryBankName: '',
+    }));
     setSearchQuery(item?.accountNumber); // Optionally reset the search query
   };
 
@@ -74,7 +75,8 @@ const CustomSearchableDropdown = ({
           maxLength={10}
           onChangeText={text => {
             setSearchQuery(text);
-            setBankDetails({
+            setBankDetails(prevData => ({
+              ...prevData,
               receiverAccountFirstName: '',
               receiverAccountLastName: '',
               receiverBankName: '',
@@ -85,8 +87,8 @@ const CustomSearchableDropdown = ({
               toWalletIdAccountNumber:
                 transferType === 'InternalTransfer' ? text : '',
               beneficiaryAccountName: '',
-              beneficiaryBankName: 'Providus',
-            });
+              beneficiaryBankName: '',
+            }));
           }}
           value={searchQuery}
           keyboardType="numeric"
@@ -95,7 +97,8 @@ const CustomSearchableDropdown = ({
           <TouchableOpacity
             onPress={() => {
               setSearchQuery('');
-              setBankDetails({
+              setBankDetails(prevData => ({
+                ...prevData,
                 receiverAccountFirstName: '',
                 receiverAccountLastName: '',
                 receiverBankName: '',
@@ -105,8 +108,8 @@ const CustomSearchableDropdown = ({
                 saveBeneficiary: false,
                 toWalletIdAccountNumber: '',
                 beneficiaryAccountName: '',
-                beneficiaryBankName: 'Providus',
-              });
+                beneficiaryBankName: '',
+              }));
             }}
             style={customStyles.clearIcon}>
             <Icon name="times-circle" size={26} color="#000" />

@@ -17,8 +17,8 @@ const axiosInstance = axios.create({baseURL: BASE_API_URL});
 const getAllLoans = async () => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     await getFirebaseAuthToken();
     if (token) {
@@ -66,8 +66,8 @@ const getAllLoans = async () => {
 const getApprovedLoans = async () => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     await getFirebaseAuthToken();
     if (token) {
@@ -118,8 +118,8 @@ const getApprovedLoans = async () => {
 const getPaidLoans = async () => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     await getFirebaseAuthToken();
     if (token) {
@@ -164,8 +164,8 @@ const getPaidLoans = async () => {
 const getPendingLoans = async () => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     await getFirebaseAuthToken();
     if (token) {
@@ -178,9 +178,12 @@ const getPendingLoans = async () => {
         const response = await axiosInstance.get(`/loans/pending-loans/list`, {
           headers,
         });
-        DdLogs.info(`Loans | Get Pending Loans | ${auth()?.currentUser?.email}`, {
-          context: JSON.stringify(response?.data),
-        });
+        DdLogs.info(
+          `Loans | Get Pending Loans | ${auth()?.currentUser?.email}`,
+          {
+            context: JSON.stringify(response?.data),
+          },
+        );
         return {
           title: 'Get Pending Loans',
           error: false,
@@ -214,8 +217,8 @@ const getPendingLoans = async () => {
 const getLoansAmount = async () => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     await getFirebaseAuthToken();
     if (token) {
@@ -231,9 +234,12 @@ const getLoansAmount = async () => {
             headers,
           },
         );
-        DdLogs.info(`Loans | Get Loans Amount | ${auth()?.currentUser?.email}`, {
-          context: JSON.stringify(response?.data),
-        });
+        DdLogs.info(
+          `Loans | Get Loans Amount | ${auth()?.currentUser?.email}`,
+          {
+            context: JSON.stringify(response?.data),
+          },
+        );
         return {
           title: 'Get Loans Amount',
           error: false,
@@ -241,9 +247,12 @@ const getLoansAmount = async () => {
           message: 'success',
         };
       } catch (error) {
-        DdLogs.error(`Loans | Get Loans Amount | ${auth()?.currentUser?.email}`, {
-          errorMessage: JSON.stringify(error),
-        });
+        DdLogs.error(
+          `Loans | Get Loans Amount | ${auth()?.currentUser?.email}`,
+          {
+            errorMessage: JSON.stringify(error),
+          },
+        );
         return {
           title: 'Get Loans Amount',
           error: true,
@@ -264,8 +273,8 @@ const getLoansAmount = async () => {
 const getDuration = async () => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     await getFirebaseAuthToken();
     if (token) {
@@ -317,8 +326,8 @@ const getDuration = async () => {
 const getLoanUserDetails = async () => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     await getFirebaseAuthToken();
     if (token) {
@@ -370,8 +379,8 @@ const getLoanUserDetails = async () => {
 const getLoanById = async id => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     await getFirebaseAuthToken();
     if (token) {
@@ -394,11 +403,70 @@ const getLoanById = async id => {
           message: 'success',
         };
       } catch (error) {
-        DdLogs.error(`Loans | Get Single Loan | ${auth()?.currentUser?.email}`, {
-          errorMessage: JSON.stringify(error),
-        });
+        DdLogs.error(
+          `Loans | Get Single Loan | ${auth()?.currentUser?.email}`,
+          {
+            errorMessage: JSON.stringify(error),
+          },
+        );
         return {
           title: 'Get Single Loan ',
+          error: true,
+          data: null,
+          message: 'Failed to retrieve loan data!',
+        };
+      }
+    }
+  } else {
+    return {
+      error: true,
+      data: null,
+      message: 'No Internet Connection',
+    };
+  }
+};
+
+const getLoanScheduleById = async id => {
+  if (
+    store.getState().networkState &&
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
+  ) {
+    await getFirebaseAuthToken();
+    if (token) {
+      headers = {
+        accept: 'application/json',
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      };
+      try {
+        const response = await axiosInstance.get(
+          `/loans/get-loan-repayments/${id}`,
+          {
+            headers,
+          },
+        );
+        DdLogs.info(
+          `Loans | Get Single Loan Schedule | ${auth()?.currentUser?.email}`,
+          {
+            context: JSON.stringify(response?.data),
+          },
+        );
+        return {
+          title: 'Get Single Loan Schedule',
+          error: false,
+          data: response?.data,
+          message: 'success',
+        };
+      } catch (error) {
+        DdLogs.error(
+          `Loans | Get Single Loan Schedule | ${auth()?.currentUser?.email}`,
+          {
+            errorMessage: JSON.stringify(error),
+          },
+        );
+        return {
+          title: 'Get Single Loan Schedule',
           error: true,
           data: null,
           message: 'Failed to retrieve loan data!',
@@ -417,8 +485,8 @@ const getLoanById = async id => {
 const getLoanDetails = async (amount, tenor) => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     await getFirebaseAuthToken();
     if (token) {
@@ -434,9 +502,12 @@ const getLoanDetails = async (amount, tenor) => {
             headers,
           },
         );
-        DdLogs.info(`Loans | Get Loan Details | ${auth()?.currentUser?.email}`, {
-          context: JSON.stringify(response?.data),
-        });
+        DdLogs.info(
+          `Loans | Get Loan Details | ${auth()?.currentUser?.email}`,
+          {
+            context: JSON.stringify(response?.data),
+          },
+        );
         return {
           title: 'Get Loan Details ',
           error: false,
@@ -444,9 +515,12 @@ const getLoanDetails = async (amount, tenor) => {
           message: 'success',
         };
       } catch (error) {
-        DdLogs.error(`Loans | Get Loan Details | ${auth()?.currentUser?.email}`, {
-          errorMessage: JSON.stringify(error),
-        });
+        DdLogs.error(
+          `Loans | Get Loan Details | ${auth()?.currentUser?.email}`,
+          {
+            errorMessage: JSON.stringify(error),
+          },
+        );
         return {
           title: 'Get Loan Details ',
           error: true,
@@ -467,8 +541,8 @@ const getLoanDetails = async (amount, tenor) => {
 const createLoan = async details => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     await getFirebaseAuthToken();
     if (token) {
@@ -485,14 +559,26 @@ const createLoan = async details => {
             headers,
           },
         );
+        if (response?.data?.error) {
+          DdLogs.error(`Loans | Create Loan | ${auth()?.currentUser?.email}`, {
+            errorMessage: JSON.stringify(response?.data),
+          });
+          return {
+            title: 'Create Loan',
+            error: true,
+            data: null,
+            message: response?.data?.message,
+          };
+        }
+
         DdLogs.info(`Loans | Create Loan | ${auth()?.currentUser?.email}`, {
           context: JSON.stringify(response?.data),
         });
         return {
           title: 'Create Loan ',
           error: false,
-          data: response?.data,
-          message: "Loan request successful. You'll be redirected shortly!,",
+          data: response?.data?.data,
+          message: response?.data?.message,
         };
       } catch (error) {
         DdLogs.error(`Loans | Create Loan | ${auth()?.currentUser?.email}`, {
@@ -518,8 +604,8 @@ const createLoan = async details => {
 const createUserProfile = async details => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     await getFirebaseAuthToken();
     if (token) {
@@ -570,8 +656,8 @@ const createUserProfile = async details => {
 const createBusinessDetails = async details => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     await getFirebaseAuthToken();
     if (token) {
@@ -628,8 +714,8 @@ const createBusinessDetails = async details => {
 const createNextOfKin = async details => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     await getFirebaseAuthToken();
     if (token) {
@@ -686,8 +772,8 @@ const createNextOfKin = async details => {
 const createBankDetails = async details => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     await getFirebaseAuthToken();
     if (token) {
@@ -744,8 +830,8 @@ const createBankDetails = async details => {
 const createDocumentsDetails = async details => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     await getFirebaseAuthToken();
     if (token) {
@@ -801,8 +887,8 @@ const createDocumentsDetails = async details => {
 const createUploadDocument = async (details, documentName) => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     await getFirebaseAuthToken();
     if (token) {
@@ -877,8 +963,8 @@ const createUploadDocument = async (details, documentName) => {
 const updatePersonalDetails = async details => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     await getFirebaseAuthToken();
     if (token) {
@@ -929,8 +1015,8 @@ const updatePersonalDetails = async details => {
 const updateBusinessDetails = async details => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     await getFirebaseAuthToken();
     if (token) {
@@ -990,8 +1076,8 @@ const updateBusinessDetails = async details => {
 const updateNokDetails = async details => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     await getFirebaseAuthToken();
     if (token) {
@@ -1051,8 +1137,8 @@ const updateNokDetails = async details => {
 const updateBankDetails = async details => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     await getFirebaseAuthToken();
     if (token) {
@@ -1112,8 +1198,8 @@ const updateBankDetails = async details => {
 const updateDocumentsDetails = async details => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     await getFirebaseAuthToken();
     if (token) {
@@ -1170,8 +1256,8 @@ const updateDocumentsDetails = async details => {
 const createArmDetails = async details => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     await getFirebaseAuthToken();
     if (token) {
@@ -1225,6 +1311,75 @@ const createArmDetails = async details => {
   }
 };
 
+const repayLoan = async loanrepaymentId => {
+  if (
+    store.getState().networkState &&
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
+  ) {
+    await getFirebaseAuthToken();
+    if (token) {
+      headers = {
+        accept: 'application/json',
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      };
+      try {
+        const payload = {
+          loanRepaymentId: loanrepaymentId,
+        };
+        const response = await axiosInstance.post(
+          `/loans/self-loan-repayment`,
+          payload,
+          {
+            headers,
+          },
+        );
+        if (response?.data?.error) {
+          DdLogs.error(
+            `Loans | Pay Back Loan | ${auth()?.currentUser?.email}`,
+            {
+              errorMessage: JSON.stringify(response?.data),
+            },
+          );
+          return {
+            title: 'Pay Back Loan',
+            error: true,
+            data: null,
+            message: response?.data?.message,
+          };
+        }
+
+        DdLogs.info(`Loans | Pay Back Loan | ${auth()?.currentUser?.email}`, {
+          context: JSON.stringify(response?.data),
+        });
+        return {
+          title: 'Pay Back Loan',
+          error: false,
+          data: response?.data,
+          message: response?.data?.message,
+        };
+      } catch (error) {
+        DdLogs.error(`Loans | Pay Back Loan| ${auth()?.currentUser?.email}`, {
+          errorMessage: JSON.stringify(error),
+        });
+        return {
+          title: 'Pay Back Loan',
+          error: true,
+          data: null,
+          message: 'Loan Pay Back failed',
+        };
+      }
+    }
+  } else {
+    return {
+      error: true,
+      data: null,
+      message: 'No Internet Connection',
+    };
+  }
+};
+
 const getFirebaseAuthToken = async () => {
   try {
     const user = auth().currentUser;
@@ -1263,4 +1418,6 @@ export {
   updateBankDetails,
   updateDocumentsDetails,
   createArmDetails,
+  getLoanScheduleById,
+  repayLoan,
 };

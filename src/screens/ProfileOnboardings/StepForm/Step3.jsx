@@ -38,6 +38,9 @@ import CustomButton from '../../../component/buttons/CustomButtons';
 import {SelectList} from 'react-native-dropdown-select-list';
 import COLORS from '../../../constants/colors';
 import Loader from '../../../component/loader/loader';
+import {getAsyncData} from '../../../context/AsyncContext';
+import CustomInputPhone from '../../../component/inputField/input-phone.component';
+import {Location} from '../../../constants/location';
 const countryList = require('country-list');
 
 const titleData = [
@@ -118,7 +121,9 @@ let currentState = [
   {value: '', label: '...Select State'},
   {value: 'Outside Nigeria', label: 'Outside Nigeria', key: 0},
 ];
+let defaultNumber = '';
 const Step3 = props => {
+  const phoneInputRef = useRef(null);
   const insets = useSafeAreaInsets();
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
@@ -126,11 +131,13 @@ const Step3 = props => {
   const user = useSelector(state => state.userAuth.user);
   const dispatch = useDispatch();
   const [userDetails, setUserDetails] = useState({
-    title: '',
     email: user != undefined || user != null ? JSON.parse(user)?.email : '',
+    signedOnDevice: Platform.OS,
+    title: '',
     firstName: '',
     lastName: '',
     phoneNumber: '',
+    gender: '',
     bvn: '',
     nin: '',
     dob: '',
@@ -139,15 +146,12 @@ const Step3 = props => {
     state: '',
     city: '',
     maritalStatus: '',
-    eduLevel: '',
-    gender: '',
-    residentialStatus: '',
-    yearYouMovedToCurrentAddress: '',
     NoOfDependents: 0,
-    referredByCode: undefined,
+    wdymtta: '',
+    eduLevel: '',
+    referredByCode: '',
     referredByOption: '',
-    referredByAnswer: undefined,
-    signedOnDevice: '',
+    referredByAnswer: '',
     bvnData: '',
     accountType: 'Personal',
   });
@@ -159,11 +163,25 @@ const Step3 = props => {
   const [verifiedUser, setVerifiedUser] = useState();
   const [bvnData, setBvnData] = useState();
   const navigation = useNavigation();
+  const countries =
+    countryList?.getData() &&
+    countryList?.getData()?.map(country => ({
+      value: country.name,
+      label: country.name,
+    }));
 
-  const countries = countryList.getData().map(country => ({
-    value: country.name,
-    label: country.name,
-  }));
+  const [selectedCountry, setSelectedCountry] = useState();
+
+  function handleInputValue(phoneNumber) {
+    setUserDetails(prevData => ({
+      ...prevData,
+      phoneNumber: phoneNumber.replace(/^0+|\s+/g, ''),
+    }));
+  }
+
+  function handleSelectedCountry(country) {
+    setSelectedCountry(country);
+  }
 
   useLayoutEffect(() => {
     setTotalSteps(props.getTotalSteps());
@@ -181,7 +199,6 @@ const Step3 = props => {
       firstName: retrieveState()?.firstName?.split(' ')[0],
       gender: retrieveState()?.gender,
       lastName: retrieveState()?.lastname,
-      phoneNumber: Number(retrieveState()?.phoneNumber).toString(),
     });
   }, [retrieveState()]);
 
@@ -208,11 +225,17 @@ const Step3 = props => {
     saveState(null);
     finish();
   };
+
   useLayoutEffect(() => {
     if (preDetails && preDetails?.firstName && preDetails?.lastName) {
       setUserDetails({...preDetails});
     }
   }, [preDetails, retrieveState()]);
+
+  const retrieveMobileNumber = async () => {
+    const retrieve = await getAsyncData({storage_name: 'signup'});
+    defaultNumber = retrieve?.data?.countryCode + retrieve?.data?.phoneNumber;
+  };
 
   useLayoutEffect(() => {
     setUserDetails(prevData => ({
@@ -276,6 +299,8 @@ const Step3 = props => {
 
       bvnData: bvnData != undefined || bvnData != null ? bvnData : '',
     }));
+
+    retrieveMobileNumber();
   }, [user, verifiedUser, bvnData]);
 
   useLayoutEffect(() => {
@@ -292,85 +317,85 @@ const Step3 = props => {
   const validate = () => {
     let isValid = true;
 
-    if (!userDetails.email) {
+    if (!userDetails?.email) {
       handleError('Please input email', 'email');
       isValid = false;
-    } else if (!userDetails.email.match(/\S+@\S+\.\S+/)) {
+    } else if (!userDetails?.email.match(/\S+@\S+\.\S+/)) {
       handleError('Please input a valid email', 'email');
       isValid = false;
     }
 
-    if (!userDetails.firstName) {
+    if (!userDetails?.firstName) {
       handleError('Please input firstname', 'firstName');
       isValid = false;
     }
 
-    if (!userDetails.lastName) {
+    if (!userDetails?.lastName) {
       handleError('Please input lastname', 'lastName');
       isValid = false;
     }
 
-    if (!userDetails.title) {
+    if (!userDetails?.title) {
       handleError('Please input title', 'title');
       isValid = false;
     }
 
-    if (!userDetails.phoneNumber) {
+    if (!userDetails?.phoneNumber) {
       handleError('Please input phone number', 'phoneNumber');
       isValid = false;
     }
 
-    if (!userDetails.bvn) {
+    if (!userDetails?.bvn) {
       handleError('Please input bvn', 'bvn');
       isValid = false;
     }
 
-    if (!userDetails.nin) {
+    if (!userDetails?.nin) {
       handleError('Please input nin', 'nin');
       isValid = false;
     }
-    if (!userDetails.dob) {
+    if (!userDetails?.dob) {
       handleError('Please input dob', 'dob');
       isValid = false;
     }
-    if (!userDetails.address) {
+    if (!userDetails?.address) {
       handleError('Please input address', 'address');
       isValid = false;
     }
-    if (!userDetails.country) {
+    if (!userDetails?.country) {
       handleError('Please input country', 'country');
       isValid = false;
     }
-    if (!userDetails.state) {
+    if (!userDetails?.state) {
       handleError('Please input state', 'state');
       isValid = false;
     }
 
-    if (!userDetails.city) {
+    if (!userDetails?.city) {
       handleError('Please input city', 'city');
       isValid = false;
     }
 
-    if (!userDetails.maritalStatus) {
+    if (!userDetails?.maritalStatus) {
       handleError('Please input marital status', 'maritalStatus');
       isValid = false;
     }
-    if (!userDetails.eduLevel) {
+    if (!userDetails?.eduLevel) {
       handleError('Please input educational level', 'eduLevel');
       isValid = false;
     }
 
-    if (!userDetails.gender) {
+    if (!userDetails?.gender) {
       handleError('Please input gender', 'gender');
       isValid = false;
     }
 
-    if (!userDetails.residentialStatus) {
+    if (!userDetails?.residentialStatus) {
       handleError('Please input residential status', 'residentialStatus');
       isValid = false;
     }
 
-    if (!userDetails.yearYouMovedToCurrentAddress) {
+    if (!userDetails?.yearYouMovedToCurrentAddress) {
       handleError(
         'Please input year you moved to current address',
         'yearYouMovedToCurrentAddress',
@@ -378,11 +403,11 @@ const Step3 = props => {
       isValid = false;
     }
 
-    // if (!userDetails.NoOfDependents) {
+    // if (!userDetails?.NoOfDependents) {
     //   handleError('Please input No of dependents', 'NoOfDependents');
     //   isValid = false;
     // }
-    if (!userDetails.referredByOption) {
+    if (!userDetails?.referredByOption) {
       handleError('Please input referred by option', 'referredByOption');
       isValid = false;
     }
@@ -396,27 +421,24 @@ const Step3 = props => {
     setErrors(prevState => ({...prevState, [input]: error}));
   };
 
-  const disableit =
-    !userDetails.phoneNumber ||
-    !userDetails.address ||
-    !userDetails.title ||
-    !userDetails.bvn ||
-    !userDetails.city ||
-    !userDetails.state ||
-    !userDetails.nin;
+  const disableit = false;
 
   const handleCreateUser = async () => {
+    const customNumber =
+      selectedCountry.callingCode +
+      userDetails?.phoneNumber.replace(/^0+|\s+/g, '');
+
     if (userDetails?.accountType === 'Personal') {
       try {
         setIsLoading(true);
-        const res = await createUserProfile(userDetails);
-        if (res?.data?.error) {
+        const res = await createUserProfile(userDetails, customNumber);
+        if (res?.error) {
           Toast.show({
             type: 'error',
             position: 'top',
             topOffset: 50,
-            text1: res?.data?.title,
-            text2: res?.data?.message,
+            text1: res?.title,
+            text2: res?.message,
             visibilityTime: 5000,
             autoHide: true,
             onPress: () => Toast.hide(),
@@ -426,8 +448,8 @@ const Step3 = props => {
             type: 'success',
             position: 'top',
             topOffset: 50,
-            text1: res?.data?.title,
-            text2: res?.data?.message,
+            text1: res?.title,
+            text2: res?.message,
             visibilityTime: 3000,
             autoHide: true,
             onPress: () => Toast.hide(),
@@ -443,31 +465,24 @@ const Step3 = props => {
     } else {
       saveState({
         profileData: userDetails,
+        customNumber: customNumber,
         routeType: 'onboarding',
       });
       nextStep();
     }
   };
 
+  // new local state Logic
   useLayoutEffect(() => {
     const fetchState = async () => {
-      try {
-        const res = await getState();
-        if (res?.data !== undefined) {
-          res?.data &&
-            res?.data?.length > 0 &&
-            res?.data.map((item, index) => {
-              currentState.push({
-                value: item,
-                label: item,
-                key: index + 1,
-              });
-            });
-        }
-        dispatch(setReduxState(res?.data));
-      } catch (error) {}
+      Location?.map((item, index) => {
+        currentState.push({
+          value: item.state,
+          label: item.state,
+          key: index + 1,
+        });
+      });
     };
-
     fetchState();
     return () => {
       fetchState();
@@ -565,7 +580,7 @@ const Step3 = props => {
                       maxHeight={300}
                       labelField="label"
                       valueField="value"
-                      value={userDetails.title}
+                      value={userDetails?.title}
                       onChange={option => {
                         setUserDetails({...userDetails, title: option.value});
                       }}
@@ -617,17 +632,17 @@ const Step3 = props => {
                     defaultValue={user && JSON.parse(user)?.email}
                   />
 
-                  <InputPhone
-                    label="Phone number"
-                    onFocus={() => handleError(null, 'phoneNumber')}
-                    layout="first"
+                  <CustomInputPhone
+                    label={'Phone number'}
                     isNeeded={true}
-                    defaultCode="NG"
-                    error={errors.phoneNumber}
-                    codeTextStyle={{color: '#6E7191'}}
-                    onChangeFormattedText={text => {
-                      setUserDetails({...userDetails, phoneNumber: text});
-                    }}
+                    defaultValue={defaultNumber}
+                    value={userDetails?.phoneNumber}
+                    onChangePhoneNumber={handleInputValue}
+                    selectedCountry={selectedCountry}
+                    onChangeSelectedCountry={handleSelectedCountry}
+                    defaultCountry="NG"
+                    placeholder="Phone number"
+                    language="en"
                   />
 
                   <View style={{marginVertical: 10}}>
@@ -688,7 +703,7 @@ const Step3 = props => {
 
                   <Input
                     label="Address"
-                    defaultValue={userDetails.address}
+                    defaultValue={userDetails?.address}
                     onChangeText={text =>
                       setUserDetails({...userDetails, address: text})
                     }
@@ -764,11 +779,11 @@ const Step3 = props => {
                         maxHeight={300}
                         labelField="label"
                         valueField="value"
-                        value={userDetails.state}
+                        value={userDetails?.state}
                         defaultValue={userDetails?.state && userDetails?.state}
                         onChange={option => {
                           if (
-                            userDetails.country === 'Nigeria' &&
+                            userDetails?.country === 'Nigeria' &&
                             option.value === 'Outside Nigeria'
                           ) {
                             setUserDetails({
@@ -795,19 +810,26 @@ const Step3 = props => {
                             });
 
                             //Get cities by state
-                            getCity(option.value)
-                              .then(res => {
-                                res?.data &&
-                                  res?.data?.length > 0 &&
-                                  res?.data.map((item, index) => {
-                                    fetchedCity.push({
-                                      value: item,
-                                      label: item,
-                                      key: index,
-                                    });
-                                  });
-                              })
-                              .catch(err => {});
+                            const lgaData = Location?.find(
+                              item => item.state === option.value,
+                            );
+                            if (lgaData) {
+                              fetchedCity = [
+                                {value: '', label: '...Select LGA'},
+                                {
+                                  value: 'Outside Nigeria',
+                                  label: 'Outside Nigeria',
+                                  key: 0,
+                                },
+                              ];
+                              lgaData?.lgas.map((item, index) => {
+                                fetchedCity.push({
+                                  value: item,
+                                  label: item,
+                                  key: index + 1,
+                                });
+                              });
+                            }
                           }
                         }}
                         error={errors.state}
@@ -827,15 +849,15 @@ const Step3 = props => {
                         placeholderStyle={styles.placeholderStyle}
                         selectedTextStyle={styles.selectedTextStyle}
                         data={fetchedCity.length > 0 ? fetchedCity : cityData}
-                        disabled={!userDetails.state}
+                        disabled={!userDetails?.state}
                         maxHeight={300}
                         labelField="label"
                         valueField="value"
-                        value={userDetails.city}
+                        value={userDetails?.city}
                         defaultValue={userDetails?.city && userDetails?.city}
                         onChange={option => {
                           if (
-                            userDetails.country === 'Nigeria' &&
+                            userDetails?.country === 'Nigeria' &&
                             option.value === 'Outside Nigeria'
                           ) {
                             setUserDetails({
@@ -878,7 +900,7 @@ const Step3 = props => {
                       maxHeight={300}
                       labelField="label"
                       valueField="value"
-                      value={userDetails.residentialStatus}
+                      value={userDetails?.residentialStatus}
                       onChange={option => {
                         setUserDetails({
                           ...userDetails,
@@ -902,7 +924,7 @@ const Step3 = props => {
                       maxHeight={300}
                       labelField="label"
                       valueField="value"
-                      value={userDetails.yearYouMovedToCurrentAddress}
+                      value={userDetails?.yearYouMovedToCurrentAddress}
                       onChange={option => {
                         setUserDetails({
                           ...userDetails,
@@ -924,7 +946,7 @@ const Step3 = props => {
                       maxHeight={300}
                       labelField="label"
                       valueField="value"
-                      value={userDetails.maritalStatus}
+                      value={userDetails?.maritalStatus}
                       onChange={option => {
                         setUserDetails({
                           ...userDetails,
@@ -947,7 +969,7 @@ const Step3 = props => {
                       maxHeight={300}
                       labelField="label"
                       valueField="value"
-                      value={userDetails.eduLevel}
+                      value={userDetails?.eduLevel}
                       onChange={option => {
                         setUserDetails({
                           ...userDetails,
@@ -963,7 +985,10 @@ const Step3 = props => {
                     onChangeText={text =>
                       setUserDetails({
                         ...userDetails,
-                        NoOfDependents: parseInt(text, 10),
+                        NoOfDependents:
+                          text != undefined || text != null
+                            ? Number(text)
+                            : text,
                       })
                     }
                     defaultValue={userDetails?.NoOfDependents?.toString()}
@@ -985,7 +1010,7 @@ const Step3 = props => {
                       maxHeight={300}
                       labelField="label"
                       valueField="value"
-                      value={userDetails.referredByOption}
+                      value={userDetails?.referredByOption}
                       onChange={option => {
                         setUserDetails({
                           ...userDetails,
@@ -996,8 +1021,8 @@ const Step3 = props => {
                     />
                   </View>
 
-                  {userDetails.referredByOption &&
-                  userDetails.referredByOption === 'By Referral' ? (
+                  {userDetails?.referredByOption &&
+                  userDetails?.referredByOption === 'By Referral' ? (
                     <Input
                       label="Referral Code (i.e XZRHNC)"
                       defaultValue={userDetails?.referredByCode}
@@ -1238,6 +1263,43 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderColor: COLORS.lendaComponentBorder,
     padding: 12,
+    borderBottomWidth: 0.8,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 1.41,
+  },
+  labelPhone: {
+    marginVertical: 5,
+    fontSize: 14,
+    color: COLORS.labelColor,
+  },
+  inputContainerPhone: {
+    height: 53,
+    backgroundColor: COLORS.light,
+    paddingVertical: 15,
+    width: '100%',
+    borderTopWidth: 0,
+    borderBottomWidth: 0,
+    borderLeftWidth: 0,
+    borderRightWidth: 0,
+    borderRadius: 8,
+    borderTopLeftRadius: 0,
+    borderBottomLeftRadius: 0,
+    borderColor: COLORS.lendaBlue,
+  },
+  mainContainerPhone: {
+    height: 55,
+    alignItems: 'center',
+    backgroundColor: COLORS.light,
+    paddingHorizontal: 5,
+    width: '100%',
+    borderWidth: 0.5,
+    borderRadius: 8,
+    borderColor: COLORS.lendaComponentBorder,
     borderBottomWidth: 0.8,
     shadowColor: '#000',
     shadowOffset: {

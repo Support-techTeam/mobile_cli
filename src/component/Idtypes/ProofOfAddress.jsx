@@ -3,24 +3,18 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  // Modal,
   Image,
   TouchableOpacity,
   Alert,
-  PermissionsAndroid,
   ActivityIndicator,
 } from 'react-native';
 import React, {useCallback, useContext, useEffect, useState} from 'react';
-// import ImagePicker from 'react-native-image-picker';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
-import AntDesign from 'react-native-vector-icons/AntDesign';
-import Feather from 'react-native-vector-icons/Feather';
 import Entypo from 'react-native-vector-icons/Entypo';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import {getStatusBarHeight} from 'react-native-status-bar-height';
 import Buttons from '../buttons/Buttons';
 import {useNavigation, useRoute} from '@react-navigation/native';
-// you may also import just the functions or constants that you will use from this library
 import {request, PERMISSIONS, openSettings} from 'react-native-permissions';
 import {
   getLoanUserDetails,
@@ -29,22 +23,14 @@ import {
   updateDocumentsDetails,
 } from '../../stores/LoanStore';
 import Toast from 'react-native-toast-message';
-import Spinner from 'react-native-loading-spinner-overlay/lib';
 import {uploadProgress} from '../../stores/LoanStore';
 import {DdLogs} from '@datadog/mobile-react-native';
-import Loader from '../loader/loader';
 import COLORS from '../../constants/colors';
 import {Button, Modal} from 'native-base';
 import {heightPercentageToDP} from 'react-native-responsive-screen';
 
 const statusBarHeight = getStatusBarHeight();
 
-// let fileUrl = '';
-// let fileName = '';
-// let fileType = '';
-// let setDocument('';
-// let setNextScreen('';
-// let newUrl = '';
 const ProofofAdd = ({
   isCam,
   isProof,
@@ -71,10 +57,8 @@ const ProofofAdd = ({
   const [newUrl, setNewUrl] = useState('');
   const [nextScreen, setNextScreen] = useState('');
 
-  // const [filePath, setFilePath] = useState({});
-  // const [documentName, setDocumentName] = useState('');
   const {params} = route;
-  const {paramKey} = params;
+  const {paramKey, origin} = params;
 
   const [userDocs, setUserDocs] = useState({
     validIdentificationType: '',
@@ -156,7 +140,6 @@ const ProofofAdd = ({
   }, [orgDetails, navigation]);
 
   useEffect(() => {
-    // if (route.name !== '') {
     const unsubscribe = navigation.addListener('focus', async () => {
       unSubBusinessDetails();
       setFileUrl('');
@@ -166,7 +149,6 @@ const ProofofAdd = ({
       setNextScreen('');
     });
     return unsubscribe;
-    // }
   }, [navigation]);
 
   useEffect(() => {
@@ -956,11 +938,6 @@ const ProofofAdd = ({
     setShowConfirmModal(false);
   };
 
-  const noPhoto = () => {
-    setImage(null);
-    setShowConfirmModal(false);
-  };
-
   //Instant Update
 
   let formDetails = {
@@ -1025,6 +1002,7 @@ const ProofofAdd = ({
             ...paramKey,
             [document]: newUrl,
           },
+          origin: origin,
         });
       }, 500);
 
@@ -1069,6 +1047,7 @@ const ProofofAdd = ({
           paramKey: {
             ...formDetails,
           },
+          origin: origin,
         });
       }, 500);
 
@@ -1342,9 +1321,10 @@ const ProofofAdd = ({
             {isProof && !isCam && (
               <>
                 <Text style={styles.textHead}>
-                  Take a clear picture or upload a proof of address (utility
-                  bill) It must carry the address you entered. Date on utility
-                  bill must not be more than 3month before registration
+                  File format: JPG, JPEG, PNG,PDF | Max File Size 3mb. Take a
+                  clear picture or upload a proof of address (utility bill) It
+                  must carry the address you entered. Date on utility bill must
+                  not be more than 3 month before registration
                 </Text>
                 <View style={styles.reqField}>
                   {docsName.utilityBill || userDocs.utilityBill ? (
@@ -1426,9 +1406,10 @@ const ProofofAdd = ({
             {isProof && isCam && (
               <>
                 <Text style={styles.textHead}>
-                  Take a clear picture or upload a proof of address (utility
-                  bill) It must carry the address you entered. Date on utility
-                  bill must not be more than 3month before registration
+                  File format: JPG, JPEG, PNG,PDF | Max File Size 3mb. Take a
+                  clear picture or upload a proof of address (utility bill) It
+                  must carry the address you entered. Date on utility bill must
+                  not be more than 3month before registration
                 </Text>
                 <View style={styles.reqField}>
                   {fileUrl !== '' ? (
@@ -1477,7 +1458,8 @@ const ProofofAdd = ({
             {isSeal && !isCam && (
               <>
                 <Text style={styles.textHead}>
-                  Take a clear picture or upload your company seal
+                  File format: JPG, JPEG, PNG,PDF | Max File Size 3mb. Take a
+                  clear picture or upload your company seal
                 </Text>
                 <Text style={[styles.textHead, {color: '#054B99'}]}>
                   See samples
@@ -1564,9 +1546,10 @@ const ProofofAdd = ({
             {isSeal && isCam && (
               <>
                 <Text style={styles.textHead}>
-                  Take a clear picture or upload a proof of address (utility
-                  bill) It must carry the address you entered. Date on utility
-                  bill must not be more than 3month before registration
+                  File format: JPG, JPEG, PNG,PDF | Max File Size 3mb. Take a
+                  clear picture or upload a proof of address (utility bill) It
+                  must carry the address you entered. Date on utility bill must
+                  not be more than 3month before registration
                 </Text>
                 <View style={styles.reqField}>
                   {fileUrl !== '' ? (
@@ -1613,7 +1596,8 @@ const ProofofAdd = ({
             {isCac && !isCam && (
               <>
                 <Text style={styles.textHead}>
-                  Take a clear picture or upload your CAC
+                  File format: JPG, JPEG, PNG,PDF | Max File Size 3mb. Take a
+                  clear picture or upload your CAC
                 </Text>
                 <Text style={[styles.textHead, {color: '#054B99'}]}>
                   See samples
@@ -1700,9 +1684,10 @@ const ProofofAdd = ({
             {isCac && isCam && (
               <>
                 <Text style={styles.textHead}>
-                  Take a clear picture or upload a proof of address (utility
-                  bill) It must carry the address you entered. Date on utility
-                  bill must not be more than 3month before registration
+                  File format: JPG, JPEG, PNG,PDF | Max File Size 3mb. Take a
+                  clear picture or upload a proof of address (utility bill) It
+                  must carry the address you entered. Date on utility bill must
+                  not be more than 3month before registration
                 </Text>
                 <View style={styles.reqField}>
                   {fileUrl !== '' ? (
@@ -1749,8 +1734,8 @@ const ProofofAdd = ({
             {isBank && !isCam && (
               <>
                 <Text style={styles.textHead}>
-                  Take a clear picture or upload your a copy of your bank
-                  statement{' '}
+                  File format: JPG, JPEG, PNG,PDF | Max File Size 3mb. Take a
+                  clear picture or upload your a copy of your bank statement{' '}
                 </Text>
                 <Text style={[styles.textHead, {color: '#054B99'}]}>
                   See samples
@@ -1839,9 +1824,10 @@ const ProofofAdd = ({
             {isBank && isCam && (
               <>
                 <Text style={styles.textHead}>
-                  Take a clear picture or upload a proof of address (utility
-                  bill) It must carry the address you entered. Date on utility
-                  bill must not be more than 3month before registration
+                  File format: JPG, JPEG, PNG,PDF | Max File Size 3mb. Take a
+                  clear picture or upload a proof of address (utility bill) It
+                  must carry the address you entered. Date on utility bill must
+                  not be more than 3month before registration
                 </Text>
                 <View style={styles.reqField}>
                   {fileUrl !== '' ? (
@@ -1894,7 +1880,7 @@ const ProofofAdd = ({
                   See samples
                 </Text>
                 <Text style={styles.textHead}>
-                  Passport size not more than 3MB
+                  File format: JPG, JPEG, PNG,PDF | Max File Size 3mb.
                 </Text>
                 <View style={styles.reqField}>
                   {docsName.passport || userDocs.passport ? (
@@ -1978,9 +1964,10 @@ const ProofofAdd = ({
             {isPass && isCam && (
               <>
                 <Text style={styles.textHead}>
-                  Take a clear picture or upload a proof of address (utility
-                  bill) It must carry the address you entered. Date on utility
-                  bill must not be more than 3month before registration
+                  File format: JPG, JPEG, PNG,PDF | Max File Size 3mb. Take a
+                  clear picture or upload a proof of address (utility bill) It
+                  must carry the address you entered. Date on utility bill must
+                  not be more than 3month before registration
                 </Text>
                 <View style={styles.reqField}>
                   {fileUrl !== '' ? (
@@ -2027,7 +2014,8 @@ const ProofofAdd = ({
             {isSign ? (
               <>
                 <Text style={styles.textHead}>
-                  Draw, take a clear picture or upload your signature{' '}
+                  File format: JPG, JPEG, PNG,PDF | Max File Size 3mb. Draw,
+                  take a clear picture or upload your signature{' '}
                 </Text>
                 <Text style={[styles.textHead, {color: '#054B99'}]}>
                   See samples
@@ -2119,7 +2107,7 @@ const ProofofAdd = ({
                   See samples
                 </Text>
                 <Text style={styles.textHead}>
-                  Personal Photo size not more than 3MB
+                  File format: JPG, JPEG, PNG,PDF | Max File Size 3mb.
                 </Text>
                 <View style={styles.reqField}>
                   {docsName.personalPhoto || userDocs.personalPhoto ? (
@@ -2203,7 +2191,8 @@ const ProofofAdd = ({
             {isPer && isCam && (
               <>
                 <Text style={styles.textHead}>
-                  Take a clear picture or upload a Personal Photo
+                  File format: JPG, JPEG, PNG,PDF | Max File Size 3mb. Take a
+                  clear picture or upload a Personal Photo
                 </Text>
                 <View style={styles.reqField}>
                   {fileUrl !== '' ? (
@@ -2257,7 +2246,7 @@ const ProofofAdd = ({
                   See samples
                 </Text>
                 <Text style={styles.textHead}>
-                  Id Card size not more than 3MB
+                  File format: JPG, JPEG, PNG,PDF | Max File Size 3mb.
                 </Text>
                 <View style={styles.reqField}>
                   {docsName.identityCard || userDocs.identityCard ? (
@@ -2342,7 +2331,8 @@ const ProofofAdd = ({
             {isId && isCam && (
               <>
                 <Text style={styles.textHead}>
-                  Take a clear picture or upload an Id Card
+                  File format: JPG, JPEG, PNG,PDF | Max File Size 3mb. Take a
+                  clear picture or upload an Id Card
                 </Text>
                 <View style={styles.reqField}>
                   {fileUrl !== '' ? (

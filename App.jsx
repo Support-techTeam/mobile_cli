@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useEffect, useState, useRef, useLayoutEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   Platform,
   StatusBar,
@@ -7,13 +7,8 @@ import {
   View,
   AppState,
   LogBox,
-  useColorScheme,
   PermissionsAndroid,
-  DeviceEventEmitter,
-  NativeAppEventEmitter,
-  NativeModules,
-  Button,
-  Alert,
+  Text,
 } from 'react-native';
 import SpInAppUpdates, {IAUUpdateKind} from 'sp-react-native-in-app-updates';
 import {version} from './app.json';
@@ -39,9 +34,7 @@ import {userLogOut} from './src/stores/AuthStore';
 import {TextColorProvider} from './src/component/TextColorContext';
 import InitializeSDKHandler from './src/component/appFlyer/InitializeSDKHandler';
 import DeviceInfo from 'react-native-device-info';
-import RemotePushController from './src/component/push-notifications/RemotePushController';
-import messaging, {firebase} from '@react-native-firebase/messaging';
-import CustomNotification from './src/component/push-notifications/CustomNotification';
+import messaging from '@react-native-firebase/messaging';
 import auth from '@react-native-firebase/auth';
 import {
   request,
@@ -52,7 +45,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {DataProvider} from './src/context/DataProvider';
 import {Settings} from 'react-native-fbsdk-next';
 import notifee from '@notifee/react-native';
-import BackgroundFetch from 'react-native-background-fetch';
+import {CopilotProvider} from 'react-native-copilot';
+import {NotificationProvider} from './src/context/NotificationContext';
 
 const inAppUpdates = new SpInAppUpdates(false);
 LogBox.ignoreAllLogs();
@@ -78,18 +72,11 @@ datadogConfiguration.nativeCrashReportEnabled = true;
 datadogConfiguration.sampleRate = 80;
 const TRANSITIONS = ['fade', 'slide', 'none'];
 
-const TIMEOUT_DURATION = 120000;
-
 const requestUserPermission = async () => {
+  await notifee.requestPermission();
   if (Platform.OS === 'ios') {
     try {
-      const {status, settings} = await requestNotifications([
-        'alert',
-        'sound',
-        'badge',
-      ]);
-      // console.log("Notification permissions status:", status);
-      // console.log("Notification settings:", settings);
+      await requestNotifications(['alert', 'sound', 'badge']);
     } catch (error) {}
     const authStatus = await messaging().requestPermission({
       sound: true,
@@ -124,16 +111,12 @@ const requestUserPermission = async () => {
 const requestNotificationPermission = async () => {
   if (Platform.OS === 'ios') {
     await request(PERMISSIONS.IOS.NOTIFICATIONS);
+  } else if (Platform.OS === 'android') {
+    await request(PERMISSIONS.ANDROID.NOTIFICATIONS);
   }
 };
 
 function App() {
-  const [hidden, setHidden] = useState(false);
-  const [statusBarTransition, setStatusBarTransition] = useState(
-    TRANSITIONS[0],
-  );
-  const [notification, setNotification] = useState(null);
-  // const {BackgroundFetch} = NativeModules;
   //Facebook SDK integration
   useEffect(() => {
     Settings.setAppID('225305113437958');
@@ -156,7 +139,7 @@ function App() {
               buttonCancelText: 'Cancel',
             },
             android: {
-              updateType: IAUUpdateKind.FLEXIBLE,
+              updateType: IAUUpdateKind.IMMEDIATE,
             },
           });
           inAppUpdates.startUpdate(updateOptions);
@@ -171,7 +154,7 @@ function App() {
       inAppUpdates.removeStatusUpdateListener(onStatusUpdate);
     };
   }, [onStatusUpdate]);
-
+  //update download
   const onStatusUpdate = status => {
     const {bytesDownloaded, totalBytesToDownload} = status;
     Toast.show({
@@ -196,6 +179,7 @@ function App() {
   };
 
   // App State Monitor
+  // logout action
   const logout = async () => {
     if (auth().currentUser) {
       try {
@@ -209,56 +193,9 @@ function App() {
     }
   };
 
-  // App state check
-  // useEffect(() => {
-  //   const handleAppStateChange = async nextAppState => {
-  //     if (nextAppState === 'background') {
-  //       // console.log('App is in background || inactive', nextAppState);
-  //       // setIsLoading(true);
-  //       // Save current time in AsyncStorage when app goes to background
-  //       await AsyncStorage.setItem(
-  //         'backgroundTime',
-  //         new Date().getTime().toString(),
-  //       );
-  //     } else if (nextAppState === 'active') {
-  //       // console.log('App is active', nextAppState);
-  //       // Check time difference when app returns to active state
-  //       const backgroundTime = await AsyncStorage.getItem('backgroundTime');
-  //       if (backgroundTime) {
-  //         const currentTime = new Date().getTime();
-  //         const timeDifference = currentTime - parseInt(backgroundTime);
-
-  //         if (timeDifference > TIMEOUT_DURATION) {
-  //           // Lock the user if more than 120,000 seconds have passed
-  //           await AsyncStorage.removeItem('backgroundTime');
-  //           // console.log('App is Logged Out');
-  //           await logout();
-  //           // Perform user lock actions
-  //         } else {
-  //           // Clear stored time if less than 120,000 seconds have passed
-  //           await AsyncStorage.removeItem('backgroundTime');
-  //         }
-  //       }
-  //     }
-  //   };
-  //   // Subscribe to app state changes
-
-  //   const appStateSubscription = AppState.addEventListener(
-  //     'change',
-  //     handleAppStateChange,
-  //   );
-
-  //   return () => {
-  //     // Remove the app state change listener when the component unmounts
-  //     try {
-  //       appStateSubscription.remove();
-  //     } catch (e) {}
-  //   };
-  // }, []);
-
   useEffect(() => {
     const handleAppState = async nextAppState => {
-      console.log('nextAppState', nextAppState);
+      // console.log('nextAppState', nextAppState);
       handleAppStateChange(nextAppState);
     };
 
@@ -274,6 +211,7 @@ function App() {
     };
   }, []);
 
+  //app state change monitoring method
   const handleAppStateChange = async nextAppState => {
     if (nextAppState === 'background') {
       // Save current time in AsyncStorage when app goes to background
@@ -309,70 +247,18 @@ function App() {
     getDeviceInfo();
   }, []);
 
-  // push notification
+  // push notification token
   useEffect(() => {
     messaging()
       .getToken()
       .then(fid => {
-        console.log('FCM message:', Platform.OS);
-        console.log('Firebase Installation ID:', fid);
+        // console.log('FCM message:', Platform.OS);
+        // console.log('Firebase Installation ID:', fid);
       })
       .catch(error => {
         // console.error('Error getting Firebase Installation ID:', error);
       });
-
-    const unsubscribe = messaging().onMessage(async remoteMessage => {
-      onMessageReceived(remoteMessage);
-      // console.log('Listening');
-      // console.log(remoteMessage.notification);
-      const {title, body, android} = remoteMessage.notification;
-      const {clickAction, smallIcon, imageUrl, redirectUrl} = android;
-      // console.log('Img', imageUrl);
-      // console.log('And', android);
-      setNotification({title, body, android});
-    });
-
-    return unsubscribe;
   }, []);
-
-  // push notification
-  useEffect(() => {
-    const onMessageReceived = async remoteMessage => {
-      console.log('Background/Quit Notification:', remoteMessage);
-      // Handle background/quit notifications
-      const {title, body, android} = remoteMessage.notification;
-      const {clickAction, smallIcon, imageUrl, redirectUrl} = android;
-      // console.log('Img', imageUrl);
-      // console.log('And', android);
-      setNotification({title, body, android});
-    };
-
-    const unsubscribeForeground = messaging().onMessage(onMessageReceived);
-
-    const handleAppStateChange = nextAppState => {
-      if (Platform.OS === 'ios' && nextAppState === 'active') {
-        unsubscribeBackground && unsubscribeBackground();
-        unsubscribeBackground =
-          messaging().setBackgroundMessageHandler(onMessageReceived);
-      }
-    };
-
-    let unsubscribeBackground;
-
-    const appListener = AppState.addEventListener(
-      'change',
-      handleAppStateChange,
-    );
-
-    return () => {
-      unsubscribeForeground();
-      appListener.remove();
-    };
-  }, []);
-
-  const handleNotificationPress = () => {
-    setNotification(null);
-  };
 
   const getDeviceInfo = async () => {
     try {
@@ -418,11 +304,6 @@ function App() {
     }
   };
 
-  function onMessageReceived(message) {
-    console.log('message', message);
-    notifee.displayNotification(JSON.parse(message.data.notifee));
-  }
-
   return (
     <SafeAreaProvider style={styles.rootContainer}>
       <PaperProvider theme={theme}>
@@ -432,8 +313,8 @@ function App() {
               animated={true}
               backgroundColor={COLORS.lendaBlue}
               barStyle={'default'}
-              showHideTransition={statusBarTransition}
-              hidden={hidden}
+              showHideTransition={TRANSITIONS[0]}
+              hidden={false}
             />
 
             <View style={styles.container}>
@@ -441,17 +322,27 @@ function App() {
                 <DataProvider>
                   <PersistGate persistor={persistor} loading={null}>
                     <TextColorProvider>
-                      <InitializeSDKHandler />
-                      <CustomNotification
-                        isVisible={!!notification}
-                        title={notification?.title}
-                        body={notification?.body}
-                        imageUrl={notification?.android?.imageUrl}
-                        redirectUrl={notification?.android?.redirectUrl}
-                        onPress={handleNotificationPress}
-                      />
-                      <NetworkStatus />
-                      <AppNavigationContainer />
+                      <NotificationProvider>
+                        <CopilotProvider
+                          stopOnOutsideClick={false}
+                          androidStatusBarVisible={false}
+                          animated={false}
+                          overlay="svg"
+                          verticalOffset={36}
+                          margin={10}
+                          backdropColor="rgba(50, 50, 100, 0.6)"
+                          tooltipStyle={{
+                            backgroundColor: COLORS.lendaComponentBg,
+                            borderColor: COLORS.lendaComponentBorder,
+                            borderWidth: 0.8,
+                            borderRadius: 10,
+                            margin: 15,
+                          }}>
+                          <InitializeSDKHandler />
+                          <NetworkStatus />
+                          <AppNavigationContainer />
+                        </CopilotProvider>
+                      </NotificationProvider>
                     </TextColorProvider>
                   </PersistGate>
                 </DataProvider>

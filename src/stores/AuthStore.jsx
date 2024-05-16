@@ -9,13 +9,12 @@ import {storeSensitiveData} from './SecurityStore';
 const axiosInstance = axios.create({baseURL: BASE_API_URL});
 let token = null;
 let headers;
-let confirm = null;
 
 const userLogin = async (email, password) => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     try {
       const userCredential = await auth().signInWithEmailAndPassword(
@@ -64,8 +63,8 @@ const userLogin = async (email, password) => {
 const userLogOut = async () => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     await auth()
       .signOut()
@@ -97,8 +96,8 @@ const userLogOut = async () => {
 const userSignUp = async details => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     try {
       const userCredential = await auth().createUserWithEmailAndPassword(
@@ -109,7 +108,7 @@ const userSignUp = async details => {
       const newUser = userCredential.user;
 
       const formatPhoneNumber =
-        details.countryCode + Number(details.phoneNumber).toString();
+        details.countryCode + details.phoneNumber;
 
       if (newUser) {
         await updatePhoneNumber(formatPhoneNumber, newUser?.uid);
@@ -164,8 +163,8 @@ const userSignUp = async details => {
 const resendVerificationEmail = async () => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     try {
       auth().currentUser.sendEmailVerification();
@@ -384,8 +383,8 @@ const resendOTP = async data => {
 const forgotPassword = async email => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     try {
       const actionCodeSettings = {

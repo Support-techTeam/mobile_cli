@@ -24,14 +24,9 @@ import {
   useBlurOnFulfill,
   useClearByFocusCell,
 } from 'react-native-confirmation-code-field';
-import styles, {
-  ACTIVE_CELL_BG_COLOR,
-  CELL_BORDER_RADIUS,
-  CELL_SIZE,
-  DEFAULT_CELL_BG_COLOR,
-  NOT_EMPTY_CELL_BG_COLOR,
-} from '../../../styles';
+import styles from '../../../styles';
 import Loader from '../../component/loader/loader';
+import {getAsyncData} from '../../context/AsyncContext';
 
 const {Value, Text: AnimatedText} = Animated;
 
@@ -54,7 +49,8 @@ const animateCell = ({hasValue, index, isFocused}) => {
   ]).start();
 };
 
-const Verification = () => {
+const Verification = ({navigation}) => {
+  // const navigationRef = useNavigationContainerRef();
   const dispatch = useDispatch();
   const user = useSelector(state => state.userAuth.user);
   const insets = useSafeAreaInsets();
@@ -118,10 +114,13 @@ const Verification = () => {
     setIsLoading(true);
     const userData = auth().currentUser;
     await userData?.reload();
+    const retrieve = await getAsyncData({storage_name: 'signup'});
     const payLoad = {
       email: userData?.email,
       firstName: userData?.displayName?.split(' ')[0],
-      phoneNumber: userData?.phoneNumber || '+2340000000000',
+      phoneNumber:
+        retrieve?.data?.countryCode + retrieve?.data?.phoneNumber ||
+        '+2340000000000',
       uuid: userData?.uid,
     };
 
@@ -183,13 +182,18 @@ const Verification = () => {
             autoHide: true,
             onPress: () => Toast.hide(),
           });
+
+          await auth().currentUser?.reload();
+          const user = auth().currentUser;
+          dispatch(signUpUser(JSON.stringify(user)));
+          isVerified = user?.emailVerified;
+
+          setTimeout(() => {
+            navigation.navigate('BottomTabs');
+          }, 3000);
         }
 
         setIsSending(false);
-        await auth().currentUser?.reload();
-        const user = auth().currentUser;
-        dispatch(signUpUser(JSON.stringify(user)));
-        isVerified = user?.emailVerified;
       })
       .catch(e => {
         setIsSending(false);
@@ -244,48 +248,94 @@ const Verification = () => {
               renderCell={renderCell}
             />
           </View>
+
           <View style={internalStyles.message}>
             <Text style={internalStyles.messageText}>
               Please enter the verification code{'\n'}
-              we send to your email address oe phone number
+              sent to your email address or phone number
             </Text>
           </View>
-          <View style={internalStyles.demark} />
+          <View
+            style={[
+              internalStyles.demark,
+              {justifyContent: 'center', alignItems: 'center'},
+            ]}
+          />
 
-          <TouchableOpacity
-            style={internalStyles.signUp}
-            onPress={handleResendVerificationEmail}>
-            {false ? (
-              <View style={internalStyles.signUpactivity}>
-                <ActivityIndicator size="large" color="#fff" />
-              </View>
-            ) : (
-              <Text
-                style={{
-                  fontWeight: '500',
-                  color: '#fff',
-                }}>
-                Resend verification code
-              </Text>
-            )}
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={internalStyles.signOut}
-            onPress={handleSignOut}>
-            {false ? (
-              <View style={internalStyles.signUpactivity}>
-                <ActivityIndicator size="large" color="#fff" />
-              </View>
-            ) : (
-              <Text
-                style={{
-                  fontWeight: '500',
-                  color: COLORS.white,
-                }}>
-                SignOut
-              </Text>
-            )}
-          </TouchableOpacity>
+          <View
+            style={{
+              marginHorizontal: 0,
+              marginBottom: 6,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+            <TouchableOpacity
+              style={internalStyles.inverseSignUp}
+              onPress={handleVerificationData}>
+              {isSending ? (
+                <View style={internalStyles.signUpactivity}>
+                  <ActivityIndicator size="large" color={COLORS.lendaBlue} />
+                </View>
+              ) : (
+                <Text
+                  style={{
+                    fontWeight: '500',
+                    color: COLORS.lendaBlue,
+                  }}>
+                  Check verification status
+                </Text>
+              )}
+            </TouchableOpacity>
+          </View>
+          <View
+            style={{
+              marginHorizontal: 0,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+            <TouchableOpacity
+              style={internalStyles.signUp}
+              onPress={handleResendVerificationEmail}>
+              {false ? (
+                <View style={internalStyles.signUpactivity}>
+                  <ActivityIndicator size="large" color="#fff" />
+                </View>
+              ) : (
+                <Text
+                  style={{
+                    fontWeight: '500',
+                    color: '#fff',
+                  }}>
+                  Resend verification code
+                </Text>
+              )}
+            </TouchableOpacity>
+          </View>
+
+          <View
+            style={{
+              marginHorizontal: 0,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+            <TouchableOpacity
+              style={internalStyles.signOut}
+              onPress={handleSignOut}>
+              {false ? (
+                <View style={internalStyles.signUpactivity}>
+                  <ActivityIndicator size="large" color="#fff" />
+                </View>
+              ) : (
+                <Text
+                  style={{
+                    fontWeight: '500',
+                    color: COLORS.white,
+                  }}>
+                  SignOut
+                </Text>
+              )}
+            </TouchableOpacity>
+          </View>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -335,7 +385,6 @@ const internalStyles = StyleSheet.create({
     textAlign: 'center',
   },
   demark: {
-    width: '97%',
     height: 2,
     borderRadius: 1,
     backgroundColor: '#D9DBE9',
@@ -366,7 +415,18 @@ const internalStyles = StyleSheet.create({
     backgroundColor: COLORS.lendaBlue,
     width: '95%',
     height: 48,
-    borderRadius: 12,
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  inverseSignUp: {
+    marginTop: 5,
+    backgroundColor: COLORS.white,
+    borderColor: COLORS.lendaBlue,
+    borderWidth: 1,
+    width: '95%',
+    height: 45,
+    borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -375,7 +435,7 @@ const internalStyles = StyleSheet.create({
     backgroundColor: COLORS.red,
     width: '95%',
     height: 48,
-    borderRadius: 12,
+    borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
   },

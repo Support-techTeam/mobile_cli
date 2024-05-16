@@ -8,18 +8,30 @@ const InputPhone = ({
   iconName,
   error,
   isNeeded,
+  placeholder,
   onFocus = () => {},
   ...props
 }) => {
   const [isFocused, setIsFocused] = React.useState(false);
+  const phoneInput = React.useRef(null);
   return (
     <View style={{marginBottom: 20}}>
       <View style={{flexDirection: 'row'}}>
-        <Text style={style.label}>{label}</Text>
+        <Text style={style.label}>{label} </Text>
+        <Text
+          style={{
+            color: 'red',
+            marginVertical: 7,
+            fontSize: 12,
+            color: COLORS.lendaBlue,
+          }}>
+          (without country code or '0' prefix)
+        </Text>
         {isNeeded && <Text style={{color: 'red', marginRight: 10}}>*</Text>}
       </View>
       <View>
         <PhoneInput
+          ref={phoneInput}
           textContainerStyle={style.inputContainer}
           containerStyle={[
             style.mainContainer,
@@ -38,6 +50,7 @@ const InputPhone = ({
           onBlur={() => setIsFocused(false)}
           isNeeded={true}
           placeholderTextColor={COLORS.Secondary}
+          placeholder="e.g '8123********'"
           {...props}
         />
       </View>

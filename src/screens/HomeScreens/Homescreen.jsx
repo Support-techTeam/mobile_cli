@@ -1,7 +1,6 @@
 import {
   StyleSheet,
   ScrollView,
-  NativeModules,
   RefreshControl,
   ActivityIndicator,
 } from 'react-native';
@@ -14,13 +13,17 @@ import {useSelector, useDispatch} from 'react-redux';
 import Toast from 'react-native-toast-message';
 import {
   setAccount,
+  setBalanceSB,
+  setMultipleWallets,
+  setProvidusBanks,
+  setSeerbitbanks,
   setWallet,
 } from '../../util/redux/userProfile/user.profile.slice';
 import PersonalDetails from '../ProfileOnboardings/PersonalDetails';
 import Splashscreen from '../../navigation/Splashscreen';
-import {useRoute, useIsFocused} from '@react-navigation/native';
+import {useRoute} from '@react-navigation/native';
 import {getLoanUserDetails, getLoansAmount} from '../../stores/LoanStore';
-import {checkPin} from '../../stores/ProfileStore';
+import {checkPin, getAllAdverts} from '../../stores/ProfileStore';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -38,6 +41,11 @@ import {
   getTransactionsStatement,
   getAccountWallet,
   getAccountTransactions,
+  getAllWallet,
+  getSeerbitWalletBalance,
+  getSecondWallet,
+  getAllBankDetails,
+  getSeerbitNipBanks,
 } from '../../stores/WalletStore';
 import {IntroSection} from '../../component/homescreen/Intro-Section';
 import {SlideSection} from '../../component/homescreen/Slide-Section';
@@ -49,7 +57,10 @@ import {WalletStatementModal} from '../../component/modals/WalletStatementModal'
 import {UpdateProfileBtn} from '../../component/homescreen/Update-Profile-Btn';
 import {FundWalletSection} from '../../component/homescreen/FundWallet-Section';
 import {MakeTransferSection} from '../../component/homescreen/MakeTransferSection';
+import {Announcement} from '../../component/homescreen/Announcement';
+// import {AdvertBtn} from '../../component/homescreen/advert-Btn';
 
+let selectedData = '';
 const Homescreen = () => {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
@@ -57,25 +68,22 @@ const Homescreen = () => {
   const [isFundWalletVisible, setIsFundWalletVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isSending, setIsSending] = useState(false);
-  const [isLoadingWallet, setIsLoadingWallet] = useState(false);
-  const [isLoadingTransaction, setIsLoadingTransaction] = useState(false);
-  const [isLoadingLoanData, setIsLoadingLoanData] = useState(false);
-  const [isLoadingLenda, setIsLoadingLenda] = useState(false);
-  const [isLoadingArm, setIsLoadingArm] = useState(false);
   const [isLoadingLoanAmount, setIsLoadingLoanAmount] = useState(false);
   const [isLoadingPullDown, setIsLoadingPullDown] = useState(false);
+  const [isLoadingWallet, setIsLoadingWallet] = useState(false);
   //Redux Calls
   const userProfileData = useSelector(state => state.userProfile.profile);
   const userWalletData = useSelector(state => state.userProfile.wallet);
+  const userMultiWalletData = useSelector(
+    state => state.userProfile.multiWallet,
+  );
+  const seerbitBalance = useSelector(state => state.userProfile.balanceSB);
+  const currentBanks = useSelector(state => state.userProfile.providusBanks);
+  const seerbitBanks = useSelector(state => state.userProfile.seerbitBanks);
   const [userTransactionsData, setUserTransactionsData] = useState([]);
-  const [allUserTransactionsData, setAllUserTransactionsData] = useState([]);
-  const [userTransactionsPages, setUserTransactionsPages] = useState([]);
-  const [userTransactionsTotal, setUserTransactionsTotal] = useState([]);
   const [userLoanAmount, setUserLoanAmount] = useState(undefined);
-  const [currentPage, setCurrentPage] = useState(1);
   const [data, setString] = useClipboard();
   const [timeOut, setTimeOut] = useState(false);
-  const route = useRoute();
   const [loanUserDetails, setLoanUserDetails] = useState(undefined);
   const [userPin, setUserPin] = useState(true);
   const [guarantor, setGuarantor] = useState([]);
@@ -110,6 +118,10 @@ const Homescreen = () => {
     endDate: new Date().toISOString().split('T')[0],
   });
   const [hideBalance, setHideBalance] = useState(true);
+  const [adverts, setAdverts] = useState([]);
+  const [isLoadingMultipleWallets, setIsLoadingMultipleWallets] =
+    useState(true);
+  // const [seerbitBalance, setSeerbitBalance] = useState(0);
   const toggleHideBalance = () => {
     setHideBalance(!hideBalance);
   };
@@ -144,23 +156,35 @@ const Homescreen = () => {
   useEffect(() => {
     setTimeout(() => {
       setTimeOut(true);
-    }, 3000);
+    }, 5000);
   });
 
   useFocusEffect(
     useCallback(() => {
+      setTimeout(() => {
+        setTimeOut(true);
+      }, 5000);
+    }, []),
+  );
+
+  useFocusEffect(
+    useCallback(() => {
       unsubGetWallet();
+      unsubGetMultipleWallets();
       getGuarantorData();
       getAllLendaInvestments();
       getAllArmInvestments();
       unsubGetAllTransactions();
       unsubGetTransactions();
+      unsubCheckPin();
+      getLoanUserData();
+      unsubGetLoanAmount();
+      unsubGetAllAdverts();
+      unsubGetSeerbitWalletBalance();
+      handleGetAllBanks();
+      handleGetAllSeerbitBanks();
     }, []),
   );
-
-  useEffect(() => {
-    unsubCheckPin();
-  }, [userPin]);
 
   // // Timed useEffect
   useEffect(() => {
@@ -189,6 +213,16 @@ const Homescreen = () => {
 
   useEffect(() => {
     const interval = setInterval(async () => {
+      unsubGetMultipleWallets();
+    }, 60000);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(async () => {
       const res = await getAccountTransactions();
       if (res?.error == false) {
         if (
@@ -196,7 +230,6 @@ const Homescreen = () => {
           res?.data?.transactions?.transaction !== null
         ) {
           setUserTransactionsData(res?.data?.transactions.transaction);
-          setAllUserTransactionsData(res?.data?.transactions.transaction);
         }
       }
     }, 60000);
@@ -227,21 +260,65 @@ const Homescreen = () => {
       });
   };
 
+  // Get multiple Wallets
+  const unsubGetMultipleWallets = async () => {
+    setIsLoadingMultipleWallets(true);
+    getAllWallet()
+      .then(res => {
+        if (res) {
+          if (!res?.error) {
+            dispatch(setMultipleWallets(res?.data?.wallet));
+            selectedData = res?.data?.wallet?.find(
+              walletData => walletData?.walletIdAccountNumber[0] === '4',
+            );
+          }
+        }
+      })
+      .catch(e => {})
+      .finally(() => {
+        setIsLoadingMultipleWallets(false);
+        unsubGetSeerbitWalletBalance();
+      });
+  };
+
+  // Get seerbit balance
+  const unsubGetSeerbitWalletBalance = async () => {
+    try {
+      if (userMultiWalletData && userMultiWalletData?.length > 0) {
+        if (
+          selectedData?.pocketId !== null &&
+          selectedData?.pocketId !== undefined
+        ) {
+          setIsLoading(true);
+          getSeerbitWalletBalance(selectedData?.pocketId)
+            .then(res => {
+              if (res) {
+                if (!res?.error) {
+                  dispatch(setBalanceSB(res?.data));
+                }
+              }
+            })
+            .catch(e => {})
+            .finally(() => {
+              setIsLoading(false);
+            });
+        }
+      }
+    } catch (e) {}
+  };
+
+
   const unsubGetAllTransactions = async () => {
     setIsLoading(true);
     getAccountTransactions(0, 10)
       .then(res => {
         if (res) {
           if (!res?.error) {
-            setCurrentPage(0);
             if (
               res?.data?.transactions?.transaction !== undefined &&
               res?.data?.transactions?.transaction !== null
             ) {
               setUserTransactionsData(res?.data?.transactions?.transaction);
-              setAllUserTransactionsData(res?.data?.transactions?.transaction);
-              setUserTransactionsPages(res?.data?.transactions?.maxPages);
-              setUserTransactionsTotal(res?.data?.transactions?.count);
             }
           }
         }
@@ -253,23 +330,29 @@ const Homescreen = () => {
   };
 
   const unsubGetTransactions = async () => {
-    setIsLoadingTransaction(true);
-
     getAccountTransactions(0, 10)
       .then(res => {
         if (res) {
           if (!res?.error) {
-            setCurrentPage(0);
             setUserTransactionsData(res?.data?.transactions?.transaction);
-            setUserTransactionsPages(res?.data?.transactions?.maxPages);
-            setUserTransactionsTotal(res?.data?.transactions?.count);
           }
         }
       })
       .catch(e => {})
-      .finally(() => {
-        setIsLoadingTransaction(false);
-      });
+      .finally(() => {});
+  };
+
+  const unsubGetAllAdverts = async () => {
+    getAllAdverts()
+      .then(res => {
+        if (res) {
+          if (!res?.error) {
+            setAdverts(res?.data);
+          }
+        }
+      })
+      .catch(e => {})
+      .finally(() => {});
   };
 
   const unsubGetTransactionsonPullDown = async () => {
@@ -278,10 +361,7 @@ const Homescreen = () => {
       .then(res => {
         if (res) {
           if (!res?.error) {
-            setCurrentPage(0);
             setUserTransactionsData(res?.data?.transactions?.transaction);
-            setUserTransactionsPages(res?.data?.transactions?.maxPages);
-            setUserTransactionsTotal(res?.data?.transactions?.count);
           }
         }
       })
@@ -333,7 +413,6 @@ const Homescreen = () => {
   };
 
   const getAllLendaInvestments = async () => {
-    setIsLoadingLenda(true);
     getAllLendaInvestment()
       .then(res => {
         if (res) {
@@ -343,13 +422,10 @@ const Homescreen = () => {
         }
       })
       .catch(e => {})
-      .finally(() => {
-        setIsLoadingLenda(false);
-      });
+      .finally(() => {});
   };
   // get all ARM investments
   const getAllArmInvestments = async () => {
-    setIsLoadingArm(true);
     getAllArmInvestment()
       .then(async res => {
         if (res) {
@@ -369,9 +445,7 @@ const Homescreen = () => {
         }
       })
       .catch(e => {})
-      .finally(() => {
-        setIsLoadingArm(false);
-      });
+      .finally(() => {});
   };
 
   const getGuarantorData = async () => {
@@ -399,13 +473,10 @@ const Homescreen = () => {
         autoHide: true,
         onPress: () => Toast.hide(),
       });
-    } catch (error) {
-      // console.error('Error copying to clipboard:', error);
-    }
+    } catch (error) {}
   };
 
   const getLoanUserData = async () => {
-    setIsLoadingLoanData(true);
     getLoanUserDetails()
       .then(res => {
         if (res) {
@@ -423,8 +494,59 @@ const Homescreen = () => {
         }
       })
       .catch(e => {})
+      .finally(() => {});
+  };
+
+  // Data to Persist
+  const handleGetAllBanks = async () => {
+    getAllBankDetails()
+      .then(res => {
+        if (res) {
+          if (res?.error) {
+            // Todo: Handle Error
+          } else {
+            const bankData = res?.data?.map((banks, i) => {
+              return {value: banks?.bankName, label: banks?.bankName, key: i};
+            });
+
+            if (currentBanks == undefined || currentBanks == null) {
+              dispatch(setProvidusBanks(bankData));
+            }
+          }
+        }
+      })
+      .catch(error => {})
+      .finally(() => {});
+  };
+
+  const handleGetAllSeerbitBanks = async () => {
+    getSeerbitNipBanks()
+      .then(res => {
+        if (res) {
+          if (res?.error) {
+            // Todo: Handle Error
+          } else {
+            const bankData =
+              res?.data &&
+              res?.data?.length > 0 &&
+              res?.data?.map((bank, i) => {
+                return {
+                  value: bank?.bankname,
+                  label: bank?.bankname,
+                  key: i,
+                  NIPCode: bank?.bankcode,
+                };
+              });
+
+            if (seerbitBanks == undefined || seerbitBanks == '') {
+              dispatch(setSeerbitbanks(bankData));
+            }
+          }
+        }
+      })
+      .catch(error => {})
       .finally(() => {
-        setIsLoadingLoanData(false);
+        // Todo: Handle Error
       });
   };
 
@@ -489,6 +611,56 @@ const Homescreen = () => {
           topOffset: 50,
           text1: 'Get Transactions Statement',
           text2: 'Error fetching statement',
+          visibilityTime: 5000,
+          autoHide: true,
+          onPress: () => Toast.hide(),
+        });
+      })
+      .finally(() => {
+        setTimeout(() => {
+          setIsSending(false);
+        }, 1000);
+      });
+  };
+
+  handleWalletCreation = async () => {
+    setIsSending(true);
+    getSecondWallet()
+      .then(res => {
+        if (res) {
+          if (!res?.error) {
+            Toast.show({
+              type: 'success',
+              position: 'top',
+              topOffset: 50,
+              text1: res?.title,
+              text2: res?.message,
+              visibilityTime: 3000,
+              autoHide: true,
+              onPress: () => Toast.hide(),
+            });
+            unsubGetMultipleWallets();
+          } else {
+            Toast.show({
+              type: 'error',
+              position: 'top',
+              topOffset: 50,
+              text1: res?.title,
+              text2: res?.message,
+              visibilityTime: 5000,
+              autoHide: true,
+              onPress: () => Toast.hide(),
+            });
+          }
+        }
+      })
+      .catch(e => {
+        Toast.show({
+          type: 'error',
+          position: 'top',
+          topOffset: 50,
+          text1: 'Create Wallet',
+          text2: 'Error creating wallet',
           visibilityTime: 5000,
           autoHide: true,
           onPress: () => Toast.hide(),
@@ -716,17 +888,21 @@ const Homescreen = () => {
             onPress: () => Toast.hide(),
           });
         }
+        // changed on the 17th march 2024, on CEO's request.
         navigation.navigate(
-          `${
-            loanUserDetails === undefined ||
-            loanUserDetails?.loanDocumentDetails?.validIdentification ===
-              undefined
-              ? 'OnboardingHome'
-              : guarantor && guarantor.length > 0
-              ? 'GetLoan'
-              : 'AddGuarantors'
-          }`,
+          `${guarantor && guarantor.length > 0 ? 'GetLoan' : 'AddGuarantors'}`,
         );
+        // navigation.navigate(
+        //   `${
+        //     loanUserDetails === undefined ||
+        //     loanUserDetails?.loanDocumentDetails?.validIdentification ===
+        //       undefined
+        //       ? 'OnboardingHome'
+        //       : guarantor && guarantor.length > 0
+        //       ? 'GetLoan'
+        //       : 'AddGuarantors'
+        //   }`,
+        // );
       },
       buttonTextColor: COLORS.lendaBlue,
       buttonColor: COLORS.lendaBlue,
@@ -780,6 +956,7 @@ const Homescreen = () => {
           toggleFundWallet={toggleFundWallet}
           userProfileData={userProfileData}
           userWalletData={userWalletData}
+          multipleWalletsData={userMultiWalletData}
           handleLongPress={handleLongPress}
         />
 
@@ -859,6 +1036,7 @@ const Homescreen = () => {
         <SlideSection
           portfolioDetail={portfolioDetail}
           userWalletData={userWalletData}
+          userMultiWalletData={userMultiWalletData}
           totalLendaAmount={totalLendaAmount}
           userLoanAmount={userLoanAmount}
           guarantor={guarantor}
@@ -867,6 +1045,8 @@ const Homescreen = () => {
           toggleHideBalance={toggleHideBalance}
           handleLongPress={handleLongPress}
           toggleFundWallet={toggleFundWallet}
+          seerbitWalletBalance={seerbitBalance}
+          handleCreateSecondWallet={handleWalletCreation}
         />
       </>
     );
@@ -898,12 +1078,26 @@ const Homescreen = () => {
       </>
     );
   };
-
   const renderScrollableComponents = () => {
     return (
       <>
         {/* Third Section Wallet and Bill*/}
         <ItemsSection buttonParameters={buttonItems} userPin={userPin} />
+
+        {/* Adverts */}
+
+        {adverts &&
+          adverts?.length > 0 &&
+          adverts.map((item, idx) => (
+            <Announcement
+              key={idx}
+              index={item._id}
+              title={item?.title}
+              body={item?.description}
+              image={require('../../../assets/images/announcement.png')}
+              action={() => navigation.navigate('SetPin')}
+            />
+          ))}
 
         {/* Sixth Section Single Transaction History*/}
         <SingleTransactionSection
@@ -920,11 +1114,8 @@ const Homescreen = () => {
       <>
         {isLoading ||
         isLoadingWallet ||
-        isLoadingTransaction ||
-        isLoadingLoanData ||
-        isLoadingLenda ||
-        isLoadingArm ||
-        isLoadingLoanAmount ? (
+        isLoadingLoanAmount ||
+        isLoadingMultipleWallets ? (
           <ActivityIndicator
             size="large"
             color={COLORS.lendaGreen}
@@ -981,7 +1172,6 @@ const Homescreen = () => {
       </>
     );
   };
-
   return !timeOut ? (
     <Splashscreen text="Getting Profile Details..." />
   ) : timeOut &&
@@ -989,23 +1179,21 @@ const Homescreen = () => {
     userProfileData?.profileProgress === null ? (
     <PersonalDetails />
   ) : (
-    timeOut &&
-    userProfileData &&
-    userProfileData?.profileProgress !== null && (
-        <SafeAreaView
-          style={{
-            flex: 1,
-            height: hp('100%'),
-            width: wp('100%'),
-            backgroundColor: COLORS.lendaLightGrey,
-            paddingTop: insets.top !== 0 ? Math.min(insets.top, 10) : 'auto',
-            paddingBottom: insets.bottom !== 0 ? Math.min(insets.bottom, 10) : 'auto',
-            paddingLeft: insets.left !== 0 ? Math.min(insets.left, 10) : 'auto',
-            paddingRight: insets.right !== 0 ? Math.min(insets.right, 10) : 'auto',
-          }}>
-          {renderMainComponents()}
-        </SafeAreaView>
-    )
+    <SafeAreaView
+      style={{
+        flex: 1,
+        height: hp('100%'),
+        width: wp('100%'),
+        backgroundColor: COLORS.lendaLightGrey,
+        paddingTop: insets.top !== 0 ? Math.min(insets.top, 10) : 'auto',
+        paddingBottom:
+          insets.bottom !== 0 ? Math.min(insets.bottom, 10) : 'auto',
+        paddingLeft: insets.left !== 0 ? Math.min(insets.left, 10) : 'auto',
+        paddingRight: insets.right !== 0 ? Math.min(insets.right, 10) : 'auto',
+      }}>
+      {renderMainComponents()}
+    </SafeAreaView>
+    // )
   );
 };
 
@@ -1052,7 +1240,6 @@ const styles = StyleSheet.create({
   transView: {
     marginHorizontal: 2,
     flexDirection: 'row',
-    // justifyContent: 'space-between',
     justifyContent: 'space-evenly',
     marginVertical: 10,
   },

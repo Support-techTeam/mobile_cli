@@ -69,7 +69,7 @@ const Loanscreen = () => {
 
   //total Paid
   let totalPaidLoanAmount = paidLoansData?.reduce(
-    (total, loan) => total + (loan?.amount || 0),
+    (total, loan) => total + (loan?.totalPaidBack || 0),
     0,
   );
 
@@ -327,7 +327,9 @@ const Loanscreen = () => {
                     <TouchableOpacity
                       onPress={() =>
                         navigation.navigate('LoanTransaction', {
-                          paramKey: loan.id,
+                          paramKey: loan._id ? loan._id : loan.id,
+                          data: loan,
+                          type: 'all',
                         })
                       }>
                       <View
@@ -486,7 +488,9 @@ const Loanscreen = () => {
                     <TouchableOpacity
                       onPress={() =>
                         navigation.navigate('LoanTransaction', {
-                          paramKey: loan._id,
+                          paramKey: loan._id ? loan._id : loan.id,
+                          data: loan,
+                          type: 'approved',
                         })
                       }>
                       <View
@@ -637,7 +641,9 @@ const Loanscreen = () => {
                     <TouchableOpacity
                       onPress={() =>
                         navigation.navigate('LoanTransaction', {
-                          paramKey: loan._id,
+                          paramKey: loan._id ? loan._id : loan.id,
+                          data: loan,
+                          type: 'paid',
                         })
                       }>
                       <View
@@ -670,13 +676,17 @@ const Loanscreen = () => {
                             <Text style={styles.title}>{loan?.loanType}</Text>
                             <Text style={styles.price}>
                               ₦
-                              {loan?.amount
+                              {loan?.amount && loan?.amount > 0
                                 ? new Intl.NumberFormat('en-US', {
                                     style: 'decimal',
                                     minimumFractionDigits: 2,
                                     maximumFractionDigits: 2,
-                                  }).format(loan?.amount)
-                                : '0.00'}
+                                  }).format(Number(loan?.amount))
+                                : new Intl.NumberFormat('en-US', {
+                                    style: 'decimal',
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2,
+                                  }).format(Number(loan?.totalPaidBack))}
                             </Text>
                           </View>
                           <View
@@ -687,11 +697,11 @@ const Loanscreen = () => {
                             <Text style={styles.desc}>{loan?.reason}</Text>
                             <View style={{flexDirection: 'row'}}>
                               <Text style={[styles.desc]}>
-                                {loan?.createdAt?.substr(11, 5)}
+                                {loan?.updatedAt?.substr(11, 5)}
                                 {'  '}
                               </Text>
                               <Text style={styles.desc}>
-                                {loan?.createdAt?.substr(0, 10)}
+                                {loan?.updatedAt?.substr(0, 10)}
                               </Text>
                             </View>
                           </View>
@@ -790,7 +800,9 @@ const Loanscreen = () => {
                     <TouchableOpacity
                       onPress={() =>
                         navigation.navigate('LoanTransaction', {
-                          paramKey: loan._id,
+                          paramKey: loan._id ? loan._id : loan.id,
+                          data: loan,
+                          type: 'pending',
                         })
                       }>
                       <View
@@ -1057,11 +1069,7 @@ const Loanscreen = () => {
               }
               navigation.navigate(
                 `${
-                  loanUserDetails === undefined ||
-                  loanUserDetails?.loanDocumentDetails?.validIdentification ===
-                    undefined
-                    ? 'OnboardingHome'
-                    : guarantor && guarantor?.length > 0
+                  guarantor && guarantor?.length > 0
                     ? 'GetLoan'
                     : 'AddGuarantors'
                 }`,
@@ -1088,7 +1096,6 @@ const Loanscreen = () => {
       </View>
     );
   };
-
 
   const renderSlideComponent = () => {
     return (

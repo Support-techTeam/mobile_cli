@@ -28,7 +28,7 @@ import Loader from '../../component/loader/loader';
 
 const durationData = [
   {value: '', label: 'Select Duration'},
-  {value: '30 days', label: '30 Days'},
+  {value: '30 Days', label: '30 Days'},
   {value: '45 Days', label: '45 Days'},
   {value: '60 Days', label: '60 Days'},
   {value: '90 Days', label: '90 Days'},
@@ -40,6 +40,7 @@ const typeData = [
   {value: '', label: 'Select Loan Type'},
   {value: 'Local Purchase Order', label: 'Local Purchase Order'},
   {value: 'Working Capital', label: 'Working Capital'},
+  {value: 'Asset Financing', label: 'Asset Financing'},
 ];
 
 const reasonData = [
@@ -148,10 +149,11 @@ const GetLoan = () => {
   };
 
   useEffect(() => {
-    if (loanDetails.amount !== 0 && loanDetails.loanTenor !== '') {
+    if (loanDetails.amount > 0 && loanDetails.loanTenor !== '') {
       getLoanDetail(loanDetails.amount, loanDetails.loanTenor);
     }
-  }, [loanDetails.amount, loanDetails.loanTenor]);
+  }, [loanDetails.loanTenor]);
+
 
   const getLoanDetail = async (amount, loanTenor) => {
     try {
@@ -176,7 +178,7 @@ const GetLoan = () => {
     } catch (e) {
       setIsLoading(false);
     }
-  };  
+  };
 
   useEffect(() => {
     const Data =
@@ -212,6 +214,7 @@ const GetLoan = () => {
     !loanDetails.reason ||
     !loanDetails.loanType ||
     !loanDetails.amount ||
+    !loanDetails.note ||
     !loanDetails.loanTenor;
 
   const logAppsFlyer = (event, duration, type, value) => {
@@ -236,17 +239,34 @@ const GetLoan = () => {
   };
 
   const handleCreateLoan = async () => {
+    if (
+      profile?.email == undefined ||
+      profile?.email == '' ||
+      profile?.email == null
+    ) {
+      Toast.show({
+        type: 'error',
+        position: 'top',
+        topOffset: 50,
+        text1: 'Unable to process loan request, please try again later.',
+        text2: '',
+        visibilityTime: 5000,
+        autoHide: true,
+        onPress: () => Toast.hide(),
+      });
+      return;
+    }
     if (guarantors.length !== 0) {
       try {
         setIsLoading(true);
         const res = await createLoan(loanDetails);
-        if (res?.error || res?.data?.error) {
+        if (res?.error) {
           Toast.show({
             type: 'error',
             position: 'top',
             topOffset: 50,
             text1: res?.title,
-            text2: res?.message || res?.data?.message,
+            text2: res?.message,
             visibilityTime: 5000,
             autoHide: true,
             onPress: () => Toast.hide(),
@@ -263,7 +283,7 @@ const GetLoan = () => {
             position: 'top',
             topOffset: 50,
             text1: res?.title,
-            text2: res?.message || res?.data?.message,
+            text2: res?.message,
             visibilityTime: 3000,
             autoHide: true,
             onPress: () => Toast.hide(),
@@ -529,7 +549,13 @@ const GetLoan = () => {
                           defaultValue={
                             profile?.email === undefined ? '' : profile?.email
                           }
-                          disabled
+                          readOnly={
+                            profile?.email == undefined ||
+                            profile?.email == '' ||
+                            profile?.email == null
+                              ? false
+                              : true
+                          }
                           isNeeded={true}
                         />
                         <Input
@@ -538,6 +564,17 @@ const GetLoan = () => {
                           placeholder="Enter amount"
                           keyboardType="numeric"
                           // value={details?.Amount}
+                          onBlur={() => {
+                            if (
+                              loanDetails.amount > 0 &&
+                              loanDetails.loanTenor !== ''
+                            ) {
+                              getLoanDetail(
+                                loanDetails.amount,
+                                loanDetails.loanTenor,
+                              );
+                            }
+                          }}
                           onChangeText={text =>
                             setLoanDetails({
                               ...loanDetails,

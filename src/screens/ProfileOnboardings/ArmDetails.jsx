@@ -547,7 +547,8 @@ const ArmDetails = () => {
                       navigation.navigate('MyAccount');
                     }
                   }}
-                  disabled={disableit}>
+                  // disabled={disableit}
+                  >
                   <View style={{width: wp(20)}}>
                     <Buttons label="Skip" />
                   </View>

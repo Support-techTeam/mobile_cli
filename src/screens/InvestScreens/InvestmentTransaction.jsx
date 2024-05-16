@@ -4,17 +4,17 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
-  TextInput,
   Animated,
 } from 'react-native';
-import React, {useState, useRef} from 'react';
+import React, {useState, useEffect} from 'react';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import IconAwe from 'react-native-vector-icons/FontAwesome';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 import Input from '../../component/inputField/input.component';
 import CustomDropdown from '../../component/dropDown/dropdown.component';
 import Buttons from '../../component/buttons/Buttons';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import Toast from 'react-native-toast-message';
 import COLORS from '../../constants/colors';
 import {
@@ -33,12 +33,19 @@ import styles, {
 import {Center, Checkbox} from 'native-base';
 import {Header} from '../../component/header/Header';
 import Loader from '../../component/loader/loader';
+import {SelectList} from 'react-native-dropdown-select-list';
+import {getSeerbitWalletBalance} from '../../stores/WalletStore';
 
 const durationData = [
   {value: '', label: 'Select Option'},
   {value: '3 Months', label: '3 Months'},
   {value: '6 Months', label: '6 Months'},
   {value: '12 Months', label: '12 Months'},
+];
+
+let bankerListData = [
+  {value: 'Select Option', label: 'Select Option'},
+  {value: 'N/A', label: 'N/A'},
 ];
 
 const {Value, Text: AnimatedText} = Animated;
@@ -60,11 +67,17 @@ const animateCell = ({hasValue, index, isFocused}) => {
     }),
   ]).start();
 };
+let selectedData = '';
 
 const InvestmentTransaction = () => {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
   const userWalletData = useSelector(state => state.userProfile.wallet);
+  const userMultiWalletData = useSelector(
+    state => state.userProfile.multiWallet,
+  );
+  const seerbitBalance = useSelector(state => state.userProfile.balanceSB);
+  const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
   const route = useRoute();
   const {name, investment} = route.params;
@@ -76,6 +89,7 @@ const InvestmentTransaction = () => {
     setValue,
   });
   const [investmentDetails, setInvestmentDetails] = useState({
+    fromWalletIdAccountNumber: '',
     investmentType: investment?.investmentName,
     investmentTenor: '',
     investmentAmount: 0,
@@ -89,6 +103,7 @@ const InvestmentTransaction = () => {
 
   const disableit =
     value.length < 4 ||
+    !investmentDetails.fromWalletIdAccountNumber ||
     !investmentDetails.investmentType ||
     !investmentDetails.investmentTenor ||
     investmentDetails.investmentAmount == 0;
@@ -140,6 +155,46 @@ const InvestmentTransaction = () => {
     );
   };
 
+  // set bank list
+  useEffect(() => {
+    try {
+      if (userMultiWalletData && userMultiWalletData?.length > 0) {
+        bankerListData = [{value: 'Select Option', label: 'Select Option'}];
+        userMultiWalletData?.map((walletData, index) => {
+          bankerListData.push({
+            label: walletData?.walletIdAccountNumber,
+            value: `${walletData?.walletIdAccountNumber} - ${
+              walletData?.banker === 'Providus'
+                ? 'Providus Bank'
+                : walletData?.banker
+            }`,
+            key: index,
+          });
+        });
+      }
+    } catch (e) {}
+  }, [userMultiWalletData]);
+
+  const unsubGetSeerbitWalletBalance = async () => {
+    if (userMultiWalletData && userMultiWalletData?.length > 0) {
+      if (
+        selectedData?.pocketId !== null &&
+        selectedData?.pocketId !== undefined
+      ) {
+        getSeerbitWalletBalance(selectedData?.pocketId)
+          .then(res => {
+            if (res) {
+              if (!res?.error) {
+                dispatch(setBalanceSB(res?.data));
+              }
+            }
+          })
+          .catch(e => {})
+          .finally(() => {});
+      }
+    }
+  };
+
   return (
     <SafeAreaView
       style={{
@@ -151,7 +206,7 @@ const InvestmentTransaction = () => {
         paddingLeft: insets.left !== 0 ? Math.min(insets.left, 10) : 'auto',
         paddingRight: insets.right !== 0 ? Math.min(insets.right, 10) : 'auto',
       }}>
-       <Loader visible={isLoading} loadingText={'Please wait...'} />
+      <Loader visible={isLoading} loadingText={'Please wait...'} />
       <Header
         routeAction={() => navigation.goBack()}
         heading={name === 'Arm' ? 'ARM INVESTMENT' : 'LENDA INVESTMENT'}
@@ -237,6 +292,18 @@ const InvestmentTransaction = () => {
                       onPress: () => Toast.hide(),
                     });
                     return;
+                  } else if (userWalletData?.walletIdAccountNumber == '4') {
+                    Toast.show({
+                      type: 'error',
+                      position: 'top',
+                      topOffset: 50,
+                      text1: 'ARM Investment',
+                      text2: 'Investment not available!',
+                      visibilityTime: 5000,
+                      autoHide: true,
+                      onPress: () => Toast.hide(),
+                    });
+                    return;
                   } else if (
                     Number(armDetails?.investmentAmount) <
                     Number(investment?.minimumInvestmentAmount)
@@ -266,6 +333,80 @@ const InvestmentTransaction = () => {
           </View>
         ) : (
           <View style={internalStyles.innerContainer}>
+            <View style={{marginVertical: 10}}>
+              <View style={{flexDirection: 'row'}}>
+                <Text style={internalStyles.droplabel}>Select Account</Text>
+                <Text style={{color: 'red', marginRight: 10}}>*</Text>
+              </View>
+              <SelectList
+                setSelected={val => {
+                  try {
+                    const splitData = val && val?.length > 0 && val.split('-');
+                    const selectedAccount = splitData[0].trim();
+                    if (selectedAccount === 'Select Option') {
+                      Toast.show({
+                        type: 'warning',
+                        position: 'top',
+                        topOffset: 50,
+                        text1: 'Select Account',
+                        text2: 'You need to select an account!',
+                        visibilityTime: 3000,
+                        autoHide: true,
+                        onPress: () => Toast.hide(),
+                      });
+                      setInvestmentDetails({
+                        fromWalletIdAccountNumber: '',
+                        investmentType: investment?.investmentName,
+                        investmentTenor: '',
+                        investmentAmount: 0,
+                        transactionPin: '',
+                      });
+                    } else {
+                      selectedData = userMultiWalletData?.find(
+                        walletData =>
+                          walletData?.walletIdAccountNumber ===
+                          selectedAccount.toString(),
+                      );
+                      setInvestmentDetails({
+                        fromWalletIdAccountNumber: selectedAccount?.toString(),
+                        investmentType: investment?.investmentName,
+                        investmentTenor: '',
+                        investmentAmount: 0,
+                        transactionPin: '',
+                      });
+                      if (selectedAccount[0] == '4') {
+                        unsubGetSeerbitWalletBalance();
+                      }
+                    }
+                  } catch (e) {}
+                }}
+                data={bankerListData}
+                save="value"
+                searchPlaceholder="Search for account"
+                search={false}
+                boxStyles={internalStyles.inputContainer}
+                closeicon={
+                  <IconAwe name="times-circle" size={26} color="#000" />
+                }
+                dropdownStyles={{
+                  paddingHorizontal: 10,
+                  marginTop: 2,
+                  backgroundColor: COLORS.lendaComponentBg,
+                  borderColor: COLORS.lendaComponentBorder,
+                  borderWidth: 1,
+                  borderRadius: 5,
+                }}
+                dropdownItemStyles={{
+                  paddingHorizontal: 8,
+                  paddingVertical: 10,
+                  backgroundColor: COLORS.lendaComponentBg,
+                  borderColor: COLORS.lendaComponentBorder,
+                  borderWidth: 1,
+                  borderRadius: 5,
+                  marginVertical: 3,
+                }}
+              />
+            </View>
             <CustomDropdown
               label="Investment Tenor"
               isNeeded={true}
@@ -298,12 +439,19 @@ const InvestmentTransaction = () => {
                 isNeeded={true}
                 isAirtime={true}
                 isBalance={
-                  userWalletData &&
-                  new Intl.NumberFormat('en-US', {
-                    style: 'decimal',
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  }).format(Number(userWalletData?.availableBalance))
+                  userMultiWalletData && selectedData?.banker === 'Providus'
+                    ? new Intl.NumberFormat('en-US', {
+                        style: 'decimal',
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      }).format(Number(selectedData?.availableBalance))
+                    : selectedData?.banker === '9 Payment Service Bank'
+                    ? new Intl.NumberFormat('en-US', {
+                        style: 'decimal',
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      }).format(Number(seerbitBalance))
+                    : '0.00'
                 }
               />
               {investment?.amountRange?.minAmount && (
@@ -378,21 +526,6 @@ const InvestmentTransaction = () => {
                       topOffset: 50,
                       text1: 'Lenda Investment',
                       text2: 'Invalid amount entered!',
-                      visibilityTime: 5000,
-                      autoHide: true,
-                      onPress: () => Toast.hide(),
-                    });
-                    return;
-                  } else if (
-                    Number(investmentDetails?.investmentAmount) >
-                    Number(userWalletData?.availableBalance)
-                  ) {
-                    Toast.show({
-                      type: 'error',
-                      position: 'top',
-                      topOffset: 50,
-                      text1: 'Lenda Investment',
-                      text2: 'Available balance exceeded!',
                       visibilityTime: 5000,
                       autoHide: true,
                       onPress: () => Toast.hide(),
@@ -539,5 +672,29 @@ const internalStyles = StyleSheet.create({
     textAlign: 'center',
     paddingHorizontal: 5,
     paddingVertical: 2,
+  },
+  inputContainer: {
+    height: 55,
+    alignItems: 'center',
+    backgroundColor: COLORS.light,
+    paddingHorizontal: 15,
+    width: '100%',
+    borderWidth: 0.5,
+    borderRadius: 8,
+    borderColor: COLORS.lendaComponentBorder,
+    padding: 12,
+    borderBottomWidth: 0.8,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 1.41,
+  },
+  droplabel: {
+    marginVertical: 5,
+    fontSize: 14,
+    color: COLORS.labelColor,
   },
 });

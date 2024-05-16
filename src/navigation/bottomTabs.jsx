@@ -56,7 +56,7 @@ export default function BottomTabs({navigation}) {
     clearTimeout(timerId.current);
     timerId.current = setTimeout(() => {
       // handleSignOut();
-      console.log('log me out');
+      // console.log('log me out');
     }, timeForInactivityInSecond * 10000);
   };
 
@@ -108,149 +108,147 @@ export default function BottomTabs({navigation}) {
         flex: 1,
       }}
       {...panResponder.panHandlers}>
+      <Tab.Navigator
+        initialRouteName="Home"
+        screenOptions={{
+          tabBarActiveTintColor: COLORS.lendaBlue,
+          tabBarInactiveTintColor: COLORS.Secondary,
+          headerShown: false,
+          tabBarShowLabel: true,
+          tabBarStyle: styles.tabBar,
+          sceneAnimationEnabled: true,
+          sceneAnimationType: 'shifting',
+          shifting: true,
+          compact: true,
+        }}>
+        <Tab.Screen
+          name="Home"
+          component={Homescreen}
+          options={{
+            tabBarLabel: ({focused, position}) => (
+              <>
+                <Text
+                  style={{
+                    color: focused ? COLORS.lendaBlue : COLORS.Secondary,
+                    fontSize: 12,
+                    marginBottom: position === 'beside-icon' ? 0 : 5,
+                    marginLeft: position === 'beside-icon' ? 20 : 0,
+                    marginTop: position === 'beside-icon' ? 3 : 0,
+                  }}>
+                  Home
+                </Text>
+              </>
+            ),
+            tabBarIcon: ({color, size, focused}) => {
+              return <Icon name="home" size={size} color={color} />;
+            },
+          }}
+          listeners={{
+            tabPress: e => opened && e.preventDefault(),
+          }}
+        />
 
-        <Tab.Navigator
-          initialRouteName="Home"
-          screenOptions={{
-            tabBarActiveTintColor: COLORS.lendaBlue,
-            tabBarInactiveTintColor: COLORS.Secondary,
-            headerShown: false,
-            tabBarShowLabel: true,
-            tabBarStyle: styles.tabBar,
-            sceneAnimationEnabled: true,
-            sceneAnimationType: 'shifting',
-            shifting: true,
-            compact: true,
-          }}>
-            
-          <Tab.Screen
-            name="Home"
-            component={Homescreen}
-            options={{
-              tabBarLabel: ({focused, position}) => (
-                <>
-                  <Text
-                    style={{
-                      color: focused ? COLORS.lendaBlue : COLORS.Secondary,
-                      fontSize: 12,
-                      marginBottom: position === 'beside-icon' ? 0 : 5,
-                      marginLeft: position === 'beside-icon' ? 20 : 0,
-                      marginTop: position === 'beside-icon' ? 3 : 0,
-                    }}>
-                    Home
-                  </Text>
-                </>
-              ),
-              tabBarIcon: ({color, size, focused}) => {
-                return <Icon name="home" size={size} color={color} />;
-              },
-            }}
-            listeners={{
-              tabPress: e => opened && e.preventDefault(),
-            }}
-          />
+        <Tab.Screen
+          name="Loan"
+          component={LoanStack}
+          options={{
+            tabBarButton: disabledIt,
+            tabBarLabel: ({focused, position}) => (
+              <>
+                <Text
+                  style={{
+                    color: focused ? COLORS.lendaBlue : COLORS.Secondary,
+                    fontSize: 12,
+                    marginBottom: position === 'beside-icon' ? 0 : 5,
+                    marginLeft: position === 'beside-icon' ? 20 : 0,
+                    marginTop: position === 'beside-icon' ? 3 : 0,
+                  }}>
+                  Loan
+                </Text>
+              </>
+            ),
+            tabBarIcon: ({color, size}) => {
+              return (
+                <Image
+                  style={{
+                    width: size,
+                    height: size,
+                    tintColor: color,
+                  }}
+                  source={require('../../assets/icons/loan_icon.png')}
+                />
+              );
+            },
+          }}
+          listeners={{
+            tabPress: e => opened && e.preventDefault(),
+          }}
+        />
 
-          <Tab.Screen
-            name="Loan"
-            component={LoanStack}
-            options={{
-              tabBarButton: disabledIt,
-              tabBarLabel: ({focused, position}) => (
-                <>
-                  <Text
-                    style={{
-                      color: focused ? COLORS.lendaBlue : COLORS.Secondary,
-                      fontSize: 12,
-                      marginBottom: position === 'beside-icon' ? 0 : 5,
-                      marginLeft: position === 'beside-icon' ? 20 : 0,
-                      marginTop: position === 'beside-icon' ? 3 : 0,
-                    }}>
-                    Loan
-                  </Text>
-                </>
-              ),
-              tabBarIcon: ({color, size}) => {
-                return (
-                  <Image
-                    style={{
-                      width: size,
-                      height: size,
-                      tintColor: color,
-                    }}
-                    source={require('../../assets/icons/loan_icon.png')}
-                  />
-                );
-              },
-            }}
-            listeners={{
-              tabPress: e => opened && e.preventDefault(),
-            }}
-          />
+        <Tab.Screen
+          name="Invest"
+          component={Investscreen}
+          options={{
+            tabBarButton: disabledIt,
+            tabBarLabel: ({focused, position}) => (
+              <>
+                <Text
+                  style={{
+                    color: focused ? COLORS.lendaBlue : COLORS.Secondary,
+                    fontSize: 12,
+                    marginBottom: position === 'beside-icon' ? 0 : 5,
+                    marginLeft: position === 'beside-icon' ? 20 : 0,
+                    marginTop: position === 'beside-icon' ? 3 : 0,
+                  }}>
+                  Invest
+                </Text>
+              </>
+            ),
+            tabBarIcon: ({color, size}) => {
+              return (
+                <Image
+                  style={{
+                    width: size,
+                    height: size,
+                    tintColor: color,
+                  }}
+                  source={require('../../assets/icons/invest_icon.png')}
+                />
+              );
+            },
+          }}
+          listeners={{
+            tabPress: e => opened && e.preventDefault(),
+          }}
+        />
 
-          <Tab.Screen
-            name="Invest"
-            component={Investscreen}
-            options={{
-              tabBarButton: disabledIt,
-              tabBarLabel: ({focused, position}) => (
-                <>
-                  <Text
-                    style={{
-                      color: focused ? COLORS.lendaBlue : COLORS.Secondary,
-                      fontSize: 12,
-                      marginBottom: position === 'beside-icon' ? 0 : 5,
-                      marginLeft: position === 'beside-icon' ? 20 : 0,
-                      marginTop: position === 'beside-icon' ? 3 : 0,
-                    }}>
-                    Invest
-                  </Text>
-                </>
-              ),
-              tabBarIcon: ({color, size}) => {
-                return (
-                  <Image
-                    style={{
-                      width: size,
-                      height: size,
-                      tintColor: color,
-                    }}
-                    source={require('../../assets/icons/invest_icon.png')}
-                  />
-                );
-              },
-            }}
-            listeners={{
-              tabPress: e => opened && e.preventDefault(),
-            }}
-          />
-
-          <Tab.Screen
-            name="More"
-            component={Morescreens}
-            options={{
-              tabBarLabel: ({focused, position}) => (
-                <>
-                  <Text
-                    style={{
-                      color: focused ? COLORS.lendaBlue : COLORS.Secondary,
-                      fontSize: 12,
-                      marginBottom: position === 'beside-icon' ? 0 : 5,
-                      marginLeft: position === 'beside-icon' ? 20 : 0,
-                      marginTop: position === 'beside-icon' ? 3 : 0,
-                    }}>
-                    More
-                  </Text>
-                </>
-              ),
-              tabBarIcon: ({color, size}) => {
-                return <Icon name="view-dashboard" size={size} color={color} />;
-              },
-            }}
-            listeners={{
-              tabPress: e => opened && e.preventDefault(),
-            }}
-          />
-        </Tab.Navigator>
+        <Tab.Screen
+          name="More"
+          component={Morescreens}
+          options={{
+            tabBarLabel: ({focused, position}) => (
+              <>
+                <Text
+                  style={{
+                    color: focused ? COLORS.lendaBlue : COLORS.Secondary,
+                    fontSize: 12,
+                    marginBottom: position === 'beside-icon' ? 0 : 5,
+                    marginLeft: position === 'beside-icon' ? 20 : 0,
+                    marginTop: position === 'beside-icon' ? 3 : 0,
+                  }}>
+                  More
+                </Text>
+              </>
+            ),
+            tabBarIcon: ({color, size}) => {
+              return <Icon name="view-dashboard" size={size} color={color} />;
+            },
+          }}
+          listeners={{
+            tabPress: e => opened && e.preventDefault(),
+          }}
+        />
+      </Tab.Navigator>
     </View>
   );
 }

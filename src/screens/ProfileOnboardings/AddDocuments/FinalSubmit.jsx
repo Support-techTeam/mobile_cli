@@ -10,6 +10,11 @@ import {
   updateDocumentsDetails,
 } from '../../../stores/LoanStore';
 import Loader from '../../../component/loader/loader';
+import {Header} from '../../../component/header/Header';
+import VerifyModal from '../../../component/modals/verifyModal';
+import COLORS from '../../../constants/colors';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import {getAsyncData} from '../../../context/AsyncContext';
 
 const ITEM_HEIGHT = 100;
 
@@ -27,12 +32,17 @@ const TobTabs = [
   {name: 'Submit All', key: 'SubmitDocs'},
 ];
 
+let origin = '';
 const FinalSubmit = ({route}) => {
   const docsDetails = route?.params?.paramKey;
   const [isLoading, setIsLoading] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [origin, setOrigin] = useState('');
   const navigation = useNavigation();
   const activeTab = 'SubmitDocs';
+  const previousRoute = navigation.getState()?.routes.slice(-2)[0]?.name;
+  const [showConfirm, setShowConfirm] = useState(false);
+
   const renderItem = ({item}) => {
     const isActive = item.key === activeTab;
 
@@ -47,147 +57,70 @@ const FinalSubmit = ({route}) => {
     );
   };
 
-  const formDetails = {
-    validIdentificationType:
-      docsDetails?.validIdentificationType === undefined
-        ? ''
-        : docsDetails?.validIdentificationType,
-    validIdentification:
-      docsDetails?.validIdentification === undefined
-        ? ''
-        : docsDetails?.validIdentification,
-    utilityBill:
-      docsDetails?.utilityBill === undefined ? '' : docsDetails?.utilityBill,
-    bankStatement:
-      docsDetails?.bankStatement === undefined
-        ? ''
-        : docsDetails?.bankStatement,
-    passport: docsDetails?.passport === undefined ? '' : docsDetails?.passport,
-    signature:
-      docsDetails?.signature === undefined ? '' : docsDetails?.signature,
-    seal: docsDetails?.seal === undefined ? '' : docsDetails?.seal,
-    cacCertificate:
-      docsDetails?.cacCertificate === undefined
-        ? ''
-        : docsDetails?.cacCertificate,
-    othersName:
-      docsDetails?.othersName === undefined ? '' : docsDetails?.othersName,
-    others: docsDetails?.others === undefined ? '' : docsDetails?.others,
-    identityCard:
-      docsDetails?.identityCard === undefined ? '' : docsDetails?.identityCard,
-    personalPhoto:
-      docsDetails?.personalPhoto === undefined
-        ? ''
-        : docsDetails?.personalPhoto,
-    cac7: '',
-    cac2: '',
-    lpoFile: '',
-    proformaFile: '',
-    MERMAT: '',
+  useEffect(() => {
+    getData();
+  }, []);
+
+  const getData = async () => {
+    const res = await getAsyncData({storage_name: 'originRoute'});
+    setOrigin(res.data);
   };
 
-  const handleCreateDocs = async () => {
-    try {
-      setIsUpdating(true);
-      const res = await createDocumentsDetails(formDetails);
-      if (res?.error) {
-        Toast.show({
-          type: 'error',
-          position: 'top',
-          topOffset: 50,
-          text1: res?.title,
-          text2: res?.message,
-          visibilityTime: 5000,
-          autoHide: true,
-          onPress: () => Toast.hide(),
-        });
-      } else {
-        Toast.show({
-          type: 'success',
-          position: 'top',
-          topOffset: 50,
-          text1: res?.title,
-          text2: res?.message,
-          visibilityTime: 3000,
-          autoHide: true,
-          onPress: () => Toast.hide(),
-        });
-        setTimeout(() => {
-          navigation.navigate('GetLoan');
-        }, 1000);
-      }
-      setIsUpdating(false);
-    } catch (e) {
-      setIsUpdating(false);
-    }
-  };
-
-  const handleUpdateDocs = async () => {
-    try {
-      setIsUpdating(true);
-      const res = await updateDocumentsDetails(formDetails);
-      if (res?.error) {
-        Toast.show({
-          type: 'error',
-          position: 'top',
-          topOffset: 50,
-          text1: res?.title,
-          text2: res?.message,
-          visibilityTime: 5000,
-          autoHide: true,
-          onPress: () => Toast.hide(),
-        });
-      } else {
-        Toast.show({
-          type: 'success',
-          position: 'top',
-          topOffset: 50,
-          text1: res?.title,
-          text2: res?.message,
-          visibilityTime: 3000,
-          autoHide: true,
-          onPress: () => Toast.hide(),
-        });
-        setTimeout(() => {
-          navigation.navigate('MyAccount');
-        }, 1000);
-      }
-      setIsUpdating(false);
-    } catch (e) {
-      setIsUpdating(false);
-    }
-  };
+  function toggleConfirm() {
+    setShowConfirm(!showConfirm);
+  }
 
   return (
     <SafeAreaView style={styles.container}>
       <Loader visible={isUpdating} loadingText={'Submitting ...'} />
       <Loader visible={isLoading} loadingText={'Submitting ...'} />
-      <View
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginHorizontal: 15,
-        }}>
-        <TouchableOpacity onPress={() => navigation.goBack('')}>
-          <View
-            style={{
-              borderWidth: 0.5,
-              borderColor: '#D9DBE9',
-              borderRadius: 5,
+      <Header
+        routeAction={() => navigation.goBack()}
+        heading={'UPLOAD DOCUMENT'}
+        disable={false}
+      />
+      <VerifyModal visible={showConfirm}>
+        <View style={{alignItems: 'center'}}>
+          <MaterialCommunityIcons
+            name="check-circle"
+            size={45}
+            color={COLORS.lendaGreen}
+            style={{marginLeft: 'auto', marginRight: 'auto'}}
+          />
+          <Text
+            style={[styles.resetPinText, {fontSize: 24, fontFamily: 'serif'}]}>
+            What next!
+          </Text>
+          <Text style={styles.question}>
+            Do you want to request for a loan ?
+          </Text>
+
+          <TouchableOpacity
+            style={styles.signUpactivity}
+            onPress={() => {
+              toggleConfirm();
+              navigation.navigate('BottomTabs', {screen: 'Loan'});
             }}>
-            <AntDesign name="left" size={24} color="black" />
-          </View>
-        </TouchableOpacity>
-        <View style={styles.HeadView}>
-          <View style={styles.TopView}>
-            <Text style={styles.TextHead}>UPLOAD DOCUMENT</Text>
-          </View>
+            <Text style={styles.confirmText}>Yes</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => {
+              toggleConfirm();
+              navigation.popToTop('BottomTabs');
+            }}
+            style={[
+              styles.signUpactivity,
+              {
+                borderColor: '#054B99',
+                backgroundColor: '#fff',
+                borderWidth: 1,
+              },
+            ]}>
+            <Text style={[styles.confirmText, {color: '#054B99'}]}>No</Text>
+          </TouchableOpacity>
         </View>
-        <View>
-          <Text> </Text>
-        </View>
-      </View>
+      </VerifyModal>
 
       <View style={styles.form}>
         <Text style={styles.header}>Submit All</Text>
@@ -208,7 +141,6 @@ const FinalSubmit = ({route}) => {
           })}
         />
       </View>
-
       <View style={[styles.innercontainer, {marginBottom: 40, flex: 1}]}>
         <View>
           <View style={styles.require}>
@@ -228,9 +160,20 @@ const FinalSubmit = ({route}) => {
           <View style={{marginTop: 40}}>
             <TouchableOpacity
               onPress={() => {
-                docsDetails?.validIdentificationType === undefined
-                  ? navigation.navigate('GetLoan')
-                  : navigation.navigate('MyAccount');
+                if (origin !== 'MyAccount') {
+                  if (docsDetails?.validIdentificationType !== undefined) {
+                    toggleConfirm();
+                  } else {
+                    navigation.popToTop('BottomTabs');
+                  }
+                } else {
+                  navigation.popToTop('BottomTabs', {
+                    screen: 'More',
+                    params: {
+                      screen: 'MyAccount',
+                    },
+                  });
+                }
               }}>
               <Buttons label={'Submit & Finish'} />
             </TouchableOpacity>
@@ -331,5 +274,32 @@ const styles = StyleSheet.create({
     backgroundColor: 'lightgray',
     borderRadius: 5,
     overflow: 'hidden',
+  },
+  resetPinText: {
+    color: '#ED2E7E',
+    fontFamily: 'serif',
+    fontSize: 16,
+    paddingVertical: 10,
+  },
+  question: {
+    textAlign: 'center',
+    color: '#4E4B66',
+  },
+  confirmText: {
+    color: '#fff',
+    fontSize: 16,
+  },
+  signUpactivity: {
+    backgroundColor: COLORS.lendaBlue,
+    height: 48,
+    width: '100%',
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  signOutView: {
+    alignItems: 'center',
+    marginVertical: 20,
   },
 });

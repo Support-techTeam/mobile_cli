@@ -123,6 +123,10 @@ const Pin = ({route}) => {
 
   useEffect(() => {
     setTransferDetails({
+      fromWalletIdAccountNumber:
+        bankDetails?.fromWalletIdAccountNumber === undefined
+          ? ''
+          : bankDetails?.fromWalletIdAccountNumber,
       receiverAccountFirstName:
         bankDetails?.receiverAccountFirstName === undefined
           ? ''
@@ -155,6 +159,10 @@ const Pin = ({route}) => {
 
   useEffect(() => {
     setInternalTransferDetails({
+      fromWalletIdAccountNumber:
+        bankDetails?.fromWalletIdAccountNumber === undefined
+          ? ''
+          : bankDetails?.fromWalletIdAccountNumber,
       toWalletIdAccountNumber:
         bankDetails?.toWalletIdAccountNumber === undefined
           ? ''

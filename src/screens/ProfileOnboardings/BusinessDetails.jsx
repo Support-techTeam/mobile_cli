@@ -5,12 +5,11 @@ import {
   ScrollView,
   TouchableOpacity,
   Pressable,
-  Platform,
   Image,
   ImageBackground,
   Dimensions,
 } from 'react-native';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useLayoutEffect, useState} from 'react';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import {useNavigation, useRoute} from '@react-navigation/native';
@@ -27,6 +26,10 @@ import {
 } from '../../stores/LoanStore';
 import KeyboardAvoidingWrapper from '../../component/KeyBoardAvoiding/keyBoardAvoiding';
 import Loader from '../../component/loader/loader';
+import COLORS from '../../constants/colors';
+const countryList = require('country-list');
+import {SelectList} from 'react-native-dropdown-select-list';
+import {Location} from '../../constants/location';
 
 const businessTypeData = [
   {value: '', label: 'Select type'},
@@ -47,10 +50,15 @@ const businessRegData = [
   {value: false, label: 'No'},
 ];
 
-const stateData = [{value: '', label: 'Select State'}];
+const stateData = [
+  {value: '', label: 'Select State'},
+  {value: 'Outside Nigeria', label: 'Outside Nigeria'},
+  {value: '', label: 'N/A'},
+];
 
 const cityData = [
   {value: '', label: 'Select LGA'},
+  {value: 'Outside Nigeria', label: 'Outside Nigeria'},
   {value: '', label: 'N/A'},
 ];
 
@@ -114,10 +122,11 @@ const industryData = [
 
 const monthlySalesData = [
   {value: '', label: 'Select Option'},
-  {value: 'Less than 10 sales', label: 'Less than 10 sales'},
-  {value: '51 to 100 sales', label: '51 to 100 sales'},
-  {value: '100 to 500 sales', label: '100 to 500 sales'},
-  {value: 'Above 500 sales', label: 'Above 500 sales'},
+  {value: 'Less than ₦10,000', label: 'Less than ₦10,000'},
+  {value: '₦10,000 to ₦100,000', label: '₦10,000 to ₦100,000'},
+  {value: '₦100,000 to ₦500,000', label: '₦100,000 to ₦500,000'},
+  {value: '₦500,000 to ₦1,000,000', label: '₦500,000 to ₦1,000,000'},
+  {value: 'Above ₦1,000,000', label: 'Above ₦1,000,000'},
 ];
 
 const businessDurationData = [
@@ -136,13 +145,19 @@ const monthlyExpData = [
   {value: '₦100,000 to ₦500,000', label: '₦100,000 to ₦500,000'},
   {value: '₦500,000 to ₦1,000,000', label: '₦500,000 to ₦1,000,000'},
   {value: 'Above ₦1,000,000', label: 'Above ₦1,000,000'},
-  {value: 'Dr', label: 'Dr'},
 ];
 
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
 
-let fetchedCity = [];
+let fetchedCity = [
+  {value: '', label: '...Select LGA'},
+  {value: 'Outside Nigeria', label: 'Outside Nigeria', key: 0},
+];
+let currentState = [
+  {value: '', label: '...Select State'},
+  {value: 'Outside Nigeria', label: 'Outside Nigeria', key: 0},
+];
 
 const BusinessDetails = () => {
   const navigation = useNavigation();
@@ -152,17 +167,17 @@ const BusinessDetails = () => {
   const date = new Date(2000, 0, 1);
   const addressDate = new Date(2000, 0, 1);
   const [orgDetails, setOrgDetails] = useState([]);
-  const [currentState, setCurrentState] = useState(undefined);
-  const [currentCity, setCurrentCity] = useState(undefined);
-  const [state, setState] = useState();
-  const [cityByState, setCitybyState] = useState([]);
-  const [city, setCity] = useState();
   const [isLoading, setIsLoading] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
-
+  const [errors, setErrors] = useState({});
   const route = useRoute();
-  const curentRoute = route.name;
   const previousRoute = navigation.getState()?.routes.slice(-2)[0]?.name;
+  const countries =
+    countryList?.getData() &&
+    countryList?.getData()?.map(country => ({
+      value: country.name,
+      label: country.name,
+    }));
 
   const [businessDetails, setBusinessDetails] = useState({
     businessType: '',
@@ -172,7 +187,7 @@ const BusinessDetails = () => {
     rcNum: '',
     establishmentDate: '',
     businessAddress: '',
-    country: '',
+    country: 'Nigeria',
     state: '',
     city: '',
     ownedOrRented: '',
@@ -313,16 +328,15 @@ const BusinessDetails = () => {
   }, [orgDetails, navigation]);
 
   const disableit =
-    !businessDetails.businessType ||
-    !businessDetails.businessName ||
-    !businessDetails.businessAddress ||
-    // !businessDetails.city ||
-    !businessDetails.state ||
-    !businessDetails.positionInOrg ||
-    !businessDetails.totalEmployees ||
-    !businessDetails.industry ||
-    !businessDetails.monthlyExpenses ||
-    !businessDetails.monthlySales;
+    !businessDetails?.businessType ||
+    !businessDetails?.businessName ||
+    !businessDetails?.businessAddress ||
+    !businessDetails?.state ||
+    !businessDetails?.positionInOrg ||
+    !businessDetails?.totalEmployees ||
+    !businessDetails?.industry ||
+    !businessDetails?.monthlyExpenses ||
+    !businessDetails?.monthlySales;
 
   const showDatePicker = () => {
     setShow(true);
@@ -437,18 +451,17 @@ const BusinessDetails = () => {
     }
   };
 
-  useEffect(() => {
+  // new local state Logic
+  useLayoutEffect(() => {
     const fetchState = async () => {
-      try {
-        const res = await getState();
-        if (res?.data !== undefined) {
-          setState(res?.data);
-        }
-      } catch (error) {
-        // console.error(error);
-      }
+      Location?.map((item, index) => {
+        currentState.push({
+          value: item.state,
+          label: item.state,
+          key: index + 1,
+        });
+      });
     };
-
     fetchState();
     return () => {
       fetchState();
@@ -456,63 +469,15 @@ const BusinessDetails = () => {
   }, []);
 
   useEffect(() => {
-    const stateData =
-      state &&
-      state.map((item, index) => {
-        return {value: item, label: item, key: index};
-      });
-
-    if (currentState == undefined || currentState == '') {
-      setCurrentState(stateData);
-    }
-  }, [state]);
-
-  useEffect(() => {
-    if (businessDetails?.state !== '' && state !== undefined) {
-      setCitybyState(state?.filter(statee => statee === businessDetails.state));
-    }
-  }, [state, businessDetails.state]);
-
-  const stateCity = cityByState[0];
-
-  useEffect(() => {
-    const fetchCity = async () => {
-      try {
-        const res = await getCity(stateCity);
-        if (res?.data !== undefined) {
-          setCity(res?.data);
-        }
-      } catch (error) {
-        // console.error(error);
-      }
-    };
-
-    fetchCity();
-    return () => {
-      fetchCity();
-    };
-  }, [stateCity]);
-
-  useEffect(() => {
-    if (businessDetails.state !== '') {
-      const getStateData = getCity(businessDetails.state)
-        .then(res => {
-          fetchedCity = [];
-          res?.data &&
-            res?.data.map((item, index) => {
-              fetchedCity.push({value: item, label: item, key: index});
-            });
-        })
-        .catch(err => {});
-    }
-  }, [businessDetails.state]);
-
-  useEffect(() => {
     setIsLoading(true);
     setTimeout(() => {
       setIsLoading(false);
     }, 2000);
   }, []);
+
+  const handleError = (error, input) => {
+    setErrors(prevState => ({...prevState, [input]: error}));
+  };
 
   return (
     <SafeAreaView
@@ -524,8 +489,9 @@ const BusinessDetails = () => {
         paddingLeft: insets.left !== 0 ? insets.left / 2 : 'auto',
         paddingRight: insets.right !== 0 ? insets.right / 2 : 'auto',
       }}>
-       <Loader visible={isLoading} loadingText={'Please wait...'} />
-       <Loader visible={isLoading} loadingText={'Please wait...'} />
+      <Loader visible={isLoading} loadingText={'Please wait...'} />
+      <Loader visible={isUpdating} loadingText={'Storing business data...'} />
+
       <View
         style={{
           flexDirection: 'row',
@@ -597,7 +563,7 @@ const BusinessDetails = () => {
                   maxHeight={300}
                   labelField="label"
                   valueField="value"
-                  value={businessDetails.businessType}
+                  value={businessDetails?.businessType}
                   onChange={option => {
                     setBusinessDetails({
                       ...businessDetails,
@@ -632,7 +598,7 @@ const BusinessDetails = () => {
                   maxHeight={300}
                   labelField="label"
                   valueField="value"
-                  value={businessDetails.registered}
+                  value={businessDetails?.registered}
                   onChange={option => {
                     setBusinessDetails({
                       ...businessDetails,
@@ -667,8 +633,8 @@ const BusinessDetails = () => {
                   placeholder="2000 - 01 - 01"
                   iconName="calendar-month-outline"
                   defaultValue={
-                    businessDetails.establishmentDate
-                      ? businessDetails.establishmentDate?.substr(0, 10)
+                    businessDetails?.establishmentDate
+                      ? businessDetails?.establishmentDate?.substr(0, 10)
                       : ''
                   }
                   isDate={true}
@@ -724,8 +690,8 @@ const BusinessDetails = () => {
                   label="When did you move to this address?"
                   placeholder="2000 - 01 - 01"
                   defaultValue={
-                    businessDetails.whenDidYouMoveToThisBusinessLocation
-                      ? businessDetails.whenDidYouMoveToThisBusinessLocation?.substr(
+                    businessDetails?.whenDidYouMoveToThisBusinessLocation
+                      ? businessDetails?.whenDidYouMoveToThisBusinessLocation?.substr(
                           0,
                           10,
                         )
@@ -758,75 +724,177 @@ const BusinessDetails = () => {
                 textColor="#054B99"
               />
 
-              <Input
-                label="Country"
-                placeholder="Enter country"
-                iconName="flag-outline"
-                isNeeded={true}
-                defaultValue={businessDetails?.country}
-                onChangeText={text =>
-                  setBusinessDetails({...businessDetails, country: text})
-                }
-              />
+              <View style={{marginBottom: 20}}>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                  }}>
+                  <View style={{flexDirection: 'row'}}>
+                    <Text
+                      style={{
+                        marginVertical: 5,
+                        fontSize: 14,
+                        color: COLORS.labelColor,
+                      }}>
+                      Country
+                    </Text>
+                    <Text style={{color: 'red', marginRight: 10}}>*</Text>
+                  </View>
+                </View>
+                <SelectList
+                  setSelected={text =>
+                    setBusinessDetails({
+                      ...businessDetails,
+                      country: text,
+                      state: '',
+                      city: '',
+                    })
+                  }
+                  defaultOption={{
+                    value: businessDetails?.country
+                      ? businessDetails?.country
+                      : 'Nigeria',
+                    key: businessDetails?.country
+                      ? businessDetails?.country
+                      : 'Nigeria',
+                  }}
+                  data={countries}
+                  save="value"
+                  placeholder="Select your country"
+                  boxStyles={styles.inputContainer}
+                />
+              </View>
 
               <View
-                style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                }}>
                 <View
-                  style={{marginVertical: 10, paddingRight: 5, width: '50%'}}>
+                  style={{
+                    marginVertical: 10,
+                    paddingRight: 5,
+                    width: '50%',
+                  }}>
                   <CustomDropdown
                     label="State"
                     isNeeded={true}
                     placeholder="Select State"
+                    onFocus={() => handleError(null, 'state')}
                     placeholderStyle={styles.placeholderStyle}
                     selectedTextStyle={styles.selectedTextStyle}
                     data={currentState ? currentState : stateData}
-                    // data={stateData}
                     maxHeight={300}
                     labelField="label"
                     valueField="value"
-                    value={businessDetails.state}
+                    value={businessDetails?.state}
+                    defaultValue={
+                      businessDetails?.state && businessDetails?.state
+                    }
                     onChange={option => {
-                      setBusinessDetails({
-                        ...businessDetails,
-                        state: option.value,
-                      });
-                      const getStateData = getCity(option.value)
-                        .then(res => {
-                          fetchedCity = [];
-                          res?.data &&
-                            res?.data.map((item, index) => {
-                              fetchedCity.push({
-                                value: item,
-                                label: item,
-                                key: index,
-                              });
-                            });
-                        })
-                        .catch(err => {
-                          // console.log(err);
+                      if (
+                        businessDetails?.country === 'Nigeria' &&
+                        option.value === 'Outside Nigeria'
+                      ) {
+                        setBusinessDetails({
+                          ...businessDetails,
+                          state: '',
+                          city: '',
                         });
+
+                        Toast.show({
+                          type: 'warning',
+                          position: 'top',
+                          topOffset: 50,
+                          text1: 'Warning',
+                          text2:
+                            'Option selected is not available for this country',
+                          visibilityTime: 3000,
+                          autoHide: true,
+                          onPress: () => Toast.hide(),
+                        });
+                      } else {
+                        setBusinessDetails({
+                          ...businessDetails,
+                          state: option.value,
+                        });
+
+                        //Get cities by state
+                        const lgaData = Location?.find(
+                          item => item.state === option.value,
+                        );
+                        if (lgaData) {
+                          fetchedCity = [
+                            {value: '', label: '...Select LGA'},
+                            {
+                              value: 'Outside Nigeria',
+                              label: 'Outside Nigeria',
+                              key: 0,
+                            },
+                          ];
+                          lgaData?.lgas.map((item, index) => {
+                            fetchedCity.push({
+                              value: item,
+                              label: item,
+                              key: index + 1,
+                            });
+                          });
+                        }
+                      }
                     }}
                   />
                 </View>
                 <View
-                  style={{marginVertical: 10, paddingLeft: 5, width: '50%'}}>
+                  style={{
+                    marginVertical: 10,
+                    paddingLeft: 5,
+                    width: '50%',
+                  }}>
                   <CustomDropdown
                     label="City"
                     isNeeded={true}
                     placeholder="Select LGA"
+                    onFocus={() => handleError(null, 'city')}
                     placeholderStyle={styles.placeholderStyle}
                     selectedTextStyle={styles.selectedTextStyle}
                     data={fetchedCity.length > 0 ? fetchedCity : cityData}
-                    disabled={!businessDetails.state}
+                    disabled={!businessDetails?.state}
                     maxHeight={300}
                     labelField="label"
                     valueField="value"
-                    value={businessDetails.city}
+                    value={businessDetails?.city}
+                    defaultValue={
+                      businessDetails?.city && businessDetails?.city
+                    }
                     onChange={option => {
-                      setBusinessDetails({
-                        ...businessDetails,
-                        city: option.value,
-                      });
+                      if (
+                        businessDetails?.country === 'Nigeria' &&
+                        option.value === 'Outside Nigeria'
+                      ) {
+                        setBusinessDetails({
+                          ...businessDetails,
+                          city: '',
+                        });
+
+                        Toast.show({
+                          type: 'warning',
+                          position: 'top',
+                          topOffset: 50,
+                          text1: 'Warning',
+                          text2:
+                            'Option selected is not available for this country',
+                          visibilityTime: 3000,
+                          autoHide: true,
+                          onPress: () => Toast.hide(),
+                        });
+                      } else {
+                        setBusinessDetails({
+                          ...businessDetails,
+                          city: option.value,
+                        });
+                      }
                     }}
                   />
                 </View>
@@ -897,7 +965,7 @@ const BusinessDetails = () => {
                   maxHeight={300}
                   labelField="label"
                   valueField="value"
-                  value={businessDetails.shariaCom}
+                  value={businessDetails?.shariaCom}
                   onChange={option => {
                     setBusinessDetails({
                       ...businessDetails,
@@ -930,7 +998,7 @@ const BusinessDetails = () => {
                   maxHeight={300}
                   labelField="label"
                   valueField="value"
-                  value={businessDetails.salesMethod}
+                  value={businessDetails?.salesMethod}
                   onChange={option => {
                     setBusinessDetails({
                       ...businessDetails,
@@ -950,7 +1018,7 @@ const BusinessDetails = () => {
                   maxHeight={300}
                   labelField="label"
                   valueField="value"
-                  value={businessDetails.industry}
+                  value={businessDetails?.industry}
                   onChange={option => {
                     setBusinessDetails({
                       ...businessDetails,
@@ -970,7 +1038,7 @@ const BusinessDetails = () => {
                   maxHeight={300}
                   labelField="label"
                   valueField="value"
-                  value={businessDetails.monthlySales}
+                  value={businessDetails?.monthlySales}
                   onChange={option => {
                     setBusinessDetails({
                       ...businessDetails,
@@ -990,7 +1058,7 @@ const BusinessDetails = () => {
                   maxHeight={300}
                   labelField="label"
                   valueField="value"
-                  value={businessDetails.monthlyExpenses}
+                  value={businessDetails?.monthlyExpenses}
                   onChange={option => {
                     setBusinessDetails({
                       ...businessDetails,
@@ -1010,7 +1078,7 @@ const BusinessDetails = () => {
                   maxHeight={300}
                   labelField="label"
                   valueField="value"
-                  value={businessDetails.businessDuration}
+                  value={businessDetails?.businessDuration}
                   onChange={option => {
                     setBusinessDetails({
                       ...businessDetails,
@@ -1164,5 +1232,24 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  inputContainer: {
+    height: 55,
+    alignItems: 'center',
+    backgroundColor: COLORS.light,
+    paddingHorizontal: 15,
+    width: '100%',
+    borderWidth: 0.5,
+    borderRadius: 8,
+    borderColor: COLORS.lendaComponentBorder,
+    padding: 12,
+    borderBottomWidth: 0.8,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 1.41,
   },
 });
