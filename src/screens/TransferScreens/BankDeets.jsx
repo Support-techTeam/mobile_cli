@@ -26,7 +26,6 @@ import {
 } from '../../stores/WalletStore';
 import Toast from 'react-native-toast-message';
 import COLORS from '../../constants/colors';
-import SearchableDropdown from 'react-native-searchable-dropdown';
 import {Header} from '../../component/header/Header';
 import CustomSearchableDropdown from '../../component/inputField/CustomSearchableDropdown';
 import Loader from '../../component/loader/loader';
@@ -55,7 +54,6 @@ let selectedData = '';
 const BankDeets = ({route}) => {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
-  const userWalletData = useSelector(state => state.userProfile.wallet);
   const userMultiWalletData = useSelector(
     state => state.userProfile.multiWallet,
   );
@@ -67,8 +65,6 @@ const BankDeets = ({route}) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
   const [isFetchingSeerbitBanks, setIsFetchingSeerbitBanks] = useState(false);
-  // const [currentBanks, setCurrentBanks] = useState(undefined);
-  // const [seerbitBanks, setSeerbitBanks] = useState(undefined);
   const [numComplete, setNumComplete] = useState(false);
   const [bankDetails, setBankDetails] = useState({
     fromWalletIdAccountNumber: '',
@@ -655,10 +651,7 @@ const BankDeets = ({route}) => {
                                   style: 'decimal',
                                   minimumFractionDigits: 2,
                                   maximumFractionDigits: 2,
-                                })
-                                  .format(Number(seerbitBalance))
-                                  ?.toString()
-                                  ?.replace(/\B(?=(\d{3})+\b)/g, ',')
+                                }).format(Number(seerbitBalance))
                               : '0.00'
                           }
                         />
@@ -695,39 +688,7 @@ const BankDeets = ({route}) => {
                                       onPress: () => Toast.hide(),
                                     });
                                     return;
-                                  }
-                                  // else if (
-                                  //   userWalletData?.availableBalance ==
-                                  //     undefined ||
-                                  //   userWalletData?.availableBalance == null
-                                  // ) {
-                                  //   Toast.show({
-                                  //     type: 'error',
-                                  //     position: 'top',
-                                  //     topOffset: 50,
-                                  //     text1: 'Wallet Internal Transfer',
-                                  //     text2: 'Balance not available!',
-                                  //     visibilityTime: 5000,
-                                  //     autoHide: true,
-                                  //     onPress: () => Toast.hide(),
-                                  //   });
-                                  // } else if (
-                                  //   Number(bankDetails?.amount) >
-                                  //   Number(userWalletData?.availableBalance)
-                                  // ) {
-                                  //   Toast.show({
-                                  //     type: 'error',
-                                  //     position: 'top',
-                                  //     topOffset: 50,
-                                  //     text1: 'Wallet Internal Transfer',
-                                  //     text2: 'Available balance exceeded!',
-                                  //     visibilityTime: 5000,
-                                  //     autoHide: true,
-                                  //     onPress: () => Toast.hide(),
-                                  //   });
-                                  //   return;
-                                  // }
-                                  else if (
+                                  } else if (
                                     userMultiWalletData &&
                                     selectedData?.banker === 'Providus'
                                   ) {
@@ -963,7 +924,7 @@ const BankDeets = ({route}) => {
                           autoHide: true,
                           onPress: () => Toast.hide(),
                         });
-                        if (seerbitBanks && seerbitBanks.length <= 0) {
+                        if (seerbitBanks && seerbitBanks?.length <= 0) {
                           handleGetAllSeerbitBanks();
                         }
                       } else {
