@@ -14,7 +14,7 @@ import {SelectList} from 'react-native-dropdown-select-list';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 import Input from '../../component/inputField/input.component';
 import Buttons from '../../component/buttons/Buttons';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {
   getAllBankDetails,
   getBeneficiaries,
@@ -30,6 +30,11 @@ import SearchableDropdown from 'react-native-searchable-dropdown';
 import {Header} from '../../component/header/Header';
 import CustomSearchableDropdown from '../../component/inputField/CustomSearchableDropdown';
 import Loader from '../../component/loader/loader';
+import {
+  setBalanceSB,
+  setProvidusBanks,
+  setSeerbitbanks,
+} from '../../util/redux/userProfile/user.profile.slice';
 
 const defaultData = [
   {value: 'Select Option', label: 'Select Option'},
@@ -54,14 +59,17 @@ const BankDeets = ({route}) => {
   const userMultiWalletData = useSelector(
     state => state.userProfile.multiWallet,
   );
+  const seerbitBalance = useSelector(state => state.userProfile.balanceSB);
+  const currentBanks = useSelector(state => state.userProfile.providusBanks);
+  const seerbitBanks = useSelector(state => state.userProfile.seerbitBanks);
+  const dispatch = useDispatch();
   const prevRoute = route?.params?.paramKey;
   const [isLoading, setIsLoading] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
   const [isFetchingSeerbitBanks, setIsFetchingSeerbitBanks] = useState(false);
-  const [currentBanks, setCurrentBanks] = useState(undefined);
-  const [seerbitBanks, setSeerbitBanks] = useState(undefined);
+  // const [currentBanks, setCurrentBanks] = useState(undefined);
+  // const [seerbitBanks, setSeerbitBanks] = useState(undefined);
   const [numComplete, setNumComplete] = useState(false);
-  const [seerbitBalance, setSeerbitBalance] = useState(0);
   const [bankDetails, setBankDetails] = useState({
     fromWalletIdAccountNumber: '',
     receiverAccountFirstName: '',
@@ -121,7 +129,7 @@ const BankDeets = ({route}) => {
             });
 
             if (currentBanks == undefined || currentBanks == '') {
-              setCurrentBanks(bankData);
+              dispatch(setProvidusBanks(bankData));
             }
           }
         }
@@ -162,7 +170,7 @@ const BankDeets = ({route}) => {
               });
 
             if (seerbitBanks == undefined || seerbitBanks == '') {
-              setSeerbitBanks(bankData);
+              dispatch(setSeerbitbanks(bankData));
             }
           }
         }
@@ -434,7 +442,7 @@ const BankDeets = ({route}) => {
           .then(res => {
             if (res) {
               if (!res?.error) {
-                setSeerbitBalance(res?.data);
+                dispatch(setBalanceSB(res?.data));
               }
             }
           })
@@ -611,6 +619,11 @@ const BankDeets = ({route}) => {
                               setBankDetails({
                                 ...bankDetails,
                                 saveBeneficiary: !bankDetails.saveBeneficiary,
+                                beneficiaryBankName:
+                                  bankDetails?.toWalletIdAccountNumber[0] ===
+                                  '4'
+                                    ? '9 Payment Service Bank'
+                                    : 'Providus',
                               })
                             }
                           />
@@ -627,10 +640,26 @@ const BankDeets = ({route}) => {
                           isNeeded={true}
                           isAirtime={true}
                           isBalance={
-                            userWalletData &&
-                            userWalletData?.availableBalance
-                              ?.toString()
-                              ?.replace(/\B(?=(\d{3})+\b)/g, ',')
+                            userMultiWalletData &&
+                            selectedData?.banker === 'Providus'
+                              ? new Intl.NumberFormat('en-US', {
+                                  style: 'decimal',
+                                  minimumFractionDigits: 2,
+                                  maximumFractionDigits: 2,
+                                }).format(
+                                  Number(selectedData?.availableBalance),
+                                )
+                              : selectedData?.banker ===
+                                '9 Payment Service Bank'
+                              ? new Intl.NumberFormat('en-US', {
+                                  style: 'decimal',
+                                  minimumFractionDigits: 2,
+                                  maximumFractionDigits: 2,
+                                })
+                                  .format(Number(seerbitBalance))
+                                  ?.toString()
+                                  ?.replace(/\B(?=(\d{3})+\b)/g, ',')
+                              : '0.00'
                           }
                         />
                         {bankDetails.amount > 0 && (
@@ -666,36 +695,118 @@ const BankDeets = ({route}) => {
                                       onPress: () => Toast.hide(),
                                     });
                                     return;
-                                  } else if (
-                                    userWalletData?.availableBalance ==
-                                      undefined ||
-                                    userWalletData?.availableBalance == null
+                                  }
+                                  // else if (
+                                  //   userWalletData?.availableBalance ==
+                                  //     undefined ||
+                                  //   userWalletData?.availableBalance == null
+                                  // ) {
+                                  //   Toast.show({
+                                  //     type: 'error',
+                                  //     position: 'top',
+                                  //     topOffset: 50,
+                                  //     text1: 'Wallet Internal Transfer',
+                                  //     text2: 'Balance not available!',
+                                  //     visibilityTime: 5000,
+                                  //     autoHide: true,
+                                  //     onPress: () => Toast.hide(),
+                                  //   });
+                                  // } else if (
+                                  //   Number(bankDetails?.amount) >
+                                  //   Number(userWalletData?.availableBalance)
+                                  // ) {
+                                  //   Toast.show({
+                                  //     type: 'error',
+                                  //     position: 'top',
+                                  //     topOffset: 50,
+                                  //     text1: 'Wallet Internal Transfer',
+                                  //     text2: 'Available balance exceeded!',
+                                  //     visibilityTime: 5000,
+                                  //     autoHide: true,
+                                  //     onPress: () => Toast.hide(),
+                                  //   });
+                                  //   return;
+                                  // }
+                                  else if (
+                                    userMultiWalletData &&
+                                    selectedData?.banker === 'Providus'
                                   ) {
-                                    Toast.show({
-                                      type: 'error',
-                                      position: 'top',
-                                      topOffset: 50,
-                                      text1: 'Wallet Internal Transfer',
-                                      text2: 'Balance not available!',
-                                      visibilityTime: 5000,
-                                      autoHide: true,
-                                      onPress: () => Toast.hide(),
-                                    });
+                                    if (
+                                      selectedData?.availableBalance ==
+                                        undefined ||
+                                      selectedData?.availableBalance == null
+                                    ) {
+                                      Toast.show({
+                                        type: 'error',
+                                        position: 'top',
+                                        topOffset: 50,
+                                        text1: 'Wallet Internal Transfer',
+                                        text2: 'Balance not available!',
+                                        visibilityTime: 5000,
+                                        autoHide: true,
+                                        onPress: () => Toast.hide(),
+                                      });
+                                      return;
+                                    } else if (
+                                      Number(bankDetails?.amount) >
+                                      Number(selectedData?.availableBalance)
+                                    ) {
+                                      Toast.show({
+                                        type: 'error',
+                                        position: 'top',
+                                        topOffset: 50,
+                                        text1: 'Wallet Internal Transfer',
+                                        text2: 'Available balance exceeded!',
+                                        visibilityTime: 5000,
+                                        autoHide: true,
+                                        onPress: () => Toast.hide(),
+                                      });
+                                      return;
+                                    } else {
+                                      navigation.navigate('Summary', {
+                                        bankDetails: bankDetails,
+                                      });
+                                    }
                                   } else if (
-                                    Number(bankDetails?.amount) >
-                                    Number(userWalletData?.availableBalance)
+                                    userMultiWalletData &&
+                                    selectedData?.banker ===
+                                      '9 Payment Service Bank'
                                   ) {
-                                    Toast.show({
-                                      type: 'error',
-                                      position: 'top',
-                                      topOffset: 50,
-                                      text1: 'Wallet Internal Transfer',
-                                      text2: 'Available balance exceeded!',
-                                      visibilityTime: 5000,
-                                      autoHide: true,
-                                      onPress: () => Toast.hide(),
-                                    });
-                                    return;
+                                    if (
+                                      seerbitBalance == undefined ||
+                                      seerbitBalance == null
+                                    ) {
+                                      Toast.show({
+                                        type: 'error',
+                                        position: 'top',
+                                        topOffset: 50,
+                                        text1: 'Wallet Internal Transfer',
+                                        text2: 'Balance not available!',
+                                        visibilityTime: 5000,
+                                        autoHide: true,
+                                        onPress: () => Toast.hide(),
+                                      });
+                                      return;
+                                    } else if (
+                                      Number(bankDetails?.amount) >
+                                      Number(seerbitBalance)
+                                    ) {
+                                      Toast.show({
+                                        type: 'error',
+                                        position: 'top',
+                                        topOffset: 50,
+                                        text1: 'Wallet Internal Transfer',
+                                        text2: 'Available balance exceeded!',
+                                        visibilityTime: 5000,
+                                        autoHide: true,
+                                        onPress: () => Toast.hide(),
+                                      });
+                                      return;
+                                    } else {
+                                      navigation.navigate('Summary', {
+                                        bankDetails: bankDetails,
+                                      });
+                                    }
                                   } else {
                                     navigation.navigate('Summary', {
                                       bankDetails: bankDetails,
@@ -1022,7 +1133,7 @@ const BankDeets = ({route}) => {
                                           type: 'error',
                                           position: 'top',
                                           topOffset: 50,
-                                          text1: 'Wallet Internal Transfer',
+                                          text1: 'NIP Transfer',
                                           text2: 'Balance not available!',
                                           visibilityTime: 5000,
                                           autoHide: true,
@@ -1062,7 +1173,7 @@ const BankDeets = ({route}) => {
                                           type: 'error',
                                           position: 'top',
                                           topOffset: 50,
-                                          text1: 'Wallet Internal Transfer',
+                                          text1: 'NIP Transfer',
                                           text2: 'Balance not available!',
                                           visibilityTime: 5000,
                                           autoHide: true,

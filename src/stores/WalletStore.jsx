@@ -875,7 +875,6 @@ const getSeerbitNipBanks = async () => {
             headers,
           },
         );
-        console.log(response?.data, 'verifySeerbitNipAccount');
         DdLogs.info(
           `Wallet | Get All Seerbit bank list| ${auth()?.currentUser?.email}`,
           {
@@ -941,7 +940,6 @@ const verifySeerbitNipAccount = async (accountNumber, bankName) => {
             headers,
           },
         );
-        console.log(response?.data, 'verifySeerbitNipAccount');
         DdLogs.info(
           `Wallet | Verify Seerbit Wallet | ${auth()?.currentUser?.email}`,
           {

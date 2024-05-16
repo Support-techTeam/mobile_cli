@@ -24,7 +24,7 @@ import Input from '../../component/inputField/input.component';
 import CustomDropdown from '../../component/dropDown/dropdown.component';
 import InputPhone from '../../component/inputField/phone-input.component';
 import Toast from 'react-native-toast-message';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {SelectList} from 'react-native-dropdown-select-list';
 import {
   getDataPlanByProvider,
@@ -41,11 +41,11 @@ let bankerListData = [
 
 let selectedData = '';
 
-const Overview = ({route}) => {
+const Overview = () => {
   const navigation = useNavigation();
   const [isLoading, setIsLoading] = useState(false);
   const routes = useRoute();
-  const [seerbitBalance, setSeerbitBalance] = useState(0);
+  const dispatch = useDispatch();
   const [airtimeDetails, setAirtimeDetails] = useState({
     fromWalletIdAccountNumber: '',
     number: '',
@@ -61,7 +61,7 @@ const Overview = ({route}) => {
     packages: '',
   });
   const insets = useSafeAreaInsets();
-  const userWalletData = useSelector(state => state.userProfile.wallet);
+  const seerbitBalance = useSelector(state => state.userProfile.balanceSB);
   const userMultiWalletData = useSelector(
     state => state.userProfile.multiWallet,
   );
@@ -255,7 +255,7 @@ const Overview = ({route}) => {
             .then(res => {
               if (res) {
                 if (!res?.error) {
-                  setSeerbitBalance(res?.data);
+                  dispatch(setBalanceSB(res?.data));
                 }
               }
             })
@@ -425,7 +425,7 @@ const Overview = ({route}) => {
                 setSelected={val => {
                   try {
                     const splitData = val && val?.length > 0 && val.split('-');
-                    const selectedAccount = splitData[0].trim();
+                    const selectedAccount = splitData[0]?.trim();
                     if (selectedAccount === 'Select Option') {
                       Toast.show({
                         type: 'warning',
@@ -441,7 +441,7 @@ const Overview = ({route}) => {
                       selectedData = userMultiWalletData?.find(
                         walletData =>
                           walletData?.walletIdAccountNumber ===
-                          selectedAccount.toString(),
+                          selectedAccount?.toString(),
                       );
                       setAirtimeDetails({
                         ...airtimeDetails,

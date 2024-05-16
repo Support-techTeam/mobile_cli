@@ -13,7 +13,10 @@ import {useSelector, useDispatch} from 'react-redux';
 import Toast from 'react-native-toast-message';
 import {
   setAccount,
+  setBalanceSB,
   setMultipleWallets,
+  setProvidusBanks,
+  setSeerbitbanks,
   setWallet,
 } from '../../util/redux/userProfile/user.profile.slice';
 import PersonalDetails from '../ProfileOnboardings/PersonalDetails';
@@ -41,6 +44,8 @@ import {
   getAllWallet,
   getSeerbitWalletBalance,
   getSecondWallet,
+  getAllBankDetails,
+  getSeerbitNipBanks,
 } from '../../stores/WalletStore';
 import {IntroSection} from '../../component/homescreen/Intro-Section';
 import {SlideSection} from '../../component/homescreen/Slide-Section';
@@ -71,11 +76,13 @@ const Homescreen = () => {
   const userMultiWalletData = useSelector(
     state => state.userProfile.multiWallet,
   );
+  const seerbitBalance = useSelector(state => state.userProfile.balanceSB);
+  const currentBanks = useSelector(state => state.userProfile.providusBanks);
+  const seerbitBanks = useSelector(state => state.userProfile.seerbitBanks);
   const [userTransactionsData, setUserTransactionsData] = useState([]);
   const [userLoanAmount, setUserLoanAmount] = useState(undefined);
   const [data, setString] = useClipboard();
   const [timeOut, setTimeOut] = useState(false);
-  const route = useRoute();
   const [loanUserDetails, setLoanUserDetails] = useState(undefined);
   const [userPin, setUserPin] = useState(true);
   const [guarantor, setGuarantor] = useState([]);
@@ -113,7 +120,7 @@ const Homescreen = () => {
   const [adverts, setAdverts] = useState([]);
   const [isLoadingMultipleWallets, setIsLoadingMultipleWallets] =
     useState(true);
-  const [seerbitBalance, setSeerbitBalance] = useState(0);
+  // const [seerbitBalance, setSeerbitBalance] = useState(0);
   const toggleHideBalance = () => {
     setHideBalance(!hideBalance);
   };
@@ -173,6 +180,8 @@ const Homescreen = () => {
       unsubGetLoanAmount();
       unsubGetAllAdverts();
       unsubGetSeerbitWalletBalance();
+      handleGetAllBanks();
+      handleGetAllSeerbitBanks();
     }, []),
   );
 
@@ -203,7 +212,7 @@ const Homescreen = () => {
 
   useEffect(() => {
     const interval = setInterval(async () => {
-      unsubGetSeerbitWalletBalance();
+      unsubGetMultipleWallets();
     }, 60000);
 
     return () => {
@@ -286,7 +295,8 @@ const Homescreen = () => {
         .then(res => {
           if (res) {
             if (!res?.error) {
-              setSeerbitBalance(res?.data);
+              // setSeerbitBalance(res?.data);
+              dispatch(setBalanceSB(res?.data));
             }
           }
         })
@@ -482,6 +492,59 @@ const Homescreen = () => {
       })
       .catch(e => {})
       .finally(() => {});
+  };
+
+  // Data to Persist
+  const handleGetAllBanks = async () => {
+    getAllBankDetails()
+      .then(res => {
+        if (res) {
+          if (res?.error) {
+            // Todo: Handle Error
+          } else {
+            const bankData = res?.data?.map((banks, i) => {
+              return {value: banks?.bankName, label: banks?.bankName, key: i};
+            });
+
+            if (currentBanks == undefined || currentBanks == null) {
+              dispatch(setProvidusBanks(bankData));
+            }
+          }
+        }
+      })
+      .catch(error => {})
+      .finally(() => {});
+  };
+
+  const handleGetAllSeerbitBanks = async () => {
+    getSeerbitNipBanks()
+      .then(res => {
+        if (res) {
+          if (res?.error) {
+            // Todo: Handle Error
+          } else {
+            const bankData =
+              res?.data &&
+              res?.data?.length > 0 &&
+              res?.data?.map((bank, i) => {
+                return {
+                  value: bank?.bankname,
+                  label: bank?.bankname,
+                  key: i,
+                  NIPCode: bank?.bankcode,
+                };
+              });
+
+            if (seerbitBanks == undefined || seerbitBanks == '') {
+              dispatch(setSeerbitbanks(bankData));
+            }
+          }
+        }
+      })
+      .catch(error => {})
+      .finally(() => {
+        // Todo: Handle Error
+      });
   };
 
   // Wallet Statement Functions
