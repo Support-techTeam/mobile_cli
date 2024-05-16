@@ -32,6 +32,7 @@ import COLORS from '../../../constants/colors';
 const countryList = require('country-list');
 import {SelectList} from 'react-native-dropdown-select-list';
 import Loader from '../../../component/loader/loader';
+import {Location} from '../../../constants/location';
 
 const businessTypeData = [
   {value: '', label: 'Select type'},
@@ -168,10 +169,12 @@ const BusinessDetails = props => {
   const date = new Date(2000, 0, 1);
   const addressDate = new Date(2000, 0, 1);
   const [isLoading, setIsLoading] = useState(false);
-  const countries = countryList.getData().map(country => ({
-    value: country.name,
-    label: country.name,
-  }));
+  const countries =
+    countryList?.getData() &&
+    countryList?.getData()?.map(country => ({
+      value: country.name,
+      label: country.name,
+    }));
   const [businessDetails, setBusinessDetails] = useState({
     businessType: '',
     businessName: '',
@@ -218,16 +221,16 @@ const BusinessDetails = props => {
   };
 
   const disableit =
-    !businessDetails.businessType ||
-    !businessDetails.businessName ||
-    !businessDetails.businessAddress ||
-    !businessDetails.state ||
-    !businessDetails.city ||
-    !businessDetails.positionInOrg ||
-    !businessDetails.totalEmployees ||
-    !businessDetails.industry ||
-    !businessDetails.monthlyExpenses ||
-    !businessDetails.monthlySales;
+    !userDetails?.businessType ||
+    !userDetails?.businessName ||
+    !userDetails?.businessAddress ||
+    !userDetails?.state ||
+    !userDetails?.city ||
+    !userDetails?.positionInOrg ||
+    !userDetails?.totalEmployees ||
+    !userDetails?.industry ||
+    !userDetails?.monthlyExpenses ||
+    !userDetails?.monthlySales;
 
   const showDatePicker = () => {
     setShow(true);
@@ -254,7 +257,7 @@ const BusinessDetails = props => {
 
   const handleConfirmAddressDate = selectedDate => {
     const currentDate = selectedDate || addressDate;
-    const formattedDate = new Date(currentDate).toISOString().split('T')[0];
+    const formattedDate = new Date(currentDate)?.toISOString().split('T')[0];
     setBusinessDetails({
       ...businessDetails,
       whenDidYouMoveToThisBusinessLocation: formattedDate,
@@ -335,27 +338,16 @@ const BusinessDetails = props => {
     }
   };
 
-  //set State
-  useEffect(() => {
+  useLayoutEffect(() => {
     const fetchState = async () => {
-      try {
-        const res = await getState();
-        if (res?.data !== undefined) {
-          res?.data &&
-            res?.data?.length > 0 &&
-            res?.data.map((item, index) => {
-              currentState.push({
-                value: item,
-                label: item,
-                key: index + 1,
-              });
-            });
-        }
-      } catch (error) {
-        // console.error(error);
-      }
+      Location?.map((item, index) => {
+        currentState.push({
+          value: item.state,
+          label: item.state,
+          key: index + 1,
+        });
+      });
     };
-
     fetchState();
     return () => {
       fetchState();
@@ -434,7 +426,7 @@ const BusinessDetails = props => {
                   maxHeight={300}
                   labelField="label"
                   valueField="value"
-                  value={businessDetails.businessType}
+                  value={businessDetails?.businessType}
                   onChange={option => {
                     setBusinessDetails({
                       ...businessDetails,
@@ -469,7 +461,7 @@ const BusinessDetails = props => {
                   maxHeight={300}
                   labelField="label"
                   valueField="value"
-                  value={businessDetails.registered}
+                  value={userDetails?.registered}
                   onChange={option => {
                     setBusinessDetails({
                       ...businessDetails,
@@ -504,8 +496,8 @@ const BusinessDetails = props => {
                   placeholder="2000 - 01 - 01"
                   iconName="calendar-month-outline"
                   defaultValue={
-                    businessDetails.establishmentDate
-                      ? businessDetails.establishmentDate?.substr(0, 10)
+                    businessDetails?.establishmentDate
+                      ? businessDetails?.establishmentDate?.substr(0, 10)
                       : ''
                   }
                   isDate={true}
@@ -561,8 +553,8 @@ const BusinessDetails = props => {
                   label="When did you move to this address?"
                   placeholder="2000 - 01 - 01"
                   defaultValue={
-                    businessDetails.whenDidYouMoveToThisBusinessLocation
-                      ? businessDetails.whenDidYouMoveToThisBusinessLocation?.substr(
+                    businessDetails?.whenDidYouMoveToThisBusinessLocation
+                      ? businessDetails?.whenDidYouMoveToThisBusinessLocation?.substr(
                           0,
                           10,
                         )
@@ -653,10 +645,10 @@ const BusinessDetails = props => {
                     maxHeight={300}
                     labelField="label"
                     valueField="value"
-                    value={businessDetails.state}
+                    value={userDetails?.state}
                     onChange={option => {
                       if (
-                        userDetails.country === 'Nigeria' &&
+                        userDetails?.country === 'Nigeria' &&
                         option.value === 'Outside Nigeria'
                       ) {
                         setBusinessDetails({
@@ -681,19 +673,28 @@ const BusinessDetails = props => {
                           ...businessDetails,
                           state: option.value,
                         });
-                        getCity(option.value)
-                          .then(res => {
-                            fetchedCity = [];
-                            res?.data &&
-                              res?.data.map((item, index) => {
-                                fetchedCity.push({
-                                  value: item,
-                                  label: item,
-                                  key: index,
-                                });
-                              });
-                          })
-                          .catch(err => {});
+
+                        //Get cities by state
+                        const lgaData = Location?.find(
+                          item => item.state === option.value,
+                        );
+                        if (lgaData) {
+                          fetchedCity = [
+                            {value: '', label: '...Select LGA'},
+                            {
+                              value: 'Outside Nigeria',
+                              label: 'Outside Nigeria',
+                              key: 0,
+                            },
+                          ];
+                          lgaData?.lgas.map((item, index) => {
+                            fetchedCity.push({
+                              value: item,
+                              label: item,
+                              key: index + 1,
+                            });
+                          });
+                        }
                       }
                     }}
                   />
@@ -707,14 +708,14 @@ const BusinessDetails = props => {
                     placeholderStyle={styles.placeholderStyle}
                     selectedTextStyle={styles.selectedTextStyle}
                     data={fetchedCity.length > 0 ? fetchedCity : cityData}
-                    disabled={!businessDetails.state}
+                    disabled={!userDetails?.state}
                     maxHeight={300}
                     labelField="label"
                     valueField="value"
-                    value={businessDetails.city}
+                    value={userDetails?.city}
                     onChange={option => {
                       if (
-                        userDetails.country === 'Nigeria' &&
+                        userDetails?.country === 'Nigeria' &&
                         option.value === 'Outside Nigeria'
                       ) {
                         setBusinessDetails({
@@ -809,7 +810,7 @@ const BusinessDetails = props => {
                   maxHeight={300}
                   labelField="label"
                   valueField="value"
-                  value={businessDetails.shariaCom}
+                  value={businessDetails?.shariaCom}
                   onChange={option => {
                     setBusinessDetails({
                       ...businessDetails,
@@ -842,7 +843,7 @@ const BusinessDetails = props => {
                   maxHeight={300}
                   labelField="label"
                   valueField="value"
-                  value={businessDetails.salesMethod}
+                  value={businessDetails?.salesMethod}
                   onChange={option => {
                     setBusinessDetails({
                       ...businessDetails,
@@ -862,7 +863,7 @@ const BusinessDetails = props => {
                   maxHeight={300}
                   labelField="label"
                   valueField="value"
-                  value={businessDetails.industry}
+                  value={businessDetails?.industry}
                   onChange={option => {
                     setBusinessDetails({
                       ...businessDetails,
@@ -882,7 +883,7 @@ const BusinessDetails = props => {
                   maxHeight={300}
                   labelField="label"
                   valueField="value"
-                  value={businessDetails.monthlySales}
+                  value={businessDetails?.monthlySales}
                   onChange={option => {
                     setBusinessDetails({
                       ...businessDetails,
@@ -902,7 +903,7 @@ const BusinessDetails = props => {
                   maxHeight={300}
                   labelField="label"
                   valueField="value"
-                  value={businessDetails.monthlyExpenses}
+                  value={businessDetails?.monthlyExpenses}
                   onChange={option => {
                     setBusinessDetails({
                       ...businessDetails,
@@ -922,7 +923,7 @@ const BusinessDetails = props => {
                   maxHeight={300}
                   labelField="label"
                   valueField="value"
-                  value={businessDetails.businessDuration}
+                  value={businessDetails?.businessDuration}
                   onChange={option => {
                     setBusinessDetails({
                       ...businessDetails,

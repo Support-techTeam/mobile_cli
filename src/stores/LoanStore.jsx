@@ -17,8 +17,8 @@ const axiosInstance = axios.create({baseURL: BASE_API_URL});
 const getAllLoans = async () => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     await getFirebaseAuthToken();
     if (token) {
@@ -66,8 +66,8 @@ const getAllLoans = async () => {
 const getApprovedLoans = async () => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     await getFirebaseAuthToken();
     if (token) {
@@ -118,8 +118,8 @@ const getApprovedLoans = async () => {
 const getPaidLoans = async () => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     await getFirebaseAuthToken();
     if (token) {
@@ -164,8 +164,8 @@ const getPaidLoans = async () => {
 const getPendingLoans = async () => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     await getFirebaseAuthToken();
     if (token) {
@@ -217,8 +217,8 @@ const getPendingLoans = async () => {
 const getLoansAmount = async () => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     await getFirebaseAuthToken();
     if (token) {
@@ -273,8 +273,8 @@ const getLoansAmount = async () => {
 const getDuration = async () => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     await getFirebaseAuthToken();
     if (token) {
@@ -326,8 +326,8 @@ const getDuration = async () => {
 const getLoanUserDetails = async () => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     await getFirebaseAuthToken();
     if (token) {
@@ -379,8 +379,8 @@ const getLoanUserDetails = async () => {
 const getLoanById = async id => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     await getFirebaseAuthToken();
     if (token) {
@@ -429,8 +429,8 @@ const getLoanById = async id => {
 const getLoanScheduleById = async id => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     await getFirebaseAuthToken();
     if (token) {
@@ -485,8 +485,8 @@ const getLoanScheduleById = async id => {
 const getLoanDetails = async (amount, tenor) => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     await getFirebaseAuthToken();
     if (token) {
@@ -541,8 +541,8 @@ const getLoanDetails = async (amount, tenor) => {
 const createLoan = async details => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     await getFirebaseAuthToken();
     if (token) {
@@ -604,8 +604,8 @@ const createLoan = async details => {
 const createUserProfile = async details => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     await getFirebaseAuthToken();
     if (token) {
@@ -656,8 +656,8 @@ const createUserProfile = async details => {
 const createBusinessDetails = async details => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     await getFirebaseAuthToken();
     if (token) {
@@ -714,8 +714,8 @@ const createBusinessDetails = async details => {
 const createNextOfKin = async details => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     await getFirebaseAuthToken();
     if (token) {
@@ -772,8 +772,8 @@ const createNextOfKin = async details => {
 const createBankDetails = async details => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     await getFirebaseAuthToken();
     if (token) {
@@ -830,8 +830,8 @@ const createBankDetails = async details => {
 const createDocumentsDetails = async details => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     await getFirebaseAuthToken();
     if (token) {
@@ -887,8 +887,8 @@ const createDocumentsDetails = async details => {
 const createUploadDocument = async (details, documentName) => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     await getFirebaseAuthToken();
     if (token) {
@@ -963,8 +963,8 @@ const createUploadDocument = async (details, documentName) => {
 const updatePersonalDetails = async details => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     await getFirebaseAuthToken();
     if (token) {
@@ -1015,8 +1015,8 @@ const updatePersonalDetails = async details => {
 const updateBusinessDetails = async details => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     await getFirebaseAuthToken();
     if (token) {
@@ -1076,8 +1076,8 @@ const updateBusinessDetails = async details => {
 const updateNokDetails = async details => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     await getFirebaseAuthToken();
     if (token) {
@@ -1137,8 +1137,8 @@ const updateNokDetails = async details => {
 const updateBankDetails = async details => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     await getFirebaseAuthToken();
     if (token) {
@@ -1198,8 +1198,8 @@ const updateBankDetails = async details => {
 const updateDocumentsDetails = async details => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     await getFirebaseAuthToken();
     if (token) {
@@ -1256,8 +1256,8 @@ const updateDocumentsDetails = async details => {
 const createArmDetails = async details => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     await getFirebaseAuthToken();
     if (token) {
@@ -1314,8 +1314,8 @@ const createArmDetails = async details => {
 const repayLoan = async loanrepaymentId => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     await getFirebaseAuthToken();
     if (token) {

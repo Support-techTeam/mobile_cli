@@ -181,6 +181,8 @@ const OnboardingHome = () => {
   };
 
   const navigation = useNavigation();
+
+  console.log(hasStarted);
   return (
     <SafeAreaView
       style={{
@@ -359,7 +361,8 @@ const OnboardingHome = () => {
             </TouchableOpacity>
           </View>
         )}
-        {hasStarted === '5' && (
+
+        {hasStarted === '4' && (
           <View style={styles.selectView}>
             <TouchableOpacity
               onPress={() => navigation.navigate('UpdatePersonalDetails')}>
@@ -385,6 +388,37 @@ const OnboardingHome = () => {
                 label="Add Documents"
                 status={`[${hasDocumentCount} / 9] Filled`}
               />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => navigation.navigate('ValidIdentity')}>
+              <Buttons label={'Complete Profile'} />
+            </TouchableOpacity>
+          </View>
+        )}
+        {hasStarted === '5' && (
+          <View style={styles.selectView}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('UpdatePersonalDetails')}>
+              <CustomView2 label="Personal Details" status="Filled" />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => navigation.navigate('BusinessDetails')}>
+              <CustomView2 label="Business Details" status="Filled" />
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={() => navigation.navigate('NextOfKin')}>
+              <CustomView2 label="Next Of Kin Details" status="Filled" />
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={() => navigation.navigate('ArmDetails')}>
+              <CustomView2 label="ARM Details" status="Filled" />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => navigation.navigate('ValidIdentity')}>
+              <CustomView2 label="Add Documents" status="[9 / 9] Filled" />
             </TouchableOpacity>
 
             <TouchableOpacity

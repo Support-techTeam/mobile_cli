@@ -77,12 +77,6 @@ const Investscreen = () => {
     }, []),
   );
 
-  // useFocusEffect(
-  //   useCallback(() => {
-  //     const mergedData = [...allArmData, ...allILendaData];
-  //     setAllInvestmentData(mergedData);
-  //   }, [allArmData, allILendaData]),
-  // );
   useEffect(() => {
     if (route.name === 'Invest') {
       const mergedData = [...allArmData, ...allILendaData];

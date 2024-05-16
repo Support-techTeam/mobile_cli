@@ -16,8 +16,8 @@ const axiosInstance = axios.create({baseURL: BASE_API_URL});
 const getState = async () => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     try {
       const response = await axiosInstance.get('/address/get-state');
@@ -51,8 +51,8 @@ const getState = async () => {
 const getCity = async cityByState => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     try {
       const response = await axiosInstance.get(
@@ -88,8 +88,8 @@ const getCity = async cityByState => {
 const getProfileDetails = async () => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     await getFirebaseAuthToken();
     if (token) {
@@ -140,8 +140,8 @@ const getProfileDetails = async () => {
 const createUserProfile = async (details, customNumber) => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     await getFirebaseAuthToken();
     if (token) {
@@ -211,8 +211,8 @@ const createUserProfile = async (details, customNumber) => {
 const checkPin = async () => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     await getFirebaseAuthToken();
     if (token) {
@@ -258,8 +258,8 @@ const checkPin = async () => {
 const createTransactionPin = async details => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     await getFirebaseAuthToken();
     if (token) {
@@ -330,8 +330,8 @@ const createTransactionPin = async details => {
 const changePin = async details => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     await getFirebaseAuthToken();
     if (token) {
@@ -401,8 +401,8 @@ const changePin = async details => {
 const resetPin = async () => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     await getFirebaseAuthToken();
     if (token) {
@@ -462,8 +462,8 @@ const resetPin = async () => {
 const bvnValidation = async data => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     await getFirebaseAuthToken();
     if (token) {
@@ -523,8 +523,8 @@ const bvnValidation = async data => {
 const getAllAdverts = async () => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     await getFirebaseAuthToken();
     if (token) {

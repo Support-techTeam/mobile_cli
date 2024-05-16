@@ -31,96 +31,284 @@ export const SlideSection = props => {
     toggleHideBalance,
     toggleFundWallet,
     handleLongPress,
+    userMultiWalletData,
+    seerbitWalletBalance,
+    handleCreateSecondWallet,
   } = props;
   const navigation = useNavigation();
   const carouselRef = useRef(null);
   const [index, setIndex] = useState(0);
 
-  const slides = [
-    {
-      id: '1',
-      title: 'Wallet balance',
-      balance:
-        userWalletData &&
-        userWalletData?.availableBalance &&
-        userWalletData?.availableBalance !== null &&
-        userWalletData?.availableBalance !== undefined
-          ? new Intl.NumberFormat('en-US', {
-              style: 'decimal',
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            }).format(userWalletData?.availableBalance)
-          : '0.00',
-      accountName:
-        userWalletData && userWalletData?.walletIdAccountNumber
-          ? userWalletData?.walletIdAccountNumber
-          : 'N/A',
-      button: 'Fund wallet',
-      extra: '',
-      image: require('../../../assets/icons/wallet_background.png'),
-    },
-    {
-      id: '2',
-      title: 'Loan balance',
-      balance: `${
-        userLoanAmount?.totalLoanAmount === undefined
-          ? '0.00'
-          : `${
-              userLoanAmount?.totalLoanAmount === 0
+  const slides =
+    userMultiWalletData && userMultiWalletData.length === 1
+      ? [
+          {
+            id: '1',
+            title: 'First Wallet Balance',
+            balance:
+              userMultiWalletData[0].banker === 'Providus'
+                ? userMultiWalletData[0] &&
+                  userMultiWalletData[0]?.availableBalance &&
+                  userMultiWalletData[0]?.availableBalance !== null &&
+                  userMultiWalletData[0]?.availableBalance !== undefined
+                  ? new Intl.NumberFormat('en-US', {
+                      style: 'decimal',
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    }).format(userMultiWalletData[0]?.availableBalance)
+                  : '0.00'
+                : userMultiWalletData[0]?.banker === '9 Payment Service Bank'
+                ? seerbitWalletBalance &&
+                  seerbitWalletBalance !== null &&
+                  seerbitWalletBalance !== undefined
+                  ? new Intl.NumberFormat('en-US', {
+                      style: 'decimal',
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    }).format(seerbitWalletBalance)
+                  : '0.00'
+                : '0.00',
+            accountName:
+              userMultiWalletData[0] &&
+              userMultiWalletData[0]?.walletIdAccountNumber
+                ? userWalletData?.walletIdAccountNumber
+                : 'N/A',
+            button: 'Fund wallet',
+            banker: userMultiWalletData[0].banker,
+            extra: '',
+            image: require('../../../assets/icons/wallet_background.png'),
+          },
+          {
+            id: '2',
+            title: 'Second Wallet Balance',
+            balance: '0.00',
+            accountName: 'N/A',
+            button: 'Add Second wallet',
+            banker: 'N/A',
+            extra: '',
+            image: require('../../../assets/icons/wallet_background.png'),
+          },
+          {
+            id: '3',
+            title: 'Loan Balance',
+            balance: `${
+              userLoanAmount?.totalLoanAmount === undefined
                 ? '0.00'
+                : `${
+                    userLoanAmount?.totalLoanAmount === 0
+                      ? '0.00'
+                      : new Intl.NumberFormat('en-US', {
+                          style: 'decimal',
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        }).format(userLoanAmount?.totalLoanAmount)
+                  }`
+            }`,
+            button: 'Get loan',
+            extra: 'Loan details',
+            image: require('../../../assets/icons/wallet_background.png'),
+          },
+          {
+            id: '4',
+            title: 'My Investment',
+            balance:
+              Number(portfolioDetail) !== 0
+                ? new Intl.NumberFormat('en-US', {
+                    style: 'decimal',
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  }).format(Number(portfolioDetail) + totalLendaAmount)
                 : new Intl.NumberFormat('en-US', {
                     style: 'decimal',
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
-                  }).format(userLoanAmount?.totalLoanAmount)
-            }`
-      }`,
-      button: 'Get loan',
-      extra: 'Loan details',
-      image: require('../../../assets/icons/wallet_background.png'),
-    },
-    {
-      id: '3',
-      title: 'My investment',
-      balance:
-        Number(portfolioDetail) !== 0
-          ? new Intl.NumberFormat('en-US', {
-              style: 'decimal',
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            }).format(Number(portfolioDetail) + totalLendaAmount)
-          : new Intl.NumberFormat('en-US', {
-              style: 'decimal',
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            }).format(totalArmAmount + totalLendaAmount),
-      button: 'View investment',
-      extra: '',
-      image: require('../../../assets/icons/wallet_background.png'),
-    },
-  ];
+                  }).format(totalArmAmount + totalLendaAmount),
+            button: 'View investment',
+            extra: '',
+            image: require('../../../assets/icons/wallet_background.png'),
+          },
+        ]
+      : userMultiWalletData && userMultiWalletData.length === 2
+      ? [
+          {
+            id: '1',
+            title: 'First Wallet Balance',
+            balance:
+              userMultiWalletData[0].banker === 'Providus'
+                ? userMultiWalletData[0] &&
+                  userMultiWalletData[0]?.availableBalance &&
+                  userMultiWalletData[0]?.availableBalance !== null &&
+                  userMultiWalletData[0]?.availableBalance !== undefined
+                  ? new Intl.NumberFormat('en-US', {
+                      style: 'decimal',
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    }).format(userMultiWalletData[0]?.availableBalance)
+                  : '0.00'
+                : userMultiWalletData[0]?.banker === '9 Payment Service Bank'
+                ? seerbitWalletBalance &&
+                  seerbitWalletBalance !== null &&
+                  seerbitWalletBalance !== undefined
+                  ? new Intl.NumberFormat('en-US', {
+                      style: 'decimal',
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    }).format(seerbitWalletBalance)
+                  : '0.00'
+                : '0.00',
+            accountName:
+              userMultiWalletData[0] &&
+              userMultiWalletData[0]?.walletIdAccountNumber
+                ? userWalletData?.walletIdAccountNumber
+                : 'N/A',
+            button: 'Fund wallet',
+            banker: userMultiWalletData[0].banker,
+            extra: '',
+            image: require('../../../assets/icons/wallet_background.png'),
+          },
+          {
+            id: '2',
+            title: 'Second Wallet Balance',
+            balance:
+              userMultiWalletData[1].banker === 'Providus'
+                ? userMultiWalletData[1] &&
+                  userMultiWalletData[1]?.availableBalance &&
+                  userMultiWalletData[1]?.availableBalance !== null &&
+                  userMultiWalletData[1]?.availableBalance !== undefined
+                  ? new Intl.NumberFormat('en-US', {
+                      style: 'decimal',
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    }).format(userMultiWalletData[1]?.availableBalance)
+                  : '0.00'
+                : userMultiWalletData[1]?.banker === '9 Payment Service Bank'
+                ? seerbitWalletBalance &&
+                  seerbitWalletBalance !== null &&
+                  seerbitWalletBalance !== undefined
+                  ? new Intl.NumberFormat('en-US', {
+                      style: 'decimal',
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    }).format(seerbitWalletBalance)
+                  : '0.00'
+                : '0.00',
+            accountName:
+              userMultiWalletData[1] &&
+              userMultiWalletData[1]?.walletIdAccountNumber
+                ? userMultiWalletData[1]?.walletIdAccountNumber
+                : 'N/A',
+            button: 'Fund wallet',
+            banker: userMultiWalletData[1].banker,
+            extra: '',
+            image: require('../../../assets/icons/wallet_background.png'),
+          },
+          {
+            id: '3',
+            title: 'Loan Balance',
+            balance: `${
+              userLoanAmount?.totalLoanAmount === undefined
+                ? '0.00'
+                : `${
+                    userLoanAmount?.totalLoanAmount === 0
+                      ? '0.00'
+                      : new Intl.NumberFormat('en-US', {
+                          style: 'decimal',
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        }).format(userLoanAmount?.totalLoanAmount)
+                  }`
+            }`,
+            button: 'Get loan',
+            extra: 'Loan details',
+            image: require('../../../assets/icons/wallet_background.png'),
+          },
+          {
+            id: '4',
+            title: 'My Investment',
+            balance:
+              Number(portfolioDetail) !== 0
+                ? new Intl.NumberFormat('en-US', {
+                    style: 'decimal',
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  }).format(Number(portfolioDetail) + totalLendaAmount)
+                : new Intl.NumberFormat('en-US', {
+                    style: 'decimal',
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  }).format(totalArmAmount + totalLendaAmount),
+            button: 'View investment',
+            extra: '',
+            image: require('../../../assets/icons/wallet_background.png'),
+          },
+        ]
+      : [
+          {
+            id: '3',
+            title: 'Loan Balance',
+            balance: `${
+              userLoanAmount?.totalLoanAmount === undefined
+                ? '0.00'
+                : `${
+                    userLoanAmount?.totalLoanAmount === 0
+                      ? '0.00'
+                      : new Intl.NumberFormat('en-US', {
+                          style: 'decimal',
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        }).format(userLoanAmount?.totalLoanAmount)
+                  }`
+            }`,
+            button: 'Get loan',
+            extra: 'Loan details',
+            image: require('../../../assets/icons/wallet_background.png'),
+          },
+          {
+            id: '4',
+            title: 'My Investment',
+            balance:
+              Number(portfolioDetail) !== 0
+                ? new Intl.NumberFormat('en-US', {
+                    style: 'decimal',
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  }).format(Number(portfolioDetail) + totalLendaAmount)
+                : new Intl.NumberFormat('en-US', {
+                    style: 'decimal',
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  }).format(totalArmAmount + totalLendaAmount),
+            button: 'View investment',
+            extra: '',
+            image: require('../../../assets/icons/wallet_background.png'),
+          },
+        ];
 
   const Slide = ({item}) => {
     return (
       <LinearGradient
         colors={
-          item.title === 'Wallet balance'
+          item.title === 'First Wallet Balance'
             ? ['#F7F7FC', '#F7F7FC']
-            : item.title === 'Loan balance'
+            : item.title === 'Second Wallet Balance'
+            ? ['#a6001a', '#a6001a']
+            : item.title === 'Loan Balance'
             ? ['#010C4D', '#0384FF']
             : ['#06A75D', '#06A76B']
         }
         start={
-          item.title === 'Wallet balance'
+          item.title === 'First Wallet Balance' ||
+          item.title === 'Second Wallet Balance'
             ? {x: 0.01, y: 0}
-            : item.title === 'Loan balance'
+            : item.title === 'Loan Balance'
             ? {x: 0, y: 0}
             : {x: 0.01, y: 0}
         }
         end={
-          item.title === 'Wallet balance'
+          item.title === 'First Wallet Balance' ||
+          item.title === 'Second Wallet Balance'
             ? {x: 0.5, y: 0.5}
-            : item.title === 'Loan balance'
+            : item.title === 'Loan Balance'
             ? {x: 1, y: 1}
             : {x: 0.5, y: 0.5}
         }
@@ -128,9 +316,17 @@ export const SlideSection = props => {
         style={[
           styles.gradient,
           {
-            borderWidth: item.title === 'Wallet balance' ? 1 : 0,
+            borderWidth:
+              item.title === 'First Wallet Balance' ||
+              item.title === 'Second Wallet Balance'
+                ? 1
+                : 0,
             borderColor:
-              item.title === 'Wallet balance' ? '#b7d8fd' : '#ffffff',
+              item.title === 'First Wallet Balance'
+                ? '#b7d8fd'
+                : item.title === 'Second Wallet Balance'
+                ? '#ffffff'
+                : '#ffffff',
           },
         ]}>
         <ImageBackground
@@ -142,14 +338,22 @@ export const SlideSection = props => {
                 justifyContent: 'space-between',
                 alignItems: 'center',
               }}>
-              {item.title === 'Wallet balance' && (
+              {item.title === 'First Wallet Balance' && (
                 <View style={styles.card}>
                   <EntypoIcon name="wallet" size={24} color="#054B99" />
                   <Text style={styles.wallet}>{item.title}</Text>
                 </View>
               )}
 
-              {item.title === 'Loan balance' && (
+              {item.title === 'Second Wallet Balance' && (
+                <View style={styles.card}>
+                  <Icon name="wallet" size={24} color="white" />
+                  <Text style={[styles.wallet, {color: '#fff'}]}>
+                    {item.title}
+                  </Text>
+                </View>
+              )}
+              {item.title === 'Loan Balance' && (
                 <View style={styles.card}>
                   <Icon name="poll" size={24} color="white" />
                   <Text style={[styles.wallet, {color: '#fff'}]}>
@@ -158,7 +362,7 @@ export const SlideSection = props => {
                 </View>
               )}
 
-              {item.title === 'My investment' && (
+              {item.title === 'My Investment' && (
                 <View style={styles.card}>
                   <Icon name="poll" size={24} color="white" />
                   <Text style={[styles.wallet, {color: '#fff'}]}>
@@ -169,7 +373,13 @@ export const SlideSection = props => {
 
               <FontIcon
                 size={25}
-                color={item.title === 'Wallet balance' ? '#054B99' : '#FFFFFF'}
+                color={
+                  item.title === 'First Wallet Balance'
+                    ? '#054B99'
+                    : item.title === 'Second Wallet Balance'
+                    ? '#FFFFFF'
+                    : '#FFFFFF'
+                }
                 name={hideBalance ? 'eye' : 'eye-slash'}
                 onPress={toggleHideBalance}
               />
@@ -180,7 +390,11 @@ export const SlideSection = props => {
                 styles.prices,
                 {
                   color:
-                    item.title === 'Wallet balance' ? '#054B99' : '#FFFFFF',
+                    item.title === 'First Wallet Balance'
+                      ? '#054B99'
+                      : item.title === 'Second Wallet Balance'
+                      ? '#FFFFFF'
+                      : '#FFFFFF',
                 },
               ]}>
               {hideBalance ? '₦******' : `₦${item.balance}`}
@@ -238,36 +452,177 @@ export const SlideSection = props => {
                     justifyContent: 'space-between',
                   }}>
                   <TouchableOpacity
-                    style={[styles.fundView, {backgroundColor: '#054B99'}]}
+                    style={[
+                      styles.fundView,
+                      {
+                        backgroundColor:
+                          item.title === 'First Wallet Balance'
+                            ? '#054B99'
+                            : '#FFFFFF',
+                      },
+                    ]}
                     onPress={() => toggleFundWallet()}>
-                    <Text style={[styles.FundButton, {color: '#FFFFFF'}]}>
+                    <Text
+                      style={[
+                        styles.FundButton,
+                        {
+                          color:
+                            item.title === 'First Wallet Balance'
+                              ? '#FFFFFF'
+                              : '#054B99',
+                        },
+                      ]}>
                       {item.button}
                     </Text>
                   </TouchableOpacity>
                   {item.accountName && (
                     <View>
-                      <Text
-                        style={{
-                          color: '#6E7191',
-                          marginTop: 5,
-                          fontFamily: 'Montserrat',
-                          fontWeight: '400',
-                          textAlign: 'right',
-                        }}>
-                        Providus Bank
-                      </Text>
-                      <View
-                        style={{
-                          flex: 1,
-                          flexDirection: 'row',
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                        }}>
-                        <TouchableWithoutFeedback
-                          onPress={() => handleLongPress(item.accountName)}>
+                      {item.title === 'First Wallet Balance' && (
+                        <>
                           <Text
                             style={{
-                              color: '#14142A',
+                              color: '#6E7191',
+                              marginTop: 5,
+                              fontFamily: 'Montserrat',
+                              fontWeight: '400',
+                              textAlign: 'right',
+                            }}>
+                            {item.banker === "Providus" ? "Providus Bank" : item.banker}
+                          </Text>
+                          <View
+                            style={{
+                              flex: 1,
+                              flexDirection: 'row',
+                              justifyContent: 'flex-end',
+                              alignItems: 'center',
+                            }}>
+                            <TouchableWithoutFeedback
+                              onPress={() => handleLongPress(item.accountName)}>
+                              <Text
+                                style={{
+                                  color: '#14142A',
+                                  marginTop: 5,
+                                  fontFamily: 'Montserrat',
+                                  fontWeight: '400',
+                                  textAlign: 'right',
+                                }}>
+                                {item.accountName}
+                              </Text>
+                            </TouchableWithoutFeedback>
+                            <TouchableWithoutFeedback>
+                              <Icon
+                                size={17}
+                                color={COLORS.lendaBlue}
+                                name="content-copy"
+                                style={{marginLeft: 4}}
+                                onPress={() =>
+                                  handleLongPress(item.accountName)
+                                }
+                              />
+                            </TouchableWithoutFeedback>
+                          </View>
+                        </>
+                      )}
+
+                      {item.title === 'Second Wallet Balance' && (
+                        <>
+                          <Text
+                            style={{
+                              color: 'white',
+                              marginTop: 5,
+                              fontFamily: 'Montserrat',
+                              fontWeight: '400',
+                              textAlign: 'right',
+                            }}>
+                            {item.banker === "Providus" ? "Providus Bank" : item.banker}
+                          </Text>
+                          <View
+                            style={{
+                              flex: 1,
+                              flexDirection: 'row',
+                              justifyContent: 'flex-end',
+                              alignItems: 'center',
+                            }}>
+                            <TouchableWithoutFeedback
+                              onPress={() => handleLongPress(item.accountName)}>
+                              <Text
+                                style={{
+                                  color: 'white',
+                                  marginTop: 5,
+                                  fontFamily: 'Montserrat',
+                                  fontWeight: '400',
+                                  textAlign: 'right',
+                                }}>
+                                {item.accountName}
+                              </Text>
+                            </TouchableWithoutFeedback>
+                            <TouchableWithoutFeedback>
+                              <Icon
+                                size={17}
+                                color={COLORS.white}
+                                name="content-copy"
+                                style={{marginLeft: 4}}
+                                onPress={() =>
+                                  handleLongPress(item.accountName)
+                                }
+                              />
+                            </TouchableWithoutFeedback>
+                          </View>
+                        </>
+                      )}
+                    </View>
+                  )}
+                </View>
+              )}
+
+              {item.button === 'Add Second wallet' && (
+                <View
+                  style={{
+                    flex: 1,
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                  }}>
+                  <TouchableOpacity
+                    style={[
+                      styles.fundView,
+                      {
+                        backgroundColor: '#FFFFFF',
+                      },
+                    ]}
+                    onPress={() => handleCreateSecondWallet()}>
+                    <Text
+                      style={[
+                        styles.FundButton,
+                        {
+                          color: '#054B99',
+                        },
+                      ]}>
+                      {item.button}
+                    </Text>
+                  </TouchableOpacity>
+                  {item.accountName && (
+                    <View>
+                      <>
+                        <Text
+                          style={{
+                            color: 'white',
+                            marginTop: 5,
+                            fontFamily: 'Montserrat',
+                            fontWeight: '400',
+                            textAlign: 'right',
+                          }}>
+                          {item.banker === "Providus" ? "Providus Bank" : item.banker}
+                        </Text>
+                        <View
+                          style={{
+                            flex: 1,
+                            flexDirection: 'row',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}>
+                          <Text
+                            style={{
+                              color: 'white',
                               marginTop: 5,
                               fontFamily: 'Montserrat',
                               fontWeight: '400',
@@ -275,17 +630,8 @@ export const SlideSection = props => {
                             }}>
                             {item.accountName}
                           </Text>
-                        </TouchableWithoutFeedback>
-                        <TouchableWithoutFeedback>
-                          <Icon
-                            size={17}
-                            color={COLORS.lendaBlue}
-                            name="content-copy"
-                            style={{marginLeft: 4}}
-                            onPress={() => handleLongPress(item.accountName)}
-                          />
-                        </TouchableWithoutFeedback>
-                      </View>
+                        </View>
+                      </>
                     </View>
                   )}
                 </View>
@@ -339,8 +685,10 @@ export const SlideSection = props => {
           borderRadius: 5,
           backgroundColor:
             index == 0
-              ? COLORS.lendaOrange
+              ? COLORS.lendaGrey
               : index == 1
+              ? COLORS.highwayRed
+              : index == 2
               ? COLORS.lendaBlue
               : COLORS.lendaGreen,
         }}

@@ -139,7 +139,7 @@ function App() {
               buttonCancelText: 'Cancel',
             },
             android: {
-              updateType: IAUUpdateKind.FLEXIBLE,
+              updateType: IAUUpdateKind.IMMEDIATE,
             },
           });
           inAppUpdates.startUpdate(updateOptions);

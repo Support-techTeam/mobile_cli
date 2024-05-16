@@ -17,8 +17,8 @@ const axiosInstance = axios.create({baseURL: BASE_API_URL});
 const createGuarantor = async data => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     await getFirebaseAuthToken();
     if (token) {
@@ -71,8 +71,8 @@ const createGuarantor = async data => {
 const getGuarantors = async () => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     await getFirebaseAuthToken();
     if (token) {
@@ -124,8 +124,8 @@ const getGuarantors = async () => {
 const getGuarantor = async id => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     await getFirebaseAuthToken();
     if (token) {
@@ -177,8 +177,8 @@ const getGuarantor = async id => {
 const sendOtp = async data => {
   if (
     store.getState().networkState &&
-    store.getState().networkState.network.isConnected &&
-    store.getState().networkState.network.isInternetReachable
+    store.getState().networkState.network?.isConnected &&
+    store.getState().networkState.network?.isInternetReachable
   ) {
     await getFirebaseAuthToken();
     if (token) {

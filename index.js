@@ -7,7 +7,6 @@ import Toast, {BaseToast, ErrorToast} from 'react-native-toast-message';
 import {NativeBaseProvider, extendTheme} from 'native-base';
 import networkService from './src/util/NetworkService';
 
-
 // Initialize network service
 // const network = new networkService();
 const newColorTheme = {
@@ -30,26 +29,29 @@ const toastConfig = {
         flex: 1,
         borderLeftColor: '#28a745',
         borderRightColor: '#28a745',
-        borderRightWidth: 2,
-        backgroundColor: '#28a745',
+        shadowOffset: 0,
+        borderLeftWidth: 4,
+        borderRightWidth: 4,
         flexWrap: 'wrap',
         height: '100%',
+        minHeight: 70,
+        padding: 5,
       }}
       contentContainerStyle={{
         padding: 5,
-        backgroundColor: '#28a745',
+        backgroundColor: 'white',
         flexWrap: 'wrap',
       }}
       text1Style={{
         fontSize: 15,
         fontWeight: '400',
-        color: 'white',
+        color: 'black',
         flexWrap: 'wrap',
       }}
       text1NumberOfLines={2}
       text2Style={{
         fontSize: 14,
-        color: 'white',
+        color: 'black',
         flexWrap: 'wrap',
       }}
       text2NumberOfLines={10}
@@ -63,24 +65,30 @@ const toastConfig = {
         flex: 1,
         borderLeftColor: '#dc3545',
         borderRightColor: '#dc3545',
-        borderRightWidth: 2,
-        backgroundColor: '#dc3545',
+        shadowOffset: 0,
+        borderLeftWidth: 4,
+        borderRightWidth: 4,
+        flexWrap: 'wrap',
         height: '100%',
+        minHeight: 70,
+        padding: 5,
       }}
       contentContainerStyle={{
-        paddingHorizontal: 5,
-        paddingVertical: 5,
-        backgroundColor: '#dc3545',
+        padding: 5,
+        backgroundColor: 'white',
+        flexWrap: 'wrap',
       }}
       text1Style={{
-        fontSize: 13,
+        fontSize: 15,
         fontWeight: '400',
-        color: 'white',
+        color: 'black',
+        flexWrap: 'wrap',
       }}
       text1NumberOfLines={2}
       text2Style={{
-        fontSize: 12,
-        color: 'white',
+        fontSize: 14,
+        color: 'black',
+        flexWrap: 'wrap',
       }}
       text2NumberOfLines={10}
     />
@@ -90,26 +98,33 @@ const toastConfig = {
     <BaseToast
       {...props}
       style={{
+        flex: 1,
         borderLeftColor: '#17a2b8',
         borderRightColor: '#17a2b8',
-        borderRightWidth: 2,
-        backgroundColor: '#17a2b8',
+        shadowOffset: 0,
+        borderLeftWidth: 4,
+        borderRightWidth: 4,
+        flexWrap: 'wrap',
         height: '100%',
+        minHeight: 70,
+        padding: 5,
       }}
       contentContainerStyle={{
-        paddingHorizontal: 5,
-        paddingVertical: 5,
-        backgroundColor: '#17a2b8',
+        padding: 5,
+        backgroundColor: 'white',
+        flexWrap: 'wrap',
       }}
       text1Style={{
         fontSize: 15,
         fontWeight: '400',
-        color: 'white',
+        color: 'black',
+        flexWrap: 'wrap',
       }}
       text1NumberOfLines={2}
       text2Style={{
         fontSize: 14,
-        color: 'white',
+        color: 'black',
+        flexWrap: 'wrap',
       }}
       text2NumberOfLines={10}
     />
@@ -119,26 +134,33 @@ const toastConfig = {
     <ErrorToast
       {...props}
       style={{
+        flex: 1,
         borderLeftColor: '#ffc107',
         borderRightColor: '#ffc107',
-        borderRightWidth: 2,
-        backgroundColor: '#ffc107',
+        shadowOffset: 0,
+        borderLeftWidth: 4,
+        borderRightWidth: 4,
+        flexWrap: 'wrap',
         height: '100%',
+        minHeight: 70,
+        padding: 5,
       }}
       contentContainerStyle={{
-        paddingHorizontal: 5,
-        paddingVertical: 5,
-        backgroundColor: '#ffc107',
+        padding: 5,
+        backgroundColor: 'white',
+        flexWrap: 'wrap',
       }}
       text1Style={{
         fontSize: 15,
         fontWeight: '400',
-        color: 'white',
+        color: 'black',
+        flexWrap: 'wrap',
       }}
       text1NumberOfLines={2}
       text2Style={{
         fontSize: 14,
-        color: 'white',
+        color: 'black',
+        flexWrap: 'wrap',
       }}
       text2NumberOfLines={10}
     />

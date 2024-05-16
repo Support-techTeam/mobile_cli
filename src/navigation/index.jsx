@@ -201,36 +201,44 @@ const AppNavigationContainer = () => {
   };
 
   async function onBackgroundMessageReceived(message) {
-    await notifee.requestPermission();
-    const {from, collapseKey, data, messageId, notification, sentTime, ttl} =
-      message;
-    const {title, body, android} = notification;
-    const {redirectUrl} = data;
-    await notifee.displayNotification({
-      title: title,
-      body: body,
-      android: android,
-    });
-    const state = false;
-    handleAddNotification(title, body, android, redirectUrl, state);
+    try {
+      await notifee.requestPermission();
+      const {from, collapseKey, data, messageId, notification, sentTime, ttl} =
+        message;
+      const {title, body, android} = notification;
+      const {redirectUrl} = data;
+      await notifee.displayNotification({
+        title: title,
+        body: body,
+        android: android,
+      });
+      const state = false;
+      handleAddNotification(title, body, android, redirectUrl, state);
+    } catch (e) {
+      // console.log(e);
+    }
   }
 
   async function onForegroundMessageReceived(message) {
-    await notifee.requestPermission();
-    const {from, collapseKey, data, messageId, notification, sentTime, ttl} =
-      message;
-    const {title, body, android} = notification;
-    const {redirectUrl} = data;
-    setNotification({title, body, android, redirectUrl});
-    const state = true;
-    handleAddNotification(title, body, android, redirectUrl, state);
+    try {
+      await notifee.requestPermission();
+      const {from, collapseKey, data, messageId, notification, sentTime, ttl} =
+        message;
+      const {title, body, android} = notification;
+      const {redirectUrl} = data;
+      setNotification({title, body, android, redirectUrl});
+      const state = true;
+      handleAddNotification(title, body, android, redirectUrl, state);
+    } catch (e) {
+      // console.log(e);
+    }
   }
 
   messaging().onMessage(onForegroundMessageReceived);
   messaging().setBackgroundMessageHandler(onBackgroundMessageReceived);
-  // messaging().onNotificationOpenedApp(remoteMessage => {
-  //   onForegroundMessageReceived(remoteMessage);
-  // });
+  messaging().onNotificationOpenedApp(remoteMessage => {
+    onForegroundMessageReceived(remoteMessage);
+  });
 
   const featureIntro = () => {
     return (

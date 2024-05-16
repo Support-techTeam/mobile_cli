@@ -222,80 +222,80 @@ const UpdatePersonalDetails = () => {
   const validate = () => {
     let isValid = true;
 
-    if (!userDetails.email) {
+    if (!userDetails?.email) {
       handleError('Please input email', 'email');
       isValid = false;
-    } else if (!userDetails.email.match(/\S+@\S+\.\S+/)) {
+    } else if (!userDetails?.email.match(/\S+@\S+\.\S+/)) {
       handleError('Please input a valid email', 'email');
       isValid = false;
     }
 
-    if (!userDetails.firstName) {
+    if (!userDetails?.firstName) {
       handleError('Please input firstname', 'firstName');
       isValid = false;
     }
 
-    if (!userDetails.lastName) {
+    if (!userDetails?.lastName) {
       handleError('Please input lastname', 'lastName');
       isValid = false;
     }
 
-    if (!userDetails.title) {
+    if (!userDetails?.title) {
       handleError('Please input title', 'title');
       isValid = false;
     }
 
-    if (!userDetails.phoneNumber) {
+    if (!userDetails?.phoneNumber) {
       handleError('Please input phone number', 'phoneNumber');
       isValid = false;
     }
 
-    if (!userDetails.bvn) {
+    if (!userDetails?.bvn) {
       handleError('Please input bvn', 'bvn');
       isValid = false;
     }
-    if (!userDetails.dob) {
+    if (!userDetails?.dob) {
       handleError('Please input dob', 'dob');
       isValid = false;
     }
-    if (!userDetails.address) {
+    if (!userDetails?.address) {
       handleError('Please input address', 'address');
       isValid = false;
     }
-    if (!userDetails.country) {
+    if (!userDetails?.country) {
       handleError('Please input country', 'country');
       isValid = false;
     }
-    if (!userDetails.state) {
+    if (!userDetails?.state) {
       handleError('Please input state', 'state');
       isValid = false;
     }
 
-    if (!userDetails.city) {
+    if (!userDetails?.city) {
       handleError('Please input city', 'city');
       isValid = false;
     }
 
-    if (!userDetails.maritalStatus) {
+    if (!userDetails?.maritalStatus) {
       handleError('Please input marital status', 'maritalStatus');
       isValid = false;
     }
-    if (!userDetails.eduLevel) {
+    if (!userDetails?.eduLevel) {
       handleError('Please input educational level', 'eduLevel');
       isValid = false;
     }
 
-    if (!userDetails.gender) {
+    if (!userDetails?.gender) {
       handleError('Please input gender', 'gender');
       isValid = false;
     }
 
-    if (!userDetails.residentialStatus) {
+    if (!userDetails?.residentialStatus) {
       handleError('Please input residential status', 'residentialStatus');
       isValid = false;
     }
 
-    if (!userDetails.yearYouMovedToCurrentAddress) {
+    if (!userDetails?.yearYouMovedToCurrentAddress) {
       handleError(
         'Please input year you moved to current address',
         'yearYouMovedToCurrentAddress',
@@ -303,7 +303,7 @@ const UpdatePersonalDetails = () => {
       isValid = false;
     }
 
-    // if (!userDetails.NoOfDependents) {
+    // if (!userDetails?.NoOfDependents) {
     //   handleError('Please input No of dependents', 'NoOfDependents');
     //   isValid = false;
     // }
@@ -361,9 +361,9 @@ const UpdatePersonalDetails = () => {
 
   useEffect(() => {
     if (userDetails?.state !== '' && state !== undefined) {
-      setCitybyState(state?.filter(statee => statee === userDetails.state));
+      setCitybyState(state?.filter(statee => statee === userDetails?.state));
     }
-  }, [state, userDetails.state]);
+  }, [state, userDetails?.state]);
 
   const stateCity = cityByState?.length > 0 ? cityByState[0] : null;
 
@@ -389,8 +389,8 @@ const UpdatePersonalDetails = () => {
   }, [stateCity]);
 
   useEffect(() => {
-    if (userDetails.state !== '') {
-      const getStateData = getCity(userDetails.state)
+    if (userDetails?.state !== '') {
+      const getStateData = getCity(userDetails?.state)
         .then(res => {
           fetchedCity = [];
           res?.data &&
@@ -402,15 +402,15 @@ const UpdatePersonalDetails = () => {
           // console.log(err);
         });
     }
-  }, [userDetails.state]);
+  }, [userDetails?.state]);
 
   const disableit =
-    !userDetails.phoneNumber ||
-    !userDetails.address ||
-    !userDetails.title ||
-    !userDetails.firstName ||
-    !userDetails.lastName ||
-    !userDetails.email;
+    !userDetails?.phoneNumber ||
+    !userDetails?.address ||
+    !userDetails?.title ||
+    !userDetails?.firstName ||
+    !userDetails?.lastName ||
+    !userDetails?.email;
 
   const showDatePicker = () => {
     setShow(true);
@@ -583,7 +583,7 @@ const UpdatePersonalDetails = () => {
                   maxHeight={300}
                   labelField="label"
                   valueField="value"
-                  value={userDetails.title}
+                  value={userDetails?.title}
                   onChange={option => {
                     setUserDetails({...userDetails, title: option.value});
                   }}
@@ -659,7 +659,7 @@ const UpdatePersonalDetails = () => {
                   maxHeight={300}
                   labelField="label"
                   valueField="value"
-                  value={userDetails.gender}
+                  value={userDetails?.gender}
                   onChange={option => {
                     setUserDetails({...userDetails, gender: option.value});
                   }}
@@ -675,7 +675,7 @@ const UpdatePersonalDetails = () => {
                 error={errors.bvn}
                 keyboardType="numeric"
                 isNeeded={true}
-                defaultValue={userDetails.bvn}
+                defaultValue={userDetails?.bvn}
                 readOnly={true}
               />
 
@@ -686,7 +686,7 @@ const UpdatePersonalDetails = () => {
                   iconName="calendar-month-outline"
                   placeholder="2000 - 01 - 01"
                   defaultValue={
-                    userDetails.dob ? userDetails.dob.toString() : ''
+                    userDetails?.dob ? userDetails?.dob.toString() : ''
                   }
                   isDate={true}
                   editable={false}
@@ -702,7 +702,7 @@ const UpdatePersonalDetails = () => {
               <DateTimePickerModal
                 isVisible={show}
                 testID="dateTimePicker"
-                defaultValue={userDetails.dob}
+                defaultValue={userDetails?.dob}
                 mode="date"
                 is24Hour={true}
                 onConfirm={handleConfirm}
@@ -712,7 +712,7 @@ const UpdatePersonalDetails = () => {
 
               <Input
                 label="Address"
-                defaultValue={userDetails.address}
+                defaultValue={userDetails?.address}
                 onFocus={() => handleError(null, 'address')}
                 iconName="map-marker-outline"
                 placeholder="Enter your address"
@@ -723,7 +723,7 @@ const UpdatePersonalDetails = () => {
 
               <Input
                 label="Country"
-                defaultValue={userDetails.country}
+                defaultValue={userDetails?.country}
                 onChangeText={text =>
                   setUserDetails({...userDetails, country: text})
                 }
@@ -743,7 +743,7 @@ const UpdatePersonalDetails = () => {
                     onFocus={() => handleError(null, 'state')}
                     isNeeded={true}
                     placeholder="Select State"
-                    value={userDetails.state}
+                    value={userDetails?.state}
                     error={errors.state}
                   />
                 </View>
@@ -753,7 +753,7 @@ const UpdatePersonalDetails = () => {
                     label="City"
                     onFocus={() => handleError(null, 'city')}
                     isNeeded={true}
-                    value={userDetails.city}
+                    value={userDetails?.city}
                     iconName="flag-outline"
                     placeholder="Select LGA"
                     error={errors.city}
@@ -773,7 +773,7 @@ const UpdatePersonalDetails = () => {
                   maxHeight={300}
                   labelField="label"
                   valueField="value"
-                  value={userDetails.residentialStatus}
+                  value={userDetails?.residentialStatus}
                   onChange={option => {
                     setUserDetails({
                       ...userDetails,
@@ -797,7 +797,7 @@ const UpdatePersonalDetails = () => {
                   maxHeight={300}
                   labelField="label"
                   valueField="value"
-                  value={userDetails.yearYouMovedToCurrentAddress}
+                  value={userDetails?.yearYouMovedToCurrentAddress}
                   onChange={option => {
                     setUserDetails({
                       ...userDetails,
@@ -819,7 +819,7 @@ const UpdatePersonalDetails = () => {
                   maxHeight={300}
                   labelField="label"
                   valueField="value"
-                  value={userDetails.maritalStatus}
+                  value={userDetails?.maritalStatus}
                   onChange={option => {
                     setUserDetails({
                       ...userDetails,
@@ -842,7 +842,7 @@ const UpdatePersonalDetails = () => {
                   maxHeight={300}
                   labelField="label"
                   valueField="value"
-                  value={userDetails.eduLevel}
+                  value={userDetails?.eduLevel}
                   onChange={option => {
                     setUserDetails({
                       ...userDetails,

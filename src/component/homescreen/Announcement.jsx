@@ -9,9 +9,9 @@ import {
 
 export const Announcement = props => {
   const navigation = useNavigation();
-  const {key, title, body, image, action} = props;
+  const {index, title, body, image, action} = props;
   return (
-    <View style={[styles.container, {marginVertical: hp(1)}]} key={key}>
+    <View style={[styles.container, {marginVertical: hp(1)}]} key={index}>
       <View
         style={[
           styles.button,
