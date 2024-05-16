@@ -447,6 +447,17 @@ const LoanTransactions = ({route}) => {
             </View>
           )}
 
+          {data?.underwriterNote && (
+            <View style={styles.body}>
+              <View style={styles.leftView}>
+                <Text style={styles.infotext}>Underwriter Note</Text>
+              </View>
+              <View style={styles.rightView}>
+                <Text style={styles.values}>{data?.underwriterNote}</Text>
+              </View>
+            </View>
+          )}
+
           <View style={styles.body}>
             <View style={styles.leftView}>
               <Text style={styles.infotext}>Loan Ref</Text>

@@ -1064,7 +1064,7 @@ const Homescreen = () => {
 
         {/* Optional Section */}
         {loanUserDetails === undefined ||
-        loanUserDetails?.loanDocumentDetails !== undefined ? (
+        loanUserDetails?.loanDocumentDetails === undefined ? (
           <UpdateProfileBtn
             title="Complete Account Setup !!!"
             body="Click here to update your profile details"
