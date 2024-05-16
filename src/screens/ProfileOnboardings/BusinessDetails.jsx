@@ -29,6 +29,7 @@ import Loader from '../../component/loader/loader';
 import COLORS from '../../constants/colors';
 const countryList = require('country-list');
 import {SelectList} from 'react-native-dropdown-select-list';
+import {Location} from '../../constants/location';
 
 const businessTypeData = [
   {value: '', label: 'Select type'},
@@ -171,10 +172,12 @@ const BusinessDetails = () => {
   const [errors, setErrors] = useState({});
   const route = useRoute();
   const previousRoute = navigation.getState()?.routes.slice(-2)[0]?.name;
-  const countries = countryList.getData().map(country => ({
-    value: country.name,
-    label: country.name,
-  }));
+  const countries =
+    countryList?.getData() &&
+    countryList?.getData()?.map(country => ({
+      value: country.name,
+      label: country.name,
+    }));
 
   const [businessDetails, setBusinessDetails] = useState({
     businessType: '',
@@ -325,15 +328,15 @@ const BusinessDetails = () => {
   }, [orgDetails, navigation]);
 
   const disableit =
-    !businessDetails.businessType ||
-    !businessDetails.businessName ||
-    !businessDetails.businessAddress ||
-    !businessDetails.state ||
-    !businessDetails.positionInOrg ||
-    !businessDetails.totalEmployees ||
-    !businessDetails.industry ||
-    !businessDetails.monthlyExpenses ||
-    !businessDetails.monthlySales;
+    !businessDetails?.businessType ||
+    !businessDetails?.businessName ||
+    !businessDetails?.businessAddress ||
+    !businessDetails?.state ||
+    !businessDetails?.positionInOrg ||
+    !businessDetails?.totalEmployees ||
+    !businessDetails?.industry ||
+    !businessDetails?.monthlyExpenses ||
+    !businessDetails?.monthlySales;
 
   const showDatePicker = () => {
     setShow(true);
@@ -448,25 +451,17 @@ const BusinessDetails = () => {
     }
   };
 
+  // new local state Logic
   useLayoutEffect(() => {
     const fetchState = async () => {
-      try {
-        const res = await getState();
-        if (res?.data !== undefined) {
-          res?.data &&
-            res?.data?.length > 0 &&
-            res?.data.map((item, index) => {
-              currentState.push({
-                value: item,
-                label: item,
-                key: index + 1,
-              });
-            });
-        }
-        dispatch(setReduxState(res?.data));
-      } catch (error) {}
+      Location?.map((item, index) => {
+        currentState.push({
+          value: item.state,
+          label: item.state,
+          key: index + 1,
+        });
+      });
     };
-
     fetchState();
     return () => {
       fetchState();
@@ -479,7 +474,6 @@ const BusinessDetails = () => {
       setIsLoading(false);
     }, 2000);
   }, []);
-
 
   const handleError = (error, input) => {
     setErrors(prevState => ({...prevState, [input]: error}));
@@ -497,7 +491,7 @@ const BusinessDetails = () => {
       }}>
       <Loader visible={isLoading} loadingText={'Please wait...'} />
       <Loader visible={isUpdating} loadingText={'Storing business data...'} />
-      
+
       <View
         style={{
           flexDirection: 'row',
@@ -569,7 +563,7 @@ const BusinessDetails = () => {
                   maxHeight={300}
                   labelField="label"
                   valueField="value"
-                  value={businessDetails.businessType}
+                  value={businessDetails?.businessType}
                   onChange={option => {
                     setBusinessDetails({
                       ...businessDetails,
@@ -604,7 +598,7 @@ const BusinessDetails = () => {
                   maxHeight={300}
                   labelField="label"
                   valueField="value"
-                  value={businessDetails.registered}
+                  value={businessDetails?.registered}
                   onChange={option => {
                     setBusinessDetails({
                       ...businessDetails,
@@ -639,8 +633,8 @@ const BusinessDetails = () => {
                   placeholder="2000 - 01 - 01"
                   iconName="calendar-month-outline"
                   defaultValue={
-                    businessDetails.establishmentDate
-                      ? businessDetails.establishmentDate?.substr(0, 10)
+                    businessDetails?.establishmentDate
+                      ? businessDetails?.establishmentDate?.substr(0, 10)
                       : ''
                   }
                   isDate={true}
@@ -696,8 +690,8 @@ const BusinessDetails = () => {
                   label="When did you move to this address?"
                   placeholder="2000 - 01 - 01"
                   defaultValue={
-                    businessDetails.whenDidYouMoveToThisBusinessLocation
-                      ? businessDetails.whenDidYouMoveToThisBusinessLocation?.substr(
+                    businessDetails?.whenDidYouMoveToThisBusinessLocation
+                      ? businessDetails?.whenDidYouMoveToThisBusinessLocation?.substr(
                           0,
                           10,
                         )
@@ -795,13 +789,13 @@ const BusinessDetails = () => {
                     maxHeight={300}
                     labelField="label"
                     valueField="value"
-                    value={businessDetails.state}
+                    value={businessDetails?.state}
                     defaultValue={
                       businessDetails?.state && businessDetails?.state
                     }
                     onChange={option => {
                       if (
-                        businessDetails.country === 'Nigeria' &&
+                        businessDetails?.country === 'Nigeria' &&
                         option.value === 'Outside Nigeria'
                       ) {
                         setBusinessDetails({
@@ -828,29 +822,26 @@ const BusinessDetails = () => {
                         });
 
                         //Get cities by state
-                        getCity(option.value)
-                          .then(res => {
-                            fetchedCity = [
-                              {value: '', label: '...Select LGA'},
-                              {
-                                value: 'Outside Nigeria',
-                                label: 'Outside Nigeria',
-                                key: 0,
-                              },
-                            ];
-
-                            fetchedCity;
-                            res?.data &&
-                              res?.data?.length > 0 &&
-                              res?.data.map((item, index) => {
-                                fetchedCity.push({
-                                  value: item,
-                                  label: item,
-                                  key: index,
-                                });
-                              });
-                          })
-                          .catch(err => {});
+                        const lgaData = Location?.find(
+                          item => item.state === option.value,
+                        );
+                        if (lgaData) {
+                          fetchedCity = [
+                            {value: '', label: '...Select LGA'},
+                            {
+                              value: 'Outside Nigeria',
+                              label: 'Outside Nigeria',
+                              key: 0,
+                            },
+                          ];
+                          lgaData?.lgas.map((item, index) => {
+                            fetchedCity.push({
+                              value: item,
+                              label: item,
+                              key: index + 1,
+                            });
+                          });
+                        }
                       }
                     }}
                   />
@@ -869,17 +860,17 @@ const BusinessDetails = () => {
                     placeholderStyle={styles.placeholderStyle}
                     selectedTextStyle={styles.selectedTextStyle}
                     data={fetchedCity.length > 0 ? fetchedCity : cityData}
-                    disabled={!businessDetails.state}
+                    disabled={!businessDetails?.state}
                     maxHeight={300}
                     labelField="label"
                     valueField="value"
-                    value={businessDetails.city}
+                    value={businessDetails?.city}
                     defaultValue={
                       businessDetails?.city && businessDetails?.city
                     }
                     onChange={option => {
                       if (
-                        businessDetails.country === 'Nigeria' &&
+                        businessDetails?.country === 'Nigeria' &&
                         option.value === 'Outside Nigeria'
                       ) {
                         setBusinessDetails({
@@ -974,7 +965,7 @@ const BusinessDetails = () => {
                   maxHeight={300}
                   labelField="label"
                   valueField="value"
-                  value={businessDetails.shariaCom}
+                  value={businessDetails?.shariaCom}
                   onChange={option => {
                     setBusinessDetails({
                       ...businessDetails,
@@ -1007,7 +998,7 @@ const BusinessDetails = () => {
                   maxHeight={300}
                   labelField="label"
                   valueField="value"
-                  value={businessDetails.salesMethod}
+                  value={businessDetails?.salesMethod}
                   onChange={option => {
                     setBusinessDetails({
                       ...businessDetails,
@@ -1027,7 +1018,7 @@ const BusinessDetails = () => {
                   maxHeight={300}
                   labelField="label"
                   valueField="value"
-                  value={businessDetails.industry}
+                  value={businessDetails?.industry}
                   onChange={option => {
                     setBusinessDetails({
                       ...businessDetails,
@@ -1047,7 +1038,7 @@ const BusinessDetails = () => {
                   maxHeight={300}
                   labelField="label"
                   valueField="value"
-                  value={businessDetails.monthlySales}
+                  value={businessDetails?.monthlySales}
                   onChange={option => {
                     setBusinessDetails({
                       ...businessDetails,
@@ -1067,7 +1058,7 @@ const BusinessDetails = () => {
                   maxHeight={300}
                   labelField="label"
                   valueField="value"
-                  value={businessDetails.monthlyExpenses}
+                  value={businessDetails?.monthlyExpenses}
                   onChange={option => {
                     setBusinessDetails({
                       ...businessDetails,
@@ -1087,7 +1078,7 @@ const BusinessDetails = () => {
                   maxHeight={300}
                   labelField="label"
                   valueField="value"
-                  value={businessDetails.businessDuration}
+                  value={businessDetails?.businessDuration}
                   onChange={option => {
                     setBusinessDetails({
                       ...businessDetails,
