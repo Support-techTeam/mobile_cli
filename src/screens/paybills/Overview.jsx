@@ -13,6 +13,7 @@ import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 import Loader from '../../component/loader/loader';
 import {Header} from '../../component/header/Header';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import IconFw from 'react-native-vector-icons/FontAwesome';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -458,7 +459,7 @@ const Overview = () => {
                 searchPlaceholder="Search for account"
                 search={false}
                 boxStyles={styles.inputContainer}
-                closeicon={<Icon name="times-circle" size={26} color="#000" />}
+                closeicon={<IconFw name="times-circle" size={26} color="#000" />}
                 dropdownStyles={{
                   paddingHorizontal: 10,
                   marginTop: 2,
@@ -778,7 +779,7 @@ const Overview = () => {
                 searchPlaceholder="Search for account"
                 search={false}
                 boxStyles={styles.inputContainer}
-                closeicon={<Icon name="times-circle" size={26} color="#000" />}
+                closeicon={<IconFw name="times-circle" size={26} color="#000" />}
                 dropdownStyles={{
                   paddingHorizontal: 10,
                   marginTop: 2,
@@ -1084,7 +1085,7 @@ const Overview = () => {
                 searchPlaceholder="Search for account"
                 search={false}
                 boxStyles={styles.inputContainer}
-                closeicon={<Icon name="times-circle" size={26} color="#000" />}
+                closeicon={<IconFw name="times-circle" size={26} color="#000" />}
                 dropdownStyles={{
                   paddingHorizontal: 10,
                   marginTop: 2,
@@ -1462,7 +1463,7 @@ const Overview = () => {
                 searchPlaceholder="Search for account"
                 search={false}
                 boxStyles={styles.inputContainer}
-                closeicon={<Icon name="times-circle" size={26} color="#000" />}
+                closeicon={<IconFw name="times-circle" size={26} color="#000" />}
                 dropdownStyles={{
                   paddingHorizontal: 10,
                   marginTop: 2,
