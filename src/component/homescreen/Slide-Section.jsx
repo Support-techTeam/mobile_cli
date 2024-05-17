@@ -1,5 +1,5 @@
 import {useNavigation} from '@react-navigation/native';
-import React, {useRef, useState} from 'react';
+import React, {useRef, useState, useEffect} from 'react';
 import {
   StyleSheet,
   View,
@@ -15,6 +15,9 @@ import LinearGradient from 'react-native-linear-gradient';
 import EntypoIcon from 'react-native-vector-icons/Entypo';
 import COLORS from '../../constants/colors';
 import Carousel, {Pagination} from 'react-native-snap-carousel';
+import {useDispatch, useSelector} from 'react-redux';
+import {getSeerbitWalletBalance} from '../../stores/WalletStore';
+import {setBalanceSB} from '../../util/redux/userProfile/user.profile.slice';
 
 const SLIDE_WIDTH = Dimensions.get('window').width;
 const ITEM_WIDTH = SLIDE_WIDTH - 60;
@@ -32,12 +35,52 @@ export const SlideSection = props => {
     toggleFundWallet,
     handleLongPress,
     userMultiWalletData,
-    seerbitWalletBalance,
+    // seerbitWalletBalance,
     handleCreateSecondWallet,
   } = props;
   const navigation = useNavigation();
   const carouselRef = useRef(null);
   const [index, setIndex] = useState(0);
+  const dispatch = useDispatch();
+
+  const [seerbitWalletBalance, setSeerbitWalletBalance] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      unsubGetSeerbitWalletBalance();
+    }, 30000);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, []);
+
+  // Get seerbit balance
+  const unsubGetSeerbitWalletBalance = async () => {
+    try {
+      if (userMultiWalletData && userMultiWalletData?.length > 0) {
+        const selectedData = userMultiWalletData.find(
+          walletData => walletData?.walletIdAccountNumber[0] === '4',
+        );
+        if (
+          selectedData?.pocketId !== null &&
+          selectedData?.pocketId !== undefined
+        ) {
+          getSeerbitWalletBalance(selectedData?.pocketId)
+            .then(res => {
+              if (res) {
+                if (!res?.error) {
+                  dispatch(setBalanceSB(res?.data));
+                  setSeerbitWalletBalance(res?.data);
+                }
+              }
+            })
+            .catch(e => {})
+            .finally(() => {});
+        }
+      }
+    } catch (e) {}
+  };
 
   const slides =
     userMultiWalletData && userMultiWalletData.length === 1
@@ -487,7 +530,9 @@ export const SlideSection = props => {
                               fontWeight: '400',
                               textAlign: 'right',
                             }}>
-                            {item.banker === "Providus" ? "Providus Bank" : item.banker}
+                            {item.banker === 'Providus'
+                              ? 'Providus Bank'
+                              : item.banker}
                           </Text>
                           <View
                             style={{
@@ -534,7 +579,9 @@ export const SlideSection = props => {
                               fontWeight: '400',
                               textAlign: 'right',
                             }}>
-                            {item.banker === "Providus" ? "Providus Bank" : item.banker}
+                            {item.banker === 'Providus'
+                              ? 'Providus Bank'
+                              : item.banker}
                           </Text>
                           <View
                             style={{
@@ -611,7 +658,9 @@ export const SlideSection = props => {
                             fontWeight: '400',
                             textAlign: 'right',
                           }}>
-                          {item.banker === "Providus" ? "Providus Bank" : item.banker}
+                          {item.banker === 'Providus'
+                            ? 'Providus Bank'
+                            : item.banker}
                         </Text>
                         <View
                           style={{
