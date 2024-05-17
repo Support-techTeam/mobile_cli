@@ -121,7 +121,6 @@ const Homescreen = () => {
   const [adverts, setAdverts] = useState([]);
   const [isLoadingMultipleWallets, setIsLoadingMultipleWallets] =
     useState(true);
-  // const [seerbitBalance, setSeerbitBalance] = useState(0);
   const toggleHideBalance = () => {
     setHideBalance(!hideBalance);
   };
@@ -180,13 +179,14 @@ const Homescreen = () => {
       getLoanUserData();
       unsubGetLoanAmount();
       unsubGetAllAdverts();
-      unsubGetSeerbitWalletBalance();
+      // unsubGetSeerbitWalletBalance();
       handleGetAllBanks();
       handleGetAllSeerbitBanks();
     }, []),
   );
 
   // // Timed useEffect
+  //get account details
   useEffect(() => {
     const interval = setInterval(async () => {
       getAccountWallet()
@@ -211,6 +211,7 @@ const Homescreen = () => {
     };
   }, []);
 
+  // get wallet details
   useEffect(() => {
     const interval = setInterval(async () => {
       unsubGetMultipleWallets();
@@ -221,6 +222,7 @@ const Homescreen = () => {
     };
   }, []);
 
+  // get transactions
   useEffect(() => {
     const interval = setInterval(async () => {
       const res = await getAccountTransactions();
@@ -294,7 +296,7 @@ const Homescreen = () => {
             .then(res => {
               if (res) {
                 if (!res?.error) {
-                  dispatch(setBalanceSB(res?.data));
+                    dispatch(setBalanceSB(res?.data));
                 }
               }
             })
@@ -306,7 +308,6 @@ const Homescreen = () => {
       }
     } catch (e) {}
   };
-
 
   const unsubGetAllTransactions = async () => {
     setIsLoading(true);
@@ -1045,7 +1046,7 @@ const Homescreen = () => {
           toggleHideBalance={toggleHideBalance}
           handleLongPress={handleLongPress}
           toggleFundWallet={toggleFundWallet}
-          seerbitWalletBalance={seerbitBalance}
+          // seerbitWalletBalance={seerbitBalance}
           handleCreateSecondWallet={handleWalletCreation}
         />
       </>

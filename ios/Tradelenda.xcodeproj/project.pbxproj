@@ -638,7 +638,7 @@
 				CODE_SIGN_IDENTITY = "Apple Distribution: TRADE LENDA COM LIMITED (BZG5ZNL62R)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Distribution: TRADE LENDA COM LIMITED (BZG5ZNL62R)";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 15;
+				CURRENT_PROJECT_VERSION = 46;
 				DEVELOPMENT_TEAM = BZG5ZNL62R;
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = BZG5ZNL62R;
 				ENABLE_BITCODE = NO;
@@ -650,7 +650,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 3.0.8;
+				MARKETING_VERSION = 3.10.3;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -680,7 +680,7 @@
 				CODE_SIGN_IDENTITY = "Apple Distribution: TRADE LENDA COM LIMITED (BZG5ZNL62R)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Distribution: TRADE LENDA COM LIMITED (BZG5ZNL62R)";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 15;
+				CURRENT_PROJECT_VERSION = 46;
 				DEVELOPMENT_TEAM = BZG5ZNL62R;
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = BZG5ZNL62R;
 				INFOPLIST_FILE = Tradelenda/Info.plist;
@@ -691,7 +691,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 3.0.8;
+				MARKETING_VERSION = 3.10.3;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
